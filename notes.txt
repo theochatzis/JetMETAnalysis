@@ -1,0 +1,8 @@
+
+* re-ran hlt-like reconstruction on Phase-2 RAW samples: VBF_HiggsToInvisible_{NoPU, PU140, PU200}
+
+* HLT-like MET collections:
+  - started from HLT-like particleFlow collection provided by TSG (S. Gennai)
+  - used it to create PF-MET, PF-MET-Type1, Puppi-MET and Puppi-MET-Type1 with standard offline EDProducers (e.g. PFMETProducer)
+
+* compared to GEN (genMetTrue) and offline (slimmedMETs and slimmedMETsPuppi collections from corresponding MINIAODSIM samples)
