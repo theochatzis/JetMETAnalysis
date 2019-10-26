@@ -3,6 +3,7 @@ import argparse
 import os
 import glob
 import array
+import math
 import ROOT
 
 from common.utils import *
@@ -32,13 +33,13 @@ output_histos_dict['offlineNPV'] = [10*_tmp for _tmp in range(40+1)]
 
 for i_met in METCollections:
     output_histos_dict[i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 700, 800, 1000]
-    output_histos_dict[i_met+'_phi'] = [3.1416*(2./40*_tmp-1) for _tmp in range(40+1)]
+    output_histos_dict[i_met+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
     output_histos_dict[i_met+'_sumEt'] = [0, 30, 60, 90, 120, 180, 250, 400, 600, 800, 1000, 1500, 2000, 3000]
 
     if i_met == 'genMetTrue': continue
 
     output_histos_dict[i_met+'_pt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
-    output_histos_dict[i_met+'_phi_minusGEN'] = [-2.5+0.1*_tmp for _tmp in range(50+1)]
+    output_histos_dict[i_met+'_phi_minusGEN'] = [math.pi/40*_tmp for _tmp in range(40+1)]
     output_histos_dict[i_met+'_sumEt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
 
     output_histos_dict[i_met+'_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
@@ -69,7 +70,12 @@ def analyze_event(event, histograms):
         if i_met == 'genMetTrue': continue
 
         for i_var in ['pt', 'phi', 'sumEt']:
+
             values[i_met+'_'+i_var+'_minusGEN'] = values[i_met+'_'+i_var] - values['genMetTrue_'+i_var]
+            if i_var == 'phi':
+               values[i_met+'_'+i_var+'_minusGEN'] = abs(values[i_met+'_'+i_var+'_minusGEN'])
+               if values[i_met+'_'+i_var+'_minusGEN'] > math.pi:
+                  values[i_met+'_'+i_var+'_minusGEN'] = 2*math.pi - values[i_met+'_'+i_var+'_minusGEN']
 
             if values['genMetTrue_'+i_var] != 0:
                values[i_met+'_'+i_var+'_overGEN'] = values[i_met+'_'+i_var] / values['genMetTrue_'+i_var]
