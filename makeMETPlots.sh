@@ -4,11 +4,15 @@ NoPU=/home/missirol/Desktop/VBF_HToInvisible_M125_14TeV_NoPU_temp.root
 PU140=/home/missirol/Desktop/VBF_HToInvisible_M125_14TeV_PU140_temp.root
 PU200=/home/missirol/Desktop/VBF_HToInvisible_M125_14TeV_PU200_temp.root
 
-ODIR=tmptmp
+ODIR=output_191027
 
 ### ----------
 
-if [ -d ${ODIR} ]; then exit 1; fi;
+if [ -d ${ODIR} ]; then
+
+  printf "\n%s\n\n" " >> execution stopped --> target output directory already exists: ${ODIR}"
+  exit 1
+fi
 
 mkdir -p ${ODIR}
 
