@@ -115,11 +115,13 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
         histo = Histogram()
         histo.th1 = _tmp['TH1']
-        histo.draw = _tmp['draw'] + bool((h0 is not None) and histo.th1.InheritsFrom('TH1'))*',same'
+        histo.draw = _tmp['draw']
         histo.legendName = _tmp['legendName']
         histo.legendDraw = _tmp['legendDraw']
 
         if histo.th1 is not None:
+
+           histo.draw = histo.draw + bool(histo.th1.InheritsFrom('TH1'))*',same'
 
            if h0 is None: h0 = histo.th1
 
@@ -156,17 +158,21 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
     canvas.cd()
 
+    XMIN, XMAX = xMin, xMax
+    if XMIN is None: XMIN = h0.GetBinLowEdge(1)
+    if XMAX is None: XMAX = h0.GetBinLowEdge(1+h0.GetNbinsX())
+
     HMAX = 0.0
     for _tmp in plot_histograms:
         if (_tmp.th1 is not None) and hasattr(_tmp.th1, 'GetNbinsX'):
            for i_bin in range(1, _tmp.th1.GetNbinsX()+1):
                HMAX = max(HMAX, (_tmp.th1.GetBinContent(i_bin) + _tmp.th1.GetBinError(i_bin)))
 
-    XMIN, XMAX = xMin, xMax
-    if XMIN is None: XMIN = h0.GetBinLowEdge(1)
-    if XMAX is None: XMAX = h0.GetBinLowEdge(1+h0.GetNbinsX())
-
     YMIN, YMAX = yMin, yMax
+    if YMIN is None: YMIN = .0003 if logY else .0001
+    if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001) *(1./.85))
+
+    h0 = canvas.DrawFrame(XMIN, YMIN, XMAX, YMAX)
 
     if not ratio:
 
@@ -178,19 +184,12 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
        for _tmp in plot_histograms:
            if _tmp.th1 is not None:
-              print _tmp.draw
               _tmp.th1.Draw(_tmp.draw)
 
-       if h0:
-          h0.Draw('axis,same')
-          h0.GetXaxis().SetTitle(title.split(';')[0])
-          h0.GetYaxis().SetTitle(title.split(';')[1])
-          h0.GetXaxis().SetRangeUser(XMIN, XMAX)
-
-          if YMIN is None: YMIN = .0003 if logY else .0001
-          if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001) *(1./.85))
-
-          h0.GetYaxis().SetRangeUser(YMIN, YMAX)
+       h0.Draw('axis,same')
+       h0.SetTitle(title)
+#       h0.GetXaxis().SetRangeUser(XMIN, XMAX)
+#       h0.GetYaxis().SetRangeUser(YMIN, YMAX)
 
        if leg: leg.Draw('same')
 
@@ -227,7 +226,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
        h11.Draw('axis,same')
        h11.GetXaxis().SetTitle('')
-       h11.GetYaxis().SetTitle(title.split(';')[1])
+       h11.GetYaxis().SetTitle(title.split(';')[2])
        h11.GetXaxis().SetRangeUser(XMIN, XMAX)
 
        h11.GetYaxis().SetTitleSize(h11.GetYaxis().GetTitleSize()/pad1H)
@@ -305,7 +304,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
        h21.SetFillStyle(3017)
        h21.SetFillColor(16)
 
-       h21.GetXaxis().SetTitle(title.split(';')[0])
+       h21.GetXaxis().SetTitle(title.split(';')[1])
        h21.GetYaxis().SetTitle('X/GEN')
        h21.GetYaxis().CenterTitle()
        h21.GetXaxis().SetTitleSize(h21.GetXaxis().GetTitleSize()/(1-pad1H))
@@ -446,68 +445,6 @@ if __name__ == '__main__':
 
    label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, 'VBF_H125ToInv_14TeV')
 
-   ### Turn-on curves
-
-   # efficiency TGraphs
-   efficiencies = {}
-
-   pt_binEdges = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 700, 800, 1000]
-
-   for pu_tag in ['NoPU', 'PU140', 'PU200']:
-
-       efficiencies[pu_tag] = {}
-
-       for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
-
-           hNum = get_rebinned_histo(clone_histogram(histograms, pu_tag, 'hltPFMET200/'+i_met), pt_binEdges)
-           hDen = get_rebinned_histo(clone_histogram(histograms, pu_tag, i_met), pt_binEdges)
-
-           efficiencies[pu_tag][i_met] = get_efficiency_graph(hNum, hDen)
-
-   outtt = ROOT.TFile('tmp.root', 'recreate')
-   outtt.cd()
-   for a in efficiencies:
-       for b in efficiencies[a]:
-           efficiencies[a][b].Write(a+'__'+b)
-   outtt.Close()
-
-
-   label_eff = get_text(Lef+(1-Lef-Rig)*0.05, Bot+(1-Bot-Top)*0.95, 13, .040, 'HLT-like PF-MET > 200 GeV')
-
-   # Turn-on curves: MET pT
-   for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
-
-       label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
-
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.45, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.45],
-
-         stickers=[label_sample, label_var, label_eff], output=opts.output+'/Eff_hltPFMET200/'+i_met,
-
-         templates=[
-
-           {'TH1': clone_graph(efficiencies, 'NoPU', 'genMetTrue_pt', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'lepa', 'legendName': 'NoPU', 'legendDraw': 'lep'},
-         ],
-
-         logX = False,
-
-         ratio = False,
-
-         xMin = 10,
-         xMax = 1000,
-
-         yMin = 0.0,
-         yMax = 1.2,
-
-         normalizedToUnity = False,
-
-         title = i_met+' [GeV];Efficiency;',
-       )
-
-       raise SystemExit
-
-
-
-
    ### 1D Comparisons
 
    for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPuppiMET', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
@@ -536,11 +473,11 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET [GeV];Fraction Of Events;',
+         title = ';MET [GeV];Fraction Of Events',
        )
 
        # phi
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
 
          stickers=[label_sample, label_var], output=opts.output+'/PU/'+i_met+'_phi',
 
@@ -559,7 +496,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #phi [GeV];Fraction Of Events;',
+         title = ';MET #phi [GeV];Fraction Of Events',
        )
 
        # pT response (Ratio wrt GEN)
@@ -582,7 +519,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET response (Ratio wrt GEN);Fraction Of Events;',
+         title = ';MET response (Ratio wrt GEN);Fraction Of Events',
        )
 
        # pT Delta GEN (X - GEN)
@@ -605,7 +542,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #Deltap_{T} (X - GEN);Fraction Of Events;',
+         title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
        )
 
        # phi response (Ratio wrt GEN)
@@ -628,7 +565,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #phi response (Ratio wrt GEN);Fraction Of Events;',
+         title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
        )
 
        # phi Delta GEN (X - GEN)
@@ -651,7 +588,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #Delta#phi (X - GEN);Fraction Of Events;',
+         title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
        )
 
    for pu_tag in ['NoPU', 'PU140', 'PU200']:
@@ -682,7 +619,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET [GeV];Fraction Of Events;',
+         title = ';MET [GeV];Fraction Of Events',
        )
 
        # phi
@@ -707,7 +644,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #phi;Fraction Of Events;',
+         title = ';MET #phi;Fraction Of Events',
        )
 
        # pT response (Ratio wrt GEN)
@@ -725,7 +662,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET response (Ratio wrt GEN);Fraction Of Events;',
+         title = ';MET response (Ratio wrt GEN);Fraction Of Events',
        )
 
        # Phi response (Ratio wrt GEN)
@@ -743,7 +680,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #phi response (Ratio wrt GEN);Fraction Of Events;',
+         title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
        )
 
        # pT Delta GEN
@@ -761,7 +698,7 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #Deltap_{T} (X - GEN);Fraction Of Events;',
+         title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
        )
 
        # Phi Delta GEN
@@ -779,7 +716,64 @@ if __name__ == '__main__':
 
          normalizedToUnity = True,
 
-         title = 'MET #Delta#phi (X - GEN);Fraction Of Events;',
+         title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
+       )
+
+   ### Turn-on curves
+
+   # efficiency TGraphs
+   efficiencies = {}
+
+   pt_binEdges = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
+
+   for pu_tag in ['NoPU', 'PU140', 'PU200']:
+
+       efficiencies[pu_tag] = {}
+
+       for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
+
+           hNum_0 = clone_histogram(histograms, pu_tag, 'hltPFMET200/'+i_met)
+           hDen_0 = clone_histogram(histograms, pu_tag, i_met)
+
+           if (hNum_0 is None) or (hDen_0 is None): continue
+
+           hNum = get_rebinned_histo(hNum_0, pt_binEdges)
+           hDen = get_rebinned_histo(hDen_0, pt_binEdges)
+
+           efficiencies[pu_tag][i_met] = get_efficiency_graph(hNum, hDen)
+
+   label_eff = get_pavetext(Lef+(1-Lef-Rig)*0.05, Bot+(1-Bot-Top)*0.85, Lef+(1-Lef-Rig)*0.55, Bot+(1-Bot-Top)*0.95, 0.035, 'HLT-like PF-MET > 200 GeV')
+   label_eff.SetFillColor(ROOT.kWhite)
+
+   # Turn-on curves: MET pT
+   for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
+
+       label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
+
+       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
+
+         stickers=[label_sample, label_var, label_eff], output=opts.output+'/Eff_hltPFMET200/'+i_met,
+
+         templates=[
+
+           {'TH1': clone_graph(efficiencies, 'NoPU', i_met, {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_graph(efficiencies, 'PU140', i_met, {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_graph(efficiencies, 'PU200', i_met, {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'PU200', 'legendDraw': 'l'},
+         ],
+
+         logX = False,
+
+         ratio = False,
+
+         xMin = 40,
+         xMax = 800,
+
+         yMin = 0.0,
+         yMax = 1.25,
+
+         normalizedToUnity = False,
+
+         title = ';'+i_met+' [GeV];Efficiency',
        )
 
    print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', opts.output

@@ -6,21 +6,21 @@ from utils import *
 def color(hexc):
     return ROOT.TColor.GetColor(hexc)
 
-def get_text(x1ndc_, y1ndc_, talign_, tsize_, text_):
-    txt = ROOT.TLatex(x1ndc_, y1ndc_, text_)
-    txt.SetTextAlign(talign_)
-    txt.SetTextSize(tsize_)
+def get_text(x1ndc, y1ndc, textAlign, textSize, text):
+    txt = ROOT.TLatex(x1ndc, y1ndc, text)
+    txt.SetTextAlign(textAlign)
+    txt.SetTextSize(textSize)
     txt.SetTextFont(42)
     txt.SetNDC()
 
     return txt
 
-def get_pavetext(x1ndc_, y1ndc_, x2ndc_, y2ndc_, tsize_, text_):
-    txt = ROOT.TPaveText(x1ndc_, y1ndc_, x2ndc_, y2ndc_, 'NDC')
-    txt.SetTextSize(tsize_)
-    txt.SetTextFont(42)
-    txt.AddText(text_)
+def get_pavetext(x1ndc, y1ndc, x2ndc, y2ndc, textSize, text):
+    txt = ROOT.TPaveText(x1ndc, y1ndc, x2ndc, y2ndc, 'NDC')
 #    txt.SetNDC()
+    txt.SetTextSize(textSize)
+    txt.SetTextFont(42)
+    txt.AddText(text)
 
     return txt
 

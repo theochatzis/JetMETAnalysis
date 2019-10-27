@@ -32,7 +32,7 @@ output_histos_dict['hltNPV'] = [10*_tmp for _tmp in range(40+1)]
 output_histos_dict['offlineNPV'] = [10*_tmp for _tmp in range(40+1)]
 
 for i_met in METCollections:
-    output_histos_dict[i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 700, 800, 1000]
+    output_histos_dict[i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
     output_histos_dict[i_met+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
     output_histos_dict[i_met+'_sumEt'] = [0, 30, 60, 90, 120, 180, 250, 400, 600, 800, 1000, 1500, 2000, 3000]
 
@@ -50,7 +50,13 @@ for i_met in METCollections:
 
     if i_met.startswith('hlt'): continue
 
-    output_histos_dict['hltPFMET200/'+i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 700, 800, 1000]
+    output_histos_dict['hltPFMET200/'+i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
+
+for i_met in METCollections:
+
+    if i_met.startswith('hlt'): continue
+
+    output_histos_dict['hltPuppiMET200/'+i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
 
 #### Event Analysis ----------------------------------------------------------------------------------------------------------------
 
@@ -84,6 +90,11 @@ def analyze_event(event, histograms):
        for i_met in METCollections:
            if i_met.startswith('hlt'): continue
            values['hltPFMET200/'+i_met+'_pt'] = float(values[i_met+'_pt'])
+
+    if values['hltPuppiMET_pt'] > 200.:
+       for i_met in METCollections:
+           if i_met.startswith('hlt'): continue
+           values['hltPuppiMET200/'+i_met+'_pt'] = float(values[i_met+'_pt'])
 
     for i_val_key in values:
         histograms[i_val_key].Fill(values[i_val_key])
