@@ -63,7 +63,7 @@ def analyze_event(event, histograms):
 
     for i_met in METCollections:
         for i_var in ['pt', 'phi', 'sumEt']:
-            values[i_met+'_'+i_var] = getattr(event, i_met+'_'+i_var)[0]
+            values[i_met+'_'+i_var] = float(getattr(event, i_met+'_'+i_var)[0])
 
     for i_met in METCollections:
 
@@ -83,7 +83,7 @@ def analyze_event(event, histograms):
     if values['hltPFMET_pt'] > 200.:
        for i_met in METCollections:
            if i_met.startswith('hlt'): continue
-           values['hltPFMET200/'+i_met+'_pt'] = values[i_met+'_pt']
+           values['hltPFMET200/'+i_met+'_pt'] = float(values[i_met+'_pt'])
 
     for i_val_key in values:
         histograms[i_val_key].Fill(values[i_val_key])
@@ -205,12 +205,9 @@ if __name__ == '__main__':
           out_dir = getattr(output_tfile, 'Get' if output_tfile.Get(out_dir) else 'mkdir')(out_dir)
           out_dir.cd()
 
-       output_histos_dict[out_key] = th1_mergeUnderflowBinIntoFirstBin(output_histos_dict[out_key])
-       output_histos_dict[out_key] = th1_mergeOverflowBinIntoLastBin(output_histos_dict[out_key])
-
-       output_histos_dict[out_key].SetName(out_key)
-       output_histos_dict[out_key].SetTitle(out_key)
-       output_histos_dict[out_key].Write()
+       output_histos_dict[i_idx].SetName(out_key)
+       output_histos_dict[i_idx].SetTitle(out_key)
+       output_histos_dict[i_idx].Write()
 
 #   ROOT.gROOT.GetListOfFiles().Remove(output_tfile)
    output_tfile.Close()

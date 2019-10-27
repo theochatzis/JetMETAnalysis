@@ -7,10 +7,12 @@ import copy
 import ROOT
 
 from common.utils import *
+from common.th1 import *
+from common.efficiency import *
 from common.plot import *
 from common.plot_style import *
 
-def get_histogram(histograms, tag1, tag2, setters):
+def clone_histogram(histograms, tag1, tag2, setters={}):
 
     if tag1 not in histograms:
        return None
@@ -22,6 +24,9 @@ def get_histogram(histograms, tag1, tag2, setters):
     h0.UseCurrentStyle()
     h0.SetDirectory(0)
 
+    h0 = th1_mergeUnderflowBinIntoFirstBin(h0)
+    h0 = th1_mergeOverflowBinIntoLastBin(h0)
+
     h0.SetMarkerSize(0)
 
     for i_set in setters:
@@ -29,6 +34,26 @@ def get_histogram(histograms, tag1, tag2, setters):
            getattr(h0, 'Set'+i_set)(setters[i_set])
 
     return h0
+
+def clone_graph(graphs, tag1, tag2, setters={}):
+
+    if tag1 not in graphs:
+       return None
+
+    if tag2 not in graphs[tag1]:
+       return None
+
+    g0 = graphs[tag1][tag2]
+    g0.UseCurrentStyle()
+#    g0.SetDirectory(0)
+
+    g0.SetMarkerSize(0)
+
+    for i_set in setters:
+        if hasattr(g0, 'Set'+i_set):
+           getattr(g0, 'Set'+i_set)(setters[i_set])
+
+    return g0
 
 def updateDictionary(dictionary, TDirectory, prefix=''):
 
@@ -80,7 +105,7 @@ class Histogram:
         self.legendName = ''
         self.legendDraw = ''
 
-def plot(canvas, output_extensions, stickers, output, templates, title, legXY, divideByBinWidth=False, normalizedToUnity=False, xMin=None, xMax=None, logX=False, logY=False, ratio=False):
+def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[], divideByBinWidth=False, normalizedToUnity=False, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False, ratio=False):
 
     h0 = None
 
@@ -90,7 +115,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
 
         histo = Histogram()
         histo.th1 = _tmp['TH1']
-        histo.draw = _tmp['draw'] + bool(h0 is not None)*',same'
+        histo.draw = _tmp['draw'] + bool((h0 is not None) and histo.th1.InheritsFrom('TH1'))*',same'
         histo.legendName = _tmp['legendName']
         histo.legendDraw = _tmp['legendDraw']
 
@@ -99,7 +124,9 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
            if h0 is None: h0 = histo.th1
 
            histo.th1.SetBit(ROOT.TH1.kNoTitle)
-           histo.th1.SetStats(0)
+
+           if hasattr(histo.th1, 'SetStats'):
+              histo.th1.SetStats(0)
 
            if divideByBinWidth:
               histo.th1.Scale(1., 'width')
@@ -117,25 +144,29 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
     Bot = canvas.GetBottomMargin()
     Lef = canvas.GetLeftMargin()
 
-    leg = ROOT.TLegend(legXY[0], legXY[1], legXY[2], legXY[3])
-    leg.SetBorderSize(2)
-    leg.SetTextFont(42)
-    leg.SetFillColor(0)
-    for _tmp in plot_histograms:
-        if _tmp.th1 is not None:
-           leg.AddEntry(_tmp.th1, _tmp.legendName, _tmp.legendDraw)
+    leg = None
+    if len(legXY) == 4:
+       leg = ROOT.TLegend(legXY[0], legXY[1], legXY[2], legXY[3])
+       leg.SetBorderSize(2)
+       leg.SetTextFont(42)
+       leg.SetFillColor(0)
+       for _tmp in plot_histograms:
+           if _tmp.th1 is not None:
+              leg.AddEntry(_tmp.th1, _tmp.legendName, _tmp.legendDraw)
 
     canvas.cd()
 
     HMAX = 0.0
     for _tmp in plot_histograms:
-        if _tmp.th1 is not None:
+        if (_tmp.th1 is not None) and hasattr(_tmp.th1, 'GetNbinsX'):
            for i_bin in range(1, _tmp.th1.GetNbinsX()+1):
                HMAX = max(HMAX, (_tmp.th1.GetBinContent(i_bin) + _tmp.th1.GetBinError(i_bin)))
 
     XMIN, XMAX = xMin, xMax
     if XMIN is None: XMIN = h0.GetBinLowEdge(1)
     if XMAX is None: XMAX = h0.GetBinLowEdge(1+h0.GetNbinsX())
+
+    YMIN, YMAX = yMin, yMax
 
     if not ratio:
 
@@ -147,6 +178,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
 
        for _tmp in plot_histograms:
            if _tmp.th1 is not None:
+              print _tmp.draw
               _tmp.th1.Draw(_tmp.draw)
 
        if h0:
@@ -154,13 +186,17 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
           h0.GetXaxis().SetTitle(title.split(';')[0])
           h0.GetYaxis().SetTitle(title.split(';')[1])
           h0.GetXaxis().SetRangeUser(XMIN, XMAX)
-          if logY: h0.GetYaxis().SetRangeUser(.0003, .0003*((HMAX/.0003)**(1./.85)))
-          else:    h0.GetYaxis().SetRangeUser(.0001, .0001+((HMAX-.0001) *(1./.85)))
+
+          if YMIN is None: YMIN = .0003 if logY else .0001
+          if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001) *(1./.85))
+
+          h0.GetYaxis().SetRangeUser(YMIN, YMAX)
 
        if leg: leg.Draw('same')
 
        for _tmp in stickers:
-           _tmp.Draw('same')
+           if hasattr(_tmp, 'Draw'):
+              _tmp.Draw('same')
 
     else:
 
@@ -200,8 +236,10 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
        h11.GetYaxis().SetLabelSize (h11.GetYaxis().GetLabelSize() /pad1H)
        h11.GetXaxis().SetTickLength(h11.GetXaxis().GetTickLength()/pad1H)
 
-       if logY: h11.GetYaxis().SetRangeUser(.0003, .0003*((HMAX/.0003)**(1./.85)))
-       else:    h11.GetYaxis().SetRangeUser(.0001, .0001+((HMAX-.0001) *(1./.85)))
+       if YMIN is None: YMIN = .0003 if logY else .0001
+       if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001) *(1./.85))
+
+       h11.GetYaxis().SetRangeUser(YMIN, YMAX)
 
        if leg:
           leg.Draw('same')
@@ -211,8 +249,9 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
 
        stickers2 = []
        for _tmp in stickers:
-           _tmp2 = _tmp.Clone()
-           stickers2 += [_tmp2]
+           if hasattr(_tmp, 'Clone'):
+              _tmp2 = _tmp.Clone()
+              stickers2 += [_tmp2]
 
        for _tmp in stickers2:
            _tmp.Draw('same')
@@ -250,7 +289,9 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
            histo.legendName = _tmp.legendName
            histo.legendDraw = _tmp.legendDraw
 
-           histo.th1.SetStats(0)
+           if hasattr(histo.th1, 'SetStats'):
+              histo.th1.SetStats(0)
+
            histo.th1.Divide(denom)
 
            if h21 is None: h21 = histo.th1
@@ -321,50 +362,6 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY, d
         print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', os.path.relpath(out_file)
 
     return 0
-
-
-############
-############
-############METCollections = [
-############
-############  'genMetTrue',
-############
-############  'hltPFMET',
-############  'hltPFMETTypeOne',
-############  'hltPuppiMET',
-############  'hltPuppiMETWithPuppiForJets',
-############
-############  'offlineMETs_Raw',
-############  'offlineMETs_Type1',
-############  'offlineMETsPuppi_Raw',
-############  'offlineMETsPuppi_Type1',
-############]
-############
-############output_histos_dict = {}
-############
-############output_histos_dict['hltNPV'] = [10*_tmp for _tmp in range(40+1)]
-############output_histos_dict['offlineNPV'] = [10*_tmp for _tmp in range(40+1)]
-############
-############for i_met in METCollections:
-############    output_histos_dict[i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 700, 800, 1000]
-############    output_histos_dict[i_met+'_phi'] = [3.1416*(2./40*_tmp-1) for _tmp in range(40+1)]
-############    output_histos_dict[i_met+'_sumEt'] = [0, 30, 60, 90, 120, 180, 250, 400, 600, 800, 1000, 1500, 2000, 3000]
-############
-############    if i_met == 'genMetTrue': continue
-############
-############    output_histos_dict[i_met+'_pt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
-############    output_histos_dict[i_met+'_phi_minusGEN'] = [-2.5+0.1*_tmp for _tmp in range(50+1)]
-############    output_histos_dict[i_met+'_sumEt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
-############
-############    output_histos_dict[i_met+'_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
-############    output_histos_dict[i_met+'_phi_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
-############    output_histos_dict[i_met+'_sumEt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
-############
-############for i_met in METCollections:
-############
-############    if i_met.startswith('hlt'): continue
-############
-############    output_histos_dict['hltPFMET200/'+i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 700, 800, 1000]
 
 #### -------------------------------------------------------------------------------------------------------------------------------
 #### -------------------------------------------------------------------------------------------------------------------------------
@@ -449,7 +446,71 @@ if __name__ == '__main__':
 
    label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, 'VBF_H125ToInv_14TeV')
 
-   for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPuppiMET', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
+   ### Turn-on curves
+
+   # efficiency TGraphs
+   efficiencies = {}
+
+   pt_binEdges = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 250, 300, 400, 500, 600, 700, 800, 1000]
+
+   for pu_tag in ['NoPU', 'PU140', 'PU200']:
+
+       efficiencies[pu_tag] = {}
+
+       for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
+
+           hNum = get_rebinned_histo(clone_histogram(histograms, pu_tag, 'hltPFMET200/'+i_met), pt_binEdges)
+           hDen = get_rebinned_histo(clone_histogram(histograms, pu_tag, i_met), pt_binEdges)
+
+           efficiencies[pu_tag][i_met] = get_efficiency_graph(hNum, hDen)
+
+   outtt = ROOT.TFile('tmp.root', 'recreate')
+   outtt.cd()
+   for a in efficiencies:
+       for b in efficiencies[a]:
+           efficiencies[a][b].Write(a+'__'+b)
+   outtt.Close()
+
+
+   label_eff = get_text(Lef+(1-Lef-Rig)*0.05, Bot+(1-Bot-Top)*0.95, 13, .040, 'HLT-like PF-MET > 200 GeV')
+
+   # Turn-on curves: MET pT
+   for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
+
+       label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
+
+       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.45, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.45],
+
+         stickers=[label_sample, label_var, label_eff], output=opts.output+'/Eff_hltPFMET200/'+i_met,
+
+         templates=[
+
+           {'TH1': clone_graph(efficiencies, 'NoPU', 'genMetTrue_pt', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'lepa', 'legendName': 'NoPU', 'legendDraw': 'lep'},
+         ],
+
+         logX = False,
+
+         ratio = False,
+
+         xMin = 10,
+         xMax = 1000,
+
+         yMin = 0.0,
+         yMax = 1.2,
+
+         normalizedToUnity = False,
+
+         title = i_met+' [GeV];Efficiency;',
+       )
+
+       raise SystemExit
+
+
+
+
+   ### 1D Comparisons
+
+   for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPuppiMET', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
 
        label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
 
@@ -460,9 +521,9 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, 'NoPU', i_met+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU140', i_met+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU200', i_met+'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = True,
@@ -485,9 +546,9 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, 'NoPU', i_met+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU140', i_met+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU200', i_met+'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -508,9 +569,9 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, 'NoPU', i_met+'_pt_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU140', i_met+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU200', i_met+'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_pt_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -531,9 +592,9 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, 'NoPU', i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU140', i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU200', i_met+'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -554,9 +615,9 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, 'NoPU', i_met+'_phi_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU140', i_met+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU200', i_met+'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_phi_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -577,9 +638,9 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, 'NoPU', i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU140', i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, 'PU200', i_met+'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -604,11 +665,11 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, pu_tag, 'genMetTrue'            +'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMET'              +'_pt', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_pt', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'            +'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'              +'_pt', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_pt', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
          ],
 
          logX = True,
@@ -631,11 +692,11 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, pu_tag, 'genMetTrue'            +'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMET'              +'_phi', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_phi', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'            +'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'              +'_phi', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_phi', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -656,10 +717,10 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMET'              +'_pt_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_pt_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'              +'_pt_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_pt_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
          ],
 
          normalizedToUnity = True,
@@ -674,10 +735,10 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMET'              +'_phi_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_phi_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'              +'_phi_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_phi_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
          ],
 
          normalizedToUnity = True,
@@ -692,10 +753,10 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMET'              +'_pt_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_pt_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'              +'_pt_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_pt_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
          ],
 
          normalizedToUnity = True,
@@ -710,10 +771,10 @@ if __name__ == '__main__':
 
          templates=[
 
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMET'              +'_phi_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_phi_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': get_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'              +'_phi_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'       +'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT-like PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'     +'_phi_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
          ],
 
          normalizedToUnity = True,
