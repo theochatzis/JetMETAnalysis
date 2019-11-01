@@ -1,10 +1,10 @@
 #!/bin/bash
 
-NoPU=/home/missirol/Desktop/jmeTriggerNTuple_VBF_HToInvisible_M125_14TeV_NoPU.root
-PU140=/home/missirol/Desktop/jmeTriggerNTuple_VBF_HToInvisible_M125_14TeV_PU140.root
-PU200=/home/missirol/Desktop/jmeTriggerNTuple_VBF_HToInvisible_M125_14TeV_PU200_temp.root
+NoPU=/home/missirol/Desktop/JMETriggerNTuples/191030_inclAging1000Fix/jmeTriggerNtuple_VBF_HToInvisible_M125_14TeV_NoPU_temp.root
+PU140=/home/missirol/Desktop/JMETriggerNTuples/191030_inclAging1000Fix/jmeTriggerNtuple_VBF_HToInvisible_M125_14TeV_PU140_temp.root
+PU200=/home/missirol/Desktop/JMETriggerNTuples/191030_inclAging1000Fix/jmeTriggerNtuple_VBF_HToInvisible_M125_14TeV_PU200_temp.root
 
-ODIR=output_191028
+ODIR=output_191030
 
 ### ----------
 
@@ -16,7 +16,7 @@ fi
 
 mkdir -p ${ODIR}
 
-./metAnalysis.py -i ${NoPU} -o ${ODIR}/NoPU.root
+./metAnalysis.py -i ${NoPU}  -o ${ODIR}/NoPU.root
 ./metAnalysis.py -i ${PU140} -o ${ODIR}/PU140.root
 ./metAnalysis.py -i ${PU200} -o ${ODIR}/PU200.root
 

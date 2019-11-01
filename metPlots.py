@@ -281,7 +281,10 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
        for _tmp in plot_histograms:
 
            histo = Histogram()
-           histo.th1 = _tmp.th1.Clone()
+           if _tmp.th1 is not None:
+              histo.th1 = _tmp.th1.Clone()
+              histo.th1.Divide(denom)
+
            histo.draw = _tmp.draw
            if 'same' not in histo.draw: histo.draw += ',same'
 
@@ -290,8 +293,6 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
            if hasattr(histo.th1, 'SetStats'):
               histo.th1.SetStats(0)
-
-           histo.th1.Divide(denom)
 
            if h21 is None: h21 = histo.th1
 
@@ -362,11 +363,72 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
     return 0
 
-#### -------------------------------------------------------------------------------------------------------------------------------
-#### -------------------------------------------------------------------------------------------------------------------------------
-#### -------------------------------------------------------------------------------------------------------------------------------
+def get_templates(key, histograms, PU_tag, directory, var):
 
-#### main
+    the_templates = []
+
+    if key == 'PF_Raw':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMET_'+var, {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Raw', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Raw_'+var, {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Raw', 'legendDraw': 'l'},
+       ]
+
+    elif key == 'PF_Type1':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMETTypeOne_'+var, {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Type1_'+var, {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+       ]
+
+    elif key == 'Puppi_Raw':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMET_'+var, {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET Raw', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Raw_'+var, {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Raw', 'legendDraw': 'l'},
+       ]
+
+    elif key == 'Puppi_Type1':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMETTypeOne_'+var, {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET Type-1', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Type1_'+var, {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+       ]
+
+    elif key == 'HLT_Raw':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMET_'+var, {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Raw', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMET_'+var, {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET Raw', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMETNoPileUpJME_'+var, {'LineColor': ROOT.kGray, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT CHS-MET Raw', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltSoftKillerMET_'+var, {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT SoftKiller-MET Raw','legendDraw': 'l'},
+       ]
+
+    elif key == 'HLT_Type1':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMETTypeOne_'+var, {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMETTypeOne_'+var, {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET Type-1','legendDraw': 'l'},
+       ]
+
+    elif key == 'Offline_Raw':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Raw_'+var, {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Raw', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Raw_'+var, {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Raw', 'legendDraw': 'l'},
+       ]
+
+    elif key == 'Offline_Type1':
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Type1_'+var, {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Type1_'+var, {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
+       ]
+
+    return the_templates
+
+#### main --------------------------------------------------------------------------------------------------------------------------
+
 if __name__ == '__main__':
    ### args --------------
    parser = argparse.ArgumentParser()
@@ -448,619 +510,303 @@ if __name__ == '__main__':
    ### 1D Comparisons
    for i_sel in ['NoSelection/']:
 
-   for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPuppiMET', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
-
-       label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
-
-       # pT
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt',
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
-         ],
-
-         logX = True,
-
-         ratio = True,
-
-         xMin = 10,
-
-         divideByBinWidth = True,
-
-         normalizedToUnity = True,
-
-         title = ';MET [GeV];Fraction Of Events',
-       )
-
-       # phi
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
-
-         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi',
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = True,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi [GeV];Fraction Of Events',
-       )
-
-       # pT response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_overGEN',
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = False,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # pT Delta GEN (X - GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_minusGEN',
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = False,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
-       )
-
-       # phi response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_overGEN',
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = False,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # phi Delta GEN (X - GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_minusGEN',
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = False,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
-       )
-
-   for pu_tag in ['NoPU', 'PU140', 'PU200']:
-
-       label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
-
-       # pT
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_pt_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_pt', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         logX = True,
-
-         ratio = True,
-
-         xMin = 10,
-
-         divideByBinWidth = True,
-
-         normalizedToUnity = True,
-
-         title = ';MET [GeV];Fraction Of Events',
-       )
-
-       # phi
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_phi_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_phi', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = True,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi;Fraction Of Events',
-       )
-
-       # pT response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_pt_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_pt_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # Phi response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_phi_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_phi_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # pT Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_pt_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_pt_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
-       )
-
-       # Phi Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_phi_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_phi_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
-       )
-
-       # pT
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_pt_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         logX = True,
-
-         ratio = True,
-
-         xMin = 10,
-
-         divideByBinWidth = True,
-
-         normalizedToUnity = True,
-
-         title = ';MET [GeV];Fraction Of Events',
-       )
-
-       # phi
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_phi_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = True,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi;Fraction Of Events',
-       )
-
-       # pT response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_pt_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # Phi response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_phi_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # pT Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_pt_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
-       )
-
-       # Phi Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_phi_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
-       )
-
-       # pT
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_pt_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_pt', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         logX = True,
-
-         ratio = True,
-
-         xMin = 10,
-
-         divideByBinWidth = True,
-
-         normalizedToUnity = True,
-
-         title = ';MET [GeV];Fraction Of Events',
-       )
-
-       # phi
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_phi_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_phi', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = True,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi;Fraction Of Events',
-       )
-
-       # pT response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_pt_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_pt_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # Phi response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_phi_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_phi_overGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # pT Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_pt_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_pt_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
-       )
-
-       # Phi Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_phi_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETs_Type1'+'_phi_minusGEN', {'LineColor': ROOT.kCyan, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'offlineMETsPuppi_Type1'+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'offline Puppi-MET Type-1', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
-       )
-
-       # pT
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_pt_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPuppiMET'+'_pt', {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET', 'legendDraw': 'l'},
-         ],
-
-         logX = True,
-
-         ratio = True,
-
-         xMin = 10,
-
-         divideByBinWidth = True,
-
-         normalizedToUnity = True,
-
-         title = ';MET [GeV];Fraction Of Events',
-       )
-
-       # phi
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_phi_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'genMetTrue'+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'GEN', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPuppiMET'+'_phi', {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET', 'legendDraw': 'l'},
-         ],
-
-         logX = False,
-
-         ratio = True,
-
-         divideByBinWidth = False,
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi;Fraction Of Events',
-       )
-
-       # pT response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_pt_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPuppiMET'+'_pt_overGEN', {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # Phi response (Ratio wrt GEN)
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_phi_overGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi_overGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPuppiMET'+'_phi_overGEN', {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
-       )
-
-       # pT Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_pt_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_pt_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPuppiMET'+'_pt_minusGEN', {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
-       )
-
-       # Phi Delta GEN
-       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_phi_minusGEN_'+pu_tag,
-
-         templates=[
-
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMET'+'_phi_minusGEN', {'LineColor': ROOT.kOrange, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPFMETTypeOne'+'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT PF-MET Type-1', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, pu_tag, 'hltPuppiMET'+'_phi_minusGEN', {'LineColor': ROOT.kViolet, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'HLT Puppi-MET', 'legendDraw': 'l'},
-         ],
-
-         normalizedToUnity = True,
-
-         title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
-       )
+       for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPuppiMET', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
+
+           label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
+
+           # pT
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt',
+    
+             templates=[
+    
+               {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+    
+             logX = True,
+    
+             ratio = True,
+    
+             xMin = 10,
+    
+             divideByBinWidth = True,
+    
+             normalizedToUnity = True,
+    
+             title = ';MET [GeV];Fraction Of Events',
+           )
+    
+           # phi
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
+    
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi',
+    
+             templates=[
+    
+               {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+    
+             logX = False,
+    
+             ratio = True,
+    
+             divideByBinWidth = False,
+    
+             normalizedToUnity = True,
+    
+             title = ';MET #phi [GeV];Fraction Of Events',
+           )
+    
+           # pT response (Ratio wrt GEN)
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_overGEN',
+    
+             templates=[
+    
+               {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_overGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_overGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_overGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+    
+             logX = False,
+    
+             ratio = False,
+    
+             divideByBinWidth = False,
+    
+             normalizedToUnity = True,
+    
+             title = ';MET response (Ratio wrt GEN);Fraction Of Events',
+           )
+    
+           # pT Delta GEN (X - GEN)
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_minusGEN',
+    
+             templates=[
+    
+               {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_minusGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_minusGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_minusGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+    
+             logX = False,
+    
+             ratio = False,
+    
+             divideByBinWidth = False,
+    
+             normalizedToUnity = True,
+    
+             title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
+           )
+    
+           # phi response (Ratio wrt GEN)
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_overGEN',
+    
+             templates=[
+    
+               {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi_overGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi_overGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi_overGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+    
+             logX = False,
+    
+             ratio = False,
+    
+             divideByBinWidth = False,
+    
+             normalizedToUnity = True,
+    
+             title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
+           )
+    
+           # phi Delta GEN (X - GEN)
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_minusGEN',
+    
+             templates=[
+    
+               {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi_minusGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi_minusGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi_minusGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+    
+             logX = False,
+    
+             ratio = False,
+    
+             divideByBinWidth = False,
+    
+             normalizedToUnity = True,
+    
+             title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
+           )
+
+           # pT Response: RECO/GEN
+           tmp_name = i_met+'_pt_overGEN_Mean_wrt_genMetTrue_pt'
+
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
+
+             templates=[
+               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU', 'legendDraw': 'ep'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
+             ],
+
+             yMin = 0.1,
+             yMax = 3.0,
+
+             title = ';GEN MET [GeV];Response <Reco/GEN>',
+           )
+           del tmp_name
+
+           # pT Resolution (RMS)
+           tmp_name = i_met+'_pt_minusGEN_RMS_wrt_genMetTrue_pt'
+
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
+
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
+
+             templates=[
+               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU', 'legendDraw': 'ep'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
+             ],
+
+             yMin = 0.1,
+             yMax = 200,
+#             xMax = 500,
+
+             title = ';GEN MET [GeV];RMS(Reco-GEN) [GeV]',
+           )
+           del tmp_name
+
+           # pT Resolution (RMS normalized by Response)
+           tmp_name = i_met+'_pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt'
+
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
+
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
+
+             templates=[
+               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU', 'legendDraw': 'ep'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
+             ],
+
+             yMin = 0.1,
+             yMax = 200,
+#             xMax = 500,
+
+             title = ';GEN MET [GeV];RMS(Reco-GEN)/Response [GeV]',
+           )
+           del tmp_name
+
+       for pu_tag in ['NoPU', 'PU140', 'PU200']:
+
+           label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
+
+           for comp_tag in ['PF_Raw', 'PF_Type1', 'Puppi_Raw', 'Puppi_Type1', 'HLT_Raw', 'HLT_Type1', 'Offline_Raw', 'Offline_Type1']:
+
+               # pT
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_'+pu_tag,
+    
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt'),
+        
+                 logX = True,
+        
+                 ratio = True,
+        
+                 xMin = 10,
+        
+                 divideByBinWidth = True,
+        
+                 normalizedToUnity = True,
+        
+                 title = ';MET [GeV];Fraction Of Events',
+               )
+        
+               # phi
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_'+pu_tag,
+    
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi'),
+    
+                 logX = False,
+    
+                 ratio = True,
+    
+                 divideByBinWidth = False,
+    
+                 normalizedToUnity = True,
+    
+                 title = ';MET #phi;Fraction Of Events',
+               )
+    
+               # pT response (Ratio wrt GEN)
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+        
+                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_overGEN_'+pu_tag,
+        
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_overGEN'),
+    
+                 normalizedToUnity = True,
+        
+                 title = ';MET response (Ratio wrt GEN);Fraction Of Events',
+               )
+        
+               # Phi response (Ratio wrt GEN)
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+        
+                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_overGEN_'+pu_tag,
+        
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_overGEN'),
+    
+                 normalizedToUnity = True,
+        
+                 title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
+               )
+        
+               # pT Delta GEN
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+        
+                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_minusGEN_'+pu_tag,
+    
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_minusGEN'),
+    
+                 normalizedToUnity = True,
+    
+                 title = ';MET #Deltap_{T} (X - GEN) [GeV];Fraction Of Events',
+               )
+    
+               # Phi Delta GEN
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_minusGEN_'+pu_tag,
+    
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_minusGEN'),
+    
+                 normalizedToUnity = True,
+    
+                 title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
+               )
 
    ### Turn-on curves
 
@@ -1104,10 +850,9 @@ if __name__ == '__main__':
              stickers=[label_sample, label_var, label_eff], output=opts.output+'/Eff_'+i_eff+'/'+i_met,
 
              templates=[
-
-               {'TH1': clone_graph(efficiencies, 'NoPU', i_met, {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'NoPU', 'legendDraw': 'l'},
-               {'TH1': clone_graph(efficiencies, 'PU140', i_met, {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'PU140', 'legendDraw': 'l'},
-               {'TH1': clone_graph(efficiencies, 'PU200', i_met, {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'PU200', 'legendDraw': 'l'},
+               {'TH1': clone_graph(efficiencies, 'NoPU' , i_met, {'LineColor': 1, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_graph(efficiencies, 'PU140', i_met, {'LineColor': 4, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_graph(efficiencies, 'PU200', i_met, {'LineColor': 2, 'LineWidth': 2}), 'draw': 'lepz', 'legendName': 'PU200', 'legendDraw': 'l'},
              ],
 
              logX = False,

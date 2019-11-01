@@ -27,8 +27,11 @@ METCollections = [
 
   'hltPFMET',
   'hltPFMETTypeOne',
+  'hltPFMETNoPileUpJME',
   'hltPuppiMET',
+  'hltPuppiMETTypeOne',
   'hltPuppiMETWithPuppiForJets',
+  'hltSoftKillerMET',
 
   'offlineMETs_Raw',
   'offlineMETs_Type1',
@@ -73,33 +76,25 @@ for i_sel in EvtSelections:
         binEdges_2d[i_sel+i_met+'_phi_overGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_phi_overGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
         binEdges_2d[i_sel+i_met+'_sumEt_overGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_sumEt_overGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
 
-        if i_met.startswith('hlt'):
-
-           binEdges_1d[i_sel+i_met+'_pt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
-           binEdges_1d[i_sel+i_met+'_phi_minusOffline'] = [math.pi/40*_tmp for _tmp in range(40+1)]
-           binEdges_1d[i_sel+i_met+'_sumEt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
-
-           binEdges_1d[i_sel+i_met+'_pt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
-           binEdges_1d[i_sel+i_met+'_phi_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
-           binEdges_1d[i_sel+i_met+'_sumEt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
-
     for [i_met_onl, i_met_off] in [
       ['hltPFMET', 'offlineMETs_Raw'],
       ['hltPFMETTypeOne', 'offlineMETs_Type1'],
       ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
       ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
+      ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
     ]:
-        binEdges_2d[i_sel+i_met_onl+'_pt:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt'], binEdges_1d[i_sel+i_met_off+'_pt']]
-        binEdges_2d[i_sel+i_met_onl+'_phi:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_phi'], binEdges_1d[i_sel+i_met_off+'_pt']]
-        binEdges_2d[i_sel+i_met_onl+'_sumEt:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_sumEt'], binEdges_1d[i_sel+i_met_off+'_pt']]
+        binEdges_1d[i_sel+i_met_onl+'_pt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+        binEdges_1d[i_sel+i_met_onl+'_phi_minusOffline'] = [math.pi/40*_tmp for _tmp in range(40+1)]
+        binEdges_1d[i_sel+i_met_onl+'_sumEt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
 
-        binEdges_2d[i_sel+i_met_onl+'_pt_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
-        binEdges_2d[i_sel+i_met_onl+'_phi_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_phi_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
-        binEdges_2d[i_sel+i_met_onl+'_sumEt_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_sumEt_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+        binEdges_1d[i_sel+i_met_onl+'_pt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+        binEdges_1d[i_sel+i_met_onl+'_phi_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+        binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
 
-        binEdges_2d[i_sel+i_met_onl+'_pt_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
-        binEdges_2d[i_sel+i_met_onl+'_phi_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_phi_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
-        binEdges_2d[i_sel+i_met_onl+'_sumEt_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+        for i_var in ['pt', 'phi', 'sumEt']:
+            binEdges_2d[i_sel+i_met_onl+'_'+i_var+':'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_'+i_var], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_'+i_var+'_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_'+i_var+'_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_'+i_var+'_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_'+i_var+'_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
 
 #### Event Analysis ----------------------------------------------------------------------------------------------------------------
 
@@ -142,6 +137,7 @@ def analyze_event(event, th1s={}, th2s={}):
           ['hltPFMETTypeOne', 'offlineMETs_Type1'],
           ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
           ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
+          ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
         ]:
             for i_var in ['pt', 'phi', 'sumEt']:
 
@@ -246,7 +242,7 @@ if __name__ == '__main__':
    INPUT_FILES = sorted(list(set(INPUT_FILES)))
 
    if len(INPUT_FILES) == 0:
-      KILL(log_prx+'empty list of input files containing MEM TTrees [-i]')
+      KILL(log_prx+'empty list of input files [-i]')
 
    if os.path.exists(opts.output):
       KILL(log_prx+'target path to output .root file already exists [-o]: '+opts.output)
