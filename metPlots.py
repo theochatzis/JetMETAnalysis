@@ -446,6 +446,7 @@ if __name__ == '__main__':
    label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, 'VBF_H125ToInv_14TeV')
 
    ### 1D Comparisons
+   for i_sel in ['NoSelection/']:
 
    for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPuppiMET', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
 
@@ -454,13 +455,13 @@ if __name__ == '__main__':
        # pT
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_var], output=opts.output+'/PU/'+i_met+'_pt',
+         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt',
 
          templates=[
 
-           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = True,
@@ -479,13 +480,13 @@ if __name__ == '__main__':
        # phi
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
 
-         stickers=[label_sample, label_var], output=opts.output+'/PU/'+i_met+'_phi',
+         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi',
 
          templates=[
 
-           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -502,13 +503,13 @@ if __name__ == '__main__':
        # pT response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_var], output=opts.output+'/PU/'+i_met+'_pt_overGEN',
+         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_overGEN',
 
          templates=[
 
-           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_pt_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -525,13 +526,13 @@ if __name__ == '__main__':
        # pT Delta GEN (X - GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_var], output=opts.output+'/PU/'+i_met+'_pt_minusGEN',
+         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_minusGEN',
 
          templates=[
 
-           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -548,13 +549,13 @@ if __name__ == '__main__':
        # phi response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_var], output=opts.output+'/PU/'+i_met+'_phi_overGEN',
+         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_overGEN',
 
          templates=[
 
-           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_phi_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi_overGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi_overGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi_overGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -571,13 +572,13 @@ if __name__ == '__main__':
        # phi Delta GEN (X - GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_var], output=opts.output+'/PU/'+i_met+'_phi_minusGEN',
+         stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_minusGEN',
 
          templates=[
 
-           {'TH1': clone_histogram(histograms, 'NoPU', i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU140', i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
-           {'TH1': clone_histogram(histograms, 'PU200', i_met+'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlack, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi_minusGEN', {'LineColor': ROOT.kBlue, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+           {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi_minusGEN', {'LineColor': ROOT.kRed, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
          ],
 
          logX = False,
@@ -598,7 +599,7 @@ if __name__ == '__main__':
        # pT
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline/MET_pt_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_pt_'+pu_tag,
 
          templates=[
 
@@ -625,7 +626,7 @@ if __name__ == '__main__':
        # phi
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline/MET_phi_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_phi_'+pu_tag,
 
          templates=[
 
@@ -650,7 +651,7 @@ if __name__ == '__main__':
        # pT response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline/MET_pt_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_pt_overGEN_'+pu_tag,
 
          templates=[
 
@@ -668,7 +669,7 @@ if __name__ == '__main__':
        # Phi response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline/MET_phi_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_phi_overGEN_'+pu_tag,
 
          templates=[
 
@@ -686,7 +687,7 @@ if __name__ == '__main__':
        # pT Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline/MET_pt_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_pt_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -704,7 +705,7 @@ if __name__ == '__main__':
        # Phi Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline/MET_phi_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline/MET_phi_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -722,7 +723,7 @@ if __name__ == '__main__':
        # pT
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline_01/MET_pt_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_pt_'+pu_tag,
 
          templates=[
 
@@ -747,7 +748,7 @@ if __name__ == '__main__':
        # phi
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline_01/MET_phi_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_phi_'+pu_tag,
 
          templates=[
 
@@ -770,7 +771,7 @@ if __name__ == '__main__':
        # pT response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline_01/MET_pt_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_pt_overGEN_'+pu_tag,
 
          templates=[
 
@@ -786,7 +787,7 @@ if __name__ == '__main__':
        # Phi response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline_01/MET_phi_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_phi_overGEN_'+pu_tag,
 
          templates=[
 
@@ -802,7 +803,7 @@ if __name__ == '__main__':
        # pT Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline_01/MET_pt_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_pt_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -818,7 +819,7 @@ if __name__ == '__main__':
        # Phi Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT_Offline_01/MET_phi_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT_Offline_01/MET_phi_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -834,7 +835,7 @@ if __name__ == '__main__':
        # pT
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_Offline/MET_pt_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_pt_'+pu_tag,
 
          templates=[
 
@@ -859,7 +860,7 @@ if __name__ == '__main__':
        # phi
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_Offline/MET_phi_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_phi_'+pu_tag,
 
          templates=[
 
@@ -882,7 +883,7 @@ if __name__ == '__main__':
        # pT response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_Offline/MET_pt_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_pt_overGEN_'+pu_tag,
 
          templates=[
 
@@ -898,7 +899,7 @@ if __name__ == '__main__':
        # Phi response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_Offline/MET_phi_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_phi_overGEN_'+pu_tag,
 
          templates=[
 
@@ -914,7 +915,7 @@ if __name__ == '__main__':
        # pT Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_Offline/MET_pt_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_pt_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -930,7 +931,7 @@ if __name__ == '__main__':
        # Phi Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_Offline/MET_phi_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_Offline/MET_phi_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -946,7 +947,7 @@ if __name__ == '__main__':
        # pT
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT/MET_pt_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_pt_'+pu_tag,
 
          templates=[
 
@@ -972,7 +973,7 @@ if __name__ == '__main__':
        # phi
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT/MET_phi_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_phi_'+pu_tag,
 
          templates=[
 
@@ -996,7 +997,7 @@ if __name__ == '__main__':
        # pT response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT/MET_pt_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_pt_overGEN_'+pu_tag,
 
          templates=[
 
@@ -1013,7 +1014,7 @@ if __name__ == '__main__':
        # Phi response (Ratio wrt GEN)
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT/MET_phi_overGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_phi_overGEN_'+pu_tag,
 
          templates=[
 
@@ -1030,7 +1031,7 @@ if __name__ == '__main__':
        # pT Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT/MET_pt_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_pt_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -1047,7 +1048,7 @@ if __name__ == '__main__':
        # Phi Delta GEN
        plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-         stickers=[label_sample, label_PU], output=opts.output+'/GEN_HLT/MET_phi_minusGEN_'+pu_tag,
+         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/GEN_HLT/MET_phi_minusGEN_'+pu_tag,
 
          templates=[
 
@@ -1077,7 +1078,7 @@ if __name__ == '__main__':
            for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
 
                hNum_0 = clone_histogram(histograms, pu_tag, i_eff+'/'+i_met)
-               hDen_0 = clone_histogram(histograms, pu_tag, i_met)
+               hDen_0 = clone_histogram(histograms, pu_tag, 'NoSelection/'+i_met)
 
                if (hNum_0 is None) or (hDen_0 is None): continue
 
