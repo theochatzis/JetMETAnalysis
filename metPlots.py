@@ -510,7 +510,7 @@ if __name__ == '__main__':
    ### 1D Comparisons
    for i_sel in ['NoSelection/']:
 
-       for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPuppiMET', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
+       for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPFMETNoPileUpJME', 'hltSoftKillerMET', 'hltPuppiMET', 'hltPuppiMETTypeOne', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
 
            label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
 
