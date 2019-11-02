@@ -564,11 +564,10 @@ if __name__ == '__main__':
     
            # pT response (Ratio wrt GEN)
            plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-    
+
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_overGEN',
-    
+
              templates=[
-    
                {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_overGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
                {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_overGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
                {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_overGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
@@ -589,9 +588,8 @@ if __name__ == '__main__':
            plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_minusGEN',
-    
+
              templates=[
-    
                {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_pt_minusGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
                {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_minusGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
                {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_minusGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
@@ -608,6 +606,50 @@ if __name__ == '__main__':
              title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
            )
     
+           # pT component parallel to GEN
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_paraToGEN',
+
+             templates=[
+               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+i_met+'_pt_paraToGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU' , 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_paraToGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_paraToGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+
+             logX = False,
+
+             ratio = False,
+
+             divideByBinWidth = False,
+
+             normalizedToUnity = True,
+
+             title = ';MET_{#scale[0.75]{#parallel GEN}} [GeV];Fraction Of Events',
+           )
+
+           # pT component perpendicular to GEN
+           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_perpToGEN',
+
+             templates=[
+               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+i_met+'_pt_perpToGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU' , 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_pt_perpToGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
+               {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_pt_perpToGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
+             ],
+
+             logX = False,
+
+             ratio = False,
+
+             divideByBinWidth = False,
+
+             normalizedToUnity = True,
+
+             title = ';MET_{#scale[0.75]{#perp GEN}} [GeV];Fraction Of Events',
+           )
+
            # phi response (Ratio wrt GEN)
            plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
@@ -655,66 +697,58 @@ if __name__ == '__main__':
            )
 
            # pT Response: RECO/GEN
-           tmp_name = i_met+'_pt_overGEN_Mean_wrt_genMetTrue_pt'
+           for (i_key, i_title, i_ymin, i_ymax) in [
+             ('pt_overGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
+             ('pt_paraToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#parallel GEN)}>', -200, 400),
+             ('pt_perpToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#perp GEN)}>', -200, 200),
+           ]:
+               tmp_name = i_met+'_'+i_key
 
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
 
-             templates=[
-               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU', 'legendDraw': 'ep'},
-               {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
-               {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
-             ],
+                 templates=[
+                   {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU' , 'legendDraw': 'ep'},
+                   {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
+                   {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
+                 ],
 
-             yMin = 0.1,
-             yMax = 3.0,
+                 yMin = i_ymin,
+                 yMax = i_ymax,
 
-             title = ';GEN MET [GeV];Response <Reco/GEN>',
-           )
-           del tmp_name
+                 title = i_title,
+               )
+               del tmp_name
 
            # pT Resolution (RMS)
-           tmp_name = i_met+'_pt_minusGEN_RMS_wrt_genMetTrue_pt'
+           for (i_key, i_title) in [
+             ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) [GeV]'),
+             ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} [GeV]'),
+             ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)} [GeV]'),
+             ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) / Response [GeV]'),
+             ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} / Response [GeV]'),
+             ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)}  / Response [GeV]'),
+           ]:
+               tmp_name = i_met+'_'+i_key
 
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
 
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
 
-             templates=[
-               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU', 'legendDraw': 'ep'},
-               {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
-               {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
-             ],
+                 templates=[
+                   {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU' , 'legendDraw': 'ep'},
+                   {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
+                   {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
+                 ],
 
-             yMin = 0.1,
-             yMax = 200,
-#             xMax = 500,
+                 yMin = 0.1,
+                 yMax = 200,
+#                 xMax = 500,
 
-             title = ';GEN MET [GeV];RMS(Reco-GEN) [GeV]',
-           )
-           del tmp_name
-
-           # pT Resolution (RMS normalized by Response)
-           tmp_name = i_met+'_pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt'
-
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
-
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
-
-             templates=[
-               {'TH1': clone_histogram(histograms, 'NoPU' , i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': 1, 'LineColor': 1, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'NoPU', 'legendDraw': 'ep'},
-               {'TH1': clone_histogram(histograms, 'PU140', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 22, 'MarkerColor': 4, 'LineColor': 4, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU140', 'legendDraw': 'ep'},
-               {'TH1': clone_histogram(histograms, 'PU200', i_sel+tmp_name, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2, 'LineWidth': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
-             ],
-
-             yMin = 0.1,
-             yMax = 200,
-#             xMax = 500,
-
-             title = ';GEN MET [GeV];RMS(Reco-GEN)/Response [GeV]',
-           )
-           del tmp_name
+                 title = i_title,
+               )
+               del tmp_name
 
        for pu_tag in ['NoPU', 'PU140', 'PU200']:
 

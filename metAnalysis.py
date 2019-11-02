@@ -74,8 +74,8 @@ def create_histograms():
             binEdges_1d[i_sel+i_met+'_phi_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
             binEdges_1d[i_sel+i_met+'_sumEt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
 
-            binEdges_1d[i_sel+i_met+'_pt_paraToGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
-            binEdges_1d[i_sel+i_met+'_pt_perpToGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_pt_paraToGEN'] = [-200+10*_tmp for _tmp in range(60+1)]
+            binEdges_1d[i_sel+i_met+'_pt_perpToGEN'] = [-200+10*_tmp for _tmp in range(60+1)]
 
             for v_ref in ['genMetTrue_pt', 'genMetTrue_sumEt', 'offlineNPV']:
 
@@ -104,8 +104,8 @@ def create_histograms():
             binEdges_1d[i_sel+i_met_onl+'_phi_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
             binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
 
-            binEdges_1d[i_sel+i_met_onl+'_pt_paraToOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
-            binEdges_1d[i_sel+i_met_onl+'_pt_perpToOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met_onl+'_pt_paraToOffline'] = [-200+10*_tmp for _tmp in range(60+1)]
+            binEdges_1d[i_sel+i_met_onl+'_pt_perpToOffline'] = [-200+10*_tmp for _tmp in range(60+1)]
 
             binEdges_2d[i_sel+i_met_onl+'_pt:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt'], binEdges_1d[i_sel+i_met_off+'_pt']]
             binEdges_2d[i_sel+i_met_onl+'_pt_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
@@ -349,26 +349,24 @@ if __name__ == '__main__':
        elif key_varX.endswith('Offline'): compTag = 'Offline'
        else: continue
 
-       if key_varX.endswith('_over'+compTag):
+       tmp_h2 = th2s[i_h2_key]
 
-          # Mean of Ratio, in bins of Y
-          h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
-          if h_name0 in th1s: KILL('aaa '+h_name0)
+       # Mean of X, in bins of Y
+       h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
+       if h_name0 in th1s: KILL('aaa1 '+h_name0)
 
-          tmp_h2 = th2s[i_h2_key]
+       tmp_h1_xMean = tmp_h2.ProjectionY(h_name0)
+       tmp_h1_xMean.SetDirectory(0)
+       tmp_h1_xMean.Reset()
 
-          tmp_h1_ratioMean = tmp_h2.ProjectionY(h_name0)
-          tmp_h1_ratioMean.SetDirectory(0)
-          tmp_h1_ratioMean.Reset()
+       for _idx in range(1, 1+tmp_h2.GetNbinsY()):
+           _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
+           _htmp.SetDirectory(0)
+           tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
+           tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
+           del _htmp
 
-          for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-              _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-              _htmp.SetDirectory(0)
-              tmp_h1_ratioMean.SetBinContent(_idx, _htmp.GetMean())
-              tmp_h1_ratioMean.SetBinError(_idx, _htmp.GetMeanError())
-              del _htmp
-
-          th1s[h_name0] = tmp_h1_ratioMean
+       th1s[h_name0] = tmp_h1_xMean
    ### -------------------
 
    ### Histograms for mean Resolution
@@ -395,26 +393,9 @@ if __name__ == '__main__':
 
        tmp_h2 = th2s[i_h2_key]
 
-       # Mean of X, in bins of Y
-       h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
-       if h_name0 in th1s: KILL('aaa '+h_name0)
-
-       tmp_h1_xMean = tmp_h2.ProjectionY(h_name0)
-       tmp_h1_xMean.SetDirectory(0)
-       tmp_h1_xMean.Reset()
-
-       for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-           _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-           _htmp.SetDirectory(0)
-           tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
-           tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
-           del _htmp
-
-       th1s[h_name0] = tmp_h1_xMean
-
        # RMS of X, in bins of Y
        h_name1 = i_h2_key_dirname+key_varX+'_RMS_wrt_'+key_varY
-       if h_name1 in th1s: KILL('aaa '+h_name1)
+       if h_name1 in th1s: KILL('aaa3 '+h_name1)
 
        tmp_h1_xRMS = tmp_h2.ProjectionY(h_name1)
        tmp_h1_xRMS.SetDirectory(0)
@@ -431,10 +412,10 @@ if __name__ == '__main__':
 
        # RMS of X scaled by Response, in bins of Y
        h_name2 = i_h2_key_dirname+key_varX+'_RMSScaledByResponse_wrt_'+key_varY
-       if h_name2 in th1s: KILL('aaa '+h_name2)
+       if h_name2 in th1s: KILL('aaa4 '+h_name2)
 
        h_name4 = i_h2_key_dirname+key_varX[:key_varX.rfind('_')]+'_over'+compTag+'_Mean_wrt_'+key_varY
-       if h_name4 not in th1s: KILL('aaa '+h_name4)
+       if h_name4 not in th1s: KILL('aaa5 '+h_name4)
 
        tmp_h1_ratioMeanNoErr = th1s[h_name4].Clone()
        for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):

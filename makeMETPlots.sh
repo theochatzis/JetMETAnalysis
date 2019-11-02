@@ -16,9 +16,9 @@ fi
 
 mkdir -p ${ODIR}
 
-./metAnalysis.py -i ${NoPU}  -o ${ODIR}/NoPU.root
-./metAnalysis.py -i ${PU140} -o ${ODIR}/PU140.root
-./metAnalysis.py -i ${PU200} -o ${ODIR}/PU200.root
+./metAnalysis.py -n -1 -i ${NoPU}  -o ${ODIR}/NoPU.root
+./metAnalysis.py -n -1 -i ${PU140} -o ${ODIR}/PU140.root
+./metAnalysis.py -n -1 -i ${PU200} -o ${ODIR}/PU200.root
 
 ./metPlots.py \
  --NoPU ${ODIR}/NoPU.root \
