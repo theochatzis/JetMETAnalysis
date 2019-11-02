@@ -8,12 +8,6 @@ import ROOT
 
 from common.utils import *
 
-#### Histograms --------------------------------------------------------------------------------------------------------------------
-
-# bin-edges for TH1Ds and TH2Ds
-binEdges_1d = {}
-binEdges_2d = {}
-
 EvtSelections = [
 
   'NoSelection/',
@@ -39,62 +33,121 @@ METCollections = [
   'offlineMETsPuppi_Type1',
 ]
 
-for i_sel in EvtSelections:
+METOnlineOfflinePairs = [
+  ['hltPFMET', 'offlineMETs_Raw'],
+  ['hltPFMETTypeOne', 'offlineMETs_Type1'],
+  ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
+  ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
+  ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
+]
 
-    binEdges_1d[i_sel+'hltNPV'] = [10*_tmp for _tmp in range(40+1)]
-    binEdges_1d[i_sel+'offlineNPV'] = [10*_tmp for _tmp in range(40+1)]
+#### Histograms --------------------------------------------------------------------------------------------------------------------
 
-    for i_met in METCollections:
+def create_histograms():
 
-        binEdges_1d[i_sel+i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
-        binEdges_1d[i_sel+i_met+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
-        binEdges_1d[i_sel+i_met+'_sumEt'] = [0, 30, 60, 90, 120, 180, 250, 400, 600, 800, 1000, 1500, 2000, 3000]
+    # bin-edges for TH1Ds and TH2Ds
+    binEdges_1d = {}
+    binEdges_2d = {}
 
-        for i_var in ['pt', 'phi', 'sumEt']:
-            binEdges_2d[i_sel+i_met+'_'+i_var+':hltNPV'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'hltNPV']]
-            binEdges_2d[i_sel+i_met+'_'+i_var+':offlineNPV'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'offlineNPV']]
+    for i_sel in EvtSelections:
 
-        if i_met == 'genMetTrue': continue
+        binEdges_1d[i_sel+'hltNPV'] = [10*_tmp for _tmp in range(40+1)]
+        binEdges_1d[i_sel+'offlineNPV'] = [10*_tmp for _tmp in range(40+1)]
 
-        binEdges_1d[i_sel+i_met+'_pt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
-        binEdges_1d[i_sel+i_met+'_phi_minusGEN'] = [math.pi/40*_tmp for _tmp in range(40+1)]
-        binEdges_1d[i_sel+i_met+'_sumEt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
+        for i_met in METCollections:
 
-        binEdges_1d[i_sel+i_met+'_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
-        binEdges_1d[i_sel+i_met+'_phi_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
-        binEdges_1d[i_sel+i_met+'_sumEt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
+            binEdges_1d[i_sel+i_met+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
+            binEdges_1d[i_sel+i_met+'_sumEt'] = [0, 30, 60, 90, 120, 180, 250, 400, 600, 800, 1000, 1500, 2000, 3000]
 
-        binEdges_2d[i_sel+i_met+'_pt:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_pt'], binEdges_1d[i_sel+'genMetTrue_pt']]
-        binEdges_2d[i_sel+i_met+'_phi:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_phi'], binEdges_1d[i_sel+'genMetTrue_pt']]
-        binEdges_2d[i_sel+i_met+'_sumEt:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_sumEt'], binEdges_1d[i_sel+'genMetTrue_pt']]
+            for i_var in ['pt', 'phi', 'sumEt']:
+                binEdges_2d[i_sel+i_met+'_'+i_var+':hltNPV'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'hltNPV']]
+                binEdges_2d[i_sel+i_met+'_'+i_var+':offlineNPV'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'offlineNPV']]
 
-        binEdges_2d[i_sel+i_met+'_pt_minusGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_pt_minusGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
-        binEdges_2d[i_sel+i_met+'_phi_minusGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_phi_minusGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
-        binEdges_2d[i_sel+i_met+'_sumEt_minusGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_sumEt_minusGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
+            if i_met == 'genMetTrue': continue
 
-        binEdges_2d[i_sel+i_met+'_pt_overGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_pt_overGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
-        binEdges_2d[i_sel+i_met+'_phi_overGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_phi_overGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
-        binEdges_2d[i_sel+i_met+'_sumEt_overGEN:genMetTrue_pt'] = [binEdges_1d[i_sel+i_met+'_sumEt_overGEN'], binEdges_1d[i_sel+'genMetTrue_pt']]
+            binEdges_1d[i_sel+i_met+'_pt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_phi_minusGEN'] = [math.pi/40*_tmp for _tmp in range(40+1)]
+            binEdges_1d[i_sel+i_met+'_sumEt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
 
-    for [i_met_onl, i_met_off] in [
-      ['hltPFMET', 'offlineMETs_Raw'],
-      ['hltPFMETTypeOne', 'offlineMETs_Type1'],
-      ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
-      ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
-      ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
-    ]:
-        binEdges_1d[i_sel+i_met_onl+'_pt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
-        binEdges_1d[i_sel+i_met_onl+'_phi_minusOffline'] = [math.pi/40*_tmp for _tmp in range(40+1)]
-        binEdges_1d[i_sel+i_met_onl+'_sumEt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_phi_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_sumEt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
 
-        binEdges_1d[i_sel+i_met_onl+'_pt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
-        binEdges_1d[i_sel+i_met_onl+'_phi_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
-        binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_pt_paraToGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met+'_pt_perpToGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
 
-        for i_var in ['pt', 'phi', 'sumEt']:
-            binEdges_2d[i_sel+i_met_onl+'_'+i_var+':'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_'+i_var], binEdges_1d[i_sel+i_met_off+'_pt']]
-            binEdges_2d[i_sel+i_met_onl+'_'+i_var+'_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_'+i_var+'_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
-            binEdges_2d[i_sel+i_met_onl+'_'+i_var+'_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_'+i_var+'_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            for v_ref in ['genMetTrue_pt', 'genMetTrue_sumEt', 'offlineNPV']:
+
+                binEdges_2d[i_sel+i_met+'_pt:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_phi:'+v_ref] = [binEdges_1d[i_sel+i_met+'_phi'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_sumEt:'+v_ref] = [binEdges_1d[i_sel+i_met+'_sumEt'], binEdges_1d[i_sel+v_ref]]
+
+                binEdges_2d[i_sel+i_met+'_pt_minusGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt_minusGEN'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_phi_minusGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_phi_minusGEN'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_sumEt_minusGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_sumEt_minusGEN'], binEdges_1d[i_sel+v_ref]]
+
+                binEdges_2d[i_sel+i_met+'_pt_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt_overGEN'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_phi_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_phi_overGEN'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_sumEt_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_sumEt_overGEN'], binEdges_1d[i_sel+v_ref]]
+
+                binEdges_2d[i_sel+i_met+'_pt_paraToGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt_paraToGEN'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_pt_perpToGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt_perpToGEN'], binEdges_1d[i_sel+v_ref]]
+
+        for [i_met_onl, i_met_off] in METOnlineOfflinePairs:
+
+            binEdges_1d[i_sel+i_met_onl+'_pt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met_onl+'_phi_minusOffline'] = [math.pi/40*_tmp for _tmp in range(40+1)]
+            binEdges_1d[i_sel+i_met_onl+'_sumEt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+
+            binEdges_1d[i_sel+i_met_onl+'_pt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met_onl+'_phi_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+
+            binEdges_1d[i_sel+i_met_onl+'_pt_paraToOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+            binEdges_1d[i_sel+i_met_onl+'_pt_perpToOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+
+            binEdges_2d[i_sel+i_met_onl+'_pt:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_pt_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_pt_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+
+            binEdges_2d[i_sel+i_met_onl+'_sumEt:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_sumEt'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_sumEt_minusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_sumEt_minusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_sumEt_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+
+            binEdges_2d[i_sel+i_met_onl+'_pt_paraToOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_paraToOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_pt_perpToOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_perpToOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+
+    th1s = {}
+    for h_name in binEdges_1d:
+        th1s[h_name] = create_TH1D(h_name, binEdges_1d[h_name])
+
+    th2s = {}
+    for h_name in binEdges_2d:
+        th2s[h_name] = create_TH2D(h_name, binEdges_2d[h_name])
+
+    return th1s, th2s
+
+def create_TH1D(name, binEdges):
+
+    _binEdges_array = array.array('d', sorted(list(set(binEdges))))
+
+    _th1d = ROOT.TH1D(name, name, len(_binEdges_array)-1, _binEdges_array)
+    _th1d.SetDirectory(0)
+    _th1d.Sumw2()
+
+    return _th1d
+
+def create_TH2D(name, binEdges):
+
+    _binEdgesX_array = array.array('d', sorted(list(set(binEdges[0]))))
+    _binEdgesY_array = array.array('d', sorted(list(set(binEdges[1]))))
+
+    _th2d = ROOT.TH2D(name, name, len(_binEdgesX_array)-1, _binEdgesX_array, len(_binEdgesY_array)-1, _binEdgesY_array)
+    _th2d.SetDirectory(0)
+    _th2d.Sumw2()
+
+    return _th2d
 
 #### Event Analysis ----------------------------------------------------------------------------------------------------------------
 
@@ -117,9 +170,20 @@ def analyze_event(event, th1s={}, th2s={}):
             for i_var in ['pt', 'phi', 'sumEt']:
                 values[i_sel+i_met+'_'+i_var] = float(getattr(event, i_met+'_'+i_var)[0])
 
+        genMetTrue_vec2d = ROOT.TVector2()
+        genMetTrue_vec2d.SetMagPhi(values[i_sel+'genMetTrue_pt'], values[i_sel+'genMetTrue_phi'])
+
         for i_met in METCollections:
 
             if i_met == 'genMetTrue': continue
+
+            values[i_sel+i_met+'_pt'], values[i_sel+i_met+'_phi']
+
+            iMET_vec2d = ROOT.TVector2()
+            iMET_vec2d.SetMagPhi(values[i_sel+i_met+'_pt'], values[i_sel+i_met+'_phi'])
+
+            values[i_sel+i_met+'_pt_paraToGEN'] = iMET_vec2d.Mod() * math.cos(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
+            values[i_sel+i_met+'_pt_perpToGEN'] = iMET_vec2d.Mod() * math.sin(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
 
             for i_var in ['pt', 'phi', 'sumEt']:
 
@@ -132,13 +196,17 @@ def analyze_event(event, th1s={}, th2s={}):
                 if values[i_sel+'genMetTrue_'+i_var] != 0:
                    values[i_sel+i_met+'_'+i_var+'_overGEN'] = values[i_sel+i_met+'_'+i_var] / values[i_sel+'genMetTrue_'+i_var]
 
-        for [i_met_onl, i_met_off] in [
-          ['hltPFMET', 'offlineMETs_Raw'],
-          ['hltPFMETTypeOne', 'offlineMETs_Type1'],
-          ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
-          ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
-          ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
-        ]:
+        for [i_met_onl, i_met_off] in METOnlineOfflinePairs:
+
+            iMETonl_vec2d = ROOT.TVector2()
+            iMETonl_vec2d.SetMagPhi(values[i_sel+i_met_onl+'_pt'], values[i_sel+i_met_onl+'_phi'])
+
+            iMEToff_vec2d = ROOT.TVector2()
+            iMEToff_vec2d.SetMagPhi(values[i_sel+i_met_off+'_pt'], values[i_sel+i_met_off+'_phi'])
+
+            values[i_sel+i_met_onl+'_pt_paraToOffline'] = iMETonl_vec2d.Mod() * math.cos(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
+            values[i_sel+i_met_onl+'_pt_perpToOffline'] = iMETonl_vec2d.Mod() * math.sin(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
+
             for i_var in ['pt', 'phi', 'sumEt']:
 
                 values[i_sel+i_met_onl+'_'+i_var+'_minusOffline'] = values[i_sel+i_met_onl+'_'+i_var] - values[i_sel+i_met_off+'_'+i_var]
@@ -176,27 +244,6 @@ def analyze_event(event, th1s={}, th2s={}):
            if i_hist_key_varY not in values: continue
 
            th2s[i_hist_key].Fill(values[i_hist_key_varX], values[i_hist_key_varY])
-
-def create_TH1D(name, binEdges):
-
-    _binEdges_array = array.array('d', sorted(list(set(binEdges))))
-
-    _th1d = ROOT.TH1D(name, name, len(_binEdges_array)-1, _binEdges_array)
-    _th1d.SetDirectory(0)
-    _th1d.Sumw2()
-
-    return _th1d
-
-def create_TH2D(name, binEdges):
-
-    _binEdgesX_array = array.array('d', sorted(list(set(binEdges[0]))))
-    _binEdgesY_array = array.array('d', sorted(list(set(binEdges[1]))))
-
-    _th2d = ROOT.TH2D(name, name, len(_binEdgesX_array)-1, _binEdgesX_array, len(_binEdgesY_array)-1, _binEdgesY_array)
-    _th2d.SetDirectory(0)
-    _th2d.Sumw2()
-
-    return _th2d
 
 #### main --------------------------------------------------------------------------------------------------------------------------
 
@@ -252,13 +299,7 @@ if __name__ == '__main__':
    ### -------------------
 
    # convert bin-edges to TH1D
-   th1s = {}
-   for h_name in binEdges_1d:
-       th1s[h_name] = create_TH1D(h_name, binEdges_1d[h_name])
-
-   th2s = {}
-   for h_name in binEdges_2d:
-       th2s[h_name] = create_TH2D(h_name, binEdges_2d[h_name])
+   th1s, th2s = create_histograms()
 
    NUM_EVENTS_PROCESSED = 0
 
@@ -284,9 +325,12 @@ if __name__ == '__main__':
 
            NUM_EVENTS_PROCESSED += 1
 
+           if not (NUM_EVENTS_PROCESSED % 1e3):
+              print '\033[1m'+'\033[93m'+'['+str(opts.output)+']'+'\033[0m', 'processed events:', NUM_EVENTS_PROCESSED
+
        i_inptfile.Close()
 
-   ### Histograms for mean Response and Resolution
+   ### Histograms for mean Response
    for i_h2_key in th2s.keys():
 
        i_h2_key_basename = os.path.basename(i_h2_key)
@@ -294,88 +338,114 @@ if __name__ == '__main__':
        i_h2_key_dirname = os.path.dirname(i_h2_key)
        if i_h2_key_dirname: i_h2_key_dirname += '/'
 
-       if '_minus' in i_h2_key_basename:
+       key_vars_split = i_h2_key_basename.split(':')
+       if len(key_vars_split) != 2:
+          KILL('ZZZ '+i_h2_key_basename)
 
-          i_h2_compTag = 'GEN' if 'GEN:' in i_h2_key_basename else 'Offline'
+       key_varX = key_vars_split[0]
+       key_varY = key_vars_split[1]
 
-          key_vars_split = i_h2_key_basename.split('_minus'+i_h2_compTag+':')
-          if len(key_vars_split) != 2:
-             KILL('ZZZ '+i_h2_key_basename)
+       if key_varX.endswith('GEN'): compTag = 'GEN'
+       elif key_varX.endswith('Offline'): compTag = 'Offline'
+       else: continue
 
-          key_varX = key_vars_split[0]
-          key_varY = key_vars_split[1]
+       if key_varX.endswith('_over'+compTag):
+
+          # Mean of Ratio, in bins of Y
+          h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
+          if h_name0 in th1s: KILL('aaa '+h_name0)
 
           tmp_h2 = th2s[i_h2_key]
 
-          # Mean of Diff, in bins of Y
-          h_name0 = i_h2_key_dirname+key_varX+'_minus'+i_h2_compTag+'_Mean_wrt_'+key_varY
-          if h_name0 in th1s: KILL('aaa '+h_name0)
-
-          tmp_h1_diffMean = tmp_h2.ProjectionY(h_name0)
-          tmp_h1_diffMean.SetDirectory(0)
-          tmp_h1_diffMean.Reset()
+          tmp_h1_ratioMean = tmp_h2.ProjectionY(h_name0)
+          tmp_h1_ratioMean.SetDirectory(0)
+          tmp_h1_ratioMean.Reset()
 
           for _idx in range(1, 1+tmp_h2.GetNbinsY()):
               _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
               _htmp.SetDirectory(0)
-              tmp_h1_diffMean.SetBinContent(_idx, _htmp.GetMean())
-              tmp_h1_diffMean.SetBinError(_idx, _htmp.GetMeanError())
+              tmp_h1_ratioMean.SetBinContent(_idx, _htmp.GetMean())
+              tmp_h1_ratioMean.SetBinError(_idx, _htmp.GetMeanError())
               del _htmp
 
-          th1s[h_name0] = tmp_h1_diffMean
+          th1s[h_name0] = tmp_h1_ratioMean
+   ### -------------------
 
-          # RMS of Diff, in bins of Y
-          h_name1 = i_h2_key_dirname+key_varX+'_minus'+i_h2_compTag+'_RMS_wrt_'+key_varY
-          if h_name1 in th1s: KILL('aaa '+h_name1)
+   ### Histograms for mean Resolution
+   ### (requires Response histograms created in previous block)
+   for i_h2_key in th2s.keys():
 
-          tmp_h1_diffRMS = tmp_h2.ProjectionY(h_name1)
-          tmp_h1_diffRMS.SetDirectory(0)
-          tmp_h1_diffRMS.Reset()
+       i_h2_key_basename = os.path.basename(i_h2_key)
 
-          for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-              _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-              _htmp.SetDirectory(0)
-              tmp_h1_diffRMS.SetBinContent(_idx, _htmp.GetRMS())
-              tmp_h1_diffRMS.SetBinError(_idx, _htmp.GetRMSError())
-              del _htmp
+       i_h2_key_dirname = os.path.dirname(i_h2_key)
+       if i_h2_key_dirname: i_h2_key_dirname += '/'
 
-          th1s[h_name1] = tmp_h1_diffRMS
+       key_vars_split = i_h2_key_basename.split(':')
+       if len(key_vars_split) != 2:
+          KILL('ZZZ '+i_h2_key_basename)
 
-          if i_h2_key_dirname+(i_h2_key_basename.replace('_minus'+i_h2_compTag+':', '_over'+i_h2_compTag+':')) in th2s:
+       key_varX = key_vars_split[0]
+       key_varY = key_vars_split[1]
 
-             tmp_h2 = th2s[i_h2_key_dirname+(i_h2_key_basename.replace('_minus'+i_h2_compTag+':', '_over'+i_h2_compTag+':'))]
+       if key_varX.endswith('GEN'): compTag = 'GEN'
+       elif key_varX.endswith('Offline'): compTag = 'Offline'
+       else: continue
 
-             h_name2 = i_h2_key_dirname+key_varX+'_over'+i_h2_compTag+'_Mean_wrt_'+key_varY
-             if h_name2 in th1s: KILL('aaa '+h_name2)
+       if key_varX.endswith('_over'+compTag): continue
 
-             # Mean of Ratio, in bins of Y
-             tmp_h1_ratioMean = tmp_h2.ProjectionY(h_name2)
-             tmp_h1_ratioMean.SetDirectory(0)
-             tmp_h1_ratioMean.Reset()
+       tmp_h2 = th2s[i_h2_key]
 
-             for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-                 _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-                 _htmp.SetDirectory(0)
-                 tmp_h1_ratioMean.SetBinContent(_idx, _htmp.GetMean())
-                 tmp_h1_ratioMean.SetBinError(_idx, _htmp.GetMeanError())
-                 del _htmp
+       # Mean of X, in bins of Y
+       h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
+       if h_name0 in th1s: KILL('aaa '+h_name0)
 
-             th1s[h_name2] = tmp_h1_ratioMean
+       tmp_h1_xMean = tmp_h2.ProjectionY(h_name0)
+       tmp_h1_xMean.SetDirectory(0)
+       tmp_h1_xMean.Reset()
 
-             # RMS of Diff scaled by Response, in bins of Y
-             h_name3 = i_h2_key_dirname+key_varX+'_minus'+i_h2_compTag+'_RMSScaledByResponse_wrt_'+key_varY
-             if h_name3 in th1s: KILL('aaa '+h_name3)
+       for _idx in range(1, 1+tmp_h2.GetNbinsY()):
+           _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
+           _htmp.SetDirectory(0)
+           tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
+           tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
+           del _htmp
 
-             tmp_h1_ratioMeanNoErr = tmp_h1_ratioMean.Clone()
-             for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):
-                 tmp_h1_ratioMeanNoErr.SetBinError(_idx, 0)
+       th1s[h_name0] = tmp_h1_xMean
 
-             tmp_h1_ratioMeanNorm = tmp_h1_diffRMS.Clone()
-             tmp_h1_ratioMeanNorm.SetName(h_name3)
-             tmp_h1_ratioMeanNorm.SetDirectory(0)
-             tmp_h1_ratioMeanNorm.Divide(tmp_h1_ratioMeanNoErr)
+       # RMS of X, in bins of Y
+       h_name1 = i_h2_key_dirname+key_varX+'_RMS_wrt_'+key_varY
+       if h_name1 in th1s: KILL('aaa '+h_name1)
 
-             th1s[h_name3] = tmp_h1_ratioMeanNorm
+       tmp_h1_xRMS = tmp_h2.ProjectionY(h_name1)
+       tmp_h1_xRMS.SetDirectory(0)
+       tmp_h1_xRMS.Reset()
+
+       for _idx in range(1, 1+tmp_h2.GetNbinsY()):
+           _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
+           _htmp.SetDirectory(0)
+           tmp_h1_xRMS.SetBinContent(_idx, _htmp.GetRMS())
+           tmp_h1_xRMS.SetBinError(_idx, _htmp.GetRMSError())
+           del _htmp
+
+       th1s[h_name1] = tmp_h1_xRMS
+
+       # RMS of X scaled by Response, in bins of Y
+       h_name2 = i_h2_key_dirname+key_varX+'_RMSScaledByResponse_wrt_'+key_varY
+       if h_name2 in th1s: KILL('aaa '+h_name2)
+
+       h_name4 = i_h2_key_dirname+key_varX[:key_varX.rfind('_')]+'_over'+compTag+'_Mean_wrt_'+key_varY
+       if h_name4 not in th1s: KILL('aaa '+h_name4)
+
+       tmp_h1_ratioMeanNoErr = th1s[h_name4].Clone()
+       for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):
+           tmp_h1_ratioMeanNoErr.SetBinError(_idx, 0)
+
+       tmp_h1_xRMSScaled = tmp_h1_xRMS.Clone()
+       tmp_h1_xRMSScaled.SetName(h_name2)
+       tmp_h1_xRMSScaled.SetDirectory(0)
+       tmp_h1_xRMSScaled.Divide(tmp_h1_ratioMeanNoErr)
+
+       th1s[h_name2] = tmp_h1_xRMSScaled
    ### -------------------
 
    ### output file -------
