@@ -557,6 +557,44 @@ if __name__ == '__main__':
       else:
          histograms['PU200'] = getTH1sFromTFile(opts.PU200)
 
+   # Histogram Aliases:
+   #  - clone histograms to have under different name
+   #    (to aid some of the plotting)
+   histogramAliases = {}
+
+   onlineToOfflineMET_dict = {
+     'hltPFMET': 'offlineMETs_Raw',
+     'hltPFMETTypeOne': 'offlineMETs_Type1',
+     'hltPuppiMET': 'offlineMETsPuppi_Raw',
+     'hltPuppiMETTypeOne': 'offlineMETsPuppi_Type1',
+   }
+
+   for _tmp in [
+     '_pt_overOffline_Mean_wrt_',
+     '_pt_minusOffline_Mean_wrt_',
+     '_pt_paraToOffline_Mean_wrt_',
+     '_pt_perpToOffline_Mean_wrt_',
+     '_pt_minusOffline_RMS_wrt_',
+     '_pt_paraToOffline_RMS_wrt_',
+     '_pt_perpToOffline_RMS_wrt_',
+     '_pt_minusOffline_RMSScaledByResponse_wrt_',
+     '_pt_paraToOffline_RMSScaledByResponse_wrt_',
+     '_pt_perpToOffline_RMSScaledByResponse_wrt_',
+   ]:
+     for _tmp2 in onlineToOfflineMET_dict:
+         histogramAliases[_tmp2+_tmp+onlineToOfflineMET_dict[_tmp2]+'_pt'] = _tmp2+_tmp+'Offline_pt'
+
+   for tag1 in sorted(histograms.keys()):
+       for tag2 in sorted(histograms[tag1].keys()):
+           tag2_basename = os.path.basename(tag2)
+           if tag2_basename in histogramAliases:
+              tag2_basename_copy = histogramAliases[tag2_basename]
+              tag2_dirname = os.path.dirname(tag2)
+              tag2_copy = tag2_dirname+'/'+tag2_basename_copy
+              if tag2_copy in histograms[tag1]:
+                 KILL('zzz '+tag1+' '+tag2_copy)
+              histograms[tag1][tag2_copy] = histograms[tag1][tag2].Clone()
+
    apply_style(0)
 
    ROOT.TGaxis.SetMaxDigits(4)
@@ -600,7 +638,7 @@ if __name__ == '__main__':
            # pT
            plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt',
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt',
 
              templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt'),
 
@@ -620,7 +658,7 @@ if __name__ == '__main__':
            # phi
            plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
     
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi',
+             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi',
     
              templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi'),
 
@@ -634,161 +672,175 @@ if __name__ == '__main__':
 
              title = ';MET #phi [GeV];Fraction Of Events',
            )
+
+           for i_ref in ['GEN', 'Offline']:
+
+               # pT response (Ratio wrt {REF})
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_over'+i_ref,
+
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_over'+i_ref),
+
+                 logX = False,
+
+                 ratio = False,
     
-           # pT response (Ratio wrt GEN)
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_overGEN',
-
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_overGEN'),
-
-             logX = False,
-
-             ratio = False,
-
-             divideByBinWidth = False,
-
-             normalizedToUnity = True,
-
-             title = ';MET response (Ratio wrt GEN);Fraction Of Events',
-           )
+                 divideByBinWidth = False,
     
-           # pT Delta GEN (X - GEN)
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+                 normalizedToUnity = True,
     
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_minusGEN',
-
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_minusGEN'),
-
-             logX = False,
+                 title = ';MET response (Ratio wrt '+i_ref+');Fraction Of Events',
+               )
+        
+               # pT Delta {REF} (X - {REF})
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+        
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_minus'+i_ref,
     
-             ratio = False,
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_minus'+i_ref),
     
-             divideByBinWidth = False,
+                 logX = False,
+        
+                 ratio = False,
+        
+                 divideByBinWidth = False,
+        
+                 normalizedToUnity = True,
     
-             normalizedToUnity = True,
+                 title = ';MET #Deltap_{T} (X - '+i_ref+');Fraction Of Events',
+               )
+
+               # pT component parallel to {REF}
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
-             title = ';MET #Deltap_{T} (X - GEN);Fraction Of Events',
-           )
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_paraTo'+i_ref,
     
-           # pT component parallel to GEN
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_paraToGEN',
-
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraToGEN'),
-
-             logX = False,
-
-             ratio = False,
-
-             divideByBinWidth = False,
-
-             normalizedToUnity = True,
-
-             title = ';MET_{#scale[0.75]{#parallel GEN}} [GeV];Fraction Of Events',
-           )
-
-           # pT component perpendicular to GEN
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_pt_perpToGEN',
-
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_perpToGEN'),
-
-             logX = False,
-
-             ratio = False,
-
-             divideByBinWidth = False,
-
-             normalizedToUnity = True,
-
-             title = ';MET_{#scale[0.75]{#perp GEN}} [GeV];Fraction Of Events',
-           )
-
-           # phi response (Ratio wrt GEN)
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref),
     
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_overGEN',
+                 logX = False,
+    
+                 ratio = False,
+    
+                 divideByBinWidth = False,
+    
+                 normalizedToUnity = True,
+    
+                 title = ';MET_{#scale[0.75]{#parallel '+i_ref+'}} [GeV];Fraction Of Events',
+               )
+    
+               # pT component perpendicular to {REF}
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+    
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_perpTo'+i_ref,
+    
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_perpTo'+i_ref),
+    
+                 logX = False,
+    
+                 ratio = False,
+    
+                 divideByBinWidth = False,
+    
+                 normalizedToUnity = True,
+    
+                 title = ';MET_{#scale[0.75]{#perp '+i_ref+'}} [GeV];Fraction Of Events',
+               )
+    
+               # phi response (Ratio wrt {REF})
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+        
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi_over'+i_ref,
+    
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_over'+i_ref),
+    
+                 logX = False,
+        
+                 ratio = False,
+        
+                 divideByBinWidth = False,
+        
+                 normalizedToUnity = True,
+        
+                 title = ';MET #phi response (Ratio wrt '+i_ref+');Fraction Of Events',
+               )
+        
+               # phi Delta {REF} (X - {REF})
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+        
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi_minus'+i_ref,
+    
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_minus'+i_ref),
+        
+                 logX = False,
+        
+                 ratio = False,
+        
+                 divideByBinWidth = False,
+        
+                 normalizedToUnity = True,
+        
+                 title = ';MET #Delta#phi (X - '+i_ref+');Fraction Of Events',
+               )
 
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_overGEN'),
-
-             logX = False,
-    
-             ratio = False,
-    
-             divideByBinWidth = False,
-    
-             normalizedToUnity = True,
-    
-             title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
-           )
-    
-           # phi Delta GEN (X - GEN)
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-    
-             stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_minusGEN',
-
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_minusGEN'),
-    
-             logX = False,
-    
-             ratio = False,
-    
-             divideByBinWidth = False,
-    
-             normalizedToUnity = True,
-    
-             title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
-           )
-
-           # pT Response: RECO/GEN
+           # pT Response: RECO/{REF}
            for (i_key, i_title, i_ymin, i_ymax) in [
              ('pt_overGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
-             ('pt_minusGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<Reco-GEN> [GeV]', -200, 200),
-             ('pt_paraToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#parallel GEN)}> [GeV]', -200, 400),
-             ('pt_perpToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#perp GEN)} > [GeV]', -30, 30),
+             ('pt_minusGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<Reco #minus GEN> [GeV]', -200, 200),
+             ('pt_paraToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#parallel GEN)}> [GeV]', -200, 400),
+             ('pt_perpToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#perp GEN)} > [GeV]', -30, 30),
+
+             ('pt_overOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];Response <HLT/Offline>', 0.1, 3.0),
+             ('pt_minusOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<HLT#minus Offline> [GeV]', -200, 200),
+             ('pt_paraToOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<MET#scale[0.75]{(HLT#parallel Offline)}> [GeV]', -200, 400),
+             ('pt_perpToOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<MET#scale[0.75]{(HLT#perp Offline)} > [GeV]', -30, 30),
            ]:
-               tmp_name = i_met+'_'+i_key
+             tmp_name = i_met+'_'+i_key
 
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.30, Bot+(1-Bot-Top)*0.95],
+             plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.30, Bot+(1-Bot-Top)*0.95],
 
-                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
+               stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-                 templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name),
+               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name),
 
-                 yMin = i_ymin,
-                 yMax = i_ymax,
+               yMin = i_ymin,
+               yMax = i_ymax,
 
-                 title = i_title,
-               )
-               del tmp_name
+               title = i_title,
+             )
+             del tmp_name
 
            # pT Resolution (RMS)
            for (i_key, i_title) in [
-             ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) [GeV]'),
-             ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} [GeV]'),
-             ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)}  [GeV]'),
-             ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) / Response [GeV]'),
-             ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} / Response [GeV]'),
-             ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)}  / Response [GeV]'),
+             ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
+             ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
+             ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
+             ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+             ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
+             ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
+
+             ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) [GeV]'),
+             ('pt_paraToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} [GeV]'),
+             ('pt_perpToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  [GeV]'),
+             ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
+             ('pt_paraToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} / Response [GeV]'),
+             ('pt_perpToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  / Response [GeV]'),
            ]:
-               tmp_name = i_met+'_'+i_key
+             tmp_name = i_met+'_'+i_key
 
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
+             plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
 
-                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
+               stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-                 templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name),
+               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name),
 
-                 yMin = 0.1,
-                 yMax = 200,
-#                 xMax = 500,
+               yMin = 0.1,
+               yMax = 200,
+#               xMax = 500,
 
-                 title = i_title,
-               )
-               del tmp_name
+               title = i_title,
+             )
+             del tmp_name
 
        for pu_tag in ['NoPU', 'PU140', 'PU200']:
 
@@ -834,60 +886,91 @@ if __name__ == '__main__':
                  title = ';MET #phi;Fraction Of Events',
                )
 
-               # pT response (Ratio wrt GEN)
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               for i_ref in ['GEN', 'Offline']:
 
-                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_overGEN_at'+pu_tag,
-
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_overGEN'),
-
-                 normalizedToUnity = True,
-
-                 title = ';MET response (Ratio wrt GEN);Fraction Of Events',
-               )
-
-               # Phi response (Ratio wrt GEN)
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-        
-                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_overGEN_at'+pu_tag,
-        
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_overGEN'),
+                   # pT response (Ratio wrt {REF})
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
-                 normalizedToUnity = True,
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_over'+i_ref+'_at'+pu_tag,
+    
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_over'+i_ref),
+    
+                     normalizedToUnity = True,
+    
+                     title = ';MET response (Ratio wrt '+i_ref+');Fraction Of Events',
+                   )
+
+                   # pT Delta {REF}
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+            
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_minus'+i_ref+'_at'+pu_tag,
         
-                 title = ';MET #phi response (Ratio wrt GEN);Fraction Of Events',
-               )
-
-               # pT Delta GEN
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_minus'+i_ref),
         
-                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_minusGEN_at'+pu_tag,
+                     normalizedToUnity = True,
+        
+                     title = ';MET #Deltap_{T} (X - '+i_ref+') [GeV];Fraction Of Events',
+                   )
+
+                   # pT component parallel to {REF}
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_paraTo'+i_ref+'_at'+pu_tag,
+        
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref),
+
+                     normalizedToUnity = True,
+
+                     title = ';MET_{#scale[0.75]{#parallel '+i_ref+'}} [GeV];Fraction Of Events',
+                   )
+
+                   # pT component perpendicular to {REF}
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_perpTo'+i_ref+'_at'+pu_tag,
+
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_perpTo'+i_ref),
+
+                     normalizedToUnity = True,
+
+                     title = ';MET_{#scale[0.75]{#perp '+i_ref+'}} [GeV];Fraction Of Events',
+                   )
+
+                   # Phi response (Ratio wrt {REF})
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+            
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_over'+i_ref+'_at'+pu_tag,
+            
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_over'+i_ref),
+        
+                     normalizedToUnity = True,
+            
+                     title = ';MET #phi response (Ratio wrt '+i_ref+');Fraction Of Events',
+                   )
+
+                   # Phi Delta {REF}
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_minusGEN'),
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_minus'+i_ref+'_at'+pu_tag,
     
-                 normalizedToUnity = True,
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_minus'+i_ref),
     
-                 title = ';MET #Deltap_{T} (X - GEN) [GeV];Fraction Of Events',
-               )
+                     normalizedToUnity = True,
+    
+                     title = ';MET #Delta#phi (X - '+i_ref+');Fraction Of Events',
+                   )
 
-               # Phi Delta GEN
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
-
-                 stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_minusGEN_at'+pu_tag,
-
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_minusGEN'),
-
-                 normalizedToUnity = True,
-
-                 title = ';MET #Delta#phi (X - GEN);Fraction Of Events',
-               )
-
-               # pT Response: RECO/GEN
+               # pT Response: RECO/{REF}
                for (i_key, i_title, i_ymin, i_ymax) in [
                  ('pt_overGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
-                 ('pt_minusGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<Reco-GEN> [GeV]', -200, 200),
-                 ('pt_paraToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#parallel GEN)}> [GeV]', -200, 400),
-                 ('pt_perpToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#perp GEN)} > [GeV]', -30, 30),
+                 ('pt_minusGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<Reco#minus GEN> [GeV]', -200, 200),
+                 ('pt_paraToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#parallel GEN)}> [GeV]', -200, 400),
+                 ('pt_perpToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#perp GEN)} > [GeV]', -30, 30),
+
+                 ('pt_overOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];Response <HLT/Offline>', 0.1, 3.0),
+                 ('pt_minusOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<HLT#minus Offline> [GeV]', -200, 200),
+                 ('pt_paraToOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<MET#scale[0.75]{(HLT#parallel Offline)}> [GeV]', -200, 400),
+                 ('pt_perpToOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<MET#scale[0.75]{(HLT#perp Offline)} > [GeV]', -30, 30),
                ]:
                  plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
 
@@ -903,12 +986,19 @@ if __name__ == '__main__':
 
                # pT Resolution (RMS)
                for (i_key, i_title) in [
-                 ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) [GeV]'),
-                 ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} [GeV]'),
-                 ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)}  [GeV]'),
-                 ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) / Response [GeV]'),
-                 ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} / Response [GeV]'),
-                 ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)}  / Response [GeV]'),
+                 ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
+                 ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
+                 ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
+                 ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                 ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
+                 ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
+
+                 ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) [GeV]'),
+                 ('pt_paraToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} [GeV]'),
+                 ('pt_perpToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  [GeV]'),
+                 ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
+                 ('pt_paraToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} / Response [GeV]'),
+                 ('pt_perpToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  / Response [GeV]'),
                ]:
                  plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
 
