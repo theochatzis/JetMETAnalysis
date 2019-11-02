@@ -37,8 +37,8 @@ METOnlineOfflinePairs = [
   ['hltPFMET', 'offlineMETs_Raw'],
   ['hltPFMETTypeOne', 'offlineMETs_Type1'],
   ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
-  ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
   ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
+  ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
 ]
 
 #### Histograms --------------------------------------------------------------------------------------------------------------------
