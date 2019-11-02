@@ -507,10 +507,25 @@ if __name__ == '__main__':
 
    label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, 'VBF_H125ToInv_14TeV')
 
+   METCollections = [
+     'genMetTrue',
+     'hltPFMET',
+     'hltPFMETTypeOne',
+     'hltPFMETNoPileUpJME',
+     'hltSoftKillerMET',
+     'hltPuppiMET',
+     'hltPuppiMETTypeOne',
+     'hltPuppiMETWithPuppiForJets',
+     'offlineMETs_Raw',
+     'offlineMETs_Type1',
+     'offlineMETsPuppi_Raw',
+     'offlineMETsPuppi_Type1',
+   ]
+
    ### 1D Comparisons
    for i_sel in ['NoSelection/']:
 
-       for i_met in ['genMetTrue', 'hltPFMET', 'hltPFMETTypeOne', 'hltPFMETNoPileUpJME', 'hltSoftKillerMET', 'hltPuppiMET', 'hltPuppiMETTypeOne', 'hltPuppiMETWithPuppiForJets', 'offlineMETs_Type1', 'offlineMETsPuppi_Type1']:
+       for i_met in METCollections:
 
            label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
 
@@ -679,7 +694,6 @@ if __name__ == '__main__':
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+i_met+'_phi_minusGEN',
     
              templates=[
-    
                {'TH1': clone_histogram(histograms, 'NoPU', i_sel+i_met+'_phi_minusGEN', {'LineColor': 1, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'NoPU', 'legendDraw': 'l'},
                {'TH1': clone_histogram(histograms, 'PU140', i_sel+i_met+'_phi_minusGEN', {'LineColor': 4, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU140', 'legendDraw': 'l'},
                {'TH1': clone_histogram(histograms, 'PU200', i_sel+i_met+'_phi_minusGEN', {'LineColor': 2, 'LineWidth': 2}), 'draw': 'hist,e0', 'legendName': 'PU200', 'legendDraw': 'l'},
@@ -699,12 +713,13 @@ if __name__ == '__main__':
            # pT Response: RECO/GEN
            for (i_key, i_title, i_ymin, i_ymax) in [
              ('pt_overGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
-             ('pt_paraToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#parallel GEN)}>', -200, 400),
-             ('pt_perpToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#perp GEN)}>', -200, 200),
+             ('pt_minusGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<Reco-GEN> [GeV]', -200, 200),
+             ('pt_paraToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#parallel GEN)}> [GeV]', -200, 400),
+             ('pt_perpToGEN_Mean_wrt_genMetTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(RECO#perp GEN)} > [GeV]', -30, 30),
            ]:
                tmp_name = i_met+'_'+i_key
 
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.30, Bot+(1-Bot-Top)*0.95],
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/PU/'+tmp_name,
 
@@ -725,7 +740,7 @@ if __name__ == '__main__':
            for (i_key, i_title) in [
              ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) [GeV]'),
              ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} [GeV]'),
-             ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)} [GeV]'),
+             ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)}  [GeV]'),
              ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco-GEN) / Response [GeV]'),
              ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO #parallel GEN)} / Response [GeV]'),
              ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(RECO#perp GEN)}  / Response [GeV]'),
