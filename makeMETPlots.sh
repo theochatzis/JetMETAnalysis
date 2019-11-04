@@ -28,7 +28,7 @@ NEVT=100001
 
 if [ -d ${ODIR}/plots ]; then rm -rf ${ODIR}/plots; fi;
 
-"${METANA_BASE}"/metPlots.py -l QCD_Pt_0_1000_14TeV \
+"${METANA_BASE}"/metPlots.py -l QCD_Pt_0_1000_14TeV --skip-GEN \
  --NoPU  ${ODIR}/histos/Bkg/NoPU.root \
  --PU200 ${ODIR}/histos/Bkg/PU200.root \
  -o ${ODIR}/plots/Bkg \

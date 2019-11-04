@@ -113,6 +113,8 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
     plot_histograms = []
 
+    nvalid_histograms = 0
+
     for _tmp in templates:
 
         histo = Histogram()
@@ -122,6 +124,8 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
         histo.legendDraw = _tmp['legendDraw']
 
         if histo.th1 is not None:
+
+           nvalid_histograms += 1
 
            histo.draw = histo.draw + bool(histo.th1.InheritsFrom('TH1'))*',same'
 
@@ -176,7 +180,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
     h0 = canvas.DrawFrame(XMIN, YMIN, XMAX, YMAX)
 
-    if not ratio:
+    if not ratio or (nvalid_histograms == 1):
 
        canvas.SetTickx()
        canvas.SetTicky()
@@ -308,7 +312,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
        h21.SetFillColor(16)
 
        h21.GetXaxis().SetTitle(title.split(';')[1])
-       h21.GetYaxis().SetTitle('X/GEN')
+       h21.GetYaxis().SetTitle('Ratio')
        h21.GetYaxis().CenterTitle()
        h21.GetXaxis().SetTitleSize(h21.GetXaxis().GetTitleSize()/(1-pad1H))
        h21.GetYaxis().SetTitleSize(h21.GetYaxis().GetTitleSize()/(1-pad1H)*pad1H)
@@ -365,7 +369,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
     return 0
 
-def get_templates_PU(key, histograms, var):
+def get_templates_PU(key, histograms, var, skipGEN=False):
 
     the_templates = []
 
@@ -383,9 +387,16 @@ def get_templates_PU(key, histograms, var):
          {'TH1': clone_histogram(histograms, 'PU200', var, {'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': 2, 'LineColor': 2}), 'draw': 'ep', 'legendName': 'PU200', 'legendDraw': 'ep'},
        ]
 
-    return the_templates
+    the_templates_skimmed = []
+    for _tmp in the_templates:
+        if skipGEN and (_tmp['TH1'] is not None):
+           if ('genMetTrue' in _tmp['TH1'].GetName()) or ('GEN' in _tmp['TH1'].GetName()):
+              continue
+        the_templates_skimmed += [_tmp]
 
-def get_templates(key, histograms, PU_tag, directory, var):
+    return the_templates_skimmed
+
+def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
 
     the_templates = []
 
@@ -493,7 +504,14 @@ def get_templates(key, histograms, PU_tag, directory, var):
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Type1_'+var, style_dict['offlineMETsPuppi_Type1']), 'draw': opt_draw, 'legendName': 'Offline Puppi-MET Type-1', 'legendDraw': opt_legDraw},
        ]
 
-    return the_templates
+    the_templates_skimmed = []
+    for _tmp in the_templates:
+        if skipGEN and (_tmp['TH1'] is not None):
+           if ('genMetTrue' in _tmp['TH1'].GetName()) or ('GEN' in _tmp['TH1'].GetName()):
+              continue
+        the_templates_skimmed += [_tmp]
+
+    return the_templates_skimmed
 
 #### main --------------------------------------------------------------------------------------------------------------------------
 
@@ -518,6 +536,9 @@ if __name__ == '__main__':
 
    parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['pdf'],
                        help='list of extension(s) for output file(s)')
+
+   parser.add_argument('--skip-GEN', dest='skip_GEN', action='store_true', default=False,
+                       help='skip distributions related to GEN collections')
 
    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
                        help='enable verbose mode')
@@ -639,6 +660,8 @@ if __name__ == '__main__':
 
        for i_met in METCollections:
 
+           if opts.skip_GEN and (i_met == 'genMetTrue'): continue
+
            label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
 
            # pT
@@ -646,7 +669,7 @@ if __name__ == '__main__':
 
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt',
 
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt'),
+             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt', skipGEN=opts.skip_GEN),
 
              logX = True,
     
@@ -666,7 +689,7 @@ if __name__ == '__main__':
     
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi',
     
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi'),
+             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi', skipGEN=opts.skip_GEN),
 
              logX = False,
 
@@ -686,7 +709,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_over'+i_ref,
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_over'+i_ref),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_over'+i_ref, skipGEN=opts.skip_GEN),
 
                  logX = False,
 
@@ -704,7 +727,7 @@ if __name__ == '__main__':
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_minus'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_minus'+i_ref),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_minus'+i_ref, skipGEN=opts.skip_GEN),
     
                  logX = False,
         
@@ -722,7 +745,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_paraTo'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref, skipGEN=opts.skip_GEN),
     
                  logX = False,
     
@@ -740,7 +763,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_paraTo'+i_ref+'Minus'+i_ref,
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref+'Minus'+i_ref),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref+'Minus'+i_ref, skipGEN=opts.skip_GEN),
 
                  logX = False,
 
@@ -758,7 +781,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_perpTo'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_perpTo'+i_ref),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_perpTo'+i_ref, skipGEN=opts.skip_GEN),
     
                  logX = False,
     
@@ -776,7 +799,7 @@ if __name__ == '__main__':
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi_over'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_over'+i_ref),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_over'+i_ref, skipGEN=opts.skip_GEN),
     
                  logX = False,
         
@@ -794,7 +817,7 @@ if __name__ == '__main__':
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi_minus'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_minus'+i_ref),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_minus'+i_ref, skipGEN=opts.skip_GEN),
         
                  logX = False,
         
@@ -827,7 +850,7 @@ if __name__ == '__main__':
 
                stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name),
+               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
 
                yMin = i_ymin,
                yMax = i_ymax,
@@ -862,7 +885,7 @@ if __name__ == '__main__':
 
                stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name),
+               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
 
                yMin = 0.1,
                yMax = 200,
@@ -883,7 +906,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_at'+pu_tag,
     
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt'),
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt', skipGEN=opts.skip_GEN),
         
                  logX = True,
         
@@ -903,7 +926,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_at'+pu_tag,
     
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi'),
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi', skipGEN=opts.skip_GEN),
     
                  logX = False,
     
@@ -923,7 +946,7 @@ if __name__ == '__main__':
     
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_over'+i_ref+'_at'+pu_tag,
     
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_over'+i_ref),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_over'+i_ref, skipGEN=opts.skip_GEN),
     
                      normalizedToUnity = True,
     
@@ -935,7 +958,7 @@ if __name__ == '__main__':
             
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_minus'+i_ref+'_at'+pu_tag,
         
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_minus'+i_ref),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_minus'+i_ref, skipGEN=opts.skip_GEN),
         
                      normalizedToUnity = True,
         
@@ -947,7 +970,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_paraTo'+i_ref+'_at'+pu_tag,
         
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref, skipGEN=opts.skip_GEN),
 
                      normalizedToUnity = True,
 
@@ -959,7 +982,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_paraTo'+i_ref+'Minus'+i_ref+'_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref+'Minus'+i_ref),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref+'Minus'+i_ref, skipGEN=opts.skip_GEN),
 
                      normalizedToUnity = True,
 
@@ -971,7 +994,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_perpTo'+i_ref+'_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_perpTo'+i_ref),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_perpTo'+i_ref, skipGEN=opts.skip_GEN),
 
                      normalizedToUnity = True,
 
@@ -983,7 +1006,7 @@ if __name__ == '__main__':
             
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_over'+i_ref+'_at'+pu_tag,
             
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_over'+i_ref),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_over'+i_ref, skipGEN=opts.skip_GEN),
         
                      normalizedToUnity = True,
             
@@ -995,7 +1018,7 @@ if __name__ == '__main__':
     
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_minus'+i_ref+'_at'+pu_tag,
     
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_minus'+i_ref),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_minus'+i_ref, skipGEN=opts.skip_GEN),
     
                      normalizedToUnity = True,
     
@@ -1020,7 +1043,7 @@ if __name__ == '__main__':
 
                    stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_'+i_key+'_at'+pu_tag,
 
-                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key),
+                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key, skipGEN=opts.skip_GEN),
 
                    yMin = i_ymin,
                    yMax = i_ymax,
@@ -1052,7 +1075,7 @@ if __name__ == '__main__':
 
                    stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_'+i_key+'_at'+pu_tag,
 
-                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key),
+                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key, skipGEN=opts.skip_GEN),
 
                    yMin = 0.1,
                    yMax = 200,
@@ -1096,6 +1119,8 @@ if __name__ == '__main__':
        # Turn-on curves: MET pT
        for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
 
+           if opts.skip_GEN and (i_met.startswith('genMetTrue')): continue
+
            label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
 
            plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
@@ -1103,7 +1128,7 @@ if __name__ == '__main__':
              stickers=[label_sample, label_var, label_eff], output=opts.output+'/Eff_'+i_eff+'/'+i_met,
 
              templates=[
-               {'TH1': clone_graph(efficiencies, 'NoPU' , i_met, {'LineColor': 1}), 'draw': 'lepz', 'legendName': 'NoPU', 'legendDraw': 'l'},
+               {'TH1': clone_graph(efficiencies, 'NoPU' , i_met, {'LineColor': 1}), 'draw': 'lepz', 'legendName': 'NoPU' , 'legendDraw': 'l'},
                {'TH1': clone_graph(efficiencies, 'PU140', i_met, {'LineColor': 4}), 'draw': 'lepz', 'legendName': 'PU140', 'legendDraw': 'l'},
                {'TH1': clone_graph(efficiencies, 'PU200', i_met, {'LineColor': 2}), 'draw': 'lepz', 'legendName': 'PU200', 'legendDraw': 'l'},
              ],
