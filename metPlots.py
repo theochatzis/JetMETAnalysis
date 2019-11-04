@@ -513,6 +513,9 @@ if __name__ == '__main__':
    parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                        help='path to output directory')
 
+   parser.add_argument('-l', '--label', dest='label', action='store', default='',
+                       help='text label (displayed in top-left corner)')
+
    parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['pdf'],
                        help='list of extension(s) for output file(s)')
 
@@ -614,7 +617,7 @@ if __name__ == '__main__':
 
    ROOT.TGaxis.SetExponentOffset(-Lef+.50*Lef, 0.03, 'y')
 
-   label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, 'VBF_H125ToInv_14TeV')
+   label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, opts.label)
 
    METCollections = [
      'genMetTrue',

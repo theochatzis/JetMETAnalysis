@@ -1,8 +1,11 @@
 #!/bin/bash
 
-NoPU="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNtuple_VBF_HToInvisible_M125_14TeV_NoPU_temp.root
-PU140="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNtuple_VBF_HToInvisible_M125_14TeV_PU140_temp.root
-PU200="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNtuple_VBF_HToInvisible_M125_14TeV_PU200_temp.root
+BKG_NoPU="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNTuple_QCD_Pt_0_1000_14TeV_NoPU.root
+BKG_PU200="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNTuple_QCD_Pt_0_1000_14TeV_PU200_temp.root
+
+SIG_NoPU="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNTuple_VBF_HToInvisible_M125_14TeV_NoPU_temp.root
+SIG_PU140="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNTuple_VBF_HToInvisible_M125_14TeV_PU140.root
+SIG_PU200="${METANA_BASE}"/ntuples/191030_inclAging1000Fix/jmeTriggerNTuple_VBF_HToInvisible_M125_14TeV_PU200.root
 
 ODIR=output_191104
 
@@ -10,23 +13,38 @@ NEVT=-1
 
 ### ----------
 
-if [ -d ${ODIR} ]; then
+if [ ! -d ${ODIR} ]; then
 
-  printf "\n%s\n\n" " >> execution stopped --> target output directory already exists: ${ODIR}"
-  exit 1
+  mkdir -p ${ODIR}
+
+#else
+#
+#  printf "\n%s\n\n" " >> execution stopped --> target output directory already exists: ${ODIR}"
+#  exit 1
 fi
 
-mkdir -p ${ODIR}
+"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${BKG_NoPU}  -o ${ODIR}/Bkg/NoPU.root
+"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${BKG_PU200} -o ${ODIR}/Bkg/PU200.root
 
-"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${NoPU}  -o ${ODIR}/NoPU.root
-"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${PU140} -o ${ODIR}/PU140.root
-"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${PU200} -o ${ODIR}/PU200.root
+"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${SIG_NoPU}  -o ${ODIR}/Sig/NoPU.root
+"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${SIG_PU140} -o ${ODIR}/Sig/PU140.root
+"${METANA_BASE}"/metAnalysis.py -n ${NEVT} -i ${SIG_PU200} -o ${ODIR}/Sig/PU200.root
 
-"${METANA_BASE}"/metPlots.py \
- --NoPU ${ODIR}/NoPU.root \
- --PU140 ${ODIR}/PU140.root \
- --PU200 ${ODIR}/PU200.root \
- -o ${ODIR}/plots \
- -e png pdf root
+if [ -d ${ODIR}/plots ]; then rm -rf ${ODIR}/plots; fi;
 
-unset -v NoPU PU140 PU200 ODIR NEVT
+"${METANA_BASE}"/metPlots.py -l QCD_Pt_0_1000_14TeV \
+ --NoPU  ${ODIR}/Bkg/NoPU.root \
+ --PU200 ${ODIR}/Bkg/PU200.root \
+ -o ${ODIR}/plots/Bkg \
+ -e png pdf
+
+"${METANA_BASE}"/metPlots.py -l VBF_H125ToInv_14TeV \
+ --NoPU  ${ODIR}/Sig/NoPU.root \
+ --PU140 ${ODIR}/Sig/PU140.root \
+ --PU200 ${ODIR}/Sig/PU200.root \
+ -o ${ODIR}/plots/Sig \
+ -e png pdf
+
+unset -v BKG_NoPU BKG_PU200
+unset -v SIG_NoPU SIG_PU140 SIG_PU200 ODIR NEVT
+unset -v ODIR NEVT
