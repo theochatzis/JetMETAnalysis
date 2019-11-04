@@ -75,6 +75,7 @@ def create_histograms():
             binEdges_1d[i_sel+i_met+'_sumEt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
 
             binEdges_1d[i_sel+i_met+'_pt_paraToGEN'] = [-200+10*_tmp for _tmp in range(60+1)]
+            binEdges_1d[i_sel+i_met+'_pt_paraToGENMinusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
             binEdges_1d[i_sel+i_met+'_pt_perpToGEN'] = [-200+10*_tmp for _tmp in range(60+1)]
 
             for v_ref in ['genMetTrue_pt', 'genMetTrue_sumEt', 'offlineNPV']:
@@ -92,6 +93,7 @@ def create_histograms():
                 binEdges_2d[i_sel+i_met+'_sumEt_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_sumEt_overGEN'], binEdges_1d[i_sel+v_ref]]
 
                 binEdges_2d[i_sel+i_met+'_pt_paraToGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt_paraToGEN'], binEdges_1d[i_sel+v_ref]]
+                binEdges_2d[i_sel+i_met+'_pt_paraToGENMinusGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt_paraToGENMinusGEN'], binEdges_1d[i_sel+v_ref]]
                 binEdges_2d[i_sel+i_met+'_pt_perpToGEN:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt_perpToGEN'], binEdges_1d[i_sel+v_ref]]
 
         for [i_met_onl, i_met_off] in METOnlineOfflinePairs:
@@ -105,6 +107,7 @@ def create_histograms():
             binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
 
             binEdges_1d[i_sel+i_met_onl+'_pt_paraToOffline'] = [-200+10*_tmp for _tmp in range(60+1)]
+            binEdges_1d[i_sel+i_met_onl+'_pt_paraToOfflineMinusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
             binEdges_1d[i_sel+i_met_onl+'_pt_perpToOffline'] = [-200+10*_tmp for _tmp in range(60+1)]
 
             binEdges_2d[i_sel+i_met_onl+'_pt:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt'], binEdges_1d[i_sel+i_met_off+'_pt']]
@@ -116,6 +119,7 @@ def create_histograms():
             binEdges_2d[i_sel+i_met_onl+'_sumEt_overOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_sumEt_overOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
 
             binEdges_2d[i_sel+i_met_onl+'_pt_paraToOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_paraToOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
+            binEdges_2d[i_sel+i_met_onl+'_pt_paraToOfflineMinusOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_paraToOfflineMinusOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
             binEdges_2d[i_sel+i_met_onl+'_pt_perpToOffline:'+i_met_off+'_pt'] = [binEdges_1d[i_sel+i_met_onl+'_pt_perpToOffline'], binEdges_1d[i_sel+i_met_off+'_pt']]
 
     th1s = {}
@@ -185,6 +189,8 @@ def analyze_event(event, th1s={}, th2s={}):
             values[i_sel+i_met+'_pt_paraToGEN'] = iMET_vec2d.Mod() * math.cos(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
             values[i_sel+i_met+'_pt_perpToGEN'] = iMET_vec2d.Mod() * math.sin(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
 
+            values[i_sel+i_met+'_pt_paraToGENMinusGEN'] = values[i_sel+i_met+'_pt_paraToGEN'] - values[i_sel+'genMetTrue_pt']
+
             for i_var in ['pt', 'phi', 'sumEt']:
 
                 values[i_sel+i_met+'_'+i_var+'_minusGEN'] = values[i_sel+i_met+'_'+i_var] - values[i_sel+'genMetTrue_'+i_var]
@@ -206,6 +212,8 @@ def analyze_event(event, th1s={}, th2s={}):
 
             values[i_sel+i_met_onl+'_pt_paraToOffline'] = iMETonl_vec2d.Mod() * math.cos(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
             values[i_sel+i_met_onl+'_pt_perpToOffline'] = iMETonl_vec2d.Mod() * math.sin(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
+
+            values[i_sel+i_met_onl+'_pt_paraToOfflineMinusOffline'] = values[i_sel+i_met_onl+'_pt_paraToOffline'] - values[i_sel+i_met_off+'_pt']
 
             for i_var in ['pt', 'phi', 'sumEt']:
 
@@ -330,7 +338,7 @@ if __name__ == '__main__':
 
        i_inptfile.Close()
 
-   ### Histograms for mean Response
+   ### Histograms for profile of Mean
    for i_h2_key in th2s.keys():
 
        i_h2_key_basename = os.path.basename(i_h2_key)
@@ -345,9 +353,8 @@ if __name__ == '__main__':
        key_varX = key_vars_split[0]
        key_varY = key_vars_split[1]
 
-       if key_varX.endswith('GEN'): compTag = 'GEN'
-       elif key_varX.endswith('Offline'): compTag = 'Offline'
-       else: continue
+       if not (key_varX.endswith('GEN') or key_varX.endswith('Offline')):
+          continue
 
        tmp_h2 = th2s[i_h2_key]
 
@@ -369,8 +376,8 @@ if __name__ == '__main__':
        th1s[h_name0] = tmp_h1_xMean
    ### -------------------
 
-   ### Histograms for mean Resolution
-   ### (requires Response histograms created in previous block)
+   ### Histograms for profile of RMS
+   ### (requires mean-Response histograms created in previous block)
    for i_h2_key in th2s.keys():
 
        i_h2_key_basename = os.path.basename(i_h2_key)
