@@ -32,14 +32,14 @@ if [ -d ${ODIR}/plots ]; then rm -rf ${ODIR}/plots; fi;
  --NoPU  ${ODIR}/histos/Bkg/NoPU.root \
  --PU200 ${ODIR}/histos/Bkg/PU200.root \
  -o ${ODIR}/plots/Bkg \
- -e png pdf
+ -e png pdf root
 
 "${METANA_BASE}"/metPlots.py -l VBF_H125ToInv_14TeV \
  --NoPU  ${ODIR}/histos/Sig/NoPU.root \
  --PU140 ${ODIR}/histos/Sig/PU140.root \
  --PU200 ${ODIR}/histos/Sig/PU200.root \
  -o ${ODIR}/plots/Sig \
- -e png pdf
+ -e png pdf root
 
 unset -v BKG_NoPU BKG_PU200
 unset -v SIG_NoPU SIG_PU140 SIG_PU200
