@@ -41,6 +41,24 @@ METOnlineOfflinePairs = [
   ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
 ]
 
+JetCollections = [
+
+  'ak4GenJets',
+  'hltAK4PFCHSJetsCorrected',
+  'offlineAK4PFCHSJetsCorrected',
+]
+
+JetOnlineOfflinePairs = [
+
+  ['hltAK4PFCHSJetsCorrected', 'offlineAK4PFCHSJetsCorrected'],
+]
+
+def delta_phi(phi1, phi2):
+    ret = phi1 - phi2
+    if ret >  math.pi: ret -= math.pi*2
+    if ret < -math.pi: ret += math.pi*2
+    return ret
+
 #### Histograms --------------------------------------------------------------------------------------------------------------------
 
 def create_histograms():
@@ -54,6 +72,52 @@ def create_histograms():
         binEdges_1d[i_sel+'hltNPV'] = [10*_tmp for _tmp in range(40+1)]
         binEdges_1d[i_sel+'offlineNPV'] = [10*_tmp for _tmp in range(40+1)]
 
+        ### Jets
+        for i_jet in JetCollections:
+
+            for i_reg in ['', '_HB', '_HE', '_HF']:
+
+                binEdges_1d[i_sel+i_jet+i_reg+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
+                binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.6, -1.2, -0.8, -0.4, 0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
+                binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
+
+                if i_jet == 'ak4GenJets': continue
+
+                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt']  = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_eta'] = binEdges_1d[i_sel+i_jet+i_reg+'_eta']
+                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_phi'] = binEdges_1d[i_sel+i_jet+i_reg+'_phi']
+                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_dRgen'] = [0.2*_tmp for _tmp in range(25+1)]
+
+                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN']  = [-250+10*_tmp for _tmp in range(50+1)]
+
+                for v_ref in ['ak4GenJets_pt', 'ak4GenJets_eta']:
+
+                    if v_ref == 'ak4GenJets_pt':
+                       binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_pt:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt'], binEdges_1d[i_sel+v_ref]]
+
+                    if v_ref == 'ak4GenJets_eta':
+                       binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_eta:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_eta'], binEdges_1d[i_sel+v_ref]]
+
+                    binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN'], binEdges_1d[i_sel+v_ref]]
+                    binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN'], binEdges_1d[i_sel+v_ref]]
+
+        for [i_jet_onl, i_jet_off] in JetOnlineOfflinePairs:
+
+            for i_reg in ['', '_HB', '_HE', '_HF']:
+
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_dRoff'] = [0.2*_tmp for _tmp in range(25+1)]
+
+                for i_var in ['_pt', '_eta']:
+
+                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt:'+i_jet_off+i_var] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt'], binEdges_1d[i_sel+i_jet_off+i_var]]
+                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_overOffline:'+i_jet_off+i_var] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_overOffline'], binEdges_1d[i_sel+i_jet_off+i_var]]
+                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_minusOffline:'+i_jet_off+i_var] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_minusOffline'], binEdges_1d[i_sel+i_jet_off+i_var]]
+
+        ### MET
         for i_met in METCollections:
 
             binEdges_1d[i_sel+i_met+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
@@ -155,7 +219,7 @@ def create_TH2D(name, binEdges):
 
 #### Event Analysis ----------------------------------------------------------------------------------------------------------------
 
-def analyze_event(event, th1s={}, th2s={}):
+def analyze_event(event, th1s={}, th2s={}, verbose=False):
 
     values = {}
 
@@ -170,6 +234,100 @@ def analyze_event(event, th1s={}, th2s={}):
         values[i_sel+'hltNPV'] = len(event.hltGoodPrimaryVertices_z)
         values[i_sel+'offlineNPV'] = len(event.offlinePrimaryVertices_z)
 
+        ## Jets
+        for i_jet in JetCollections:
+
+            n_jets = len(getattr(event, i_jet+'_pt'))
+
+            for jet_idx in range(n_jets):
+
+                jet_pt = getattr(event, i_jet+'_pt')[jet_idx]
+                jet_eta = getattr(event, i_jet+'_eta')[jet_idx]
+                jet_phi = getattr(event, i_jet+'_phi')[jet_idx]
+                jet_mass = getattr(event, i_jet+'_mass')[jet_idx]
+
+                jet_labels = ['']
+                if abs(jet_eta) < 1.3: jet_labels += ['_HB']
+                elif abs(jet_eta) < 3.0: jet_labels += ['_HE']
+                else: jet_labels += ['_HF']
+
+                for i_reg in jet_labels:
+
+                    for _tmp in [
+                      i_sel+i_jet+i_reg+'_pt',
+                      i_sel+i_jet+i_reg+'_eta',
+                      i_sel+i_jet+i_reg+'_phi',
+                    ]:
+                      if _tmp not in values: values[_tmp] = []
+
+                    values[i_sel+i_jet+i_reg+'_pt']  += [jet_pt]
+                    values[i_sel+i_jet+i_reg+'_eta'] += [jet_eta]
+                    values[i_sel+i_jet+i_reg+'_phi'] += [jet_phi]
+
+                if i_jet == 'ak4GenJets': continue
+
+                n_genJets = len(getattr(event, 'ak4GenJets_pt'))
+
+                genJet_match = None
+                for genJet_idx in range(n_genJets):
+                    genJet_pt = getattr(event, 'ak4GenJets_pt')[genJet_idx]
+                    genJet_eta = getattr(event, 'ak4GenJets_eta')[genJet_idx]
+                    genJet_phi = getattr(event, 'ak4GenJets_phi')[genJet_idx]
+                    genJet_mass = getattr(event, 'ak4GenJets_mass')[genJet_idx]
+
+                    recogen_dEta = jet_eta - genJet_eta
+                    recogen_dPhi = delta_phi(jet_phi, genJet_phi)
+                    recogen_dR2 = (recogen_dEta*recogen_dEta + recogen_dPhi*recogen_dPhi)
+
+                    if recogen_dR2 < 0.16:
+                       if (genJet_match is None) or (recogen_dR2 < recogen_dR2min):
+                          recogen_dR2min = recogen_dR2
+                          genJet_match = genJet_idx
+
+                if genJet_match is not None:
+
+                   for _tmp in [
+                     i_sel+i_jet+i_reg+'_matchedToGEN_pt',
+                     i_sel+i_jet+i_reg+'_matchedToGEN_eta',
+                     i_sel+i_jet+i_reg+'_matchedToGEN_phi',
+                     i_sel+i_jet+i_reg+'_matchedToGEN_dRgen',
+                   ]:
+                     if _tmp not in values: values[_tmp] = []
+
+                   values[i_sel+i_jet+i_reg+'_matchedToGEN_pt'] += [jet_pt]
+                   values[i_sel+i_jet+i_reg+'_matchedToGEN_eta'] += [jet_eta]
+                   values[i_sel+i_jet+i_reg+'_matchedToGEN_phi'] += [jet_phi]
+                   values[i_sel+i_jet+i_reg+'_matchedToGEN_dRgen'] += [math.sqrt(recogen_dR2min)]
+
+                   genJet_match_pt = getattr(event, 'ak4GenJets_pt')[genJet_match]
+                   genJet_match_eta = getattr(event, 'ak4GenJets_eta')[genJet_match]
+
+                   if genJet_match_pt != 0:
+
+                      for _tmp in [
+                        i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN',
+                        i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN',
+                        i_sel+i_jet+i_reg+'_matchedToGEN_pt:'         +'ak4GenJets_pt',
+                        i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_pt',
+                        i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_pt',
+                        i_sel+i_jet+i_reg+'_matchedToGEN_eta:'        +'ak4GenJets_eta',
+                        i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_eta',
+                        i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_eta',
+                      ]:
+                        if _tmp not in values: values[_tmp] = []
+
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN']  += [jet_pt / genJet_match_pt]
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN'] += [jet_pt - genJet_match_pt]
+
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_pt:'         +'ak4GenJets_pt'] += [(jet_pt,  genJet_match_pt)]
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_pt'] += [(jet_pt / genJet_match_pt, genJet_match_pt)]
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_pt'] += [(jet_pt - genJet_match_pt, genJet_match_pt)]
+
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_eta:'        +'ak4GenJets_eta'] += [(jet_eta, genJet_match_eta)]
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_eta'] += [(jet_pt / genJet_match_pt, genJet_match_eta)]
+                      values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_eta'] += [(jet_pt - genJet_match_pt, genJet_match_eta)]
+
+        ## MET
         for i_met in METCollections:
             for i_var in ['pt', 'phi', 'sumEt']:
                 values[i_sel+i_met+'_'+i_var] = float(getattr(event, i_met+'_'+i_var)[0])
@@ -226,32 +384,61 @@ def analyze_event(event, th1s={}, th2s={}):
                 if values[i_sel+i_met_off+'_'+i_var] != 0:
                    values[i_sel+i_met_onl+'_'+i_var+'_overOffline'] = values[i_sel+i_met_onl+'_'+i_var] / values[i_sel+i_met_off+'_'+i_var]
 
+    ## histogram filling
     for i_hist_key in sorted(list(set(th1s.keys() + th2s.keys()))):
 
         if i_hist_key in th1s:
 
            if i_hist_key in values:
-              th1s[i_hist_key].Fill(values[i_hist_key])
+
+              if isinstance(values[i_hist_key], list):
+                 for _tmp in values[i_hist_key]:
+                     th1s[i_hist_key].Fill(_tmp)
+              else:
+                 th1s[i_hist_key].Fill(values[i_hist_key])
 
         elif i_hist_key in th2s:
 
-           i_hist_key_basename = os.path.basename(i_hist_key)
+           if i_hist_key in values:
 
-           i_hist_key_basename_split = i_hist_key_basename.split(':')
+              if isinstance(values[i_hist_key], list):
+                 for _tmp in values[i_hist_key]:
+                     if len(_tmp) != 2: KILL('xxx1 '+i_hist_key)
+                     th2s[i_hist_key].Fill(_tmp[0], _tmp[1])
+              else:
+                 if len(values[i_hist_key]) != 2: KILL('xxx2 '+i_hist_key)
+                 th2s[i_hist_key].Fill(values[i_hist_key][0], values[i_hist_key][1])
 
-           if len(i_hist_key_basename_split) != 2:
-              KILL('AAA')
+           else:
+              i_hist_key_basename = os.path.basename(i_hist_key)
 
-           i_hist_key_dirname = os.path.dirname(i_hist_key)
-           if i_hist_key_dirname: i_hist_key_dirname += '/'
+              i_hist_key_basename_split = i_hist_key_basename.split(':')
 
-           i_hist_key_varX = i_hist_key_dirname+i_hist_key_basename_split[0]
-           i_hist_key_varY = i_hist_key_dirname+i_hist_key_basename_split[1]
+              if len(i_hist_key_basename_split) != 2:
+                 KILL('AAA')
 
-           if i_hist_key_varX not in values: continue
-           if i_hist_key_varY not in values: continue
+              i_hist_key_dirname = os.path.dirname(i_hist_key)
+              if i_hist_key_dirname: i_hist_key_dirname += '/'
 
-           th2s[i_hist_key].Fill(values[i_hist_key_varX], values[i_hist_key_varY])
+              i_hist_key_varX = i_hist_key_dirname+i_hist_key_basename_split[0]
+              i_hist_key_varY = i_hist_key_dirname+i_hist_key_basename_split[1]
+
+              if i_hist_key_varX not in values: continue
+              if i_hist_key_varY not in values: continue
+
+              if isinstance(values[i_hist_key_varX], list):
+                 if not isinstance(values[i_hist_key_varY], list): KILL('YYY')
+                 if len(values[i_hist_key_varX]) != len(values[i_hist_key_varY]): KILL(i_hist_key_varX+' '+i_hist_key_varY)
+                 for _tmp in range(len(values[i_hist_key_varX])):
+                     th2s[i_hist_key].Fill(values[i_hist_key_varX][_tmp], values[i_hist_key_varY][_tmp])
+              else:
+                 th2s[i_hist_key].Fill(values[i_hist_key_varX], values[i_hist_key_varY])
+
+    if verbose:
+       for _tmp in sorted(values.keys()):
+           if 'met' in _tmp.lower(): continue
+           if 'jets' not in _tmp.lower(): continue
+           print colored_text(_tmp, ['1','95']), values[_tmp]
 
 #### main --------------------------------------------------------------------------------------------------------------------------
 
@@ -329,7 +516,7 @@ if __name__ == '__main__':
 
            if (opts.num_maxEvents >= 0) and (NUM_EVENTS_PROCESSED >= opts.num_maxEvents): break
 
-           analyze_event(event=i_evt, th1s=th1s, th2s=th2s)
+           analyze_event(event=i_evt, th1s=th1s, th2s=th2s, verbose=opts.verbose)
 
            NUM_EVENTS_PROCESSED += 1
 
