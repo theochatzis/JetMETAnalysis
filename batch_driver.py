@@ -160,7 +160,7 @@ if __name__ == '__main__':
 
            CMDS_1 = [
              'python -B '+PYSCRIPT_ABSPATH,
-             '-i  '+i_inpf,
+             '-i '+i_inpf,
              '-o '+OUTPUT_ABSPATH,
              '--firstEvent '+str(EVT_FIRST),
              '--lastEvent  '+str(EVT_LAST),

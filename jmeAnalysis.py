@@ -502,7 +502,7 @@ if __name__ == '__main__':
 
    for i_inpf in INPUT_FILES:
 
-       if opts.verbose: print '\033[1m'+'\033[92m'+'[input]'+'\033[0m', i_inpf
+       if opts.verbose: print colored_text('[input]', ['1','92']), i_inpf
 
        try:
           i_ttree = uproot.open(i_inpf)[opts.tree]
@@ -525,107 +525,9 @@ if __name__ == '__main__':
            analyze_event(arrays=arr, index=evt_idx, th1s=th1s, th2s=th2s, verbose=opts.verbose)
 
            if not (evt_idx % 1e3) and (evt_idx > 0):
-              print '\033[1m'+'\033[93m'+'['+str(opts.output)+']'+'\033[0m', 'processed events:', evt_idx
+              print colored_text('['+str(opts.output)+']', ['1','93']), 'processed events:', evt_idx
 
        print 'events processed:', (arr_entrystop - arr_entrystart - 1)
-
-   ### Histograms for profile of Mean
-   for i_h2_key in th2s.keys():
-
-       i_h2_key_basename = os.path.basename(i_h2_key)
-
-       i_h2_key_dirname = os.path.dirname(i_h2_key)
-       if i_h2_key_dirname: i_h2_key_dirname += '/'
-
-       key_vars_split = i_h2_key_basename.split(':')
-       if len(key_vars_split) != 2:
-          KILL('ZZZ '+i_h2_key_basename)
-
-       key_varX = key_vars_split[0]
-       key_varY = key_vars_split[1]
-
-       if not (key_varX.endswith('GEN') or key_varX.endswith('Offline')):
-          continue
-
-       tmp_h2 = th2s[i_h2_key]
-
-       # Mean of X, in bins of Y
-       h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
-       if h_name0 in th1s: KILL('aaa1 '+h_name0)
-
-       tmp_h1_xMean = tmp_h2.ProjectionY(h_name0)
-       tmp_h1_xMean.SetDirectory(0)
-       tmp_h1_xMean.Reset()
-
-       for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-           _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-           _htmp.SetDirectory(0)
-           tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
-           tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
-           del _htmp
-
-       th1s[h_name0] = tmp_h1_xMean
-   ### -------------------
-
-   ### Histograms for profile of RMS
-   ### (requires mean-Response histograms created in previous block)
-   for i_h2_key in th2s.keys():
-
-       i_h2_key_basename = os.path.basename(i_h2_key)
-
-       i_h2_key_dirname = os.path.dirname(i_h2_key)
-       if i_h2_key_dirname: i_h2_key_dirname += '/'
-
-       key_vars_split = i_h2_key_basename.split(':')
-       if len(key_vars_split) != 2:
-          KILL('ZZZ '+i_h2_key_basename)
-
-       key_varX = key_vars_split[0]
-       key_varY = key_vars_split[1]
-
-       if key_varX.endswith('GEN'): compTag = 'GEN'
-       elif key_varX.endswith('Offline'): compTag = 'Offline'
-       else: continue
-
-       if key_varX.endswith('_over'+compTag): continue
-
-       tmp_h2 = th2s[i_h2_key]
-
-       # RMS of X, in bins of Y
-       h_name1 = i_h2_key_dirname+key_varX+'_RMS_wrt_'+key_varY
-       if h_name1 in th1s: KILL('aaa3 '+h_name1)
-
-       tmp_h1_xRMS = tmp_h2.ProjectionY(h_name1)
-       tmp_h1_xRMS.SetDirectory(0)
-       tmp_h1_xRMS.Reset()
-
-       for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-           _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-           _htmp.SetDirectory(0)
-           tmp_h1_xRMS.SetBinContent(_idx, _htmp.GetRMS())
-           tmp_h1_xRMS.SetBinError(_idx, _htmp.GetRMSError())
-           del _htmp
-
-       th1s[h_name1] = tmp_h1_xRMS
-
-       # RMS of X scaled by Response, in bins of Y
-       h_name2 = i_h2_key_dirname+key_varX+'_RMSScaledByResponse_wrt_'+key_varY
-       if h_name2 in th1s: KILL('aaa4 '+h_name2)
-
-       h_name4 = i_h2_key_dirname+key_varX[:key_varX.rfind('_')]+'_over'+compTag+'_Mean_wrt_'+key_varY
-       if h_name4 not in th1s: KILL('aaa5 '+h_name4)
-
-       tmp_h1_ratioMeanNoErr = th1s[h_name4].Clone()
-       for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):
-           tmp_h1_ratioMeanNoErr.SetBinError(_idx, 0)
-
-       tmp_h1_xRMSScaled = tmp_h1_xRMS.Clone()
-       tmp_h1_xRMSScaled.SetName(h_name2)
-       tmp_h1_xRMSScaled.SetDirectory(0)
-       tmp_h1_xRMSScaled.Divide(tmp_h1_ratioMeanNoErr)
-
-       th1s[h_name2] = tmp_h1_xRMSScaled
-   ### -------------------
 
    ### output file -------
    output_dirname = os.path.dirname(os.path.abspath(opts.output))
@@ -658,5 +560,5 @@ if __name__ == '__main__':
 #   ROOT.gROOT.GetListOfFiles().Remove(output_tfile)
    output_tfile.Close()
 
-   print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', opts.output
+   print colored_text('[output]', ['1','92']), opts.output
    ### -------------------
