@@ -710,7 +710,23 @@ if __name__ == '__main__':
 
            for i_jetcat in jetCategories:
 
-               label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_jet+i_jetcat)
+               label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .030, i_jet+i_jetcat)
+
+               # N-jets
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_Njets',
+
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_Njets', skipGEN=opts.skip_GEN),
+
+                 logY = True,
+
+                 ratio = True,
+
+                 normalizedToUnity = True,
+
+                 title = ';number of jets;Fraction Of Events',
+               )
 
                # pT
                plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
@@ -1089,6 +1105,22 @@ if __name__ == '__main__':
 
                for i_jetcat in jetCategories:
 
+                   # N-jets
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_Njets_at'+pu_tag,
+
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_Njets', skipGEN=opts.skip_GEN),
+
+                     logY = True,
+
+                     ratio = True,
+
+                     normalizedToUnity = True,
+
+                     title = ';number of jets;Fraction Of Events',
+                   )
+
                    # pT
                    plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
@@ -1097,6 +1129,8 @@ if __name__ == '__main__':
                      templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt', skipGEN=opts.skip_GEN),
 
                      logX = True,
+
+                     logY = True,
 
                      ratio = True,
 

@@ -78,11 +78,15 @@ def create_histograms():
 
             for i_reg in ['', '_HB', '_HE', '_HF']:
 
+                binEdges_1d[i_sel+i_jet+i_reg+'_Njets'] = [_tmp for _tmp in range(12)]
+
                 binEdges_1d[i_sel+i_jet+i_reg+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
                 binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.6, -1.2, -0.8, -0.4, 0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
                 binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
 
                 if i_jet == 'ak4GenJets': continue
+
+                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_Njets'] = [_tmp for _tmp in range(12)]
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt']  = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
                 binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_eta'] = binEdges_1d[i_sel+i_jet+i_reg+'_eta']
@@ -224,6 +228,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
     values = {}
 
+    RecoJet_minPt = 20.
+
     for i_sel in EvtSelections:
 
         if i_sel == 'hltPFMET200/':
@@ -246,6 +252,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                 jet_eta = arrays[i_jet+'_eta'][index][jet_idx]
                 jet_phi = arrays[i_jet+'_phi'][index][jet_idx]
                 jet_mass = arrays[i_jet+'_mass'][index][jet_idx]
+
+                if (i_jet != 'ak4GenJets') and (jet_pt < RecoJet_minPt): continue
 
                 jet_labels = ['']
                 if abs(jet_eta) < 1.3: jet_labels += ['_HB']
@@ -327,6 +335,13 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                           values[i_sel+i_jet+i_reg+'_matchedToGEN_eta:'        +'ak4GenJets_eta'] += [(jet_eta, genJet_match_eta)]
                           values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_eta'] += [(jet_pt / genJet_match_pt, genJet_match_eta)]
                           values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_eta'] += [(jet_pt - genJet_match_pt, genJet_match_eta)]
+
+            njets_tags = ['', '_HB', '_HE', '_HF']
+            if (i_jet != 'ak4GenJets'):
+               njets_tags += ['_matchedToGEN', '_HB_matchedToGEN', '_HE_matchedToGEN', '_HF_matchedToGEN']
+
+            for i_jettag in njets_tags:
+                values[i_sel+i_jet+i_jettag+'_Njets'] = len(values[i_sel+i_jet+i_jettag+'_pt']) if (i_sel+i_jet+i_jettag+'_pt' in values) else 0
 
         ## MET
         for i_met in METCollections:

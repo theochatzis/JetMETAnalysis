@@ -26,7 +26,7 @@ if __name__ == '__main__':
    parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                        help='path to output directory')
 
-   parser.add_argument('-n', '--num-events-per-job', dest='num_events_per_job', type=long, action='store', default=50, required=True,
+   parser.add_argument('-n', '--num-events-per-job', dest='num_events_per_job', type=long, action='store', default=1e4,
                        help='number of events per job')
 
    parser.add_argument('--time', '--RequestRuntime', dest='RequestRuntime', action='store', default='10800',
@@ -75,8 +75,10 @@ if __name__ == '__main__':
    if len(INPUT_FILES) == 0:
       KILL(log_prx+'empty list of input files containing MEM TTrees [-i]')
 
-   if os.path.exists(opts.output):
-      KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
+   if os.path.isdir(opts.output):
+      WARNING(log_prx+'output directory already exists, new files will be added to it [-o]: '+opts.output)
+   elif os.path.exists(opts.output):
+      KILL(log_prx+'target path to output directory already exists and it is not a directory [-o]: '+opts.output)
 
    OUT_DIR = os.path.abspath(opts.output)
 
