@@ -11,7 +11,7 @@ source env.sh
 
 ## Batch Jobs
 
-* Create scripts for submission of batch jobs (default script [-s]: jmeAnalysis.py):
+* Create scripts for submission of batch jobs:
 ```
 batch_driver.py -s jmeAnalysis.py -i ${NTUDIR}/*root -o ${OUTDIR}/prod -n 5000
 ```
@@ -28,7 +28,7 @@ batch_monitor.py -i ${OUTDIR}
 merge_batchOutputs.py -i ${OUTDIR}/prod/*.root -o ${OUTDIR}/outputs
 ```
 
-* Harvest outputs of jmeAnalysis.py script:
+* Harvest outputs of `jmeAnalysis.py` script (produces profiles, efficiencies, etc):
 ```
 jmeAnalysisHarvester.py -i ${OUTDIR}/outputs/*.root -o ${OUTDIR}/outputs_postHarvesting
 ```
