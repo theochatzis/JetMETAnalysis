@@ -456,6 +456,9 @@ if __name__ == '__main__':
    parser.add_argument('-t', '--tree', dest='tree', action='store', default='JMETriggerNTuple/Events',
                        help='key of TTree in input file(s)')
 
+   parser.add_argument('-e', '--every', dest='every', action='store', type=int, default=1e2,
+                       help='show progress of processing every N events')
+
    parser.add_argument('-f', '--firstEvent', dest='firstEvent', action='store', type=int, default=0,
                        help='index of first event to be processed (inclusive)')
 
@@ -493,6 +496,11 @@ if __name__ == '__main__':
    if os.path.exists(opts.output):
       KILL(log_prx+'target path to output .root file already exists [-o]: '+opts.output)
 
+   SHOW_EVERY = opts.every
+   if SHOW_EVERY <= 0:
+      WARNING(log_prx+'invalid (non-positive) value for option "-e/--every" ('+str(SHOW_EVERY)+'), value will be changed to 100')
+      SHOW_EVERY = 1e2
+
    if len(opts_unknown) > 0:
       KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
    ### -------------------
@@ -502,7 +510,7 @@ if __name__ == '__main__':
 
    for i_inpf in INPUT_FILES:
 
-       if opts.verbose: print colored_text('[input]', ['1','92']), i_inpf
+       if opts.verbose: print colored_text('[input]', ['1','92']), os.path.relpath(i_inpf)
 
        try:
           i_ttree = uproot.open(i_inpf)[opts.tree]
@@ -524,10 +532,10 @@ if __name__ == '__main__':
 
            analyze_event(arrays=arr, index=evt_idx, th1s=th1s, th2s=th2s, verbose=opts.verbose)
 
-           if not (evt_idx % 1e3) and (evt_idx > 0):
-              print colored_text('['+str(opts.output)+']', ['1','93']), 'processed events:', evt_idx
+           if not (evt_idx % SHOW_EVERY) and (evt_idx > 0):
+              print colored_text('['+str(os.path.relpath(opts.output))+']', ['1','93']), 'events processed:', evt_idx
 
-       print 'events processed:', (arr_entrystop - arr_entrystart - 1)
+       print 'events processed:', (arr_entrystop - arr_entrystart)
 
    ### output file -------
    output_dirname = os.path.dirname(os.path.abspath(opts.output))
@@ -560,5 +568,5 @@ if __name__ == '__main__':
 #   ROOT.gROOT.GetListOfFiles().Remove(output_tfile)
    output_tfile.Close()
 
-   print colored_text('[output]', ['1','92']), opts.output
+   print colored_text('[output]', ['1','92']), os.path.relpath(opts.output)
    ### -------------------

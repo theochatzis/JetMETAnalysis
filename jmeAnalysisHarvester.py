@@ -94,6 +94,8 @@ if __name__ == '__main__':
       KILL(log_prx+'target path to output file/directory already exists [-o]: '+opts.output)
    ### -------------------
 
+   ROOT.TH1.AddDirectory(False)
+
    for inpf in INPUT_FILES:
 
        ### Input Histograms
@@ -102,7 +104,7 @@ if __name__ == '__main__':
        ### Histograms for profile of Mean
        for i_h2_key in sorted(histograms.keys()):
 
-           if not histograms.InheritsFrom('TH2'):
+           if not histograms[i_h2_key].InheritsFrom('TH2'):
               continue
 
            i_h2_key_basename = os.path.basename(i_h2_key)
@@ -144,7 +146,7 @@ if __name__ == '__main__':
        ### (requires mean-Response histograms created in previous block)
        for i_h2_key in sorted(histograms.keys()):
 
-           if not histograms.InheritsFrom('TH2'):
+           if not histograms[i_h2_key].InheritsFrom('TH2'):
               continue
 
            i_h2_key_basename = os.path.basename(i_h2_key)

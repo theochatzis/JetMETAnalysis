@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 import argparse
 import os
-import glob
-import array
-import copy
 import ROOT
 
 from common.utils import *
@@ -82,7 +79,8 @@ def updateDictionary(dictionary, TDirectory, prefix=''):
            dictionary[out_key] = j_obj.Clone()
            dictionary[out_key].SetDirectory(0)
 
-           if opts.verbose: print '\033[1m'+'\033[92m'+'[input]'+'\033[0m', out_key
+           if opts.verbose:
+              print colored_text('[input]', ['1','92']), out_key
 
     return dictionary
 
@@ -365,7 +363,7 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
         canvas.SaveAs(out_file)
 
-        print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', os.path.relpath(out_file)
+        print colored_text('[file]', ['1','95']), os.path.relpath(out_file)
 
     return 0
 
@@ -406,8 +404,12 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
        opt_legDraw = 'ep'
 
        style_dict = {
-         'genMetTrue': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
 
+         'ak4GenJets': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
+         'hltAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kOrange+1},
+         'offlineAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kOrange+1},
+
+         'genMetTrue': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
          'hltPFMET': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kOrange+1},
          'hltPFMETTypeOne': {'LineColor': ROOT.kRed, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kRed},
          'hltPuppiMET': {'LineColor': ROOT.kAzure, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kAzure},
@@ -415,10 +417,8 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          'hltPuppiMETWithPuppiForJets': {'LineColor': ROOT.kCyan, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kCyan},
          'hltPFMETNoPileUpJME': {'LineColor': ROOT.kGray+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kGray+1},
          'hltSoftKillerMET': {'LineColor': ROOT.kPink+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kPink+1},
-
          'offlineMETs_Raw': {'LineColor': ROOT.kOrange+1, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kOrange+1},
          'offlineMETs_Type1': {'LineColor': ROOT.kRed, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kRed},
-
          'offlineMETsPuppi_Raw': {'LineColor': ROOT.kAzure, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kAzure},
          'offlineMETsPuppi_Type1': {'LineColor': ROOT.kViolet, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kViolet},
        }
@@ -429,8 +429,12 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
        opt_legDraw = 'l'
 
        style_dict = {
-         'genMetTrue': {'LineColor': 1},
 
+         'ak4GenJets': {'LineColor': 1},
+         'hltAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2},
+         'offlineAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1},
+
+         'genMetTrue': {'LineColor': 1},
          'hltPFMET': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2},
          'hltPFMETTypeOne': {'LineColor': ROOT.kRed, 'LineStyle': 2},
          'hltPuppiMET': {'LineColor': ROOT.kAzure, 'LineStyle': 2},
@@ -438,15 +442,20 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          'hltPuppiMETWithPuppiForJets': {'LineColor': ROOT.kCyan, 'LineStyle': 2},
          'hltPFMETNoPileUpJME': {'LineColor': ROOT.kGray+1, 'LineStyle': 2},
          'hltSoftKillerMET': {'LineColor': ROOT.kPink+1, 'LineStyle': 2},
-
          'offlineMETs_Raw': {'LineColor': ROOT.kOrange+1},
          'offlineMETs_Type1': {'LineColor': ROOT.kRed},
-
          'offlineMETsPuppi_Raw': {'LineColor': ROOT.kAzure},
          'offlineMETsPuppi_Type1': {'LineColor': ROOT.kViolet},
        }
 
-    if key in ['PF', 'PF_p']:
+    if key in ['PFCHSCorrected', 'PFCHSCorrected_p']:
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'ak4GenJets'+var, style_dict['ak4GenJets']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltAK4PFCHSJetsCorrected'+var, style_dict['hltAK4PFCHSJetsCorrected']), 'draw': opt_draw, 'legendName': 'HLT PF+CHS', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineAK4PFCHSJetsCorrected'+var, style_dict['offlineAK4PFCHSJetsCorrected']), 'draw': opt_draw, 'legendName': 'Offline PF+CHS', 'legendDraw': opt_legDraw},
+       ]
+
+    elif key in ['PF', 'PF_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMET_'+var, style_dict['hltPFMET']), 'draw': opt_draw, 'legendName': 'HLT PF-MET Raw', 'legendDraw': opt_legDraw},
@@ -673,9 +682,162 @@ if __name__ == '__main__':
      'offlineMETsPuppi_Type1',
    ]
 
+   JetCollections = [
+
+     'ak4GenJets',
+     'hltAK4PFCHSJetsCorrected',
+     'offlineAK4PFCHSJetsCorrected',
+   ]
+
+   JetOnlineOfflinePairs = [
+
+     ['hltAK4PFCHSJetsCorrected', 'offlineAK4PFCHSJetsCorrected'],
+   ]
+
    ### 1D Comparisons
    for i_sel in ['NoSelection/']:
 
+       ## ----------------------------------------------------------------------------------------------------
+       ## [Jets]: comparisons of different PU scenarios
+       ## ----------------------------------------------------------------------------------------------------
+       for i_jet in JetCollections:
+
+           if opts.skip_GEN and (i_jet == 'ak4GenJets'): continue
+
+           jetCategories = ['', '_HB', '_HE', '_HF']
+           if i_jet != 'ak4GenJets':
+              jetCategories += ['_matchedToGEN', '_HB_matchedToGEN', '_HE_matchedToGEN', '_HF_matchedToGEN']
+
+           for i_jetcat in jetCategories:
+
+               label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_jet+i_jetcat)
+
+               # pT
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_pt',
+
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt', skipGEN=opts.skip_GEN),
+
+                 logX = True,
+
+                 logY = True,
+
+                 ratio = True,
+
+                 xMin = 10,
+
+                 divideByBinWidth = True,
+
+                 normalizedToUnity = True,
+
+                 title = ';Jet p_{T} [GeV];a.u.',
+               )
+
+               # eta
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_eta',
+
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_eta', skipGEN=opts.skip_GEN),
+
+                 ratio = True,
+
+                 divideByBinWidth = True,
+
+                 normalizedToUnity = True,
+
+                 title = ';Jet #eta;a.u.',
+               )
+
+               # phi
+               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                 stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_phi',
+
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_phi', skipGEN=opts.skip_GEN),
+
+                 ratio = True,
+
+                 normalizedToUnity = True,
+
+                 title = ';Jet #phi;a.u.',
+               )
+
+               for i_ref in ['GEN']:
+
+                   # pT response (Ratio wrt {REF})
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_pt_over'+i_ref,
+
+                     templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt_over'+i_ref, skipGEN=opts.skip_GEN),
+
+                     normalizedToUnity = True,
+
+                     title = ';Jet p_{T} response (Ratio wrt '+i_ref+');a.u.',
+                   )
+
+                   # pT Delta {REF} (X - {REF})
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_pt_minus'+i_ref,
+
+                     templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt_minus'+i_ref, skipGEN=opts.skip_GEN),
+
+                     normalizedToUnity = True,
+
+                     title = ';Jet #Deltap_{T} (X - '+i_ref+');a.u.',
+                   )
+
+               # pT Response wrt GEN pT/eta
+               for (i_key, i_title, i_ymin, i_ymax) in [
+                 ('pt_overGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
+                 ('pt_overGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;Response <Reco/GEN>', 0.1, 3.0),
+                 ('pt_minusGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];<Reco #minus GEN> [GeV]', -200, 200),
+                 ('pt_minusGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;<Reco #minus GEN> [GeV]', -200, 200),
+               ]:
+                 tmp_name = i_jet+i_jetcat+'_'+i_key
+
+                 plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.30, Bot+(1-Bot-Top)*0.95],
+
+                   stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
+
+                   templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
+
+                   yMin = i_ymin,
+                   yMax = i_ymax,
+
+                   title = i_title,
+                 )
+                 del tmp_name
+
+               # pT Resolution (RMS) wrt GEN pT/eta
+               for (i_key, i_title) in [
+                 ('pt_minusGEN_RMS_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
+                 ('pt_minusGEN_RMS_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) [GeV]'),
+                 ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                 ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
+               ]:
+                 tmp_name = i_jet+i_jetcat+'_'+i_key
+
+                 plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
+
+                   stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
+
+                   templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
+
+                   yMin = 0.1,
+                   yMax = 200,
+#                   xMax = 500,
+
+                   title = i_title,
+                 )
+                 del tmp_name
+
+       ## ----------------------------------------------------------------------------------------------------
+       ## [MET] comparisons of different PU scenarios
+       ## ----------------------------------------------------------------------------------------------------
        for i_met in METCollections:
 
            if opts.skip_GEN and (i_met == 'genMetTrue'): continue
@@ -913,6 +1075,144 @@ if __name__ == '__main__':
              )
              del tmp_name
 
+       ## ----------------------------------------------------------------------------------------------------
+       ## [Jets] Compare collections in different input samples
+       ## ----------------------------------------------------------------------------------------------------
+       for pu_tag in ['NoPU', 'PU140', 'PU200']:
+
+           label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
+
+           for comp_tag in ['PFCHSCorrected']:
+
+               jetCategories = ['', '_HB', '_HE', '_HF']
+               jetCategories += ['_matchedToGEN', '_HB_matchedToGEN', '_HE_matchedToGEN', '_HF_matchedToGEN']
+
+               for i_jetcat in jetCategories:
+
+                   # pT
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_pt_at'+pu_tag,
+
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt', skipGEN=opts.skip_GEN),
+
+                     logX = True,
+
+                     ratio = True,
+
+                     xMin = 10,
+
+                     divideByBinWidth = True,
+
+                     normalizedToUnity = True,
+
+                     title = ';Jet p_{T} [GeV];a.u.',
+                   )
+
+                   # eta
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_eta_at'+pu_tag,
+
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_eta', skipGEN=opts.skip_GEN),
+
+                     logX = True,
+
+                     ratio = True,
+
+                     divideByBinWidth = True,
+
+                     normalizedToUnity = True,
+
+                     title = ';Jet #eta;a.u.',
+                   )
+
+                   # phi
+                   plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                     stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_phi_at'+pu_tag,
+
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_phi', skipGEN=opts.skip_GEN),
+
+                     logX = False,
+
+                     ratio = True,
+
+                     divideByBinWidth = False,
+
+                     normalizedToUnity = True,
+
+                     title = ';Jet #phi;a.u.',
+                   )
+
+                   for i_ref in ['GEN']:
+
+                       # pT response (Ratio wrt {REF})
+                       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_pt_over'+i_ref+'_at'+pu_tag,
+
+                         templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt_over'+i_ref, skipGEN=opts.skip_GEN),
+
+                         normalizedToUnity = True,
+
+                         title = ';Jet p_{T} response (Ratio wrt '+i_ref+');a.u.',
+                       )
+
+                       # pT Delta (Diff wrt {REF})
+                       plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+
+                         stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_pt_minus'+i_ref+'_at'+pu_tag,
+
+                         templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt_minus'+i_ref, skipGEN=opts.skip_GEN),
+
+                         normalizedToUnity = True,
+
+                         title = ';Jet #Deltap_{T} (X - '+i_ref+') [GeV];a.u.',
+                       )
+
+                   # pT Response: RECO/{REF}
+                   for (i_key, i_title, i_ymin, i_ymax) in [
+                     ('pt_overGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
+                     ('pt_overGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;Response <Reco/GEN>', 0.1, 3.0),
+                     ('pt_minusGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];<Reco#minus GEN> [GeV]', -200, 200),
+                     ('pt_minusGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;<Reco#minus GEN> [GeV]', -200, 200),
+                   ]:
+                     plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
+
+                       stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_'+i_key+'_at'+pu_tag,
+
+                       templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_jetcat+'_'+i_key, skipGEN=opts.skip_GEN),
+
+                       yMin = i_ymin,
+                       yMax = i_ymax,
+
+                       title = i_title,
+                     )
+
+                   # pT Resolution (RMS)
+                   for (i_key, i_title) in [
+                     ('pt_minusGEN_RMS_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
+                     ('pt_minusGEN_RMS_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) [GeV]'),
+                     ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                     ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
+                   ]:
+                     plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
+
+                       stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_'+i_key+'_at'+pu_tag,
+
+                       templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_jetcat+'_'+i_key, skipGEN=opts.skip_GEN),
+
+                       yMin = 0.1,
+                       yMax = 200,
+#                       xMax = 500,
+
+                       title = i_title,
+                     )
+
+       ## ----------------------------------------------------------------------------------------------------
+       ## [MET] Compare collections in different input samples
+       ## ----------------------------------------------------------------------------------------------------
        for pu_tag in ['NoPU', 'PU140', 'PU200']:
 
            label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
@@ -1166,4 +1466,4 @@ if __name__ == '__main__':
              title = ';'+i_met+' [GeV];Efficiency',
            )
 
-   print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', opts.output
+   print colored_text('[output]', ['1','92']), opts.output
