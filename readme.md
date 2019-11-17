@@ -1,6 +1,6 @@
-# Tools for JetMET Analysis
+# Tools for Jet/MET Analysis
 
-Workflow to produce JetMET performance plots from "flat" ROOT NTuples
+Workflow to produce Jet/MET performance plots from "flat" ROOT NTuples
 
 ## Setup
 
