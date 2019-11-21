@@ -518,7 +518,7 @@ if __name__ == '__main__':
 
    ROOT.TGaxis.SetExponentOffset(-Lef+.50*Lef, 0.03, 'y')
 
-   label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, opts.label)
+   label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .040, opts.label)
 
    METCollections = [
      'genMetTrue',
