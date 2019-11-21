@@ -405,9 +405,11 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
 
        style_dict = {
 
-         'ak4GenJets': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
+         'ak4GenJetsNoNu': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
          'hltAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kOrange+1},
+         'hltAK4PuppiJetsCorrected': {'LineColor': ROOT.kViolet, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kViolet},
          'offlineAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kOrange+1},
+         'offlineAK4PuppiJetsCorrected': {'LineColor': ROOT.kViolet, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kViolet},
 
          'genMetTrue': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
          'hltPFMET': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kOrange+1},
@@ -430,9 +432,11 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
 
        style_dict = {
 
-         'ak4GenJets': {'LineColor': 1},
+         'ak4GenJetsNoNu': {'LineColor': 1},
          'hltAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2},
+         'hltAK4PuppiJetsCorrected': {'LineColor': ROOT.kViolet, 'LineStyle': 2},
          'offlineAK4PFCHSJetsCorrected': {'LineColor': ROOT.kOrange+1},
+         'offlineAK4PuppiJetsCorrected': {'LineColor': ROOT.kViolet},
 
          'genMetTrue': {'LineColor': 1},
          'hltPFMET': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2},
@@ -448,14 +452,35 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          'offlineMETsPuppi_Type1': {'LineColor': ROOT.kViolet},
        }
 
-    if key in ['PFCHSCorrected', 'PFCHSCorrected_p']:
+    if key in ['AK4PFCHSCorrected', 'AK4PFCHSCorrected_p']:
        the_templates += [
-         {'TH1': clone_histogram(histograms, PU_tag, directory+'ak4GenJets'+var, style_dict['ak4GenJets']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'ak4GenJetsNoNu'+var, style_dict['ak4GenJetsNoNu']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltAK4PFCHSJetsCorrected'+var, style_dict['hltAK4PFCHSJetsCorrected']), 'draw': opt_draw, 'legendName': 'HLT PF+CHS', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineAK4PFCHSJetsCorrected'+var, style_dict['offlineAK4PFCHSJetsCorrected']), 'draw': opt_draw, 'legendName': 'Offline PF+CHS', 'legendDraw': opt_legDraw},
        ]
 
-    elif key in ['PF', 'PF_p']:
+    elif key in ['AK4PuppiCorrected', 'AK4PuppiCorrected_p']:
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'ak4GenJetsNoNu'+var, style_dict['ak4GenJetsNoNu']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltAK4PuppiJetsCorrected'+var, style_dict['hltAK4PuppiJetsCorrected']), 'draw': opt_draw, 'legendName': 'HLT AK4 Puppi','legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineAK4PuppiJetsCorrected'+var, style_dict['offlineAK4PuppiJetsCorrected']), 'draw': opt_draw, 'legendName': 'Offline AK4 Puppi', 'legendDraw': opt_legDraw},
+       ]
+
+    elif key in ['HLTAK4', 'HLTAK4_p']:
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'ak4GenJetsNoNu'+var, style_dict['ak4GenJetsNoNu']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltAK4PFCHSJetsCorrected'+var, style_dict['hltAK4PFCHSJetsCorrected']), 'draw': opt_draw,'legendName': 'HLT AK4 PF+CHS','legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'hltAK4PuppiJetsCorrected'+var, style_dict['hltAK4PuppiJetsCorrected']), 'draw': opt_draw,'legendName': 'HLT AK4 Puppi','legendDraw': opt_legDraw},
+       ]
+
+    elif key in ['OfflineAK4', 'OfflineAK4_p']:
+       the_templates += [
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'ak4GenJetsNoNu'+var, style_dict['ak4GenJetsNoNu']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineAK4PFCHSJetsCorrected'+var, style_dict['offlineAK4PFCHSJetsCorrected']), 'draw': opt_draw, 'legendName': 'Offline AK4 PF+CHS', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineAK4PuppiJetsCorrected'+var, style_dict['offlineAK4PuppiJetsCorrected']), 'draw': opt_draw, 'legendName': 'Offline AK4 Puppi', 'legendDraw': opt_legDraw},
+       ]
+
+    elif key in ['PFMET', 'PFMET_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMET_'+var, style_dict['hltPFMET']), 'draw': opt_draw, 'legendName': 'HLT PF-MET Raw', 'legendDraw': opt_legDraw},
@@ -464,21 +489,21 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Type1_'+var, style_dict['offlineMETs_Type1']), 'draw': opt_draw, 'legendName': 'Offline PF-MET Type-1', 'legendDraw': opt_legDraw},
        ]
 
-    elif key in ['PF_Raw', 'PF_Raw_p']:
+    elif key in ['PFMET_Raw', 'PFMET_Raw_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMET_'+var, style_dict['hltPFMET']), 'draw': opt_draw, 'legendName': 'HLT PF-MET Raw', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Raw_'+var, style_dict['offlineMETs_Raw']), 'draw': opt_draw, 'legendName': 'Offline PF-MET Raw', 'legendDraw': opt_legDraw},
        ]
 
-    elif key in ['PF_Type1', 'PF_Type1_p']:
+    elif key in ['PFMET_Type1', 'PFMET_Type1_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMETTypeOne_'+var, style_dict['hltPFMETTypeOne']), 'draw': opt_draw, 'legendName': 'HLT PF-MET Type-1', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Type1_'+var, style_dict['offlineMETs_Type1']), 'draw': opt_draw, 'legendName': 'Offline PF-MET Type-1', 'legendDraw': opt_legDraw},
        ]
 
-    elif key in ['Puppi', 'Puppi_p']:
+    elif key in ['PuppiMET', 'PuppiMET_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMET_'+var, style_dict['hltPuppiMET']), 'draw': opt_draw, 'legendName': 'HLT Puppi-MET Raw', 'legendDraw': opt_legDraw},
@@ -487,21 +512,21 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Type1_'+var, style_dict['offlineMETsPuppi_Type1']), 'draw': opt_draw, 'legendName': 'Offline Puppi-MET Type-1', 'legendDraw': opt_legDraw},
        ]
 
-    elif key in ['Puppi_Raw', 'Puppi_Raw_p']:
+    elif key in ['PuppiMET_Raw', 'PuppiMET_Raw_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMET_'+var, style_dict['hltPuppiMET']), 'draw': opt_draw, 'legendName': 'HLT Puppi-MET Raw', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Raw_'+var, style_dict['offlineMETsPuppi_Raw']), 'draw': opt_draw,'legendName': 'Offline Puppi-MET Raw','legendDraw': opt_legDraw},
        ]
 
-    elif key in ['Puppi_Type1', 'Puppi_Type1_p']:
+    elif key in ['PuppiMET_Type1', 'PuppiMET_Type1_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMETTypeOne_'+var, style_dict['hltPuppiMETTypeOne']), 'draw': opt_draw, 'legendName': 'HLT Puppi-MET Type-1', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Type1_'+var, style_dict['offlineMETsPuppi_Type1']), 'draw': opt_draw, 'legendName': 'Offline Puppi-MET Type-1', 'legendDraw': opt_legDraw},
        ]
 
-    elif key in ['HLT_Raw', 'HLT_Raw_p']:
+    elif key in ['HLTMET_Raw', 'HLTMET_Raw_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMET_'+var, style_dict['hltPFMET']), 'draw': opt_draw, 'legendName': 'HLT PF-MET Raw', 'legendDraw': opt_legDraw},
@@ -510,21 +535,21 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltSoftKillerMET_'+var, style_dict['hltSoftKillerMET']), 'draw': opt_draw, 'legendName': 'HLT SoftKiller-MET Raw','legendDraw': opt_legDraw},
        ]
 
-    elif key in ['HLT_Type1', 'HLT_Type1_p']:
+    elif key in ['HLTMET_Type1', 'HLTMET_Type1_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMETTypeOne_'+var, style_dict['hltPFMETTypeOne']), 'draw': opt_draw, 'legendName': 'HLT PF-MET Type-1', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMETTypeOne_'+var, style_dict['hltPuppiMETTypeOne']), 'draw': opt_draw, 'legendName': 'HLT Puppi-MET Type-1','legendDraw': opt_legDraw},
        ]
 
-    elif key in ['Offline_Raw', 'Offline_Raw_p']:
+    elif key in ['OfflineMET_Raw', 'OfflineMET_Raw_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Raw_'+var, style_dict['offlineMETs_Raw']), 'draw': opt_draw, 'legendName': 'Offline PF-MET Raw', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETsPuppi_Raw_'+var, style_dict['offlineMETsPuppi_Raw']), 'draw': opt_draw, 'legendName': 'Offline Puppi-MET Raw', 'legendDraw': opt_legDraw},
        ]
 
-    elif key in ['Offline_Type1', 'Offline_Type1_p']:
+    elif key in ['OfflineMET_Type1', 'OfflineMET_Type1_p']:
        the_templates += [
          {'TH1': clone_histogram(histograms, PU_tag, directory+'genMetTrue_'+var, style_dict['genMetTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'offlineMETs_Type1_'+var, style_dict['offlineMETs_Type1']), 'draw': opt_draw, 'legendName': 'Offline PF-MET Type-1', 'legendDraw': opt_legDraw},
@@ -684,14 +709,17 @@ if __name__ == '__main__':
 
    JetCollections = [
 
-     'ak4GenJets',
+     'ak4GenJetsNoNu',
      'hltAK4PFCHSJetsCorrected',
+     'hltAK4PuppiJetsCorrected',
      'offlineAK4PFCHSJetsCorrected',
+     'offlineAK4PuppiJetsCorrected',
    ]
 
    JetOnlineOfflinePairs = [
 
      ['hltAK4PFCHSJetsCorrected', 'offlineAK4PFCHSJetsCorrected'],
+     ['hltAK4PuppiJetsCorrected', 'offlineAK4PuppiJetsCorrected'],
    ]
 
    ### 1D Comparisons
@@ -702,10 +730,10 @@ if __name__ == '__main__':
        ## ----------------------------------------------------------------------------------------------------
        for i_jet in JetCollections:
 
-           if opts.skip_GEN and (i_jet == 'ak4GenJets'): continue
+           if opts.skip_GEN and (i_jet == 'ak4GenJetsNoNu'): continue
 
-           jetCategories = ['', '_HB', '_HE', '_HF']
-           if i_jet != 'ak4GenJets':
+           jetCategories = ['_EtaIncl', '_HB', '_HE', '_HF']
+           if i_jet != 'ak4GenJetsNoNu':
               jetCategories += ['_matchedToGEN', '_HB_matchedToGEN', '_HE_matchedToGEN', '_HF_matchedToGEN']
 
            for i_jetcat in jetCategories:
@@ -808,10 +836,10 @@ if __name__ == '__main__':
 
                # pT Response wrt GEN pT/eta
                for (i_key, i_title, i_ymin, i_ymax) in [
-                 ('pt_overGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
-                 ('pt_overGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;Response <Reco/GEN>', 0.1, 3.0),
-                 ('pt_minusGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];<Reco #minus GEN> [GeV]', -200, 200),
-                 ('pt_minusGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;<Reco #minus GEN> [GeV]', -200, 200),
+                 ('pt_overGEN_Mean_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
+                 ('pt_overGEN_Mean_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;Response <Reco/GEN>', 0.1, 3.0),
+                 ('pt_minusGEN_Mean_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];<Reco #minus GEN> [GeV]', -200, 200),
+                 ('pt_minusGEN_Mean_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;<Reco #minus GEN> [GeV]', -200, 200),
                ]:
                  tmp_name = i_jet+i_jetcat+'_'+i_key
 
@@ -830,10 +858,10 @@ if __name__ == '__main__':
 
                # pT Resolution (RMS) wrt GEN pT/eta
                for (i_key, i_title) in [
-                 ('pt_minusGEN_RMS_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
-                 ('pt_minusGEN_RMS_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) [GeV]'),
-                 ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
-                 ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
+                 ('pt_minusGEN_RMS_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
+                 ('pt_minusGEN_RMS_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;RMS(Reco#minus GEN) [GeV]'),
+                 ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                 ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
                ]:
                  tmp_name = i_jet+i_jetcat+'_'+i_key
 
@@ -1098,9 +1126,9 @@ if __name__ == '__main__':
 
            label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
 
-           for comp_tag in ['PFCHSCorrected']:
+           for comp_tag in ['AK4PFCHSCorrected', 'AK4PuppiCorrected', 'HLTAK4', 'OfflineAK4']:
 
-               jetCategories = ['', '_HB', '_HE', '_HF']
+               jetCategories = ['_EtaIncl', '_HB', '_HE', '_HF']
                jetCategories += ['_matchedToGEN', '_HB_matchedToGEN', '_HE_matchedToGEN', '_HF_matchedToGEN']
 
                for i_jetcat in jetCategories:
@@ -1149,8 +1177,6 @@ if __name__ == '__main__':
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_eta_at'+pu_tag,
 
                      templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_eta', skipGEN=opts.skip_GEN),
-
-                     logX = True,
 
                      ratio = True,
 
@@ -1207,10 +1233,10 @@ if __name__ == '__main__':
 
                    # pT Response: RECO/{REF}
                    for (i_key, i_title, i_ymin, i_ymax) in [
-                     ('pt_overGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
-                     ('pt_overGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;Response <Reco/GEN>', 0.1, 3.0),
-                     ('pt_minusGEN_Mean_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];<Reco#minus GEN> [GeV]', -200, 200),
-                     ('pt_minusGEN_Mean_wrt_ak4GenJets_eta', ';GenJet #eta;<Reco#minus GEN> [GeV]', -200, 200),
+                     ('pt_overGEN_Mean_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
+                     ('pt_overGEN_Mean_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;Response <Reco/GEN>', 0.1, 3.0),
+                     ('pt_minusGEN_Mean_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];<Reco#minus GEN> [GeV]', -200, 200),
+                     ('pt_minusGEN_Mean_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;<Reco#minus GEN> [GeV]', -200, 200),
                    ]:
                      plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
 
@@ -1226,10 +1252,10 @@ if __name__ == '__main__':
 
                    # pT Resolution (RMS)
                    for (i_key, i_title) in [
-                     ('pt_minusGEN_RMS_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
-                     ('pt_minusGEN_RMS_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) [GeV]'),
-                     ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
-                     ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJets_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
+                     ('pt_minusGEN_RMS_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
+                     ('pt_minusGEN_RMS_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;RMS(Reco#minus GEN) [GeV]'),
+                     ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                     ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
                    ]:
                      plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
 
@@ -1251,7 +1277,7 @@ if __name__ == '__main__':
 
            label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
 
-           for comp_tag in ['PF', 'PF_Raw', 'PF_Type1', 'Puppi', 'Puppi_Raw', 'Puppi_Type1', 'HLT_Raw', 'HLT_Type1', 'Offline_Raw', 'Offline_Type1']:
+           for comp_tag in ['PFMET', 'PFMET_Raw', 'PFMET_Type1', 'PuppiMET', 'PuppiMET_Raw', 'PuppiMET_Type1', 'HLTMET_Raw', 'HLTMET_Type1', 'OfflineMET_Raw', 'OfflineMET_Type1']:
 
                # pT
                plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],

@@ -26,7 +26,7 @@ if __name__ == '__main__':
    parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                        help='path to output directory')
 
-   parser.add_argument('-n', '--num-events-per-job', dest='num_events_per_job', type=long, action='store', default=1e4,
+   parser.add_argument('-n', '--nperjob', dest='nperjob', type=long, action='store', default=None, required=True,
                        help='number of events per job')
 
    parser.add_argument('--time', '--RequestRuntime', dest='RequestRuntime', action='store', default='10800',
@@ -123,7 +123,7 @@ if __name__ == '__main__':
        if i_evtN == 0:
           minmax_evts = [ [0,0] ]
        else:
-          minmax_evts = [ [long(_tmp * opts.num_events_per_job), min(long(i_evtN-1), long(((_tmp+1) * opts.num_events_per_job)-1))] for _tmp in range(long(math.ceil(float(i_evtN)/opts.num_events_per_job)))]
+          minmax_evts = [ [long(_tmp * opts.nperjob), min(long(i_evtN-1), long(((_tmp+1) * opts.nperjob)-1))] for _tmp in range(long(math.ceil(float(i_evtN)/opts.nperjob)))]
 
        for j_minmax_evt in range(len(minmax_evts)):
 

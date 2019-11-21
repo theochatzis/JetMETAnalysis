@@ -3,6 +3,7 @@ import argparse
 import os
 import glob
 import array
+import copy
 import math
 import ROOT
 import uproot
@@ -42,16 +43,21 @@ METOnlineOfflinePairs = [
   ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
 ]
 
+GenJetsCollection = 'ak4GenJetsNoNu'
+
 JetCollections = [
 
-  'ak4GenJets',
+  GenJetsCollection,
   'hltAK4PFCHSJetsCorrected',
+  'hltAK4PuppiJetsCorrected',
   'offlineAK4PFCHSJetsCorrected',
+  'offlineAK4PuppiJetsCorrected',
 ]
 
 JetOnlineOfflinePairs = [
 
   ['hltAK4PFCHSJetsCorrected', 'offlineAK4PFCHSJetsCorrected'],
+  ['hltAK4PuppiJetsCorrected', 'offlineAK4PuppiJetsCorrected'],
 ]
 
 def delta_phi(phi1, phi2):
@@ -76,51 +82,61 @@ def create_histograms():
         ### Jets
         for i_jet in JetCollections:
 
-            for i_reg in ['', '_HB', '_HE', '_HF']:
+            for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_Njets'] = [_tmp for _tmp in range(12)]
-
+                binEdges_1d[i_sel+i_jet+i_reg+'_njets'] = [_tmp for _tmp in range(31)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
-                binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.6, -1.2, -0.8, -0.4, 0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
+                binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.6, -1.3, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.3, 1.6, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
                 binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_mass'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600]
 
-                if i_jet == 'ak4GenJets': continue
+                if i_jet == GenJetsCollection: continue
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_Njets'] = [_tmp for _tmp in range(12)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_njets'] = [_tmp for _tmp in range(31)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt']  = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta'] = binEdges_1d[i_sel+i_jet+i_reg+'_eta']
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_phi'] = binEdges_1d[i_sel+i_jet+i_reg+'_phi']
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass'] = binEdges_1d[i_sel+i_jet+i_reg+'_mass']
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_dRmatch'] = [0.2*_tmp for _tmp in range(25+1)]
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt']  = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
-                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_eta'] = binEdges_1d[i_sel+i_jet+i_reg+'_eta']
-                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_phi'] = binEdges_1d[i_sel+i_jet+i_reg+'_phi']
-                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_dRgen'] = [0.2*_tmp for _tmp in range(25+1)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_minusGEN']  = [-250+10*_tmp for _tmp in range(50+1)]
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN']  = [-250+10*_tmp for _tmp in range(50+1)]
+                for v_ref in [GenJetsCollection+'_EtaIncl_pt', GenJetsCollection+'_EtaIncl_eta']:
 
-                for v_ref in ['ak4GenJets_pt', 'ak4GenJets_eta']:
+                    if v_ref == GenJetsCollection+'_EtaIncl_pt':
+                       binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt'], binEdges_1d[i_sel+v_ref]]
 
-                    if v_ref == 'ak4GenJets_pt':
-                       binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_pt:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt'], binEdges_1d[i_sel+v_ref]]
+                    if v_ref == GenJetsCollection+'_EtaIncl_eta':
+                       binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta'], binEdges_1d[i_sel+v_ref]]
 
-                    if v_ref == 'ak4GenJets_eta':
-                       binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_eta:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_eta'], binEdges_1d[i_sel+v_ref]]
-
-                    binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN'], binEdges_1d[i_sel+v_ref]]
-                    binEdges_2d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN'], binEdges_1d[i_sel+v_ref]]
+                    binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_overGEN'], binEdges_1d[i_sel+v_ref]]
+                    binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_minusGEN'], binEdges_1d[i_sel+v_ref]]
 
         for [i_jet_onl, i_jet_off] in JetOnlineOfflinePairs:
 
-            for i_reg in ['', '_HB', '_HE', '_HF']:
+            for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
 
-                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt']
-                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
-                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_minusOffline'] = [-250+10*_tmp for _tmp in range(50+1)]
-                binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_dRoff'] = [0.2*_tmp for _tmp in range(25+1)]
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_njets'] = [_tmp for _tmp in range(31)]
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt']  = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_eta'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_eta']
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_phi'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_phi']
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_mass'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_mass']
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_dRmatch'] = [0.2*_tmp for _tmp in range(25+1)]
 
-                for i_var in ['_pt', '_eta']:
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt_overOffline'] = [0.1*_tmp for _tmp in range(50+1)]
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt_minusOffline']  = [-250+10*_tmp for _tmp in range(50+1)]
 
-                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt:'+i_jet_off+i_var] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt'], binEdges_1d[i_sel+i_jet_off+i_var]]
-                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_overOffline:'+i_jet_off+i_var] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_overOffline'], binEdges_1d[i_sel+i_jet_off+i_var]]
-                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_minusOffline:'+i_jet_off+i_var] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_matchedToOffline_pt_minusOffline'], binEdges_1d[i_sel+i_jet_off+i_var]]
+                for v_ref in [i_jet_off+'_EtaIncl_pt', i_jet_off+'_EtaIncl_eta']:
+
+                    if v_ref == i_jet_off+'_EtaIncl_pt':
+                       binEdges_2d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt:'+v_ref] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt'], binEdges_1d[i_sel+v_ref]]
+
+                    if v_ref == i_jet_off+'_EtaIncl_eta':
+                       binEdges_2d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_eta:'+v_ref] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_eta'], binEdges_1d[i_sel+v_ref]]
+
+                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt_overOffline:'+v_ref] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt_overOffline'], binEdges_1d[i_sel+v_ref]]
+                    binEdges_2d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt_minusOffline:'+v_ref] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt_minusOffline'], binEdges_1d[i_sel+v_ref]]
 
         ### MET
         for i_met in METCollections:
@@ -224,181 +240,347 @@ def create_TH2D(name, binEdges):
 
 #### Event Analysis ----------------------------------------------------------------------------------------------------------------
 
+def jetMatchingIndices(arrays, index, jetColl1, jetColl2, jetPtMin1, jetPtMin2, maxDeltaR):
+
+    _ret = []
+
+    maxDeltaR2 = maxDeltaR*maxDeltaR
+
+    njets1 = len(arrays[jetColl1+'_pt'][index])
+    njets2 = len(arrays[jetColl2+'_pt'][index])
+
+    for jet1_idx in range(njets1):
+
+        bestMatch_idx = None
+        bestMatch_dR2 = -1
+
+        jet1_pt  = arrays[jetColl1+'_pt'] [index][jet1_idx]
+        jet1_eta = arrays[jetColl1+'_eta'][index][jet1_idx]
+        jet1_phi = arrays[jetColl1+'_phi'][index][jet1_idx]
+
+        if jet1_pt >= jetPtMin1:
+
+           for jet2_idx in range(njets2):
+
+               jet2_pt  = arrays[jetColl2+'_pt'] [index][jet2_idx]
+               jet2_eta = arrays[jetColl2+'_eta'][index][jet2_idx]
+               jet2_phi = arrays[jetColl2+'_phi'][index][jet2_idx]
+
+               if jet2_pt < jetPtMin2: continue
+
+               dEta = jet1_eta - jet2_eta
+               dPhi = delta_phi(jet1_phi, jet2_phi)
+               dR2 = dEta*dEta + dPhi*dPhi
+
+               if (dR2 < maxDeltaR2):
+                  if (bestMatch_idx is None) or (dR2 < bestMatch_dR2):
+                     bestMatch_idx = jet2_idx
+                     bestMatch_dR2 = dR2
+
+        _ret.append(bestMatch_idx)
+
+    return _ret
+
 def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
     values = {}
 
+    GenJet_minPt = 20.
     RecoJet_minPt = 20.
+
+    ## Event Values
+
+    values['hltNPV'] = len(arrays['hltGoodPrimaryVertices_z'][index])
+    values['offlineNPV'] = len(arrays['offlinePrimaryVertices_z'][index])
+
+    ## Jets
+
+    # indeces for matching objects in different Jet collections
+    jetMatchingIndices_dict = {}
+
+    for i_jet in JetCollections:
+        if i_jet == GenJetsCollection: continue
+
+        if i_jet not in jetMatchingIndices_dict:
+           jetMatchingIndices_dict[i_jet] = {}
+
+        if GenJetsCollection in jetMatchingIndices_dict[i_jet]:
+           KILL('mmm1')
+
+        jetMatchingIndices_dict[i_jet][GenJetsCollection] = jetMatchingIndices(
+          arrays=arrays, index=index, jetColl1=i_jet, jetColl2=GenJetsCollection, jetPtMin1=RecoJet_minPt, jetPtMin2=GenJet_minPt, maxDeltaR=0.4,
+        )
+
+    for [i_onlineJetColl, i_offlineJetColl] in JetOnlineOfflinePairs:
+
+        if i_onlineJetColl not in jetMatchingIndices_dict:
+           jetMatchingIndices_dict[i_onlineJetColl] = {}
+
+        if i_offlineJetColl in jetMatchingIndices_dict[i_onlineJetColl]:
+           KILL('mmm2')
+
+        jetMatchingIndices_dict[i_onlineJetColl][i_offlineJetColl] = jetMatchingIndices(
+          arrays=arrays, index=index, jetColl1=i_onlineJetColl, jetColl2=i_offlineJetColl, jetPtMin1=RecoJet_minPt, jetPtMin2=RecoJet_minPt, maxDeltaR=0.4,
+        )
+
+    # Jets: all collections + Reco-to-GEN matching
+    for i_jet in JetCollections:
+
+        # initialize value lists
+        for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
+
+            _tmp_vlist = [
+              i_jet+i_reg+'_pt',
+              i_jet+i_reg+'_eta',
+              i_jet+i_reg+'_phi',
+              i_jet+i_reg+'_mass',
+              i_jet+i_reg+'_MatchedToGEN_pt',
+              i_jet+i_reg+'_MatchedToGEN_eta',
+              i_jet+i_reg+'_MatchedToGEN_phi',
+              i_jet+i_reg+'_MatchedToGEN_mass',
+              i_jet+i_reg+'_MatchedToGEN_dRmatch',
+            ]
+
+            if i_jet != GenJetsCollection:
+               _tmp_vlist += [
+                 i_jet+i_reg+'_MatchedToGEN_pt_overGEN',
+                 i_jet+i_reg+'_MatchedToGEN_pt_minusGEN',
+                 i_jet+i_reg+'_MatchedToGEN_pt:'         +GenJetsCollection+'_EtaIncl_pt',
+                 i_jet+i_reg+'_MatchedToGEN_pt_overGEN:' +GenJetsCollection+'_EtaIncl_pt',
+                 i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+GenJetsCollection+'_EtaIncl_pt',
+                 i_jet+i_reg+'_MatchedToGEN_eta:'        +GenJetsCollection+'_EtaIncl_eta',
+                 i_jet+i_reg+'_MatchedToGEN_pt_overGEN:' +GenJetsCollection+'_EtaIncl_eta',
+                 i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+GenJetsCollection+'_EtaIncl_eta',
+               ]
+
+            for _tmp in _tmp_vlist:
+                if _tmp in values:
+                   KILL('analyze_event -- logic error: attempting to re-initialize value list: '+_tmp)
+                else:
+                   values[_tmp] = []
+
+        n_jets = len(arrays[i_jet+'_pt'][index])
+
+        for jet_idx in range(n_jets):
+            jet_pt = arrays[i_jet+'_pt'][index][jet_idx]
+            jet_eta = arrays[i_jet+'_eta'][index][jet_idx]
+            jet_phi = arrays[i_jet+'_phi'][index][jet_idx]
+            jet_mass = arrays[i_jet+'_mass'][index][jet_idx]
+
+            if (jet_pt < (GenJet_minPt if (i_jet == GenJetsCollection) else RecoJet_minPt)): continue
+
+            jet_labels = ['_EtaIncl']
+            if abs(jet_eta) < 1.3: jet_labels += ['_HB']
+            elif abs(jet_eta) < 3.0: jet_labels += ['_HE']
+            else: jet_labels += ['_HF']
+
+            for i_reg in jet_labels:
+
+                values[i_jet+i_reg+'_pt'] += [jet_pt]
+                values[i_jet+i_reg+'_eta'] += [jet_eta]
+                values[i_jet+i_reg+'_phi'] += [jet_phi]
+                values[i_jet+i_reg+'_mass'] += [jet_mass]
+
+                if i_jet == GenJetsCollection: continue
+
+                genJet_match = jetMatchingIndices_dict[i_jet][GenJetsCollection][jet_idx]
+
+                if genJet_match is not None:
+
+                   genJet_match_pt = arrays[GenJetsCollection+'_pt'][index][genJet_match]
+                   genJet_match_eta = arrays[GenJetsCollection+'_eta'][index][genJet_match]
+                   genJet_match_phi = arrays[GenJetsCollection+'_phi'][index][genJet_match]
+
+                   recoGen_dEta = jet_eta - genJet_match_eta
+                   recoGen_dPhi = delta_phi(jet_phi, genJet_match_phi)
+                   recoGen_dRmatch = math.sqrt(recoGen_dEta*recoGen_dEta + recoGen_dPhi*recoGen_dPhi)
+
+                   values[i_jet+i_reg+'_MatchedToGEN_pt'] += [jet_pt]
+                   values[i_jet+i_reg+'_MatchedToGEN_eta'] += [jet_eta]
+                   values[i_jet+i_reg+'_MatchedToGEN_phi'] += [jet_phi]
+                   values[i_jet+i_reg+'_MatchedToGEN_mass'] += [jet_mass]
+                   values[i_jet+i_reg+'_MatchedToGEN_dRmatch'] += [recoGen_dRmatch]
+
+                   if genJet_match_pt != 0:
+
+                      values[i_jet+i_reg+'_MatchedToGEN_pt_overGEN']  += [jet_pt / genJet_match_pt]
+                      values[i_jet+i_reg+'_MatchedToGEN_pt_minusGEN'] += [jet_pt - genJet_match_pt]
+
+                      values[i_jet+i_reg+'_MatchedToGEN_pt:'         +GenJetsCollection+'_EtaIncl_pt'] += [(jet_pt,  genJet_match_pt)]
+                      values[i_jet+i_reg+'_MatchedToGEN_pt_overGEN:' +GenJetsCollection+'_EtaIncl_pt'] += [(jet_pt / genJet_match_pt, genJet_match_pt)]
+                      values[i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+GenJetsCollection+'_EtaIncl_pt'] += [(jet_pt - genJet_match_pt, genJet_match_pt)]
+
+                      values[i_jet+i_reg+'_MatchedToGEN_eta:'        +GenJetsCollection+'_EtaIncl_eta'] += [(jet_eta, genJet_match_eta)]
+                      values[i_jet+i_reg+'_MatchedToGEN_pt_overGEN:' +GenJetsCollection+'_EtaIncl_eta'] += [(jet_pt / genJet_match_pt, genJet_match_eta)]
+                      values[i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+GenJetsCollection+'_EtaIncl_eta'] += [(jet_pt - genJet_match_pt, genJet_match_eta)]
+
+        njets_tags = ['_EtaIncl', '_HB', '_HE', '_HF']
+        if (i_jet != GenJetsCollection):
+           njets_tags += ['_MatchedToGEN', '_HB_MatchedToGEN', '_HE_MatchedToGEN', '_HF_MatchedToGEN']
+
+        for i_jettag in njets_tags:
+            values[i_jet+i_jettag+'_njets'] = len(values[i_jet+i_jettag+'_pt']) if (i_jet+i_jettag+'_pt' in values) else 0
+
+    # Jets: Online-to-Offline matching
+    for [i_onlineJetColl, i_offlineJetColl] in JetOnlineOfflinePairs:
+
+        # initialize value-lists
+        for i_onlineJetReg in ['_EtaIncl', '_HB', '_HE', '_HF']:
+            for _tmp in [
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_njets',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_eta',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_phi',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_mass',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_dRmatch',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_overOffline',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt:'+i_offlineJetColl+'_EtaIncl_pt',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_eta:'+i_offlineJetColl+'_EtaIncl_eta',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_overOffline:'+i_offlineJetColl+'_EtaIncl_pt',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_overOffline:'+i_offlineJetColl+'_EtaIncl_eta',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_pt',
+              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_eta',
+            ]:
+              if _tmp in values:
+                 KILL('analyze_event -- logic error: attempting to re-initialize value list: '+_tmp)
+              else:
+                 values[_tmp] = []
+
+        n_onlineJets = len(arrays[i_onlineJetColl+'_pt'][index])
+
+        for onlineJet_idx in range(n_onlineJets):
+
+            onlineJet_pt = arrays[i_onlineJetColl+'_pt'][index][onlineJet_idx]
+            onlineJet_eta = arrays[i_onlineJetColl+'_eta'][index][onlineJet_idx]
+            onlineJet_phi = arrays[i_onlineJetColl+'_phi'][index][onlineJet_idx]
+            onlineJet_mass = arrays[i_onlineJetColl+'_mass'][index][onlineJet_idx]
+
+            if (onlineJet_pt < RecoJet_minPt): continue
+
+            onlineJet_labels = ['_EtaIncl']
+            if abs(onlineJet_eta) < 1.3: onlineJet_labels += ['_HB']
+            elif abs(onlineJet_eta) < 3.0: onlineJet_labels += ['_HE']
+            else: onlineJet_labels += ['_HF']
+
+            for i_onlineJetReg in onlineJet_labels:
+
+                offlineJet_match = jetMatchingIndices_dict[i_onlineJetColl][i_offlineJetColl][onlineJet_idx]
+
+                if offlineJet_match is not None:
+
+                   offlineJet_pt  = arrays[i_offlineJetColl+'_pt'] [index][offlineJet_match]
+                   offlineJet_eta = arrays[i_offlineJetColl+'_eta'][index][offlineJet_match]
+                   offlineJet_phi = arrays[i_offlineJetColl+'_phi'][index][offlineJet_match]
+
+                   onlineOffline_dEta = onlineJet_eta - offlineJet_eta
+                   onlineOffline_dPhi = delta_phi(onlineJet_phi, offlineJet_phi)
+                   onlineOffline_dRmatch = math.sqrt(onlineOffline_dEta*onlineOffline_dEta + onlineOffline_dPhi*onlineOffline_dPhi)
+
+                   values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt'] += [onlineJet_pt]
+                   values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_eta'] += [onlineJet_eta]
+                   values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_phi'] += [onlineJet_phi]
+                   values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_mass'] += [onlineJet_mass]
+                   values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_dRmatch'] += [onlineOffline_dRmatch]
+
+                   if offlineJet_pt != 0:
+
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_overOffline'] += [onlineJet_pt / offlineJet_pt]
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline'] += [onlineJet_pt - offlineJet_pt]
+
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt:'+i_offlineJetColl+'_EtaIncl_pt'] += [(onlineJet_pt, offlineJet_pt)]
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_eta:'+i_offlineJetColl+'_EtaIncl_eta'] += [(onlineJet_eta, offlineJet_eta)]
+
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_overOffline:'+i_offlineJetColl+'_EtaIncl_pt'] += [(onlineJet_pt / offlineJet_pt, offlineJet_pt)]
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_overOffline:'+i_offlineJetColl+'_EtaIncl_eta'] += [(onlineJet_pt / offlineJet_pt, offlineJet_eta)]
+
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_pt'] += [(onlineJet_pt - offlineJet_pt, offlineJet_pt)]
+                      values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_eta'] += [(onlineJet_pt - offlineJet_pt, offlineJet_eta)]
+
+        njets_tags = ['_MatchedToOffline', '_HB_MatchedToOffline', '_HE_MatchedToOffline', '_HF_MatchedToOffline']
+
+        for i_jettag in njets_tags:
+            values[i_onlineJetColl+i_jettag+'_njets'] = len(values[i_onlineJetColl+i_jettag+'_pt']) if (i_onlineJetColl+i_jettag+'_pt' in values) else 0
+
+    ## MET
+    for i_met in METCollections:
+        for i_var in ['pt', 'phi', 'sumEt']:
+            values[i_met+'_'+i_var] = arrays[i_met+'_'+i_var][index][0]
+
+    genMetTrue_vec2d = ROOT.TVector2()
+    genMetTrue_vec2d.SetMagPhi(values['genMetTrue_pt'], values['genMetTrue_phi'])
+
+    for i_met in METCollections:
+
+        if i_met == 'genMetTrue': continue
+
+        values[i_met+'_pt'], values[i_met+'_phi']
+
+        iMET_vec2d = ROOT.TVector2()
+        iMET_vec2d.SetMagPhi(values[i_met+'_pt'], values[i_met+'_phi'])
+
+        values[i_met+'_pt_paraToGEN'] = iMET_vec2d.Mod() * math.cos(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
+        values[i_met+'_pt_perpToGEN'] = iMET_vec2d.Mod() * math.sin(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
+
+        values[i_met+'_pt_paraToGENMinusGEN'] = values[i_met+'_pt_paraToGEN'] - values['genMetTrue_pt']
+
+        for i_var in ['pt', 'phi', 'sumEt']:
+
+            values[i_met+'_'+i_var+'_minusGEN'] = values[i_met+'_'+i_var] - values['genMetTrue_'+i_var]
+            if i_var == 'phi':
+               values[i_met+'_'+i_var+'_minusGEN'] = abs(values[i_met+'_'+i_var+'_minusGEN'])
+               if values[i_met+'_'+i_var+'_minusGEN'] > math.pi:
+                  values[i_met+'_'+i_var+'_minusGEN'] = 2*math.pi - values[i_met+'_'+i_var+'_minusGEN']
+
+            if values['genMetTrue_'+i_var] != 0:
+               values[i_met+'_'+i_var+'_overGEN'] = values[i_met+'_'+i_var] / values['genMetTrue_'+i_var]
+
+    for [i_met_onl, i_met_off] in METOnlineOfflinePairs:
+
+        iMETonl_vec2d = ROOT.TVector2()
+        iMETonl_vec2d.SetMagPhi(values[i_met_onl+'_pt'], values[i_met_onl+'_phi'])
+
+        iMEToff_vec2d = ROOT.TVector2()
+        iMEToff_vec2d.SetMagPhi(values[i_met_off+'_pt'], values[i_met_off+'_phi'])
+
+        values[i_met_onl+'_pt_paraToOffline'] = iMETonl_vec2d.Mod() * math.cos(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
+        values[i_met_onl+'_pt_perpToOffline'] = iMETonl_vec2d.Mod() * math.sin(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
+
+        values[i_met_onl+'_pt_paraToOfflineMinusOffline'] = values[i_met_onl+'_pt_paraToOffline'] - values[i_met_off+'_pt']
+
+        for i_var in ['pt', 'phi', 'sumEt']:
+
+            values[i_met_onl+'_'+i_var+'_minusOffline'] = values[i_met_onl+'_'+i_var] - values[i_met_off+'_'+i_var]
+            if i_var == 'phi':
+               values[i_met_onl+'_'+i_var+'_minusOffline'] = abs(values[i_met_onl+'_'+i_var+'_minusOffline'])
+               if values[i_met_onl+'_'+i_var+'_minusOffline'] > math.pi:
+                  values[i_met_onl+'_'+i_var+'_minusOffline'] = 2*math.pi - values[i_met_onl+'_'+i_var+'_minusOffline']
+
+            if values[i_met_off+'_'+i_var] != 0:
+               values[i_met_onl+'_'+i_var+'_overOffline'] = values[i_met_onl+'_'+i_var] / values[i_met_off+'_'+i_var]
+
+    ## copies of event values under different categories/selections
+    value_keys = values.keys()
 
     for i_sel in EvtSelections:
 
-        if i_sel == 'hltPFMET200/':
-           if not (values['NoSelection/hltPFMET_pt'] > 200.): continue
+        # selections
+        if i_sel == 'NoSelection/': pass
 
-        if i_sel == 'hltPuppiMET200/':
-           if not (values['NoSelection/hltPuppiMET_pt'] > 200.): continue
+        elif i_sel == 'hltPFMET200/':
+           if not (values['hltPFMET_pt'] > 200.): continue
 
-        values[i_sel+'hltNPV'] = len(arrays['hltGoodPrimaryVertices_z'][index])
-        values[i_sel+'offlineNPV'] = len(arrays['offlinePrimaryVertices_z'][index])
+        elif i_sel == 'hltPuppiMET200/':
+           if not (values['hltPuppiMET_pt'] > 200.): continue
 
-        ## Jets
-        for i_jet in JetCollections:
+        # copies
+        for _tmp in value_keys:
+            if '/' in _tmp: continue
 
-            n_jets = len(arrays[i_jet+'_pt'][index])
+            if i_sel+_tmp in values:
+               KILL(log_prx+'logic error: attempting to overwrite event value under key "'+i_sel+_tmp+'"')
 
-            for jet_idx in range(n_jets):
-
-                jet_pt = arrays[i_jet+'_pt'][index][jet_idx]
-                jet_eta = arrays[i_jet+'_eta'][index][jet_idx]
-                jet_phi = arrays[i_jet+'_phi'][index][jet_idx]
-                jet_mass = arrays[i_jet+'_mass'][index][jet_idx]
-
-                if (i_jet != 'ak4GenJets') and (jet_pt < RecoJet_minPt): continue
-
-                jet_labels = ['']
-                if abs(jet_eta) < 1.3: jet_labels += ['_HB']
-                elif abs(jet_eta) < 3.0: jet_labels += ['_HE']
-                else: jet_labels += ['_HF']
-
-                for i_reg in jet_labels:
-
-                    for _tmp in [
-                      i_sel+i_jet+i_reg+'_pt',
-                      i_sel+i_jet+i_reg+'_eta',
-                      i_sel+i_jet+i_reg+'_phi',
-                    ]:
-                      if _tmp not in values: values[_tmp] = []
-
-                    values[i_sel+i_jet+i_reg+'_pt']  += [jet_pt]
-                    values[i_sel+i_jet+i_reg+'_eta'] += [jet_eta]
-                    values[i_sel+i_jet+i_reg+'_phi'] += [jet_phi]
-
-                    if i_jet == 'ak4GenJets': continue
-
-                    n_genJets = len(arrays['ak4GenJets_pt'][index])
-
-                    genJet_match = None
-                    for genJet_idx in range(n_genJets):
-                        genJet_pt = arrays['ak4GenJets_pt'][index][genJet_idx]
-                        genJet_eta = arrays['ak4GenJets_eta'][index][genJet_idx]
-                        genJet_phi = arrays['ak4GenJets_phi'][index][genJet_idx]
-                        genJet_mass = arrays['ak4GenJets_mass'][index][genJet_idx]
-
-                        recogen_dEta = jet_eta - genJet_eta
-                        recogen_dPhi = delta_phi(jet_phi, genJet_phi)
-                        recogen_dR2 = (recogen_dEta*recogen_dEta + recogen_dPhi*recogen_dPhi)
-
-                        if recogen_dR2 < 0.16:
-                           if (genJet_match is None) or (recogen_dR2 < recogen_dR2min):
-                              recogen_dR2min = recogen_dR2
-                              genJet_match = genJet_idx
-
-                    if genJet_match is not None:
-
-                       for _tmp in [
-                         i_sel+i_jet+i_reg+'_matchedToGEN_pt',
-                         i_sel+i_jet+i_reg+'_matchedToGEN_eta',
-                         i_sel+i_jet+i_reg+'_matchedToGEN_phi',
-                         i_sel+i_jet+i_reg+'_matchedToGEN_dRgen',
-                       ]:
-                         if _tmp not in values: values[_tmp] = []
-
-                       values[i_sel+i_jet+i_reg+'_matchedToGEN_pt'] += [jet_pt]
-                       values[i_sel+i_jet+i_reg+'_matchedToGEN_eta'] += [jet_eta]
-                       values[i_sel+i_jet+i_reg+'_matchedToGEN_phi'] += [jet_phi]
-                       values[i_sel+i_jet+i_reg+'_matchedToGEN_dRgen'] += [math.sqrt(recogen_dR2min)]
-
-                       genJet_match_pt = arrays['ak4GenJets_pt'][index][genJet_match]
-                       genJet_match_eta = arrays['ak4GenJets_eta'][index][genJet_match]
-
-                       if genJet_match_pt != 0:
-
-                          for _tmp in [
-                            i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN',
-                            i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN',
-                            i_sel+i_jet+i_reg+'_matchedToGEN_pt:'         +'ak4GenJets_pt',
-                            i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_pt',
-                            i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_pt',
-                            i_sel+i_jet+i_reg+'_matchedToGEN_eta:'        +'ak4GenJets_eta',
-                            i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_eta',
-                            i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_eta',
-                          ]:
-                            if _tmp not in values: values[_tmp] = []
-
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN']  += [jet_pt / genJet_match_pt]
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN'] += [jet_pt - genJet_match_pt]
-
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_pt:'         +'ak4GenJets_pt'] += [(jet_pt,  genJet_match_pt)]
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_pt'] += [(jet_pt / genJet_match_pt, genJet_match_pt)]
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_pt'] += [(jet_pt - genJet_match_pt, genJet_match_pt)]
-
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_eta:'        +'ak4GenJets_eta'] += [(jet_eta, genJet_match_eta)]
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_overGEN:' +'ak4GenJets_eta'] += [(jet_pt / genJet_match_pt, genJet_match_eta)]
-                          values[i_sel+i_jet+i_reg+'_matchedToGEN_pt_minusGEN:'+'ak4GenJets_eta'] += [(jet_pt - genJet_match_pt, genJet_match_eta)]
-
-            njets_tags = ['', '_HB', '_HE', '_HF']
-            if (i_jet != 'ak4GenJets'):
-               njets_tags += ['_matchedToGEN', '_HB_matchedToGEN', '_HE_matchedToGEN', '_HF_matchedToGEN']
-
-            for i_jettag in njets_tags:
-                values[i_sel+i_jet+i_jettag+'_Njets'] = len(values[i_sel+i_jet+i_jettag+'_pt']) if (i_sel+i_jet+i_jettag+'_pt' in values) else 0
-
-        ## MET
-        for i_met in METCollections:
-            for i_var in ['pt', 'phi', 'sumEt']:
-                values[i_sel+i_met+'_'+i_var] = arrays[i_met+'_'+i_var][index][0]
-
-        genMetTrue_vec2d = ROOT.TVector2()
-        genMetTrue_vec2d.SetMagPhi(values[i_sel+'genMetTrue_pt'], values[i_sel+'genMetTrue_phi'])
-
-        for i_met in METCollections:
-
-            if i_met == 'genMetTrue': continue
-
-            values[i_sel+i_met+'_pt'], values[i_sel+i_met+'_phi']
-
-            iMET_vec2d = ROOT.TVector2()
-            iMET_vec2d.SetMagPhi(values[i_sel+i_met+'_pt'], values[i_sel+i_met+'_phi'])
-
-            values[i_sel+i_met+'_pt_paraToGEN'] = iMET_vec2d.Mod() * math.cos(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
-            values[i_sel+i_met+'_pt_perpToGEN'] = iMET_vec2d.Mod() * math.sin(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
-
-            values[i_sel+i_met+'_pt_paraToGENMinusGEN'] = values[i_sel+i_met+'_pt_paraToGEN'] - values[i_sel+'genMetTrue_pt']
-
-            for i_var in ['pt', 'phi', 'sumEt']:
-
-                values[i_sel+i_met+'_'+i_var+'_minusGEN'] = values[i_sel+i_met+'_'+i_var] - values[i_sel+'genMetTrue_'+i_var]
-                if i_var == 'phi':
-                   values[i_sel+i_met+'_'+i_var+'_minusGEN'] = abs(values[i_sel+i_met+'_'+i_var+'_minusGEN'])
-                   if values[i_sel+i_met+'_'+i_var+'_minusGEN'] > math.pi:
-                      values[i_sel+i_met+'_'+i_var+'_minusGEN'] = 2*math.pi - values[i_sel+i_met+'_'+i_var+'_minusGEN']
-
-                if values[i_sel+'genMetTrue_'+i_var] != 0:
-                   values[i_sel+i_met+'_'+i_var+'_overGEN'] = values[i_sel+i_met+'_'+i_var] / values[i_sel+'genMetTrue_'+i_var]
-
-        for [i_met_onl, i_met_off] in METOnlineOfflinePairs:
-
-            iMETonl_vec2d = ROOT.TVector2()
-            iMETonl_vec2d.SetMagPhi(values[i_sel+i_met_onl+'_pt'], values[i_sel+i_met_onl+'_phi'])
-
-            iMEToff_vec2d = ROOT.TVector2()
-            iMEToff_vec2d.SetMagPhi(values[i_sel+i_met_off+'_pt'], values[i_sel+i_met_off+'_phi'])
-
-            values[i_sel+i_met_onl+'_pt_paraToOffline'] = iMETonl_vec2d.Mod() * math.cos(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
-            values[i_sel+i_met_onl+'_pt_perpToOffline'] = iMETonl_vec2d.Mod() * math.sin(iMETonl_vec2d.DeltaPhi(iMEToff_vec2d))
-
-            values[i_sel+i_met_onl+'_pt_paraToOfflineMinusOffline'] = values[i_sel+i_met_onl+'_pt_paraToOffline'] - values[i_sel+i_met_off+'_pt']
-
-            for i_var in ['pt', 'phi', 'sumEt']:
-
-                values[i_sel+i_met_onl+'_'+i_var+'_minusOffline'] = values[i_sel+i_met_onl+'_'+i_var] - values[i_sel+i_met_off+'_'+i_var]
-                if i_var == 'phi':
-                   values[i_sel+i_met_onl+'_'+i_var+'_minusOffline'] = abs(values[i_sel+i_met_onl+'_'+i_var+'_minusOffline'])
-                   if values[i_sel+i_met_onl+'_'+i_var+'_minusOffline'] > math.pi:
-                      values[i_sel+i_met_onl+'_'+i_var+'_minusOffline'] = 2*math.pi - values[i_sel+i_met_onl+'_'+i_var+'_minusOffline']
-
-                if values[i_sel+i_met_off+'_'+i_var] != 0:
-                   values[i_sel+i_met_onl+'_'+i_var+'_overOffline'] = values[i_sel+i_met_onl+'_'+i_var] / values[i_sel+i_met_off+'_'+i_var]
+            values[i_sel+_tmp] = copy.deepcopy(values[_tmp])
 
     ## histogram filling
     for i_hist_key in sorted(list(set(th1s.keys() + th2s.keys()))):
@@ -443,8 +625,13 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
               if i_hist_key_varY not in values: continue
 
               if isinstance(values[i_hist_key_varX], list):
-                 if not isinstance(values[i_hist_key_varY], list): KILL('YYY')
-                 if len(values[i_hist_key_varX]) != len(values[i_hist_key_varY]): KILL(i_hist_key_varX+' '+i_hist_key_varY)
+
+                 if not isinstance(values[i_hist_key_varY], list):
+                    KILL('analyze_event -- 2D histograms cannot be filled from 1D values (second collection is not a list): '+i_hist_key_varX+' '+i_hist_key_varY)
+
+                 if len(values[i_hist_key_varX]) != len(values[i_hist_key_varY]):
+                    KILL('analyze_event -- 2D histograms cannot be filled from 1D values (collections of different sizes): '+i_hist_key_varX+' '+i_hist_key_varY)
+
                  for _tmp in range(len(values[i_hist_key_varX])):
                      th2s[i_hist_key].Fill(values[i_hist_key_varX][_tmp], values[i_hist_key_varY][_tmp])
               else:

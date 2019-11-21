@@ -9,11 +9,18 @@ Workflow to produce Jet/MET performance plots from "flat" ROOT NTuples
 source env.sh
 ```
 
+## Prepare Analysis NTuples from crab3 outputs
+
+* Create output directory with one .root for each crab3 task:
+```
+hadd_crab3.py -i /pnfs/desy.de/cms/tier2/store/user/missirol/jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191119/* -o ${NTUDIR} # -p _temp
+```
+
 ## Batch Jobs
 
 * Create scripts for submission of batch jobs:
 ```
-batch_driver.py -s jmeAnalysis.py -i ${NTUDIR}/*root -o ${OUTDIR}/prod -n 5000
+batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/prod -n 5000 -s jmeAnalysis.py
 ```
 
 * Monitoring and (re)submission of batch jobs:
