@@ -13,8 +13,36 @@ from common.utils import *
 EvtSelections = [
 
   'NoSelection/',
+
+  'hltAK4PFCHS100_EtaIncl/',
+  'hltAK4PFCHS100_HB/',
+  'hltAK4PFCHS100_HE/',
+  'hltAK4PFCHS100_HF/',
+
+  'hltAK4Puppi100_EtaIncl/',
+  'hltAK4Puppi100_HB/',
+  'hltAK4Puppi100_HE/',
+  'hltAK4Puppi100_HF/',
+
   'hltPFMET200/',
   'hltPuppiMET200/',
+]
+
+GenJetsCollection = 'ak4GenJetsNoNu'
+
+JetCollections = [
+
+  GenJetsCollection,
+  'hltAK4PFCHSJetsCorrected',
+  'offlineAK4PFCHSJetsCorrected',
+  'hltAK4PuppiJetsCorrected',
+  'offlineAK4PuppiJetsCorrected',
+]
+
+JetOnlineOfflinePairs = [
+
+  ['hltAK4PFCHSJetsCorrected', 'offlineAK4PFCHSJetsCorrected'],
+  ['hltAK4PuppiJetsCorrected', 'offlineAK4PuppiJetsCorrected'],
 ]
 
 METCollections = [
@@ -41,23 +69,6 @@ METOnlineOfflinePairs = [
   ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
   ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
   ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
-]
-
-GenJetsCollection = 'ak4GenJetsNoNu'
-
-JetCollections = [
-
-  GenJetsCollection,
-  'hltAK4PFCHSJetsCorrected',
-  'hltAK4PuppiJetsCorrected',
-  'offlineAK4PFCHSJetsCorrected',
-  'offlineAK4PuppiJetsCorrected',
-]
-
-JetOnlineOfflinePairs = [
-
-  ['hltAK4PFCHSJetsCorrected', 'offlineAK4PFCHSJetsCorrected'],
-  ['hltAK4PuppiJetsCorrected', 'offlineAK4PuppiJetsCorrected'],
 ]
 
 def delta_phi(phi1, phi2):
@@ -567,11 +578,38 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
         # selections
         if i_sel == 'NoSelection/': pass
 
+        elif i_sel == 'hltAK4PFCHS100_EtaIncl/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_EtaIncl_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4PFCHS100_HB/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HB_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4PFCHS100_HE/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HE_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4PFCHS100_HF/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HF_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4Puppi100_EtaIncl/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_EtaIncl_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4Puppi100_HB/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_HB_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4Puppi100_HE/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_HE_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4Puppi100_HF/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_HF_pt']) > 100.): continue
+
         elif i_sel == 'hltPFMET200/':
            if not (values['hltPFMET_pt'] > 200.): continue
 
         elif i_sel == 'hltPuppiMET200/':
            if not (values['hltPuppiMET_pt'] > 200.): continue
+
+        else:
+           KILL('analyze_event -- invalid key for event selection: '+i_sel)
 
         # copies
         for _tmp in value_keys:
