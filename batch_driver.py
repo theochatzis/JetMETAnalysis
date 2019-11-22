@@ -15,7 +15,7 @@ if __name__ == '__main__':
    parser = argparse.ArgumentParser(description=__doc__)
 
    parser.add_argument('-s', '--script', dest='script', action='store', default=os.path.dirname(__file__)+'/jmeAnalysis.py',
-                       help='path to python script running MEM calculation (example: cc_looper.py)')
+                       help='path to python script executed in each batch job')
 
    parser.add_argument('-i', '--inputs', dest='inputs', required=True, nargs='+', default=[],
                        help='path to file(s) containing input TTree(s)')
@@ -73,7 +73,7 @@ if __name__ == '__main__':
    INPUT_FILES = sorted(list(set(INPUT_FILES)))
 
    if len(INPUT_FILES) == 0:
-      KILL(log_prx+'empty list of input files containing MEM TTrees [-i]')
+      KILL(log_prx+'empty list of input files [-i]')
 
    if os.path.isdir(opts.output):
       WARNING(log_prx+'output directory already exists, new files will be added to it [-o]: '+opts.output)
@@ -96,7 +96,7 @@ if __name__ == '__main__':
    if os.environ['SCRAM_ARCH'].startswith('slc7'): is_slc7_arch = True
    elif os.environ['SCRAM_ARCH'].startswith('slc6'): pass
    else:
-      KILL(log_prc+'could not infer architecture from environment variable "SCRAM_ARCH" (update mem_driver.py): '+str(os.environ['SCRAM_ARCH']))
+      KILL(log_prc+'could not infer architecture from environment variable "SCRAM_ARCH" (script needs to be updated): '+str(os.environ['SCRAM_ARCH']))
    ### ----------------
 
    ### output ---------

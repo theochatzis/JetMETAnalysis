@@ -1464,18 +1464,18 @@ if __name__ == '__main__':
 
    ### Efficiencies
 
-   # [Jets]
+   # [Jets] Efficiencies
    effJets_dict = {
 
-     'hltAK4PFCHS100_EtaIncl': ['hltAK4PFCHSJetsCorrected_EtaIncl_pt'],
-     'hltAK4PFCHS100_HB': ['hltAK4PFCHSJetsCorrected_HB_pt'],
-     'hltAK4PFCHS100_HE': ['hltAK4PFCHSJetsCorrected_HE_pt'],
-     'hltAK4PFCHS100_HF': ['hltAK4PFCHSJetsCorrected_HF_pt'],
+     'hltAK4PFCHS100_EtaIncl': {'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PFCHSJetsCorrected_EtaIncl_pt']},
+     'hltAK4PFCHS100_HB': {'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HB)', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PFCHSJetsCorrected_HB_pt']},
+     'hltAK4PFCHS100_HE': {'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HE)', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PFCHSJetsCorrected_HE_pt']},
+     'hltAK4PFCHS100_HF': {'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HF)', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PFCHSJetsCorrected_HF_pt']},
 
-     'hltAK4Puppi100_EtaIncl': ['hltAK4PuppiJetsCorrected_EtaIncl_pt'],
-     'hltAK4Puppi100_HB': ['hltAK4PuppiJetsCorrected_HB_pt'],
-     'hltAK4Puppi100_HE': ['hltAK4PuppiJetsCorrected_HE_pt'],
-     'hltAK4Puppi100_HF': ['hltAK4PuppiJetsCorrected_HF_pt'],
+     'hltAK4Puppi100_EtaIncl': {'label': 'HLT AK4 Puppi, p_{T} > 100 GeV', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PuppiJetsCorrected_EtaIncl_pt']},
+     'hltAK4Puppi100_HB': {'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HB)', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PuppiJetsCorrected_HB_pt']},
+     'hltAK4Puppi100_HE': {'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HE)', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PuppiJetsCorrected_HE_pt']},
+     'hltAK4Puppi100_HF': {'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HF)', 'wrt': [GenJetsCollection+'_pt', 'offlineAK4PuppiJetsCorrected_HF_pt']},
    }
 
    for i_eff in sorted(effJets_dict.keys()):
@@ -1488,7 +1488,7 @@ if __name__ == '__main__':
 
            efficiencies[pu_tag] = {}
 
-           for i_jetv in effJets_dict[i_eff]:
+           for i_jetv in effJets_dict[i_eff]['wrt']:
 
                hNum_0 = clone_histogram(histograms, pu_tag, i_eff+'/'+i_jetv)
                hDen_0 = clone_histogram(histograms, pu_tag, 'NoSelection/'+i_jetv)
@@ -1500,23 +1500,14 @@ if __name__ == '__main__':
 
                efficiencies[pu_tag][i_met] = get_efficiency_graph(hNum, hDen)
 
-       label_eff_str = ''
-       if   i_eff == 'hltAK4PFCHS100_EtaIncl': label_eff_str = 'HLT AK4 PF+CHS, p_{T} > 100 GeV'
-       elif i_eff == 'hltAK4PFCHS100_HB': label_eff_str = 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HB)'
-       elif i_eff == 'hltAK4PFCHS100_HE': label_eff_str = 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HE)'
-       elif i_eff == 'hltAK4PFCHS100_HF': label_eff_str = 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HF)'
-       elif i_eff == 'hltAK4Puppi100_EtaIncl': label_eff_str = 'HLT AK4 Puppi, p_{T} > 100 GeV'
-       elif i_eff == 'hltAK4Puppi100_HB': label_eff_str = 'HLT AK4 Puppi, p_{T} > 100 GeV (HB)'
-       elif i_eff == 'hltAK4Puppi100_HE': label_eff_str = 'HLT AK4 Puppi, p_{T} > 100 GeV (HE)'
-       elif i_eff == 'hltAK4Puppi100_HF': label_eff_str = 'HLT AK4 Puppi, p_{T} > 100 GeV (HF)'
+       label_eff_str = effJets_dict[i_eff]['label']
 
        label_eff = get_pavetext(Lef+(1-Lef-Rig)*0.05, Bot+(1-Bot-Top)*0.85, Lef+(1-Lef-Rig)*0.55, Bot+(1-Bot-Top)*0.95, 0.035, label_eff_str)
        label_eff.SetFillColor(ROOT.kWhite)
 
-       # Turn-on curves: Jet pT
-       for i_jet in [GenJetsCollection, 'offlineAK4PFCHSJetsCorrected', 'offlineAK4PuppiJetsCorrected']:
+       for i_jet in effJets_dict[i_eff]:
 
-           if (i_jet == GenJetsCollection) and opts.skip_GEN: continue
+           if opts.skip_GEN and i_jet.startswith(GenJetsCollection+'_'): continue
 
            label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_jet)
 
@@ -1533,7 +1524,7 @@ if __name__ == '__main__':
              ratio = False,
 
              xMin = 40,
-             xMax = 800,
+             xMax = 500,
 
              yMin = 0.0,
              yMax = 1.25,
@@ -1541,8 +1532,17 @@ if __name__ == '__main__':
              title = ';'+i_jet+' [GeV];Efficiency',
            )
 
-   # [MET]
-   for i_eff in ['hltPFMET200', 'hltPuppiMET200']:
+   # [MET] Efficiencies
+   effMET_dict = {
+
+     'hltPFMET200': {'label': 'HLT PF-MET Raw > 200 GeV', 'wrt': ['genMetTrue_pt', 'offlineMETs_Raw_pt', 'offlineMETs_Type1_pt']},
+     'hltPFMETTypeOne200': {'label': 'HLT PF-MET Type-1 > 200 GeV', 'wrt': ['genMetTrue_pt', 'offlineMETs_Raw_pt', 'offlineMETs_Type1_pt']},
+
+     'hltPuppiMET200': {'label': 'HLT Puppi-MET Raw > 200 GeV', 'wrt': ['genMetTrue_pt', 'offlineMETsPuppi_Raw_pt', 'offlineMETsPuppi_Type1_pt']},
+     'hltPuppiMETTypeOne200': {'label': 'HLT Puppi-MET Type-1 > 200 GeV', 'wrt': ['genMetTrue_pt', 'offlineMETsPuppi_Raw_pt', 'offlineMETsPuppi_Type1_pt']},
+   }
+
+   for i_eff in sorted(effMET_dict.keys()):
 
        efficiencies = {}
 
@@ -1552,7 +1552,7 @@ if __name__ == '__main__':
 
            efficiencies[pu_tag] = {}
 
-           for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
+           for i_met in effMET_dict[i_eff]['wrt']:
 
                hNum_0 = clone_histogram(histograms, pu_tag, i_eff+'/'+i_met)
                hDen_0 = clone_histogram(histograms, pu_tag, 'NoSelection/'+i_met)
@@ -1564,15 +1564,12 @@ if __name__ == '__main__':
 
                efficiencies[pu_tag][i_met] = get_efficiency_graph(hNum, hDen)
 
-       label_eff_str = ''
-       if i_eff == 'hltPFMET200': label_eff_str = 'HLT PF-MET > 200 GeV'
-       elif i_eff == 'hltPuppiMET200': label_eff_str = 'HLT Puppi-MET > 200 GeV'
+       label_eff_str = effMET_dict[i_eff]['label']
 
        label_eff = get_pavetext(Lef+(1-Lef-Rig)*0.05, Bot+(1-Bot-Top)*0.85, Lef+(1-Lef-Rig)*0.55, Bot+(1-Bot-Top)*0.95, 0.035, label_eff_str)
        label_eff.SetFillColor(ROOT.kWhite)
 
-       # Turn-on curves: MET pT
-       for i_met in ['genMetTrue_pt', 'offlineMETs_Type1_pt', 'offlineMETsPuppi_Type1_pt']:
+       for i_met in effMET_dict[i_eff]['wrt']:
 
            if opts.skip_GEN and (i_met.startswith('genMetTrue')): continue
 

@@ -26,6 +26,9 @@ EvtSelections = [
 
   'hltPFMET200/',
   'hltPuppiMET200/',
+
+  'hltPFMETTypeOne200/',
+  'hltPuppiMETTypeOne200/',
 ]
 
 GenJetsCollection = 'ak4GenJetsNoNu'
@@ -607,6 +610,12 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
         elif i_sel == 'hltPuppiMET200/':
            if not (values['hltPuppiMET_pt'] > 200.): continue
+
+        elif i_sel == 'hltPFMETTypeOne200/':
+           if not (values['hltPFMETTypeOne_pt'] > 200.): continue
+
+        elif i_sel == 'hltPuppiMETTypeOne200/':
+           if not (values['hltPuppiMETTypeOne_pt'] > 200.): continue
 
         else:
            KILL('analyze_event -- invalid key for event selection: '+i_sel)

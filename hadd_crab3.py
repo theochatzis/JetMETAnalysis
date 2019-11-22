@@ -64,7 +64,7 @@ def merge_rootfiles(input_directories, output_file, compressionLevel=None, verbo
 
           EXE('cp '+_valid_files[0]+' '+output_file, verbose=(verbosity > 0), dry_run=dry_run)
 
-          print colored_text('[output='+output_file+']', ['1', '92']), 'merging completed ({1:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0)
+          print colored_text('[output='+output_file+']', ['1', '92']), 'merging completed ({:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0)
 
        else:
           if _compressionLevel is None:
@@ -84,7 +84,7 @@ def merge_rootfiles(input_directories, output_file, compressionLevel=None, verbo
           if not _ret:
              KILL('[output='+output_file+'] call to TFileMerger::Merge() failed')
 
-          print colored_text('[output='+output_file+']', ['1', '92']), 'merging completed ({1:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0)
+          print colored_text('[output='+output_file+']', ['1', '92']), 'merging completed ({:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0)
 
     else:
        if verbosity > 10:
