@@ -390,7 +390,7 @@ def get_templates_PU(key, histograms, var, skipGEN=False):
     the_templates_skimmed = []
     for _tmp in the_templates:
         if skipGEN and (_tmp['TH1'] is not None):
-           if ('genMetTrue' in _tmp['TH1'].GetName()) or ('GEN' in _tmp['TH1'].GetName()):
+           if 'gen' in _tmp['TH1'].GetName().lower():
               continue
         the_templates_skimmed += [_tmp]
 
@@ -561,7 +561,7 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
     the_templates_skimmed = []
     for _tmp in the_templates:
         if skipGEN and (_tmp['TH1'] is not None):
-           if ('genMetTrue' in _tmp['TH1'].GetName()) or ('GEN' in _tmp['TH1'].GetName()):
+           if 'gen' in _tmp['TH1'].GetName().lower():
               continue
         the_templates_skimmed += [_tmp]
 
@@ -591,8 +591,11 @@ if __name__ == '__main__':
    parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['pdf'],
                        help='list of extension(s) for output file(s)')
 
-   parser.add_argument('--skip-GEN', dest='skip_GEN', action='store_true', default=False,
-                       help='skip distributions related to GEN collections')
+   parser.add_argument('--skip-GenJets', dest='skip_GenJets', action='store_true', default=False,
+                       help='skip distributions related to Gen-Jets collection(s)')
+
+   parser.add_argument('--skip-GenMET', dest='skip_GenMET', action='store_true', default=False,
+                       help='skip distributions related to Gen-MET collection')
 
    parser.add_argument('-v', '--verbosity', dest='verbosity', nargs='?', const=1, type=int, default=0,
                        help='verbosity level')
@@ -713,7 +716,7 @@ if __name__ == '__main__':
        ## ----------------------------------------------------------------------------------------------------
        for i_jet in JetCollections:
 
-           if opts.skip_GEN and (i_jet == 'ak4GenJetsNoNu'): continue
+           if opts.skip_GenJets and (i_jet == 'ak4GenJetsNoNu'): continue
 
            jetCategories = ['_EtaIncl', '_HB', '_HE', '_HF']
            if i_jet != 'ak4GenJetsNoNu':
@@ -729,7 +732,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_njets',
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_njets', skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_njets', skipGEN=opts.skip_GenJets),
 
                  logY = True,
 
@@ -745,7 +748,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_pt',
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt', skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt', skipGEN=opts.skip_GenJets),
 
                  logX = True,
 
@@ -767,7 +770,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_eta',
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_eta', skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_eta', skipGEN=opts.skip_GenJets),
 
                  ratio = True,
 
@@ -783,7 +786,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_phi',
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_phi', skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_phi', skipGEN=opts.skip_GenJets),
 
                  ratio = True,
 
@@ -797,7 +800,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_mass',
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_mass', skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_mass', skipGEN=opts.skip_GenJets),
 
                  logX = True,
 
@@ -821,7 +824,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_pt_over'+i_ref,
 
-                     templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt_over'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt_over'+i_ref, skipGEN=opts.skip_GenJets),
 
                      normalizedToUnity = True,
 
@@ -833,7 +836,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_jet+i_jetcat+'_pt_minus'+i_ref,
 
-                     templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt_minus'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates_PU('3PU', histograms, i_sel+i_jet+i_jetcat+'_pt_minus'+i_ref, skipGEN=opts.skip_GenJets),
 
                      normalizedToUnity = True,
 
@@ -858,7 +861,7 @@ if __name__ == '__main__':
 
                    stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-                   templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
+                   templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GenJets),
 
                    yMin = i_ymin,
                    yMax = i_ymax,
@@ -885,7 +888,7 @@ if __name__ == '__main__':
 
                    stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-                   templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
+                   templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GenJets),
 
                    yMin = 0.1,
                    yMax = 200,
@@ -900,7 +903,7 @@ if __name__ == '__main__':
        ## ----------------------------------------------------------------------------------------------------
        for i_met in METCollections:
 
-           if opts.skip_GEN and (i_met == 'genMetTrue'): continue
+           if opts.skip_GenMET and (i_met == 'genMetTrue'): continue
 
            label_var = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
 
@@ -909,7 +912,7 @@ if __name__ == '__main__':
 
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt',
 
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt', skipGEN=opts.skip_GEN),
+             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt', skipGEN=opts.skip_GenMET),
 
              logX = True,
     
@@ -929,7 +932,7 @@ if __name__ == '__main__':
     
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi',
     
-             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi', skipGEN=opts.skip_GEN),
+             templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi', skipGEN=opts.skip_GenMET),
 
              logX = False,
 
@@ -949,7 +952,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_over'+i_ref,
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_over'+i_ref, skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_over'+i_ref, skipGEN=opts.skip_GenMET),
 
                  logX = False,
 
@@ -967,7 +970,7 @@ if __name__ == '__main__':
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_minus'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_minus'+i_ref, skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_minus'+i_ref, skipGEN=opts.skip_GenMET),
     
                  logX = False,
         
@@ -985,7 +988,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_paraTo'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref, skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref, skipGEN=opts.skip_GenMET),
     
                  logX = False,
     
@@ -1003,7 +1006,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_paraTo'+i_ref+'Minus'+i_ref,
 
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref+'Minus'+i_ref, skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_paraTo'+i_ref+'Minus'+i_ref, skipGEN=opts.skip_GenMET),
 
                  logX = False,
 
@@ -1021,7 +1024,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_pt_perpTo'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_perpTo'+i_ref, skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_pt_perpTo'+i_ref, skipGEN=opts.skip_GenMET),
     
                  logX = False,
     
@@ -1039,7 +1042,7 @@ if __name__ == '__main__':
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi_over'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_over'+i_ref, skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_over'+i_ref, skipGEN=opts.skip_GenMET),
     
                  logX = False,
         
@@ -1057,7 +1060,7 @@ if __name__ == '__main__':
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+i_met+'_phi_minus'+i_ref,
     
-                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_minus'+i_ref, skipGEN=opts.skip_GEN),
+                 templates = get_templates_PU('3PU', histograms, i_sel+i_met+'_phi_minus'+i_ref, skipGEN=opts.skip_GenMET),
         
                  logX = False,
         
@@ -1090,7 +1093,7 @@ if __name__ == '__main__':
 
                stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
+               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GenMET),
 
                yMin = i_ymin,
                yMax = i_ymax,
@@ -1125,7 +1128,7 @@ if __name__ == '__main__':
 
                stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/vsPU/'+tmp_name,
 
-               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GEN),
+               templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GenMET),
 
                yMin = 0.1,
                yMax = 200,
@@ -1155,7 +1158,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_njets_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_njets', skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_njets', skipGEN=opts.skip_GenJets),
 
                      logY = True,
 
@@ -1171,7 +1174,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_pt_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt', skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt', skipGEN=opts.skip_GenJets),
 
                      logX = True,
 
@@ -1193,7 +1196,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_eta_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_eta', skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_eta', skipGEN=opts.skip_GenJets),
 
                      ratio = True,
 
@@ -1209,7 +1212,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_phi_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_phi', skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_phi', skipGEN=opts.skip_GenJets),
 
                      logX = False,
 
@@ -1227,7 +1230,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_mass_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_mass', skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_mass', skipGEN=opts.skip_GenJets),
 
                      logX = True,
 
@@ -1251,7 +1254,7 @@ if __name__ == '__main__':
 
                          stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_pt_over'+i_ref+'_at'+pu_tag,
 
-                         templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt_over'+i_ref, skipGEN=opts.skip_GEN),
+                         templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt_over'+i_ref, skipGEN=opts.skip_GenJets),
 
                          normalizedToUnity = True,
 
@@ -1263,7 +1266,7 @@ if __name__ == '__main__':
 
                          stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_pt_minus'+i_ref+'_at'+pu_tag,
 
-                         templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt_minus'+i_ref, skipGEN=opts.skip_GEN),
+                         templates = get_templates(comp_tag, histograms, pu_tag, i_sel, i_jetcat+'_pt_minus'+i_ref, skipGEN=opts.skip_GenJets),
 
                          normalizedToUnity = True,
 
@@ -1286,7 +1289,7 @@ if __name__ == '__main__':
 
                        stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_'+i_key+'_at'+pu_tag,
 
-                       templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_jetcat+'_'+i_key, skipGEN=opts.skip_GEN),
+                       templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_jetcat+'_'+i_key, skipGEN=opts.skip_GenJets),
 
                        yMin = i_ymin,
                        yMax = i_ymax,
@@ -1310,7 +1313,7 @@ if __name__ == '__main__':
 
                        stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/Jet'+i_jetcat+'_'+i_key+'_at'+pu_tag,
 
-                       templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_jetcat+'_'+i_key, skipGEN=opts.skip_GEN),
+                       templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_jetcat+'_'+i_key, skipGEN=opts.skip_GenJets),
 
                        yMin = 0.1,
                        yMax = 200,
@@ -1333,7 +1336,7 @@ if __name__ == '__main__':
 
                  stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_at'+pu_tag,
     
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt', skipGEN=opts.skip_GEN),
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt', skipGEN=opts.skip_GenMET),
         
                  logX = True,
         
@@ -1353,7 +1356,7 @@ if __name__ == '__main__':
     
                  stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_at'+pu_tag,
     
-                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi', skipGEN=opts.skip_GEN),
+                 templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi', skipGEN=opts.skip_GenMET),
     
                  logX = False,
     
@@ -1373,7 +1376,7 @@ if __name__ == '__main__':
     
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_over'+i_ref+'_at'+pu_tag,
     
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_over'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_over'+i_ref, skipGEN=opts.skip_GenMET),
     
                      normalizedToUnity = True,
     
@@ -1385,7 +1388,7 @@ if __name__ == '__main__':
             
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_minus'+i_ref+'_at'+pu_tag,
         
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_minus'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_minus'+i_ref, skipGEN=opts.skip_GenMET),
         
                      normalizedToUnity = True,
         
@@ -1397,7 +1400,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_paraTo'+i_ref+'_at'+pu_tag,
         
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref, skipGEN=opts.skip_GenMET),
 
                      normalizedToUnity = True,
 
@@ -1409,7 +1412,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_paraTo'+i_ref+'Minus'+i_ref+'_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref+'Minus'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_paraTo'+i_ref+'Minus'+i_ref, skipGEN=opts.skip_GenMET),
 
                      normalizedToUnity = True,
 
@@ -1421,7 +1424,7 @@ if __name__ == '__main__':
 
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_pt_perpTo'+i_ref+'_at'+pu_tag,
 
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_perpTo'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'pt_perpTo'+i_ref, skipGEN=opts.skip_GenMET),
 
                      normalizedToUnity = True,
 
@@ -1433,7 +1436,7 @@ if __name__ == '__main__':
             
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_over'+i_ref+'_at'+pu_tag,
             
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_over'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_over'+i_ref, skipGEN=opts.skip_GenMET),
         
                      normalizedToUnity = True,
             
@@ -1445,7 +1448,7 @@ if __name__ == '__main__':
     
                      stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_phi_minus'+i_ref+'_at'+pu_tag,
     
-                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_minus'+i_ref, skipGEN=opts.skip_GEN),
+                     templates = get_templates(comp_tag, histograms, pu_tag, i_sel, 'phi_minus'+i_ref, skipGEN=opts.skip_GenMET),
     
                      normalizedToUnity = True,
     
@@ -1470,7 +1473,7 @@ if __name__ == '__main__':
 
                    stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_'+i_key+'_at'+pu_tag,
 
-                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key, skipGEN=opts.skip_GEN),
+                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key, skipGEN=opts.skip_GenMET),
 
                    yMin = i_ymin,
                    yMax = i_ymax,
@@ -1502,7 +1505,7 @@ if __name__ == '__main__':
 
                    stickers=[label_sample, label_PU], output=opts.output+'/'+i_sel+'/'+comp_tag+'/MET_'+i_key+'_at'+pu_tag,
 
-                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key, skipGEN=opts.skip_GEN),
+                   templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key, skipGEN=opts.skip_GenMET),
 
                    yMin = 0.1,
                    yMax = 200,
@@ -1584,12 +1587,12 @@ if __name__ == '__main__':
 
        label_eff_str = effJets_dict[i_eff]['label']
 
-       label_eff = get_pavetext(Lef+(1-Lef-Rig)*0.10, Bot+(1-Bot-Top)*0.75, Lef+(1-Lef-Rig)*0.65, Bot+(1-Bot-Top)*0.95, 0.035, label_eff_str)
+       label_eff = get_pavetext(Lef+(1-Lef-Rig)*0.05, Bot+(1-Bot-Top)*0.85, Lef+(1-Lef-Rig)*0.55, Bot+(1-Bot-Top)*0.95, 0.030, label_eff_str)
        label_eff.SetFillColor(ROOT.kWhite)
 
        for i_jetv in effJets_dict[i_eff]['wrt']:
 
-           if opts.skip_GEN and i_jetv.startswith('akGenJetsNoNu_'): continue
+           if opts.skip_GenJets and i_jetv.startswith('akGenJetsNoNu_'): continue
 
            label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_jetv)
 
@@ -1648,12 +1651,12 @@ if __name__ == '__main__':
 
        label_eff_str = effMET_dict[i_eff]['label']
 
-       label_eff = get_pavetext(Lef+(1-Lef-Rig)*0.10, Bot+(1-Bot-Top)*0.75, Lef+(1-Lef-Rig)*0.65, Bot+(1-Bot-Top)*0.95, 0.035, label_eff_str)
+       label_eff = get_pavetext(Lef+(1-Lef-Rig)*0.05, Bot+(1-Bot-Top)*0.85, Lef+(1-Lef-Rig)*0.55, Bot+(1-Bot-Top)*0.95, 0.030, label_eff_str)
        label_eff.SetFillColor(ROOT.kWhite)
 
        for i_metv in effMET_dict[i_eff]['wrt']:
 
-           if opts.skip_GEN and (i_metv.startswith('genMetTrue')): continue
+           if opts.skip_GenMET and (i_metv.startswith('genMetTrue')): continue
 
            label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_metv)
 
