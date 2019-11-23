@@ -99,7 +99,8 @@ def create_histograms():
             for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_njets'] = [_tmp for _tmp in range(31)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_pt'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
+                binEdges_1d[i_sel+i_jet+i_reg+'_pt']  = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
+                binEdges_1d[i_sel+i_jet+i_reg+'_pt0'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
                 binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.6, -1.3, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.3, 1.6, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
                 binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_mass'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600]
@@ -107,7 +108,8 @@ def create_histograms():
                 if i_jet == GenJetsCollection: continue
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_njets'] = [_tmp for _tmp in range(31)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt']  = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt'] = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt0'] = binEdges_1d[i_sel+i_jet+i_reg+'_pt0']
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta'] = binEdges_1d[i_sel+i_jet+i_reg+'_eta']
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_phi'] = binEdges_1d[i_sel+i_jet+i_reg+'_phi']
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass'] = binEdges_1d[i_sel+i_jet+i_reg+'_mass']
@@ -120,6 +122,7 @@ def create_histograms():
 
                     if v_ref == GenJetsCollection+'_EtaIncl_pt':
                        binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt'], binEdges_1d[i_sel+v_ref]]
+                       binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt0:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt0'], binEdges_1d[i_sel+v_ref]]
 
                     if v_ref == GenJetsCollection+'_EtaIncl_eta':
                        binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta'], binEdges_1d[i_sel+v_ref]]
@@ -132,7 +135,8 @@ def create_histograms():
             for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
 
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_njets'] = [_tmp for _tmp in range(31)]
-                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt']  = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt']
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt0'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt0']
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_eta'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_eta']
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_phi'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_phi']
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_mass'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_mass']
@@ -145,6 +149,7 @@ def create_histograms():
 
                     if v_ref == i_jet_off+'_EtaIncl_pt':
                        binEdges_2d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt:'+v_ref] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt'], binEdges_1d[i_sel+v_ref]]
+                       binEdges_2d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt0:'+v_ref] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt0'], binEdges_1d[i_sel+v_ref]]
 
                     if v_ref == i_jet_off+'_EtaIncl_eta':
                        binEdges_2d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_eta:'+v_ref] = [binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_eta'], binEdges_1d[i_sel+v_ref]]
@@ -430,10 +435,17 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
         njets_tags = ['_EtaIncl', '_HB', '_HE', '_HF']
         if (i_jet != GenJetsCollection):
-           njets_tags += ['_MatchedToGEN', '_HB_MatchedToGEN', '_HE_MatchedToGEN', '_HF_MatchedToGEN']
+           njets_tags += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HE_MatchedToGEN', '_HF_MatchedToGEN']
 
         for i_jettag in njets_tags:
             values[i_jet+i_jettag+'_njets'] = len(values[i_jet+i_jettag+'_pt']) if (i_jet+i_jettag+'_pt' in values) else 0
+
+            if len(values[i_jet+i_jettag+'_pt']) > 0:
+               values[i_jet+i_jettag+'_pt0'] = max(values[i_jet+i_jettag+'_pt'])
+
+            if (i_jet != GenJetsCollection):
+               if len(values[i_jet+i_jettag+'_MatchedToGEN_pt:'+GenJetsCollection+'_EtaIncl_pt']) > 0:
+                  values[i_jet+i_jettag+'_MatchedToGEN_pt0:'+GenJetsCollection+'_EtaIncl_pt'] = sorted(values[i_jet+i_jettag+'_MatchedToGEN_pt:'+GenJetsCollection+'_EtaIncl_pt'], key=lambda x : x[0], reverse=True)[0]
 
     # Jets: Online-to-Offline matching
     for [i_onlineJetColl, i_offlineJetColl] in JetOnlineOfflinePairs:
@@ -441,7 +453,6 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
         # initialize value-lists
         for i_onlineJetReg in ['_EtaIncl', '_HB', '_HE', '_HF']:
             for _tmp in [
-              i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_njets',
               i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt',
               i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_eta',
               i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_phi',
@@ -511,10 +522,16 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                       values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_pt'] += [(onlineJet_pt - offlineJet_pt, offlineJet_pt)]
                       values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_eta'] += [(onlineJet_pt - offlineJet_pt, offlineJet_eta)]
 
-        njets_tags = ['_MatchedToOffline', '_HB_MatchedToOffline', '_HE_MatchedToOffline', '_HF_MatchedToOffline']
+        njets_tags = ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HE_MatchedToOffline', '_HF_MatchedToOffline']
 
         for i_jettag in njets_tags:
             values[i_onlineJetColl+i_jettag+'_njets'] = len(values[i_onlineJetColl+i_jettag+'_pt']) if (i_onlineJetColl+i_jettag+'_pt' in values) else 0
+
+            if len(values[i_onlineJetColl+i_jettag+'_pt']) > 0:
+               values[i_onlineJetColl+i_jettag+'_pt0'] = max(values[i_onlineJetColl+i_jettag+'_pt'])
+
+            if len(values[i_onlineJetColl+i_jettag+'_MatchedToOffline_pt:'+i_offlineJetColl+'_EtaIncl_pt']) > 0:
+               values[i_onlineJetColl+i_jettag+'_MatchedToOffline_pt0:'+i_offlineJetColl+'_EtaIncl_pt'] = sorted(values[i_onlineJetColl+i_jettag+'_MatchedToOffline_pt:'+i_offlineJetColl+'_EtaIncl_pt'], key=lambda x : x[0], reverse=True)[0]
 
     ## MET
     for i_met in METCollections:

@@ -100,9 +100,13 @@ if __name__ == '__main__':
 
           i_input_files = outputs_dict[i_output].sort()
 
-          i_merger = ROOT.TFileMerger(False, False)
+          i_merger = ROOT.TFileMerger(False, True)
           i_merger.OutputFile(i_output_path)
           for _tmp in outputs_dict[i_output]: i_merger.AddFile(_tmp)
+
+          if i_merger.HasCompressionChange():
+             print colored_text('[output='+i_output_path+']', ['1']), 'compression-level of output file differs from that of input files, merging will be slower'
+
           ret = i_merger.Merge()
           if not ret:
              WARNING(log_prx+'TFileMerger::Merge() did not succeed for sample "'+i_output+'"')
