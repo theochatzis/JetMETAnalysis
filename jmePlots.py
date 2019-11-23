@@ -1516,15 +1516,45 @@ if __name__ == '__main__':
    # [Jets] Efficiencies
    effJets_dict = {
 
-     'hltAK4PFCHS100_EtaIncl': {'label': 'HLT AK4 PF+CHS, p_{T}> 100 GeV', 'wrt': ['hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline_pt:Offline_EtaIncl_pt']},
-     'hltAK4PFCHS100_HB': {'label': 'HLT AK4 PF+CHS, p_{T}> 100 GeV (HB)', 'wrt': ['hltAK4PFCHSJetsCorrected_HB_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline_pt:Offline_EtaIncl_pt']},
-     'hltAK4PFCHS100_HE': {'label': 'HLT AK4 PF+CHS, p_{T}> 100 GeV (HE)', 'wrt': ['hltAK4PFCHSJetsCorrected_HE_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HE_MatchedToOffline_pt:Offline_EtaIncl_pt']},
-     'hltAK4PFCHS100_HF': {'label': 'HLT AK4 PF+CHS, p_{T}> 100 GeV (HF)', 'wrt': ['hltAK4PFCHSJetsCorrected_HF_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline_pt:Offline_EtaIncl_pt']},
+     'hltAK4PFCHS100_EtaIncl': {
+       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV',
+       'wrt': ['hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
 
-     'hltAK4Puppi100_EtaIncl': {'label': 'HLT AK4 Puppi, p_{T}> 100 GeV', 'wrt': ['hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline_pt:Offline_EtaIncl_pt']},
-     'hltAK4Puppi100_HB': {'label': 'HLT AK4 Puppi, p_{T}> 100 GeV (HB)', 'wrt': ['hltAK4PuppiJetsCorrected_HB_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HB_MatchedToOffline_pt:Offline_EtaIncl_pt']},
-     'hltAK4Puppi100_HE': {'label': 'HLT AK4 Puppi, p_{T}> 100 GeV (HE)', 'wrt': ['hltAK4PuppiJetsCorrected_HE_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HE_MatchedToOffline_pt:Offline_EtaIncl_pt']},
-     'hltAK4Puppi100_HF': {'label': 'HLT AK4 Puppi, p_{T}> 100 GeV (HF)', 'wrt': ['hltAK4PuppiJetsCorrected_HF_MatchedToGEN_pt:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HF_MatchedToOffline_pt:Offline_EtaIncl_pt']},
+     'hltAK4PFCHS100_HB': {
+       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HB)',
+       'wrt': ['hltAK4PFCHSJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
+
+     'hltAK4PFCHS100_HE': {
+       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HE)',
+       'wrt': ['hltAK4PFCHSJetsCorrected_HE_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HE_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
+
+     'hltAK4PFCHS100_HF': {
+       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HF)',
+       'wrt': ['hltAK4PFCHSJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
+
+     'hltAK4Puppi100_EtaIncl': {
+       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV',
+       'wrt': ['hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
+
+     'hltAK4Puppi100_HB': {
+       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HB)',
+       'wrt': ['hltAK4PuppiJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HB_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
+
+     'hltAK4Puppi100_HE': {
+       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HE)',
+       'wrt': ['hltAK4PuppiJetsCorrected_HE_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HE_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
+
+     'hltAK4Puppi100_HF': {
+       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HF)',
+       'wrt': ['hltAK4PuppiJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HF_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     },
    }
 
    for i_eff in sorted(effJets_dict.keys()):
