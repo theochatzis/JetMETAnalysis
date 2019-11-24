@@ -5,4 +5,6 @@
 *.png
 *.JPG
 *.jpeg
+*.tar
+*.tar.gz
 outputs_*/
