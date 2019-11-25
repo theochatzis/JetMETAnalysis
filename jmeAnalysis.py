@@ -327,7 +327,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
            KILL('mmm1')
 
         jetMatchingIndices_dict[i_jet][GenJetsCollection] = jetMatchingIndices(
-          arrays=arrays, index=index, jetColl1=i_jet, jetColl2=GenJetsCollection, jetPtMin1=RecoJet_minPt, jetPtMin2=GenJet_minPt, maxDeltaR=0.4,
+          arrays=arrays, index=index, jetColl1=i_jet, jetColl2=GenJetsCollection, jetPtMin1=RecoJet_minPt, jetPtMin2=GenJet_minPt, maxDeltaR=0.1,
         )
 
     for [i_onlineJetColl, i_offlineJetColl] in JetOnlineOfflinePairs:
@@ -339,7 +339,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
            KILL('mmm2')
 
         jetMatchingIndices_dict[i_onlineJetColl][i_offlineJetColl] = jetMatchingIndices(
-          arrays=arrays, index=index, jetColl1=i_onlineJetColl, jetColl2=i_offlineJetColl, jetPtMin1=RecoJet_minPt, jetPtMin2=RecoJet_minPt, maxDeltaR=0.4,
+          arrays=arrays, index=index, jetColl1=i_onlineJetColl, jetColl2=i_offlineJetColl, jetPtMin1=RecoJet_minPt, jetPtMin2=RecoJet_minPt, maxDeltaR=0.1,
         )
 
     # Jets: all collections + Reco-to-GEN matching
