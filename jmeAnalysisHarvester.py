@@ -165,8 +165,6 @@ if __name__ == '__main__':
            elif key_varX.endswith('Offline'): compTag = 'Offline'
            else: continue
 
-           if key_varX.endswith('_over'+compTag): continue
-
            tmp_h2 = histograms[i_h2_key]
 
            # RMS of X, in bins of Y
