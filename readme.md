@@ -39,3 +39,10 @@ merge_batchOutputs.py -i ${OUTDIR}/prod/*.root -o ${OUTDIR}/outputs
 ```
 jmeAnalysisHarvester.py -i ${OUTDIR}/outputs/*.root -o ${OUTDIR}/outputs_postHarvesting
 ```
+
+## Plots
+
+* Produce plots from harvsting outputs:
+```
+jmePlots.py -h
+```
