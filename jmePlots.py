@@ -877,10 +877,20 @@ if __name__ == '__main__':
                  ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
                  ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
 
+                 ('pt_overGEN_RMS_wrt_ak4GenJetsNoNu_EtaIncl_pt', ';GenJet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
+                 ('pt_overGEN_RMS_wrt_ak4GenJetsNoNu_EtaIncl_eta', ';GenJet #eta;#sigma(p_{T}/p^{GEN}_{T})'),
+                 ('pt_overGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_pt', ';GenJet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+                 ('pt_overGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_eta', ';GenJet #eta;#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+
                  ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) [GeV]'),
                  ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) [GeV]'),
                  ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
                  ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) / Response [GeV]'),
+
+                 ('pt_overOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
+                 ('pt_overOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})'),
+                 ('pt_overOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
+                 ('pt_overOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
                ]:
                  tmp_name = i_jet+i_jetcat+'_'+i_key
 
@@ -890,9 +900,8 @@ if __name__ == '__main__':
 
                    templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GenJets),
 
-                   yMin = 0.1,
-                   yMax = 200,
-#                   xMax = 500,
+                   yMin = (0.001 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 0.1),
+                   yMax = (0.800 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 200),
 
                    title = i_title,
                  )
@@ -1098,6 +1107,8 @@ if __name__ == '__main__':
                yMin = i_ymin,
                yMax = i_ymax,
 
+               xMax = 500,
+
                title = i_title,
              )
              del tmp_name
@@ -1105,19 +1116,23 @@ if __name__ == '__main__':
            # pT Resolution (RMS)
            for (i_key, i_title) in [
              ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
+             ('pt_overGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
              ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
              ('pt_paraToGENMinusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} [GeV]'),
              ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
              ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+             ('pt_overGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
              ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
              ('pt_paraToGENMinusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} / Response [GeV]'),
              ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
 
              ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) [GeV]'),
+             ('pt_overOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
              ('pt_paraToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} [GeV]'),
              ('pt_paraToOfflineMinusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT_{#parallel Offline}#minus Offline)} [GeV]'),
              ('pt_perpToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  [GeV]'),
              ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
+             ('pt_overOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
              ('pt_paraToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} / Response [GeV]'),
              ('pt_paraToOfflineMinusOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT_{#parallel Offline}#minus Offline)} / Response [GeV]'),
              ('pt_perpToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  / Response [GeV]'),
@@ -1130,9 +1145,10 @@ if __name__ == '__main__':
 
                templates = get_templates_PU('3PU_p', histograms, i_sel+tmp_name, skipGEN=opts.skip_GenMET),
 
-               yMin = 0.1,
-               yMax = 200,
-#               xMax = 500,
+               yMin = (0.001 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 0.1),
+               yMax = (0.800 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 200),
+
+               xMax = 500,
 
                title = i_title,
              )
@@ -1304,10 +1320,20 @@ if __name__ == '__main__':
                      ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_pt', ';GenJet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
                      ('pt_minusGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_eta', ';GenJet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
 
+                     ('pt_overGEN_RMS_wrt_ak4GenJetsNoNu_EtaIncl_pt', ';GenJet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
+                     ('pt_overGEN_RMS_wrt_ak4GenJetsNoNu_EtaIncl_eta', ';GenJet #eta;#sigma(p_{T}/p^{GEN}_{T})'),
+                     ('pt_overGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_pt', ';GenJet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+                     ('pt_overGEN_RMSScaledByResponse_wrt_ak4GenJetsNoNu_EtaIncl_eta', ';GenJet #eta;#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+
                      ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) [GeV]'),
                      ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) [GeV]'),
                      ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
                      ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) / Response [GeV]'),
+
+                     ('pt_overOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
+                     ('pt_overOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/'),
+                     ('pt_overOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
+                     ('pt_overOffline_RMSScaledByResponse_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
                    ]:
                      plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
 
@@ -1315,9 +1341,8 @@ if __name__ == '__main__':
 
                        templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_jetcat+'_'+i_key, skipGEN=opts.skip_GenJets),
 
-                       yMin = 0.1,
-                       yMax = 200,
-#                       xMax = 500,
+                       yMin = (0.001 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 0.1),
+                       yMax = (0.800 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 200),
 
                        title = i_title,
                      )
@@ -1484,19 +1509,23 @@ if __name__ == '__main__':
                # pT Resolution (RMS)
                for (i_key, i_title) in [
                  ('pt_minusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
+                 ('pt_overGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
                  ('pt_paraToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
                  ('pt_paraToGENMinusGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} [GeV]'),
                  ('pt_perpToGEN_RMS_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
                  ('pt_minusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                 ('pt_overGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
                  ('pt_paraToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
                  ('pt_paraToGENMinusGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} / Response [GeV]'),
                  ('pt_perpToGEN_RMSScaledByResponse_wrt_genMetTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
 
                  ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) [GeV]'),
+                 ('pt_overOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
                  ('pt_paraToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} [GeV]'),
                  ('pt_paraToOfflineMinusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT_{#parallel Offline}#minus Offline)} [GeV]'),
                  ('pt_perpToOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  [GeV]'),
                  ('pt_minusOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
+                 ('pt_overOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
                  ('pt_paraToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT #parallel Offline)} / Response [GeV]'),
                  ('pt_paraToOfflineMinusOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT_{#parallel Offline}#minus Offline)} / Response [GeV]'),
                  ('pt_perpToOffline_RMSScaledByResponse_wrt_Offline_pt', ';Offline MET [GeV];RMS#scale[0.75]{(HLT#perp Offline)}  / Response [GeV]'),
@@ -1507,9 +1536,10 @@ if __name__ == '__main__':
 
                    templates = get_templates(comp_tag+'_p', histograms, pu_tag, i_sel, i_key, skipGEN=opts.skip_GenMET),
 
-                   yMin = 0.1,
-                   yMax = 200,
-#                   xMax = 500,
+                   yMin = (0.001 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 0.1),
+                   yMax = (0.800 if (('overGEN_RMS' in i_key) or ('overOffline_RMS' in i_key)) else 200),
+
+                   xMax = 500,
 
                    title = i_title,
                  )
