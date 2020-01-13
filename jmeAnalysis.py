@@ -101,7 +101,7 @@ def create_histograms():
                 binEdges_1d[i_sel+i_jet+i_reg+'_njets'] = [_tmp for _tmp in range(13)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_pt']  = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
                 binEdges_1d[i_sel+i_jet+i_reg+'_pt0'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
-                binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.6, -1.3, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.3, 1.6, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
+                binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.5, -1.3, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.3, 1.5, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
                 binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_mass'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600]
 
@@ -309,7 +309,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
     ## Event Values
 
-    values['hltNPV'] = len(arrays['hltGoodPrimaryVertices_z'][index])
+    values['hltNPV'] = len(arrays['hltPrimaryVertices_z'][index])
     values['offlineNPV'] = len(arrays['offlinePrimaryVertices_z'][index])
 
     ## Jets
@@ -484,7 +484,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
             onlineJet_labels = ['_EtaIncl']
             if abs(onlineJet_eta) < 1.5: onlineJet_labels += ['_HB']
-            elif abs(onlineJet_eta) < 3.0: onlineJet_labels += ['_HG']
+            elif abs(onlineJet_eta) < 3.0: onlineJet_labels += ['_HGCal']
             else: onlineJet_labels += ['_HF']
 
             for i_onlineJetReg in onlineJet_labels:

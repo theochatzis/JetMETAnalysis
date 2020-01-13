@@ -718,10 +718,10 @@ if __name__ == '__main__':
 
            if opts.skip_GenJets and (i_jet == 'ak4GenJetsNoNu'): continue
 
-           jetCategories = ['_EtaIncl', '_HB', '_HE', '_HF']
+           jetCategories = ['_EtaIncl', '_HB', '_HGCal', '_HF']
            if i_jet != 'ak4GenJetsNoNu':
-              jetCategories += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HE_MatchedToGEN', '_HF_MatchedToGEN']
-              jetCategories += ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HE_MatchedToOffline', '_HF_MatchedToOffline']
+              jetCategories += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HGCal_MatchedToGEN', '_HF_MatchedToGEN']
+              jetCategories += ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HGCal_MatchedToOffline', '_HF_MatchedToOffline']
 
            for i_jetcat in jetCategories:
 
@@ -1163,9 +1163,9 @@ if __name__ == '__main__':
 
            for comp_tag in ['AK4Jets_PFCHS', 'AK4Jets_Puppi', 'AK4Jets_HLT', 'AK4Jets_Offline']:
 
-               jetCategories = ['_EtaIncl', '_HB', '_HE', '_HF']
-               jetCategories += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HE_MatchedToGEN', '_HF_MatchedToGEN']
-               jetCategories += ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HE_MatchedToOffline', '_HF_MatchedToOffline']
+               jetCategories = ['_EtaIncl', '_HB', '_HGCal', '_HF']
+               jetCategories += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HGCal_MatchedToGEN', '_HF_MatchedToGEN']
+               jetCategories += ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HGCal_MatchedToOffline', '_HF_MatchedToOffline']
 
                for i_jetcat in jetCategories:
 
@@ -1559,9 +1559,9 @@ if __name__ == '__main__':
        'wrt': ['hltAK4PFCHSJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
      },
 
-     'hltAK4PFCHS100_HE': {
-       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HE)',
-       'wrt': ['hltAK4PFCHSJetsCorrected_HE_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HE_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     'hltAK4PFCHS100_HGCal': {
+       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HGCal)',
+       'wrt': ['hltAK4PFCHSJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
      },
 
      'hltAK4PFCHS100_HF': {
@@ -1579,9 +1579,9 @@ if __name__ == '__main__':
        'wrt': ['hltAK4PuppiJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HB_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
      },
 
-     'hltAK4Puppi100_HE': {
-       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HE)',
-       'wrt': ['hltAK4PuppiJetsCorrected_HE_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HE_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+     'hltAK4Puppi100_HGCal': {
+       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HGCal)',
+       'wrt': ['hltAK4PuppiJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
      },
 
      'hltAK4Puppi100_HF': {

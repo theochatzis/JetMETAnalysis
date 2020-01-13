@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 
-def apply_style(type_):
+def apply_style(type_=0):
 
     s = ROOT.TStyle('swagger', 'plot swagger')
 
