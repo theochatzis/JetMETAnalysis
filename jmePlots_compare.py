@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-import argparse, os, ROOT
+import argparse
+import os
+import json
+import ROOT
 
 from common.utils import *
 
@@ -79,7 +82,30 @@ def get_text(x1ndc_, y1ndc_, talign_, tsize_, text_):
 
     return txt
 
-def plot_canvas(key, target, reference, target_legend, reference_legend, output, output_extensions):
+def plot_canvas(key, target, reference, target_legend, reference_legend, output, output_extensions, config):
+
+#    if 'met' not in key.lower(): return
+
+    plot_conf = {}
+    key0 = key
+    while key0 not in plot_conf:
+       if '/' in key0:
+          key0 = key0[key0.find('/')+1:]
+       else:
+          break
+
+    if key0 in config:
+       plot_conf = config[key0]
+    else:
+       plot_conf = {
+         'titleX': '',
+         'titleY': '',
+         'Label': key0,
+         'MarkerSize': 0.,
+         'PlotRatio': 1,
+         'Draw': 'hist,e0',
+         'DrawLegend': 'l',
+       }
 
     if (target != None) and (reference != None):
        if target.ClassName() != reference.ClassName():
@@ -95,15 +121,23 @@ def plot_canvas(key, target, reference, target_legend, reference_legend, output,
     if not (h_targ.InheritsFrom('TH1F') or h_targ.InheritsFrom('TH1D')):
        return 1
 
-    if (h_targ.GetNbinsX() == h_refe.GetNbinsX()) and (h_targ.GetNbinsY() == h_refe.GetNbinsY()):
-       for i_bin in range(0, 2+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
-           i_bin_targ = h_targ.GetBinContent(i_bin)
-           i_bin_refe = h_refe.GetBinContent(i_bin)
-           if abs(i_bin_targ - i_bin_refe) > 1e-8:
-              print 'differs', output
-              break
-    else:
-       print 'differs', output
+#    if (h_targ.GetNbinsX() == h_refe.GetNbinsX()) and (h_targ.GetNbinsY() == h_refe.GetNbinsY()):
+#       for i_bin in range(0, 2+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
+#           i_bin_targ = h_targ.GetBinContent(i_bin)
+#           i_bin_refe = h_refe.GetBinContent(i_bin)
+#           if abs(i_bin_targ - i_bin_refe) > 1e-8:
+#              print 'differs', output
+#              break
+#    else:
+#       print 'differs', output
+
+#    binwidth_nonconst, binw = False, None
+#    for i_bin in range(1, 1+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
+#        if binw is None:
+#           binw = h_targ.GetBinWidth(i_bin)
+#        elif binw != h_targ.GetBinWidth(i_bin):
+#           binwidth_nonconst = True
+#           break
 
 ##!!!!!!!
 #    output_basename_woExt = str(output)
@@ -113,33 +147,20 @@ def plot_canvas(key, target, reference, target_legend, reference_legend, output,
 #    return
 ##!!!!!!!
 
-    key_basename = os.path.basename(key)
+    titleX = str(plot_conf['titleX'])
+    titleY = str(plot_conf['titleY'])
+    markerColor = [1, 2]
+    markerSize = [plot_conf['MarkerSize'], plot_conf['MarkerSize']]
+    markerStyle = [20, 24]
+    lineColor = [1, 2]
+    lineWidth = [2, 2]
+    draw_opt = str(plot_conf['Draw'])
+    legendDraw_opt = str(plot_conf['DrawLegend'])
 
-    if '_wrt_' in key_basename:
-       key_basename_split = key_basename.split('_wrt_')
-       titleX = key_basename_split[1]
-       titleY = key_basename_split[0]
-       markerColor = [1, 2]
-       markerSize = [1.5, 1.5]
-       markerStyle = [20, 24]
-       lineColor = [1, 2]
-       lineWidth = [2, 2]
-       draw_opt = 'ep'
-       legendDraw_opt = 'ep'
-    else:
-       titleX = key_basename
-       titleY = 'Entries'
-       markerColor = [1, 2]
-       markerSize = [0, 0]
-       markerStyle = [20, 24]
-       lineColor = [1, 2]
-       lineWidth = [2, 2]
-       draw_opt = 'hist,e0'
-       legendDraw_opt = 'l'
-       if key_basename.endswith('_pt') or key_basename.endswith('_pt0') or key_basename.endswith('_eta') or key_basename.endswith('_phi'):
-          titleY += ' / Bin width'
-          h_targ.Scale(1, 'width')
-          h_refe.Scale(1, 'width')
+    if plot_conf['DivideByBinWidth']:
+       titleY += ' / Bin width'
+       h_targ.Scale(1, 'width')
+       h_refe.Scale(1, 'width')
 
     h_refe.SetBit(ROOT.TH1.kNoTitle)
     h_targ.SetBit(ROOT.TH1.kNoTitle)
@@ -162,18 +183,18 @@ def plot_canvas(key, target, reference, target_legend, reference_legend, output,
 #    opt_draw, opt_legd = 'hist,e', 'lep'
 #    if h_refe.GetName().startswith('effic_'): opt_draw, opt_legd = 'pex0', 'pex0'
 
-    ratio = True
+    ratio = plot_conf['PlotRatio']
 
     logY = False
 
-    histo_type = None
-    if   'numerator'   in h_refe.GetTitle(): histo_type = 'NUM'
-    elif 'denominator' in h_refe.GetTitle(): histo_type = 'DEN'
-
-    # normalize (numerator, denominator) histograms to unity
-    if histo_type in ['NUM', 'DEN']:
-       if h_refe.Integral() != 0.: h_refe.Scale(1. / h_refe.Integral())
-       if h_targ.Integral() != 0.: h_targ.Scale(1. / h_targ.Integral())
+#    histo_type = None
+#    if   'numerator'   in h_refe.GetTitle(): histo_type = 'NUM'
+#    elif 'denominator' in h_refe.GetTitle(): histo_type = 'DEN'
+#
+#    # normalize (numerator, denominator) histograms to unity
+#    if histo_type in ['NUM', 'DEN']:
+#       if h_refe.Integral() != 0.: h_refe.Scale(1. / h_refe.Integral())
+#       if h_targ.Integral() != 0.: h_targ.Scale(1. / h_targ.Integral())
 
     canvas = ROOT.TCanvas(key, key)
     canvas.SetGrid(1,1)
@@ -185,7 +206,7 @@ def plot_canvas(key, target, reference, target_legend, reference_legend, output,
     B = canvas.GetBottomMargin()
     L = canvas.GetLeftMargin()
 
-    ROOT.TGaxis.SetExponentOffset(-L+.50*L, 0.03, 'y')
+    ROOT.TGaxis.SetExponentOffset(0.65*L, 0.03, 'y')
 
     leg = ROOT.TLegend(L+(1-R-L)*0.00, (1-T)+T*0.05, L+(1-R-L)*1.00, (1-T)+T*0.95)
     leg.SetBorderSize(2)
@@ -194,46 +215,50 @@ def plot_canvas(key, target, reference, target_legend, reference_legend, output,
     leg.AddEntry(h_targ, '#bf{Target}: '   +target_legend   , legendDraw_opt)
     leg.AddEntry(h_refe, '#bf{Reference}: '+reference_legend, legendDraw_opt)
 
-    txt1 = None
-    if   histo_type == 'NUM': txt1 = get_text((1-R)+R*0.25, (1-T), 11, .025, '[Numerator]');   txt1.SetTextAngle(-90);
-    elif histo_type == 'DEN': txt1 = get_text((1-R)+R*0.25, (1-T), 11, .025, '[Denominator]'); txt1.SetTextAngle(-90);
+    txt1 = get_text(L+(1-R-L)*0.95, B+(1-T-B)*0.925, 31, .035, str(plot_conf['Label']))
+#    if   histo_type == 'NUM': txt1 = get_text((1-R)+R*0.25, (1-T), 11, .025, '[Numerator]');   txt1.SetTextAngle(-90);
+#    elif histo_type == 'DEN': txt1 = get_text((1-R)+R*0.25, (1-T), 11, .025, '[Denominator]'); txt1.SetTextAngle(-90);
 
     txt2 = None # get_text(L+(1-R-L)*0.05, B+(1-B-T)*.77, 13, .040, '')
 
     canvas.cd()
 
-    hmax = 0.0
+    hmax, hmin = 0.0, 0.0
     for _tmp in [h_targ, h_refe]:
         for i_bin in range(1, _tmp.GetNbinsX()+1):
             hmax = max(hmax, (_tmp.GetBinContent(i_bin) + _tmp.GetBinError(i_bin)))
+            hmin = min(hmin, (_tmp.GetBinContent(i_bin) - _tmp.GetBinError(i_bin)))
 
     if not ratio:
 
-        canvas.SetTickx()
-        canvas.SetTicky()
+       canvas.SetTickx()
+       canvas.SetTicky()
 
-        canvas.SetLogy(logY)
+       canvas.SetLogy(logY)
 
-        h_refe.SetStats(0)
+       h_refe.SetStats(0)
 
-        h_refe.SetYTitle(titleX)
-        h_refe.SetYTitle(titleY)
+       h_refe.SetYTitle(titleX)
+       h_refe.SetYTitle(titleY)
 
-        h_refe.Draw(draw_opt)
-        h_targ.Draw(draw_opt+',same')
-        h_refe.Draw('axis,same')
-        if leg: leg.Draw('same')
+       h_refe.Draw(draw_opt)
+       h_targ.Draw(draw_opt+',same')
+       h_refe.Draw('axis,same')
+       if leg: leg.Draw('same')
 
-        if txt1: txt1.Draw('same')
-        if txt2: txt2.Draw('same')
+       if txt1: txt1.Draw('same')
+       if txt2: txt2.Draw('same')
 
-#        h_refe.GetXaxis().SetRangeUser(xmin_, xmax_)
+#       h_refe.GetXaxis().SetRangeUser(xmin_, xmax_)
 
-        if histo_type in ['NUM', 'DEN']:
-           h_refe.GetYaxis().SetTitle('a.u.')
+#       if histo_type in ['NUM', 'DEN']:
+#          h_refe.GetYaxis().SetTitle('a.u.')
 
-        if logY: h_refe.GetYaxis().SetRangeUser(.0003, .0003*((hmax/.0003)**(1./.85)))
-        else   : h_refe.GetYaxis().SetRangeUser(.0001, .0001+((hmax-.0001) *(1./.85)))
+       if hmin > 0:
+          if logY: h_refe.GetYaxis().SetRangeUser(.0003, .0003*((hmax/.0003)**(1./.85)))
+          else   : h_refe.GetYaxis().SetRangeUser(.0001, .0001+((hmax-.0001) *(1./.85)))
+       else:
+          h_refe.GetYaxis().SetRangeUser(1.05*hmin, .0001+((hmax-.0001) *(1./.85)))
 
     else:
 
@@ -259,8 +284,8 @@ def plot_canvas(key, target, reference, target_legend, reference_legend, output,
         h11.SetXTitle('')
         h11.SetYTitle(titleY)
 
-        if histo_type in ['NUM', 'DEN']:
-           h11.GetYaxis().SetTitle('a.u.')
+#        if histo_type in ['NUM', 'DEN']:
+#           h11.GetYaxis().SetTitle('a.u.')
 
         h11.GetYaxis().SetTitleSize(h11.GetYaxis().GetTitleSize()/pad1H)
         h11.GetYaxis().SetTitleOffset(h11.GetYaxis().GetTitleOffset()*pad1H)
@@ -276,8 +301,11 @@ def plot_canvas(key, target, reference, target_legend, reference_legend, output,
 
         pad1.SetLogy(logY)
 
-        if logY: h11.GetYaxis().SetRangeUser(.0003, .0003*((hmax/.0003)**(1./.85)))
-        else   : h11.GetYaxis().SetRangeUser(.0001, .0001+((hmax-.0001) *(1./.85)))
+        if hmin > 0:
+           if logY: h11.GetYaxis().SetRangeUser(.0003, .0003*((hmax/.0003)**(1./.85)))
+           else   : h11.GetYaxis().SetRangeUser(.0001, .0001+((hmax-.0001) *(1./.85)))
+        else:
+           h11.GetYaxis().SetRangeUser(1.05*hmin, .0001+((hmax-.0001) *(1./.85)))
 
         if txt1: txt1.SetTextSize(txt1.GetTextSize()/pad1H); txt1.Draw('same');
         if txt2: txt2.SetTextSize(txt2.GetTextSize()/pad1H); txt2.Draw('same');
@@ -405,7 +433,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                         help='path to output directory')
 
-    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=[],
+    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=['NoSelection/'],
                         help='list of strings required to be in histogram key')
 
     parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['png'],
@@ -430,7 +458,7 @@ if __name__ == '__main__':
 #       KILL(log_prx+'invalid path to input .root file for "reference" [-r]: '+opts.reference)
 
     if os.path.exists(opts.output):
-       KILL(log_prx+'target path to output .root file already exists [-o]: '+opts.output)
+       KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
 
     EXTS = list(set(opts.exts))
 
@@ -446,6 +474,255 @@ if __name__ == '__main__':
     ### input histograms --
     histo_dict_target = add_TH1_objects(filelist=opts.target   , contains_all=ONLY_KEYS)
     histo_dict_refern = add_TH1_objects(filelist=opts.reference, contains_all=ONLY_KEYS)
+
+    tags = {
+      'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN': 'HLT AK4-CHS matched-to-GEN',
+      'hltAK4PFCHSJetsCorrected_HB_MatchedToGEN': 'HLT AK4-CHS, |#eta|<1.5, matched-to-GEN',
+      'hltAK4PFCHSJetsCorrected_HGCal_MatchedToGEN': 'HLT AK4-CHS, 1.5<|#eta|<3.0, matched-to-GEN',
+      'hltAK4PFCHSJetsCorrected_HF_MatchedToGEN': 'HLT AK4-CHS, 3.0<|#eta|<5.0, matched-to-GEN',
+      
+      'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline': 'HLT AK4-CHS matched-to-Offline',
+      'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline': 'HLT AK4-CHS, |#eta|<1.5, matched-to-Offline',
+      'hltAK4PFCHSJetsCorrected_HGCal_MatchedToOffline': 'HLT AK4-CHS, 1.5<|#eta|<3.0, matched-to-Offline',
+      'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline': 'HLT AK4-CHS, 3.0<|#eta|<5.0, matched-to-Offline',
+
+      'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN': 'HLT AK4-Puppi matched-to-GEN',
+      'hltAK4PuppiJetsCorrected_HB_MatchedToGEN': 'HLT AK4-Puppi, |#eta|<1.5, matched-to-GEN',
+      'hltAK4PuppiJetsCorrected_HGCal_MatchedToGEN': 'HLT AK4-Puppi, 1.5<|#eta|<3.0, matched-to-GEN',
+      'hltAK4PuppiJetsCorrected_HF_MatchedToGEN': 'HLT AK4-Puppi, 3.0<|#eta|<5.0, matched-to-GEN',
+      
+      'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline': 'HLT AK4-Puppi matched-to-Offline',
+      'hltAK4PuppiJetsCorrected_HB_MatchedToOffline': 'HLT AK4-Puppi, |#eta|<1.5, matched-to-Offline',
+      'hltAK4PuppiJetsCorrected_HGCal_MatchedToOffline': 'HLT AK4-Puppi, 1.5<|#eta|<3.0, matched-to-Offline',
+      'hltAK4PuppiJetsCorrected_HF_MatchedToOffline': 'HLT AK4-Puppi, 3.0<|#eta|<5.0, matched-to-Offline',
+
+      'ak4GenJetsNoNu_EtaIncl_pt' : 'GEN p_{T} [GeV]',
+      'ak4GenJetsNoNu_EtaIncl_eta': 'GEN #eta',
+      'ak4GenJetsNoNu_EtaIncl_phi': 'GEN #phi',
+
+      'offlineAK4PFCHSJetsCorrected_EtaIncl_pt' : 'Offline p_{T} [GeV]',
+      'offlineAK4PFCHSJetsCorrected_EtaIncl_eta': 'Offline #eta',
+      'offlineAK4PFCHSJetsCorrected_EtaIncl_phi': 'Offline #phi',
+
+      'offlineAK4PuppiJetsCorrected_EtaIncl_pt' : 'Offline p_{T} [GeV]',
+      'offlineAK4PuppiJetsCorrected_EtaIncl_eta': 'Offline #eta',
+      'offlineAK4PuppiJetsCorrected_EtaIncl_phi': 'Offline #phi',
+
+      'Offline_pt' : 'Offline p_{T} [GeV]',
+      'Offline_eta': 'Offline #eta',
+      'Offline_phi': 'Offline #phi',
+
+      'hltPFMET': 'HLT PF-MET',
+      'hltPFMETTypeOne': 'HLT PF-MET Type-1',
+
+      'hltPuppiMET': 'HLT Puppi',
+      'hltPuppiMETTypeOne': 'HLT Puppi Type-1',
+
+      'offlineMETs_Raw': 'Offline PF-MET Raw',
+      'offlineMETsPuppi_Raw': 'Offline Puppi-MET Raw',
+
+      'offlineNPV': 'Offline N_{PV}',
+
+      'offlineMETs_Type1': 'Offline PF-MET Type-1',
+      'offlineMETsPuppi_Type1': 'Offline Puppi-MET Type-1',
+
+      'offlineMETs_Raw_pt': 'Offline MET [GeV]',
+      'offlineMETsPuppi_Raw_pt': 'Offline MET [GeV]',
+      'offlineMETs_Type1_pt': 'Offline MET [GeV]',
+      'offlineMETsPuppi_Type1_pt': 'Offline MET [GeV]',
+
+      'genMetTrue_pt': 'GEN MET [GeV]',
+      'genMetTrue_phi': 'GEN #phi',
+      'genMetTrue_sumEt': 'GEN Sum-E_{T} [GeV]',
+
+      'phi_overGEN': '#phi / #phi^{GEN}',
+      'phi_minusGEN': '#phi - #phi^{GEN}',
+
+      'pt_paraToGEN': 'p_{T}^{#parallel {GEN}} [GeV]',
+      'pt_paraToGEN_Mean': '<p_{T}^{#parallel {GEN}}> [GeV]',
+      'pt_paraToGEN_RMS': '#sigma(p_{T}^{#parallel {GEN}}) [GeV]',
+      'pt_paraToGEN_RMSScaledByResponse': '#sigma(p_{T}^{#parallel {GEN}}) / <p_{T} / p_{T}^{GEN}> [GeV]',
+      'pt_paraToGENMinusGEN': 'p_{T}^{#parallel {GEN}} - p_{T}^{GEN} [GeV]',
+      'pt_paraToGENMinusGEN_Mean': '<p_{T}^{#parallel {GEN}} - p_{T}^{GEN}> [GeV]',
+      'pt_paraToGENMinusGEN_RMS': '#sigma(p_{T}^{#parallel {GEN}} - p_{T}^{GEN}) [GeV]',
+      'pt_paraToGENMinusGEN_RMSScaledByResponse': '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) / <p_{T} / p_{T}^{GEN}> [GeV]',
+      'pt_perpToGEN': 'p_{T}^{#perp GEN}',
+      'pt_perpToGEN_Mean': '<p_{T}^{#perp GEN}>',
+      'pt_perpToGEN_RMS': '#sigma(p_{T}^{#perp GEN}) [GeV]',
+      'pt_perpToGEN_RMSScaledByResponse': '#sigma(p_{T}^{#perp GEN}) / <p_{T} / p_{T}^{GEN}> [GeV]',
+
+      'pt_paraToOffline': 'p_{T}^{#parallel Offl} [GeV]',
+      'pt_paraToOffline_Mean': '<p_{T}^{#parallel Offl}> [GeV]',
+      'pt_paraToOffline_RMS': '#sigma(p_{T}^{#parallel Offl}) [GeV]',
+      'pt_paraToOffline_RMSScaledByResponse': '#sigma(p_{T}^{#parallel Offl}) / <p_{T} / p_{T}^{Offl}> [GeV]',
+      'pt_paraToOfflineMinusOffline': 'p_{T}^{#parallel Offl} - p_{T}^{Offl} [GeV]',
+      'pt_paraToOfflineMinusOffline_Mean': '<p_{T}^{#parallel Offl} - p_{T}^{Offl}> [GeV]',
+      'pt_paraToOfflineMinusOffline_RMS': '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) [GeV]',
+      'pt_paraToOfflineMinusOffline_RMSScaledByResponse': '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) / <p_{T} / p_{T}^{Offl}> [GeV]',
+      'pt_perpToOffline': 'p_{T}^{#perp Offl}',
+      'pt_perpToOffline_Mean': '<p_{T}^{#perp Offl}>',
+      'pt_perpToOffline_RMS': '#sigma(p_{T}^{#perp Offl}) [GeV]',
+      'pt_perpToOffline_RMSScaledByResponse': '#sigma(p_{T}^{#perp Offl}) / <p_{T} / p_{T}^{Offl}> [GeV]',
+
+      'pt_minusGEN': 'p_{T} - p_{T}^{GEN} [GeV]',
+      'pt_minusGEN_Mean': '<p_{T} - p_{T}^{GEN}> [GeV]',
+      'pt_minusGEN_RMS': '#sigma(p_{T} - p_{T}^{GEN}) [GeV]',
+      'pt_minusGEN_RMSScaledByResponse': '#sigma(p_{T} - p_{T}^{GEN}) / <p_{T} / p_{T}^{GEN}> [GeV]',
+
+      'pt_overGEN': 'p_{T} / p_{T}^{GEN}',
+      'pt_overGEN_Mean': '<p_{T} / p_{T}^{GEN}>',
+      'pt_overGEN_RMS': '#sigma(p_{T} / p_{T}^{GEN})',
+      'pt_overGEN_RMSScaledByResponse': '#sigma(p_{T} / p_{T}^{GEN}) / <p_{T} / p_{T}^{GEN}>',
+
+      'pt_minusOffline': 'p_{T} - p_{T}^{Offl} [GeV]',
+      'pt_minusOffline_Mean': '<p_{T} - p_{T}^{Offl}> [GeV]',
+      'pt_minusOffline_RMS': '#sigma(p_{T} - p_{T}^{Offl}) [GeV]',
+      'pt_minusOffline_RMSScaledByResponse': '#sigma(p_{T} - p_{T}^{Offl}) / <p_{T} / p_{T}^{Offl}> [GeV]',
+
+      'pt_overOffline': 'p_{T} / p_{T}^{Offl}',
+      'pt_overOffline_Mean': '<p_{T} / p_{T}^{Offl}>',
+      'pt_overOffline_RMS': '#sigma(p_{T} / p_{T}^{Offl})',
+      'pt_overOffline_RMSScaledByResponse': '#sigma(p_{T} / p_{T}^{Offl}) / <p_{T} / p_{T}^{Offl}>',
+
+      'sumEt_minusGEN': 'SumEt - SumEt^{GEN} [GeV]',
+      'sumEt_minusGEN_Mean': '<SumEt - SumEt^{GEN}> [GeV]',
+      'sumEt_minusGEN_RMS': '#sigma(SumEt - SumEt^{GEN}) [GeV]',
+      'sumEt_minusGEN_RMSScaledByResponse': '#sigma(SumEt - SumEt^{GEN}) / <SumEt / SumEt^{GEN}> [GeV]',
+
+      'sumEt_overGEN': 'SumEt / SumEt^{GEN}',
+      'sumEt_overGEN_Mean': '<SumEt / SumEt^{GEN}>',
+      'sumEt_overGEN_RMS': '#sigma(SumEt / SumEt^{GEN})',
+      'sumEt_overGEN_RMSScaledByResponse': '#sigma(SumEt / SumEt^{GEN}) / <SumEt / SumEt^{GEN}>',
+
+      'sumEt_minusOffline': 'SumEt - SumEt^{Offl} [GeV]',
+      'sumEt_minusOffline_Mean': '<SumEt - SumEt^{Offl}> [GeV]',
+      'sumEt_minusOffline_RMS': '#sigma(SumEt - SumEt^{Offl}) [GeV]',
+      'sumEt_minusOffline_RMSScaledByResponse': '#sigma(SumEt - SumEt^{Offl}) / <SumEt / SumEt^{Offl}> [GeV]',
+
+      'sumEt_overOffline': 'SumEt / SumEt^{Offl}',
+      'sumEt_overOffline_Mean': '<SumEt / SumEt^{Offl}>',
+      'sumEt_overOffline_RMS': '#sigma(SumEt / SumEt^{Offl})',
+      'sumEt_overOffline_RMSScaledByResponse': '#sigma(SumEt / SumEt^{Offl}) / <SumEt / SumEt^{Offl}>',
+
+      'phi_minusGEN': '#phi - #phi^{GEN} [GeV]',
+      'phi_minusGEN_Mean': '<#phi - #phi^{GEN}> [GeV]',
+      'phi_minusGEN_RMS': '#sigma(#phi - #phi^{GEN}) [GeV]',
+      'phi_minusGEN_RMSScaledByResponse': '#sigma(#phi - #phi^{GEN}) / <#phi / #phi^{GEN}> [GeV]',
+
+      'phi_overGEN': '#phi / #phi^{GEN}',
+      'phi_overGEN_Mean': '<#phi / #phi^{GEN}>',
+      'phi_overGEN_RMS': '#sigma(#phi / #phi^{GEN})',
+      'phi_overGEN_RMSScaledByResponse': '#sigma(#phi / #phi^{GEN}) / <#phi / #phi^{GEN}>',
+
+      'phi_minusOffline': '#phi - #phi^{Offl} [GeV]',
+      'phi_minusOffline_Mean': '<#phi - #phi^{Offl}> [GeV]',
+      'phi_minusOffline_RMS': '#sigma(#phi - #phi^{Offl}) [GeV]',
+      'phi_minusOffline_RMSScaledByResponse': '#sigma(#phi - #phi^{Offl}) / <#phi / #phi^{Offl}> [GeV]',
+
+      'phi_overOffline': '#phi / #phi^{Offl}',
+      'phi_overOffline_Mean': '<#phi / #phi^{Offl}>',
+      'phi_overOffline_RMS': '#sigma(#phi / #phi^{Offl})',
+      'phi_overOffline_RMSScaledByResponse': '#sigma(#phi / #phi^{Offl}) / <#phi / #phi^{Offl}>',
+
+      'pt': 'p_{T} [GeV]',
+      'pt0': 'leading-jet p_{T} [GeV]',
+      'eta': '#eta',
+      'phi': '#phi',
+      'sumEt': 'Sum-E_{T} [GeV]',
+      'mass': 'mass [GeV]',
+      'dRmatch': '#DeltaR',
+      'mass': 'mass [GeV]',
+      'njets': 'number of jets',
+    }
+
+    the_dict = {}
+
+    for _tmp in histo_dict_target:
+
+        _tmp1 = _tmp[_tmp.rfind('/')+1:] if '/' in _tmp else _tmp
+
+        if '_wrt_' in _tmp1:
+           tmp_split = _tmp1.split('_wrt_')
+
+           tx = tmp_split[1]
+           ty = tmp_split[0]
+
+           var0 = None
+           for _tmp_var in [
+             '_njets',
+             '_pt',
+             '_pt0',
+             '_eta',
+             '_phi',
+             '_mass',
+             '_dRmatch',
+             '_sumEt',
+           ]:
+             if _tmp_var in ty:
+                var0 = _tmp_var
+                break
+
+           if var0 is None:
+              KILL(_tmp)
+
+           objtag = ty[:ty.find(var0)]
+
+           ty = ty[ty.find(var0)+1:]
+
+           the_dict[_tmp1] = {
+             'titleX': tx if tx not in tags else tags[tx],
+             'titleY': ty if ty not in tags else tags[ty],
+             'Label': objtag if objtag not in tags else tags[objtag],
+             'MarkerSize': 1.5,
+             'PlotRatio': 1,
+             'Draw': 'ep',
+             'DrawLegend': 'ep',
+             'DivideByBinWidth': 0,
+           }
+
+        else:
+           tx = _tmp1
+
+           var0 = None
+           for _tmp_var in [
+             '_njets',
+             '_pt',
+             '_pt0',
+             '_eta',
+             '_phi',
+             '_mass',
+             '_dRmatch',
+             '_sumEt',
+           ]:
+             if _tmp_var in tx:
+                var0 = _tmp_var
+                break
+
+           DivideByBinWidth = 0
+           if tx.endswith('_pt') or tx.endswith('_pt0') or tx.endswith('_eta') or tx.endswith('_phi') or tx.endswith('_sumEt'):
+              DivideByBinWidth = 1
+
+           if var0 is None:
+              tx = var0 if var0 not in tags else tags[var0],
+              objtag = None
+#              KILL(_tmp)
+           else:
+              objtag = tx[:tx.find(var0)]
+              tx = tx[tx.find(var0)+1:]
+#              objtag = '' if objtag not in tags else tags[objtag]
+
+           the_dict[_tmp1] = {
+             'titleX': tx if tx not in tags else tags[tx],
+             'titleY': 'Entries',
+             'Label': objtag if objtag not in tags else tags[objtag],
+             'MarkerSize': 0.,
+             'Draw': 'hist,e0',
+             'PlotRatio': 1,
+             'DrawLegend': 'l',
+             'DivideByBinWidth': DivideByBinWidth,
+           }
+
+    json.dump(the_dict, open('tmp.json', 'w'), sort_keys=True, indent=2)
 
     ### output files (plots)
     load_plot_style()
@@ -463,6 +740,8 @@ if __name__ == '__main__':
       'reference_legend': str(opts.reference_legend),
 
       'output_extensions': EXTS,
+
+      'config': the_dict,
     }
 
     for histo_key in histo_paths_onlyTarget:
