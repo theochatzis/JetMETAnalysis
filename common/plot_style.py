@@ -79,15 +79,15 @@ def apply_style(type_=0):
     # Margins:
     s.SetPadTopMargin(0.08)
     s.SetPadBottomMargin(0.15)
-    if   type_ == 0:
-        s.SetPadLeftMargin(0.12)
-        s.SetPadRightMargin(0.03)
+    if type_ == 0:
+       s.SetPadLeftMargin(0.15)
+       s.SetPadRightMargin(0.04)
     elif type_ == 2:
-        s.SetPadLeftMargin (0.12)
-        s.SetPadRightMargin(0.12)
+       s.SetPadLeftMargin (0.12)
+       s.SetPadRightMargin(0.12)
     else:
-        s.SetPadLeftMargin(0.14)
-        s.SetPadRightMargin(0.04)
+       s.SetPadLeftMargin(0.14)
+       s.SetPadRightMargin(0.04)
 
     # For the Global title:
     s.SetOptTitle(1)
