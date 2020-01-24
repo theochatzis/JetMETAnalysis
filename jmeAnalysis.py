@@ -17,12 +17,14 @@ EvtSelections = [
   'hltAK4PFCHS100_EtaIncl/',
   'hltAK4PFCHS100_HB/',
   'hltAK4PFCHS100_HGCal/',
-  'hltAK4PFCHS100_HF/',
+  'hltAK4PFCHS100_HF1/',
+  'hltAK4PFCHS100_HF2/',
 
   'hltAK4Puppi100_EtaIncl/',
   'hltAK4Puppi100_HB/',
   'hltAK4Puppi100_HGCal/',
-  'hltAK4Puppi100_HF/',
+  'hltAK4Puppi100_HF1/',
+  'hltAK4Puppi100_HF2/',
 
   'hltPFMET200/',
   'hltPuppiMET200/',
@@ -96,18 +98,18 @@ def create_histograms():
         ### Jets
         for i_jet in JetCollections:
 
-            for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF']:
+            for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF1',  '_HF2']:
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_njets'] = [_tmp for _tmp in range(13)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_njets'] = [_tmp for _tmp in range(61)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_pt']  = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
                 binEdges_1d[i_sel+i_jet+i_reg+'_pt0'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
-                binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.5, -1.3, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.3, 1.5, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
+                binEdges_1d[i_sel+i_jet+i_reg+'_eta'] = [-5.0+0.1*_tmp for _tmp in range(100)] #[-5.0, -4.7, -4.2, -3.5, -3.0, -2.7, -2.4, -2.0, -1.5, -1.3, -1.1, -0.8, -0.4, 0.0, 0.4, 0.8, 1.1, 1.3, 1.5, 2.0, 2.4, 2.7, 3.0, 3.5, 4.2, 4.7, 5.0]
                 binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_mass'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600]
 
                 if i_jet == GenJetsCollection: continue
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_njets'] = [_tmp for _tmp in range(13)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_njets'] = [_tmp for _tmp in range(61)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt'] = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt0'] = binEdges_1d[i_sel+i_jet+i_reg+'_pt0']
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta'] = binEdges_1d[i_sel+i_jet+i_reg+'_eta']
@@ -132,9 +134,9 @@ def create_histograms():
 
         for [i_jet_onl, i_jet_off] in JetOnlineOfflinePairs:
 
-            for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF']:
+            for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']:
 
-                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_njets'] = [_tmp for _tmp in range(13)]
+                binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_njets'] = [_tmp for _tmp in range(61)]
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt']
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt0'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt0']
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_eta'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_eta']
@@ -346,7 +348,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
     for i_jet in JetCollections:
 
         # initialize value lists
-        for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF']:
+        for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']:
 
             _tmp_vlist = [
               i_jet+i_reg+'_pt',
@@ -391,7 +393,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
             jet_labels = ['_EtaIncl']
             if abs(jet_eta) < 1.5: jet_labels += ['_HB']
             elif abs(jet_eta) < 3.0: jet_labels += ['_HGCal']
-            else: jet_labels += ['_HF']
+            elif abs(jet_eta) < 4.0: jet_labels += ['_HF1']
+            else: jet_labels += ['_HF2']
 
             for i_reg in jet_labels:
 
@@ -433,9 +436,9 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                       values[i_jet+i_reg+'_MatchedToGEN_pt_overGEN:' +GenJetsCollection+'_EtaIncl_eta'] += [(jet_pt / genJet_match_pt, genJet_match_eta)]
                       values[i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+GenJetsCollection+'_EtaIncl_eta'] += [(jet_pt - genJet_match_pt, genJet_match_eta)]
 
-        njets_tags = ['_EtaIncl', '_HB', '_HGCal', '_HF']
+        njets_tags = ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']
         if (i_jet != GenJetsCollection):
-           njets_tags += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HGCal_MatchedToGEN', '_HF_MatchedToGEN']
+           njets_tags += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HGCal_MatchedToGEN', '_HF1_MatchedToGEN', '_HF2_MatchedToGEN']
 
         for i_jettag in njets_tags:
             values[i_jet+i_jettag+'_njets'] = len(values[i_jet+i_jettag+'_pt']) if (i_jet+i_jettag+'_pt' in values) else 0
@@ -450,7 +453,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
     for [i_onlineJetColl, i_offlineJetColl] in JetOnlineOfflinePairs:
 
         # initialize value-lists
-        for i_onlineJetReg in ['_EtaIncl', '_HB', '_HGCal', '_HF']:
+        for i_onlineJetReg in ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']:
             for _tmp in [
               i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt',
               i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_eta',
@@ -485,7 +488,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
             onlineJet_labels = ['_EtaIncl']
             if abs(onlineJet_eta) < 1.5: onlineJet_labels += ['_HB']
             elif abs(onlineJet_eta) < 3.0: onlineJet_labels += ['_HGCal']
-            else: onlineJet_labels += ['_HF']
+            elif abs(onlineJet_eta) < 4.0: onlineJet_labels += ['_HF1']
+            else: onlineJet_labels += ['_HF2']
 
             for i_onlineJetReg in onlineJet_labels:
 
@@ -521,7 +525,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                       values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_pt'] += [(onlineJet_pt - offlineJet_pt, offlineJet_pt)]
                       values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_eta'] += [(onlineJet_pt - offlineJet_pt, offlineJet_eta)]
 
-        njets_tags = ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HGCal_MatchedToOffline', '_HF_MatchedToOffline']
+        njets_tags = ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HGCal_MatchedToOffline', '_HF1_MatchedToOffline', '_HF2_MatchedToOffline']
 
         for i_jettag in njets_tags:
             values[i_onlineJetColl+i_jettag+'_njets'] = len(values[i_onlineJetColl+i_jettag+'_pt']) if (i_onlineJetColl+i_jettag+'_pt' in values) else 0
@@ -606,8 +610,11 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
         elif i_sel == 'hltAK4PFCHS100_HGCal/':
            if not (max([0] + values['hltAK4PFCHSJetsCorrected_HGCal_pt']) > 100.): continue
 
-        elif i_sel == 'hltAK4PFCHS100_HF/':
-           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HF_pt']) > 100.): continue
+        elif i_sel == 'hltAK4PFCHS100_HF1/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HF1_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4PFCHS100_HF2/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HF2_pt']) > 100.): continue
 
         elif i_sel == 'hltAK4Puppi100_EtaIncl/':
            if not (max([0] + values['hltAK4PuppiJetsCorrected_EtaIncl_pt']) > 100.): continue
@@ -618,8 +625,11 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
         elif i_sel == 'hltAK4Puppi100_HGCal/':
            if not (max([0] + values['hltAK4PuppiJetsCorrected_HGCal_pt']) > 100.): continue
 
-        elif i_sel == 'hltAK4Puppi100_HF/':
-           if not (max([0] + values['hltAK4PuppiJetsCorrected_HF_pt']) > 100.): continue
+        elif i_sel == 'hltAK4Puppi100_HF1/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_HF1_pt']) > 100.): continue
+
+        elif i_sel == 'hltAK4Puppi100_HF2/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_HF2_pt']) > 100.): continue
 
         elif i_sel == 'hltPFMET200/':
            if not (values['hltPFMET_pt'] > 200.): continue
