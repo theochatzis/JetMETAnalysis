@@ -107,6 +107,8 @@ def create_histograms():
                 binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_mass'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600]
 
+                binEdges_2d[i_sel+i_jet+i_reg+'_pt:'+i_sel+i_jet+i_reg+'_eta'] = [binEdges_1d[i_sel+i_jet+i_reg+'_pt'], binEdges_1d[i_sel+i_jet+i_reg+'_eta']]
+
                 if i_jet == GenJetsCollection: continue
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_njets'] = [_tmp for _tmp in range(61)]
@@ -783,6 +785,8 @@ if __name__ == '__main__':
    # convert bin-edges to TH1D
    th1s, th2s = create_histograms()
 
+   nEvtProcessed = 0
+
    for i_inpf in INPUT_FILES:
 
        if opts.verbose: print colored_text('[input]', ['1','92']), os.path.relpath(i_inpf)
@@ -807,6 +811,8 @@ if __name__ == '__main__':
 
            analyze_event(arrays=arr, index=evt_idx, th1s=th1s, th2s=th2s, verbose=opts.verbose)
 
+           nEvtProcessed += 1
+
            if not (evt_idx % SHOW_EVERY) and (evt_idx > 0):
               print colored_text('['+str(os.path.relpath(opts.output))+']', ['1','93']), 'events processed:', evt_idx
 
@@ -820,6 +826,13 @@ if __name__ == '__main__':
    output_tfile = ROOT.TFile(opts.output, 'recreate')
    if (not output_tfile) or output_tfile.IsZombie() or output_tfile.TestBit(ROOT.TFile.kRecovered):
       raise SystemExit(1)
+
+   output_tfile.cd()
+
+   hEvtProcessed = create_TH1D('eventsProcessed', [0,1])
+   hEvtProcessed.SetBinContent(1, nEvtProcessed)
+   hEvtProcessed.SetBinError(1, math.sqrt(nEvtProcessed))
+   hEvtProcessed.Write()
 
    for i_idx in sorted(th1s.keys() + th2s.keys()):
 
