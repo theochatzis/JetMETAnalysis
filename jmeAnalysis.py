@@ -110,19 +110,19 @@ def create_histograms():
 
                 binEdges_2d[i_sel+i_jet+i_reg+'_pt:'+i_sel+i_jet+i_reg+'_eta'] = [binEdges_1d[i_sel+i_jet+i_reg+'_pt'], binEdges_1d[i_sel+i_jet+i_reg+'_eta']]
 
-                if i_jet == GenJetsCollection: continue
-
                 binEdges_1d[i_sel+i_jet+i_reg+'_chargedHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_chargedEmEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_neutralHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_neutralEmEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_muonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_chargedMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_neutralMultiplicity'] = [_tmp for _tmp in range(61)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_chargedHadronMultiplicity'] = [_tmp for _tmp in range(61)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_neutralHadronMultiplicity'] = [_tmp for _tmp in range(61)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_muonMultiplicity'] = [_tmp for _tmp in range(13)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_electronMultiplicity'] = [_tmp for _tmp in range(13)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_photonMultiplicity'] = [_tmp for _tmp in range(61)]
+
+                if i_jet == GenJetsCollection: continue
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_njets'] = [_tmp for _tmp in range(121)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt'] = binEdges_1d[i_sel+i_jet+i_reg+'_pt']
@@ -137,8 +137,8 @@ def create_histograms():
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_neutralEmEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_chargedMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_neutralMultiplicity'] = [_tmp for _tmp in range(61)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity'] = [_tmp for _tmp in range(61)]
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity'] = [_tmp for _tmp in range(61)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_muonMultiplicity'] = [_tmp for _tmp in range(13)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_electronMultiplicity'] = [_tmp for _tmp in range(13)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_photonMultiplicity'] = [_tmp for _tmp in range(61)]
@@ -389,20 +389,20 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
               i_jet+i_reg+'_eta',
               i_jet+i_reg+'_phi',
               i_jet+i_reg+'_mass',
+              i_jet+i_reg+'_chargedHadronEnergyFraction',
+              i_jet+i_reg+'_chargedEmEnergyFraction',
+              i_jet+i_reg+'_neutralHadronEnergyFraction',
+              i_jet+i_reg+'_neutralEmEnergyFraction',
+              i_jet+i_reg+'_muonEnergyFraction',
+              i_jet+i_reg+'_chargedHadronMultiplicity',
+              i_jet+i_reg+'_neutralHadronMultiplicity',
+              i_jet+i_reg+'_muonMultiplicity',
+              i_jet+i_reg+'_electronMultiplicity',
+              i_jet+i_reg+'_photonMultiplicity',
             ]
 
             if i_jet != GenJetsCollection:
                _tmp_vlist += [
-                 i_jet+i_reg+'_chargedHadronEnergyFraction',
-                 i_jet+i_reg+'_chargedEmEnergyFraction',
-                 i_jet+i_reg+'_neutralHadronEnergyFraction',
-                 i_jet+i_reg+'_neutralEmEnergyFraction',
-                 i_jet+i_reg+'_muonEnergyFraction',
-                 i_jet+i_reg+'_chargedMultiplicity',
-                 i_jet+i_reg+'_neutralMultiplicity',
-                 i_jet+i_reg+'_muonMultiplicity',
-                 i_jet+i_reg+'_electronMultiplicity',
-                 i_jet+i_reg+'_photonMultiplicity',
                  i_jet+i_reg+'_MatchedToGEN_pt',
                  i_jet+i_reg+'_MatchedToGEN_eta',
                  i_jet+i_reg+'_MatchedToGEN_phi',
@@ -412,8 +412,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                  i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction',
                  i_jet+i_reg+'_MatchedToGEN_neutralEmEnergyFraction',
                  i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction',
-                 i_jet+i_reg+'_MatchedToGEN_chargedMultiplicity',
-                 i_jet+i_reg+'_MatchedToGEN_neutralMultiplicity',
+                 i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity',
+                 i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity',
                  i_jet+i_reg+'_MatchedToGEN_muonMultiplicity',
                  i_jet+i_reg+'_MatchedToGEN_electronMultiplicity',
                  i_jet+i_reg+'_MatchedToGEN_photonMultiplicity',
@@ -452,8 +452,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                jet_neutralHadronEnergyFraction = arrays[i_jet+'_neutralHadronEnergyFraction'][index][jet_idx]
                jet_neutralEmEnergyFraction = arrays[i_jet+'_neutralEmEnergyFraction'][index][jet_idx]
                jet_muonEnergyFraction = arrays[i_jet+'_muonEnergyFraction'][index][jet_idx]
-               jet_chargedMultiplicity = arrays[i_jet+'_chargedMultiplicity'][index][jet_idx]
-               jet_neutralMultiplicity = arrays[i_jet+'_neutralMultiplicity'][index][jet_idx]
+               jet_chargedHadronMultiplicity = arrays[i_jet+'_chargedHadronMultiplicity'][index][jet_idx]
+               jet_neutralHadronMultiplicity = arrays[i_jet+'_neutralHadronMultiplicity'][index][jet_idx]
                jet_muonMultiplicity = arrays[i_jet+'_muonMultiplicity'][index][jet_idx]
                jet_electronMultiplicity = arrays[i_jet+'_electronMultiplicity'][index][jet_idx]
                jet_photonMultiplicity = arrays[i_jet+'_photonMultiplicity'][index][jet_idx]
@@ -472,18 +472,18 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                 values[i_jet+i_reg+'_phi'] += [jet_phi]
                 values[i_jet+i_reg+'_mass'] += [jet_mass]
 
-                if i_jet == GenJetsCollection: continue
-
                 values[i_jet+i_reg+'_chargedHadronEnergyFraction'] += [jet_chargedHadronEnergyFraction]
                 values[i_jet+i_reg+'_chargedEmEnergyFraction'] += [jet_chargedEmEnergyFraction]
                 values[i_jet+i_reg+'_neutralHadronEnergyFraction'] += [jet_neutralHadronEnergyFraction]
                 values[i_jet+i_reg+'_neutralEmEnergyFraction'] += [jet_neutralEmEnergyFraction]
                 values[i_jet+i_reg+'_muonEnergyFraction'] += [jet_muonEnergyFraction]
-                values[i_jet+i_reg+'_chargedMultiplicity'] += [jet_chargedMultiplicity]
-                values[i_jet+i_reg+'_neutralMultiplicity'] += [jet_neutralMultiplicity]
+                values[i_jet+i_reg+'_chargedHadronMultiplicity'] += [jet_chargedHadronMultiplicity]
+                values[i_jet+i_reg+'_neutralHadronMultiplicity'] += [jet_neutralHadronMultiplicity]
                 values[i_jet+i_reg+'_muonMultiplicity'] += [jet_muonMultiplicity]
                 values[i_jet+i_reg+'_electronMultiplicity'] += [jet_electronMultiplicity]
                 values[i_jet+i_reg+'_photonMultiplicity'] += [jet_photonMultiplicity]
+
+                if i_jet == GenJetsCollection: continue
 
                 genJet_match = jetMatchingIndices_dict[i_jet][GenJetsCollection][jet_idx]
 
@@ -506,8 +506,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                    values[i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction'] += [jet_neutralHadronEnergyFraction]
                    values[i_jet+i_reg+'_MatchedToGEN_neutralEmEnergyFraction'] += [jet_neutralEmEnergyFraction]
                    values[i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction'] += [jet_muonEnergyFraction]
-                   values[i_jet+i_reg+'_MatchedToGEN_chargedMultiplicity'] += [jet_chargedMultiplicity]
-                   values[i_jet+i_reg+'_MatchedToGEN_neutralMultiplicity'] += [jet_neutralMultiplicity]
+                   values[i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity'] += [jet_chargedHadronMultiplicity]
+                   values[i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity'] += [jet_neutralHadronMultiplicity]
                    values[i_jet+i_reg+'_MatchedToGEN_muonMultiplicity'] += [jet_muonMultiplicity]
                    values[i_jet+i_reg+'_MatchedToGEN_electronMultiplicity'] += [jet_electronMultiplicity]
                    values[i_jet+i_reg+'_MatchedToGEN_photonMultiplicity'] += [jet_photonMultiplicity]
