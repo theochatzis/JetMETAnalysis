@@ -341,7 +341,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
     values = {}
 
-    GenJet_minPt  = 30.
+    GenJet_minPt = 25.
     RecoJet_minPt = 30.
 
     ## Event Values
