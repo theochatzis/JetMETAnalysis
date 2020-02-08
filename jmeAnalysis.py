@@ -108,7 +108,7 @@ def create_histograms():
                 binEdges_1d[i_sel+i_jet+i_reg+'_phi'] = [math.pi*(2./40*_tmp-1) for _tmp in range(40+1)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_mass'] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600]
 
-                binEdges_2d[i_sel+i_jet+i_reg+'_pt:'+i_sel+i_jet+i_reg+'_eta'] = [binEdges_1d[i_sel+i_jet+i_reg+'_pt'], binEdges_1d[i_sel+i_jet+i_reg+'_eta']]
+                binEdges_2d[i_sel+i_jet+i_reg+'_pt:'+i_jet+i_reg+'_eta'] = [binEdges_1d[i_sel+i_jet+i_reg+'_pt'], binEdges_1d[i_sel+i_jet+i_reg+'_eta']]
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_chargedHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_neutralHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
@@ -778,7 +778,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
               i_hist_key_basename_split = i_hist_key_basename.split(':')
 
               if len(i_hist_key_basename_split) != 2:
-                 KILL('AAA')
+                 KILL('AAA '+i_hist_key)
 
               i_hist_key_dirname = os.path.dirname(i_hist_key)
               if i_hist_key_dirname: i_hist_key_dirname += '/'
