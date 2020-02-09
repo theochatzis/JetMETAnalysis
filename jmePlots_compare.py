@@ -433,7 +433,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                         help='path to output directory')
 
-    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=['NoSelection/'],
+    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=[], #!!['NoSelection/'],
                         help='list of strings required to be in histogram key')
 
     parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['png'],
@@ -475,26 +475,52 @@ if __name__ == '__main__':
     histo_dict_target = add_TH1_objects(filelist=opts.target   , contains_all=ONLY_KEYS)
     histo_dict_refern = add_TH1_objects(filelist=opts.reference, contains_all=ONLY_KEYS)
 
+    # normalize each input to number of processed events
+    for _tmp_dict in [histo_dict_target, histo_dict_refern]:
+        if 'eventsProcessed' in _tmp_dict:
+           _tmp_norm = _tmp_dict['eventsProcessed'].GetBinContent(1)
+           for _tmp_h in _tmp_dict:
+               if '_wrt_' not in _tmp_h:
+                  _tmp_dict[_tmp_h].Scale(1. / _tmp_norm)
+        else:
+           raise RuntimeError('AAA')
+
     tags = {
+      'hltAK4PFJetsCorrected_EtaIncl_MatchedToGEN': 'HLT AK4-PF matched-to-GEN',
+      'hltAK4PFJetsCorrected_HB_MatchedToGEN': 'HLT AK4-PF, |#eta|<1.5, matched-to-GEN',
+      'hltAK4PFJetsCorrected_HGCal_MatchedToGEN': 'HLT AK4-PF, 1.5<|#eta|<3.0, matched-to-GEN',
+      'hltAK4PFJetsCorrected_HF1_MatchedToGEN': 'HLT AK4-PF, 3.0<|#eta|<4.0, matched-to-GEN',
+      'hltAK4PFJetsCorrected_HF2_MatchedToGEN': 'HLT AK4-PF, 4.0<|#eta|<5.0, matched-to-GEN',
+
+      'hltAK4PFJetsCorrected_EtaIncl_MatchedToOffline': 'HLT AK4-PF matched-to-Offline',
+      'hltAK4PFJetsCorrected_HB_MatchedToOffline': 'HLT AK4-PF, |#eta|<1.5, matched-to-Offline',
+      'hltAK4PFJetsCorrected_HGCal_MatchedToOffline': 'HLT AK4-PF, 1.5<|#eta|<3.0, matched-to-Offline',
+      'hltAK4PFJetsCorrected_HF1_MatchedToOffline': 'HLT AK4-PF, 3.0<|#eta|<4.0, matched-to-Offline',
+      'hltAK4PFJetsCorrected_HF2_MatchedToOffline': 'HLT AK4-PF, 4.0<|#eta|<5.0, matched-to-Offline',
+
       'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN': 'HLT AK4-CHS matched-to-GEN',
       'hltAK4PFCHSJetsCorrected_HB_MatchedToGEN': 'HLT AK4-CHS, |#eta|<1.5, matched-to-GEN',
       'hltAK4PFCHSJetsCorrected_HGCal_MatchedToGEN': 'HLT AK4-CHS, 1.5<|#eta|<3.0, matched-to-GEN',
-      'hltAK4PFCHSJetsCorrected_HF_MatchedToGEN': 'HLT AK4-CHS, 3.0<|#eta|<5.0, matched-to-GEN',
-      
+      'hltAK4PFCHSJetsCorrected_HF1_MatchedToGEN': 'HLT AK4-CHS, 3.0<|#eta|<4.0, matched-to-GEN',
+      'hltAK4PFCHSJetsCorrected_HF2_MatchedToGEN': 'HLT AK4-CHS, 4.0<|#eta|<5.0, matched-to-GEN',
+
       'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline': 'HLT AK4-CHS matched-to-Offline',
       'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline': 'HLT AK4-CHS, |#eta|<1.5, matched-to-Offline',
       'hltAK4PFCHSJetsCorrected_HGCal_MatchedToOffline': 'HLT AK4-CHS, 1.5<|#eta|<3.0, matched-to-Offline',
-      'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline': 'HLT AK4-CHS, 3.0<|#eta|<5.0, matched-to-Offline',
+      'hltAK4PFCHSJetsCorrected_HF1_MatchedToOffline': 'HLT AK4-CHS, 3.0<|#eta|<4.0, matched-to-Offline',
+      'hltAK4PFCHSJetsCorrected_HF2_MatchedToOffline': 'HLT AK4-CHS, 4.0<|#eta|<5.0, matched-to-Offline',
 
       'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN': 'HLT AK4-Puppi matched-to-GEN',
       'hltAK4PuppiJetsCorrected_HB_MatchedToGEN': 'HLT AK4-Puppi, |#eta|<1.5, matched-to-GEN',
       'hltAK4PuppiJetsCorrected_HGCal_MatchedToGEN': 'HLT AK4-Puppi, 1.5<|#eta|<3.0, matched-to-GEN',
-      'hltAK4PuppiJetsCorrected_HF_MatchedToGEN': 'HLT AK4-Puppi, 3.0<|#eta|<5.0, matched-to-GEN',
-      
+      'hltAK4PuppiJetsCorrected_HF1_MatchedToGEN': 'HLT AK4-Puppi, 3.0<|#eta|<4.0, matched-to-GEN',
+      'hltAK4PuppiJetsCorrected_HF2_MatchedToGEN': 'HLT AK4-Puppi, 4.0<|#eta|<5.0, matched-to-GEN',
+
       'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline': 'HLT AK4-Puppi matched-to-Offline',
       'hltAK4PuppiJetsCorrected_HB_MatchedToOffline': 'HLT AK4-Puppi, |#eta|<1.5, matched-to-Offline',
       'hltAK4PuppiJetsCorrected_HGCal_MatchedToOffline': 'HLT AK4-Puppi, 1.5<|#eta|<3.0, matched-to-Offline',
-      'hltAK4PuppiJetsCorrected_HF_MatchedToOffline': 'HLT AK4-Puppi, 3.0<|#eta|<5.0, matched-to-Offline',
+      'hltAK4PuppiJetsCorrected_HF1_MatchedToOffline': 'HLT AK4-Puppi, 3.0<|#eta|<4.0, matched-to-Offline',
+      'hltAK4PuppiJetsCorrected_HF2_MatchedToOffline': 'HLT AK4-Puppi, 4.0<|#eta|<5.0, matched-to-Offline',
 
       'ak4GenJetsNoNu_EtaIncl_pt' : 'GEN p_{T} [GeV]',
       'ak4GenJetsNoNu_EtaIncl_eta': 'GEN #eta',
@@ -633,6 +659,21 @@ if __name__ == '__main__':
       'dRmatch': '#DeltaR',
       'mass': 'mass [GeV]',
       'njets': 'number of jets',
+
+      'chargedHadronEnergyFraction': 'chargedHadronEnergyFraction',
+      'chargedHadronMultiplicity': 'chargedHadronMultiplicity',
+
+      'neutralHadronEnergyFraction': 'neutralHadronEnergyFraction',
+      'neutralHadronMultiplicity': 'neutralHadronMultiplicity',
+
+      'electronEnergyFraction': 'electronEnergyFraction',
+      'electronMultiplicity': 'electronMultiplicity',
+
+      'photonEnergyFraction': 'photonEnergyFraction',
+      'photonMultiplicity': 'photonMultiplicity',
+
+      'muonEnergyFraction': 'muonEnergyFraction',
+      'muonMultiplicity': 'muonMultiplicity',
     }
 
     the_dict = {}
