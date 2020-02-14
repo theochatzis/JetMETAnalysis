@@ -486,6 +486,18 @@ if __name__ == '__main__':
            raise RuntimeError('AAA')
 
     tags = {
+      'hltAK4PFJetsUncorrected_EtaIncl_MatchedToGEN': 'HLT AK4-PF(NoJECs) matched-to-GEN',
+      'hltAK4PFJetsUncorrected_HB_MatchedToGEN': 'HLT AK4-PF(NoJECs), |#eta|<1.5, matched-to-GEN',
+      'hltAK4PFJetsUncorrected_HGCal_MatchedToGEN': 'HLT AK4-PF(NoJECs), 1.5<|#eta|<3.0, matched-to-GEN',
+      'hltAK4PFJetsUncorrected_HF1_MatchedToGEN': 'HLT AK4-PF(NoJECs), 3.0<|#eta|<4.0, matched-to-GEN',
+      'hltAK4PFJetsUncorrected_HF2_MatchedToGEN': 'HLT AK4-PF(NoJECs), 4.0<|#eta|<5.0, matched-to-GEN',
+
+      'hltAK4PFJetsUncorrected_EtaIncl_MatchedToOffline': 'HLT AK4-PF(NoJECs) matched-to-Offline',
+      'hltAK4PFJetsUncorrected_HB_MatchedToOffline': 'HLT AK4-PF(NoJECs), |#eta|<1.5, matched-to-Offline',
+      'hltAK4PFJetsUncorrected_HGCal_MatchedToOffline': 'HLT AK4-PF(NoJECs), 1.5<|#eta|<3.0, matched-to-Offline',
+      'hltAK4PFJetsUncorrected_HF1_MatchedToOffline': 'HLT AK4-PF(NoJECs), 3.0<|#eta|<4.0, matched-to-Offline',
+      'hltAK4PFJetsUncorrected_HF2_MatchedToOffline': 'HLT AK4-PF(NoJECs), 4.0<|#eta|<5.0, matched-to-Offline',
+
       'hltAK4PFJetsCorrected_EtaIncl_MatchedToGEN': 'HLT AK4-PF matched-to-GEN',
       'hltAK4PFJetsCorrected_HB_MatchedToGEN': 'HLT AK4-PF, |#eta|<1.5, matched-to-GEN',
       'hltAK4PFJetsCorrected_HGCal_MatchedToGEN': 'HLT AK4-PF, 1.5<|#eta|<3.0, matched-to-GEN',
@@ -659,19 +671,14 @@ if __name__ == '__main__':
       'dRmatch': '#DeltaR',
       'mass': 'mass [GeV]',
       'njets': 'number of jets',
-
       'chargedHadronEnergyFraction': 'chargedHadronEnergyFraction',
       'chargedHadronMultiplicity': 'chargedHadronMultiplicity',
-
       'neutralHadronEnergyFraction': 'neutralHadronEnergyFraction',
       'neutralHadronMultiplicity': 'neutralHadronMultiplicity',
-
       'electronEnergyFraction': 'electronEnergyFraction',
       'electronMultiplicity': 'electronMultiplicity',
-
       'photonEnergyFraction': 'photonEnergyFraction',
       'photonMultiplicity': 'photonMultiplicity',
-
       'muonEnergyFraction': 'muonEnergyFraction',
       'muonMultiplicity': 'muonMultiplicity',
     }
@@ -698,6 +705,16 @@ if __name__ == '__main__':
              '_mass',
              '_dRmatch',
              '_sumEt',
+             '_chargedHadronEnergyFraction',
+             '_chargedHadronMultiplicity',
+             '_neutralHadronEnergyFraction',
+             '_neutralHadronMultiplicity',
+             '_electronEnergyFraction',
+             '_electronMultiplicity',
+             '_photonEnergyFraction',
+             '_photonMultiplicity',
+             '_muonEnergyFraction',
+             '_muonMultiplicity',
            ]:
              if _tmp_var in ty:
                 var0 = _tmp_var
@@ -734,14 +751,44 @@ if __name__ == '__main__':
              '_mass',
              '_dRmatch',
              '_sumEt',
+             '_chargedHadronEnergyFraction',
+             '_chargedHadronMultiplicity',
+             '_neutralHadronEnergyFraction',
+             '_neutralHadronMultiplicity',
+             '_electronEnergyFraction',
+             '_electronMultiplicity',
+             '_photonEnergyFraction',
+             '_photonMultiplicity',
+             '_muonEnergyFraction',
+             '_muonMultiplicity',
            ]:
              if _tmp_var in tx:
                 var0 = _tmp_var
                 break
 
            DivideByBinWidth = 0
-           if tx.endswith('_pt') or tx.endswith('_pt0') or tx.endswith('_eta') or tx.endswith('_phi') or tx.endswith('_sumEt'):
-              DivideByBinWidth = 1
+           for _tmp_var in [
+             '_pt',
+             '_pt0',
+             '_eta',
+             '_phi',
+             '_mass',
+             '_dRmatch',
+             '_sumEt',
+             '_chargedHadronEnergyFraction',
+             '_chargedHadronMultiplicity',
+             '_neutralHadronEnergyFraction',
+             '_neutralHadronMultiplicity',
+             '_electronEnergyFraction',
+             '_electronMultiplicity',
+             '_photonEnergyFraction',
+             '_photonMultiplicity',
+             '_muonEnergyFraction',
+             '_muonMultiplicity',
+           ]:
+             if tx.endswith(_tmp_var):
+                DivideByBinWidth = 1
+                break
 
            if var0 is None:
               tx = var0 if var0 not in tags else tags[var0],

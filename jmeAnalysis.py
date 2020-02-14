@@ -38,6 +38,7 @@ GenJetsCollection = 'ak4GenJetsNoNu'
 JetCollections = [
 
   GenJetsCollection,
+  'hltAK4PFJetsUncorrected',
   'hltAK4PFJetsCorrected',
   'hltAK4PFCHSJetsCorrected',
   'offlineAK4PFCHSJetsCorrected',
