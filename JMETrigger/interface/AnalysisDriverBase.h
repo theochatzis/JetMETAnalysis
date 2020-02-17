@@ -39,8 +39,8 @@ class AnalysisDriverBase {
   std::vector<T> const& vector(const std::string& key) const;
 
  protected:
-  TFile theFile;
-  TTreeReader theReader;
+  std::unique_ptr<TFile> theFile_;
+  std::unique_ptr<TTreeReader> theReader_;
   std::string outputFilePath_;
   std::string outputFileMode_;
 

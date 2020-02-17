@@ -3,39 +3,50 @@
 #include <iostream>
 
 AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
-  : theFile(tfile.c_str()), theReader(ttree.c_str(), &theFile), outputFilePath_(outputFilePath), outputFileMode_(outputFileMode) {
+  : outputFilePath_(outputFilePath), outputFileMode_(outputFileMode) {
+
+  theFile_.reset(new TFile(tfile.c_str()));
+  if((theFile_.get() == nullptr) || theFile_->IsZombie()){
+    return;
+  }
+
+  theReader_.reset(new TTreeReader(ttree.c_str(), theFile_.get()));
+  if((theReader_.get() == nullptr) || theReader_->IsInvalid()){
+    return;
+  }
+
   map_TTreeReaderValues_.clear();
 
-  auto iter = theReader.GetTree()->GetIteratorOnAllLeaves();
+  auto iter = theReader_->GetTree()->GetIteratorOnAllLeaves();
   TLeaf* leaf(nullptr);
   while((leaf = ((TLeaf*) iter->Next()))){
     const std::string type(leaf->GetTypeName());
     if(type == "UInt_t"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<unsigned int>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<unsigned int>>(*theReader_, leaf->GetName())));
     }
     else if(type == "Int_t"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<int>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<int>>(*theReader_, leaf->GetName())));
     }
     else if(type == "Long64_t"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<long long>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<long long>>(*theReader_, leaf->GetName())));
     }
     else if(type == "ULong64_t"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<unsigned long long>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<unsigned long long>>(*theReader_, leaf->GetName())));
     }
     else if(type == "vector<bool>"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<bool>>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<bool>>>(*theReader_, leaf->GetName())));
     }
     else if(type == "vector<unsigned int>"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<unsigned int>>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<unsigned int>>>(*theReader_, leaf->GetName())));
     }
     else if(type == "vector<int>"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<int>>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<int>>>(*theReader_, leaf->GetName())));
     }
     else if(type == "vector<float>"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<float>>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<float>>>(*theReader_, leaf->GetName())));
     }
     else if(type == "vector<double>"){
-      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<double>>>(theReader, leaf->GetName())));
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<double>>>(*theReader_, leaf->GetName())));
     }
     else {
 	std::ostringstream ss_str;
@@ -57,18 +68,22 @@ void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEn
 
   this->init();
 
-  while(theReader.Next()){
+  if((theReader_.get() == nullptr) || theReader_->IsInvalid()){
+    std::cout << "AnalysisDriverBase::process -- invalid TTreeReader" << std::endl;
+  }
+  else {
+    while(theReader_->Next()){
+      if(theReader_->GetCurrentEntry() < firstEntry){ continue; }
 
-    if(theReader.GetCurrentEntry() < firstEntry){ continue; }
+      if(maxEntries == 0){
+        break;
+      }
+      else if(maxEntries > 0){
+        if(theReader_->GetCurrentEntry() >= (firstEntry+maxEntries)){ continue; }
+      }
 
-    if(maxEntries == 0){
-      break;
+      this->analyze();
     }
-    else if(maxEntries > 0){
-      if(theReader.GetCurrentEntry() >= (firstEntry+maxEntries)){ continue; }
-    }
-
-    this->analyze();
   }
 
   if(outputFilePath_ != ""){
