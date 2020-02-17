@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <stdexcept>
+#include <typeinfo>
 #include <TFile.h>
 #include <TTreeReader.h>
 #include <TTreeReaderValue.h>
@@ -64,7 +65,7 @@ class AnalysisDriver {
   }
 
   template<class T>
-  const T& value(const std::string& key) const {
+  T const& value(const std::string& key) const {
 
     if(not this->find(key)){
       std::ostringstream ss_str;
@@ -72,11 +73,17 @@ class AnalysisDriver {
       throw std::runtime_error(ss_str.str());
     }
 
-    return *(((TTreeReaderValue<T>* const) map_TTreeReaderValues_.at(key).get())->Get());
+    if(dynamic_cast<TTreeReaderValue<T>*>(map_TTreeReaderValues_.at(key).get()) == nullptr){
+      std::ostringstream ss_str;
+      ss_str << "value -- dynamic_cast to \"TTreeReaderValue<" << typeid(T).name() << ">*\" failed for key \"" << key << "\".";
+      throw std::runtime_error(ss_str.str());
+    }
+
+    return *(((TTreeReaderValue<T>*) map_TTreeReaderValues_.at(key).get())->Get());
   }
 
   template<class T>
-  const std::vector<T>& vector(const std::string& key) const {
+  std::vector<T> const& vector(const std::string& key) const {
 
     if(not this->find(key)){
       std::ostringstream ss_str;
@@ -84,7 +91,13 @@ class AnalysisDriver {
       throw std::runtime_error(ss_str.str());
     }
 
-    return *(((TTreeReaderValue<std::vector<T>>* const) map_TTreeReaderValues_.at(key).get())->Get());
+    if(dynamic_cast<TTreeReaderValue<std::vector<T>>*>(map_TTreeReaderValues_.at(key).get()) == nullptr){
+      std::ostringstream ss_str;
+      ss_str << "vector -- dynamic_cast to \"TTreeReaderValue<std::vector<" << typeid(T).name() << ">>*\" failed for key \"" << key << "\".";
+      throw std::runtime_error(ss_str.str());
+    }
+
+    return *(((TTreeReaderValue<std::vector<T>>*) map_TTreeReaderValues_.at(key).get())->Get());
   }
 
   void process(const Long64_t firstEntry=0, const Long64_t maxEntries=-1){
@@ -125,19 +138,40 @@ class AnalysisDriver {
     h_eventsProcessed_.reset(new TH1D("eventsProcessed", "eventsProcessed", 1, 0, 1));
     h_eventsProcessed_->SetDirectory(0);
     h_eventsProcessed_->Sumw2();
+
+    h_hltAK4PFJetsCorrected_eta_.reset(new TH1D("hltAK4PFJetsCorrected_eta", "hltAK4PFJetsCorrected_eta", 120, -5, 5));
+    h_hltAK4PFJetsCorrected_eta_->SetDirectory(0);
+    h_hltAK4PFJetsCorrected_eta_->Sumw2();
+
+    h_hltAK4PFCHSJetsCorrected_eta_.reset(new TH1D("hltAK4PFCHSJetsCorrected_eta", "hltAK4PFCHSJetsCorrected_eta", 120, -5, 5));
+    h_hltAK4PFCHSJetsCorrected_eta_->SetDirectory(0);
+    h_hltAK4PFCHSJetsCorrected_eta_->Sumw2();
+
+    h_hltAK4PuppiJetsCorrected_eta_.reset(new TH1D("hltAK4PuppiJetsCorrected_eta", "hltAK4PuppiJetsCorrected_eta", 120, -5, 5));
+    h_hltAK4PuppiJetsCorrected_eta_->SetDirectory(0);
+    h_hltAK4PuppiJetsCorrected_eta_->Sumw2();
   }
 
   void analyze(){
     ++eventsProcessed_;
     h_eventsProcessed_->Fill(0.5, 1.);
 
-//    const auto& eta = this->vector<float>("hltAK4PFJetsCorrected_eta");
-//    for(const auto& tmp : eta){ h1_->Fill(tmp, 1.); }
+    auto const& eta1 = this->vector<float>("hltAK4PFJetsCorrected_eta");
+    for(const auto& tmp : eta1){ h_hltAK4PFJetsCorrected_eta_->Fill(tmp, 1.); }
+
+    auto const& eta2 = this->vector<float>("hltAK4PFCHSJetsCorrected_eta");
+    for(const auto& tmp : eta2){ h_hltAK4PFCHSJetsCorrected_eta_->Fill(tmp, 1.); }
+
+    auto const& eta3 = this->vector<float>("hltAK4PuppiJetsCorrected_eta");
+    for(const auto& tmp : eta3){ h_hltAK4PuppiJetsCorrected_eta_->Fill(tmp, 1.); }
   }
 
   void write(){
 
     h_eventsProcessed_->Write();
+    h_hltAK4PFJetsCorrected_eta_->Write();
+    h_hltAK4PFCHSJetsCorrected_eta_->Write();
+    h_hltAK4PuppiJetsCorrected_eta_->Write();
   }
 
   void setOutputFilePath(const std::string& foo){ outputFilePath_ = foo; }
@@ -162,6 +196,9 @@ class AnalysisDriver {
 
   Long64_t eventsProcessed_ = 0;
   std::unique_ptr<TH1D> h_eventsProcessed_;
+  std::unique_ptr<TH1D> h_hltAK4PFJetsCorrected_eta_;
+  std::unique_ptr<TH1D> h_hltAK4PFCHSJetsCorrected_eta_;
+  std::unique_ptr<TH1D> h_hltAK4PuppiJetsCorrected_eta_;
 
   std::map<std::string, std::unique_ptr<ROOT::Internal::TTreeReaderValueBase>> map_TTreeReaderValues_;
   std::map<std::string, std::string> map_options_;
