@@ -57,13 +57,15 @@ T const& AnalysisDriverBase::value(const std::string& key) const {
     throw std::runtime_error(ss_str.str());
   }
 
-  if(dynamic_cast<TTreeReaderValue<T>*>(map_TTreeReaderValues_.at(key).get()) == nullptr){
+  auto const* ptr = dynamic_cast<TTreeReaderValue<T> const*>(map_TTreeReaderValues_.at(key).get());
+
+  if(not ptr){
     std::ostringstream ss_str;
     ss_str << "value -- dynamic_cast to \"TTreeReaderValue<" << typeid(T).name() << ">*\" failed for key \"" << key << "\".";
     throw std::runtime_error(ss_str.str());
   }
 
-  return *(((TTreeReaderValue<T>*) map_TTreeReaderValues_.at(key).get())->Get());
+  return *(ptr->Get());
 }
 
 template<class T>
@@ -75,13 +77,15 @@ std::vector<T> const& AnalysisDriverBase::vector(const std::string& key) const {
     throw std::runtime_error(ss_str.str());
   }
 
-  if(dynamic_cast<TTreeReaderValue<std::vector<T>>*>(map_TTreeReaderValues_.at(key).get()) == nullptr){
+  auto const* ptr = dynamic_cast<TTreeReaderValue<std::vector<T>> const*>(map_TTreeReaderValues_.at(key).get());
+
+  if(not ptr){
     std::ostringstream ss_str;
     ss_str << "vector -- dynamic_cast to \"TTreeReaderValue<std::vector<" << typeid(T).name() << ">>*\" failed for key \"" << key << "\".";
     throw std::runtime_error(ss_str.str());
   }
 
-  return *(((TTreeReaderValue<std::vector<T>>*) map_TTreeReaderValues_.at(key).get())->Get());
+  return *(ptr->Get());
 }
 
 #endif
