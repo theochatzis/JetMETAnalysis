@@ -110,7 +110,7 @@ class Histogram:
 
 def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac=0.3, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False):
 
-    h0 = histograms[0].th1
+    h00 = histograms[0].th1
     nvalid_histograms = len(histograms)
 
     Top = canvas.GetTopMargin()
@@ -131,8 +131,8 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
     canvas.cd()
 
     XMIN, XMAX = xMin, xMax
-    if XMIN is None: XMIN = h0.GetBinLowEdge(1)
-    if XMAX is None: XMAX = h0.GetBinLowEdge(1+h0.GetNbinsX())
+    if XMIN is None: XMIN = h00.GetBinLowEdge(1)
+    if XMAX is None: XMAX = h00.GetBinLowEdge(1+h00.GetNbinsX())
 
     HMAX = 0.0
     for _tmp in histograms:
@@ -266,7 +266,8 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
            if hasattr(histo.th1, 'SetStats'):
               histo.th1.SetStats(0)
 
-           if h21 is None: h21 = histo.th1
+           if h21 is None:
+              h21 = histo.th1
 
            plot_ratios += [histo]
 
@@ -295,18 +296,14 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
 
        h2max, h2min = None, None
        for _tmp in plot_ratios:
-
            if _tmp.th1 is None: continue
-
            for _tmpb in range(1, _tmp.th1.GetNbinsX()+1):
-
-               h2max = max(h2max, _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)) if h2max is not None else _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)
-               h2min = min(h2min, _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)) if h2min is not None else _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)
-
+               if (abs(_tmp.th1.GetBinContent(_tmpb)) > 1e-7) and (abs(_tmp.th1.GetBinError(_tmpb)) > 1e-7):
+                  h2max = max(h2max, _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)) if h2max is not None else _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)
+                  h2min = min(h2min, _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)) if h2min is not None else _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)
        if (h2max is not None) and (h2min is not None):
-          h2min = min(int(h2min*101.)/100., int(h2min*99.)/100.)
-          h2max = max(int(h2max*101.)/100., int(h2max*99.)/100.)
-
+          h2min = min(int(h2min*105.)/100., int(h2min*95.)/100.)
+          h2max = max(int(h2max*105.)/100., int(h2max*95.)/100.)
           h21.GetYaxis().SetRangeUser(h2min, h2max)
 
        h21.Draw('e2')
@@ -321,15 +318,13 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
 
     for output_file in outputs:
 
-        out_file = output_basename_woExt+'.'+i_ext
-
         output_dirname = os.path.dirname(output_file)
         if not os.path.isdir(output_dirname):
            EXE('mkdir -p '+output_dirname)
 
         canvas.SaveAs(output_file)
 
-        print(colored_text('[output]', ['1', '95']), os.path.relpath(output_file))
+        print(colored_text('[output]', ['1', '92']), os.path.relpath(output_file))
 
     return 0
 
@@ -367,7 +362,7 @@ if __name__ == '__main__':
    if os.path.exists(opts.output):
       KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
 
-   OUTDIR = os.path.abspath(os.pathrealpath(opts.output))
+   OUTDIR = os.path.abspath(os.path.realpath(opts.output))
 
    if len(opts_unknown) > 0:
       KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
@@ -389,7 +384,7 @@ if __name__ == '__main__':
           _tmp['LineStyle'] = int(_input_pieces[3]) if len(_input_pieces) >= 4 else 1
           _tmp['MarkerStyle'] = int(_input_pieces[4]) if len(_input_pieces) >= 5 else 20
           _tmp['MarkerColor'] = int(_input_pieces[5]) if len(_input_pieces) >= 6 else int(_input_pieces[2])
-          _tmp['MarkerSize'] = float(_input_pieces[6]) if len(_input_pieces) >= 7 else 1.5
+          _tmp['MarkerSize'] = float(_input_pieces[6]) if len(_input_pieces) >= 7 else 1.0
           inputList.append(_tmp)
        else:
           KILL(log_prx+'argument of --inputs has invalid format: '+_input)
@@ -419,6 +414,57 @@ if __name__ == '__main__':
        _hkey_basename = os.path.basename(_hkey)
 
        _hIsProfile = '_wrt_' in _hkey_basename
+
+       ## histograms
+       _divideByBinWidth = False
+       _normalizedToUnity = False
+
+       _hists = []
+       for inp in inputList:
+           if _hkey not in inp['TH1s']: continue
+
+           h0 = inp['TH1s'][_hkey].Clone()
+
+           if h0.InheritsFrom('TH2'): continue
+
+           h0.UseCurrentStyle()
+           h0.SetDirectory(0)
+           h0.SetLineColor(inp['LineColor'])
+           h0.SetLineStyle(inp['LineStyle'])
+           h0.SetMarkerStyle(inp['MarkerStyle'])
+           h0.SetMarkerColor(inp['MarkerColor'])
+           h0.SetMarkerSize(inp['MarkerSize'] if _hIsProfile else 0.)
+
+           h0.SetBit(ROOT.TH1.kNoTitle)
+
+           if hasattr(h0, 'SetStats'):
+              h0.SetStats(0)
+
+           if (len(_hists) == 0) and (not _hIsProfile):
+              _tmpBW = None
+              for _tmp in range(1, h0.GetNbinsX()+1):
+                  if _tmpBW is None:
+                     _tmpBW = h0.GetBinWidth(_tmp)
+                  elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
+                     _divideByBinWidth = True
+                     break
+
+           if _divideByBinWidth:
+              h0.Scale(1., 'width')
+
+           if _normalizedToUnity:
+              h0.Scale(1. / h0.Integral())
+
+           hist0 = Histogram()
+           hist0.th1 = h0
+           hist0.draw = 'ep' if _hIsProfile else 'hist,e0'
+           hist0.legendName = inp['Legend']
+           hist0.legendDraw = 'ep' if _hIsProfile else 'l'
+           if len(_hists) > 0: hist0.draw += ',same'
+           _hists.append(hist0)
+
+       if len(_hists) == 0:
+          continue
 
        ## labels
        _labels = [label_sample]
@@ -453,7 +499,7 @@ if __name__ == '__main__':
        elif _hkey_basename.startswith('hltPFMET_'): _objLabel = 'HLT PFMET'
        elif _hkey_basename.startswith('hltPFMETTypeOne_'): _objLabel = 'HLT PFMET Type-1'
 
-       label_obj = get_text(L+(1-R-L)*0.95, B+(1-T-B)*0.925, 31, .035, _objLabel)
+       label_obj = get_text(Lef+(1-Rig-Lef)*0.95, Bot+(1-Top-Bot)*0.925, 31, .035, _objLabel)
        _labels += [label_obj]
 
        ## axes' titles
@@ -567,57 +613,20 @@ if __name__ == '__main__':
        elif 'muonEnergyFraction' in _hkey_basename: _titleX = 'Muon Energy Fraction'
        elif 'muonMultiplicity' in _hkey_basename: _titleX = 'Muon Multiplicity'
 
+       if _divideByBinWidth:
+          _titleY += ' / Bin width'
+
        _htitle = ';'+_titleX+';'+_titleY
 
-       ## histograms
-       _divideByBinWidth = False
-       _normalizedToUnity = False
-
-       _hists = []
-       for inp in inputList:
-           if _hkey not in inp['TH1s']: continue
-
-           h0 = inp['TH1s'][_hkey].Clone()
-           h0.UseCurrentStyle()
-           h0.SetDirectory(0)
-           h0.SetLineColor(inp['TH1s']['LineColor'])
-           h0.SetLineStyle(inp['TH1s']['LineStyle'])
-           h0.SetMarkerStyle(inp['TH1s']['MarkerStyle'])
-           h0.SetMarkerColor(inp['TH1s']['MarkerColor'])
-           h0.SetMarkerSize(inp['TH1s']['MarkerSize'] if not _hIsProfile else 0.)
-
-           h0.SetBit(ROOT.TH1.kNoTitle)
-
-           if hasattr(h0, 'SetStats'):
-              h0.SetStats(0)
-
-           if _divideByBinWidth:
-              h0.Scale(1., 'width')
-
-           if _normalizedToUnity:
-              h0.Scale(1. / h0.Integral())
-
-           hist0 = Histogram()
-           hist0.th1 = h0
-           hist0.draw = 'ep' if _hIsProfile else 'hist,e0'
-           hist0.legendName = inp['TH1s']['Legend']
-           hist0.legendDraw = 'ep' if _hIsProfile else 'l'
-           if len(_hists) > 0: hist0.draw += ',same'
-           _hists.append(hist0)
-
-       if len(_hists) == 0:
-          continue
-
+       ## plot
        plot(**{
          'canvas': canvas,
          'histograms': _hists,
-         'title': _title, 
+         'title': _htitle, 
          'labels': _labels, 
-         'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+         'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
 
          'ratio': True,
          'logY': False,
        })
-
-   print(colored_text('[output]', ['1','92']), os.path.relpath(opts.output))
