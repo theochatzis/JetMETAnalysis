@@ -499,6 +499,10 @@ if __name__ == '__main__':
        elif _hkey_basename.startswith('hltPFMET_'): _objLabel = 'HLT PFMET'
        elif _hkey_basename.startswith('hltPFMETTypeOne_'): _objLabel = 'HLT PFMET Type-1'
 
+       if '_NotMatchedToGEN_' in _hkey_basename: _objLabel += ' [Not Matched to GEN]'
+       elif '_MatchedToGEN_' in _hkey_basename: _objLabel += ' [Matched to GEN]'
+       elif '_MatchedToOffline_' in _hkey_basename: _objLabel += ' [Matched to Offline]'
+
        label_obj = get_text(Lef+(1-Rig-Lef)*0.95, Bot+(1-Top-Bot)*0.925, 31, .035, _objLabel)
        _labels += [label_obj]
 
