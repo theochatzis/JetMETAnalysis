@@ -48,7 +48,7 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
               _good_files.append(_tmp)
            else:
               if verbosity > 10:
-                 print('merge_rootfiles --', colored_text('[input will be skipped]', ['1','94']), _tmp)
+                 print('merge_rootfiles --', colored_text('[input will be skipped]', ['1','94']), os.path.relpath(_tmp))
        for fi in _good_files:
 
            _tf = ROOT.TFile.Open(fi)
@@ -62,21 +62,21 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
            _tf.Close()
            ROOT.gROOT.GetListOfFiles().Remove(_tf)
 
-    print(colored_text('[output='+output_file+']', ['1']), 'merging {0} files'.format(len(_valid_files)))
+    print(colored_text('[output = '+output_file+']', ['1']), 'merging {0} files'.format(len(_valid_files)))
 
     _ret = 0
 
     if not dry_run:
 
        if len(_valid_files) == 0:
-          print(colored_text('[output='+output_file+']', ['1', '93']), 'no valid input files found, output will not be created')
+          print(colored_text('[output = '+output_file+']', ['1', '93']), 'no valid input files found, output will not be created')
 
        elif len(_valid_files) == 1:
           if verbosity > 10: print('  '+colored_text('[input]', ['1']), _valid_files[0])
 
           EXE('cp '+_valid_files[0]+' '+output_file, verbose=(verbosity > 0), dry_run=dry_run)
 
-          print(colored_text('[output='+output_file+']', ['1', '92']), 'merging completed ({:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0))
+          print(colored_text('[output = '+output_file+']', ['1', '92']), 'merging completed ({:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0))
 
        else:
           if _compressionLevel is None:
@@ -86,24 +86,24 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
           _merger.OutputFile(output_file, False, _compressionLevel)
 
           for _tmp in _valid_files:
-              if verbosity > 10: print('  '+colored_text('[input]', ['1']), _tmp)
+              if verbosity > 10: print('  '+colored_text('[input]', ['1']), os.path.relpath(_tmp))
               _merger.AddFile(_tmp)
 
           if _merger.HasCompressionChange():
-             print(colored_text('[output='+output_file+']', ['1']), 'compression-level of output file differs from that of input files, merging will be slower')
+             print(colored_text('[output = '+output_file+']', ['1']), 'compression-level of output file differs from that of input files, merging will be slower')
 
           _ret = _merger.Merge()
           if not _ret:
-             KILL('merge_rootfiles -- runtime error: call to TFileMerger::Merge() failed [output='+output_file+']')
+             KILL('merge_rootfiles -- runtime error: call to TFileMerger::Merge() failed [output = '+output_file+']')
 
-          print(colored_text('[output='+output_file+']', ['1', '92']), 'merging completed ({:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0))
+          print(colored_text('[output = '+output_file+']', ['1', '92']), 'merging completed ({:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0))
 
     else:
        if verbosity > 10:
           for _tmp in _valid_files:
-              print('  '+colored_text('[input]', ['1']), _tmp)
+              print('  '+colored_text('[input]', ['1']), os.path.relpath(_tmp))
 
-       print(colored_text('[output='+output_file+']', ['1', '92']))
+       print(colored_text('[output = '+output_file+']', ['1', '92']))
 
     return _ret
 

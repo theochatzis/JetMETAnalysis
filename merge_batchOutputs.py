@@ -99,6 +99,8 @@ if __name__ == '__main__':
        EXE('mkdir -p '+i_output_dirpath, verbose=opts.verbose, dry_run=opts.dry_run)
 
        i_output_path = opts.output+'/'+i_output+'.root'
+       if os.path.exists(i_output_path):
+          KILL(log_prx+'logic error - target output file already exists: '+i_output_path)
 
        if len(outputs_dict[i_output]) == 1:
 

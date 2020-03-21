@@ -140,6 +140,9 @@ if __name__ == '__main__':
 
        OUTDIR_PATH = OUT_DIR+'/'+('/'.join(input_subdirs)) if len(input_subdirs) else OUT_DIR
 
+       if os.path.exists(OUTDIR_PATH):
+          KILL(log_prx+'target output directory already exists: '+OUTDIR_PATH)
+
        for j_minmax_evt in range(len(minmax_evts)):
 
            OUTEXE_NAME = os.path.splitext(os.path.basename(i_inpf))[0]+'__'+str(j_minmax_evt)
@@ -198,8 +201,7 @@ if __name__ == '__main__':
            ### submission script
            BATCH_DIR = opts.batch
 
-           if not os.path.exists(OUTDIR_PATH):
-              EXE('mkdir -p '+OUTDIR_PATH+'/'+BATCH_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
+           EXE('mkdir -p '+OUTDIR_PATH+'/'+BATCH_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
 
            # HTCondor ----------
            if BATCH_HTC:
