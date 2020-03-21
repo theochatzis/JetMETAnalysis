@@ -38,6 +38,9 @@ if __name__ == '__main__':
    parser.add_argument('--submit', dest='submit', action='store_true', default=False,
                        help='submit job(s) to the batch system')
 
+   parser.add_argument('-l', '--level', dest='level', action='store', type=int, default=0,
+                       help='level of directory depth in output directory')
+
    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
                        help='enable verbose mode')
 
@@ -52,6 +55,9 @@ if __name__ == '__main__':
    log_prx = os.path.basename(__file__)+' -- '
 
    ### args validation
+   if opts.level < 0:
+      KILL(log_prx+'negative level of directory depth in output directory (must be >=0) [-l]: '+str(opts.level))
+
    PYSCRIPT_PATH = opts.script
 
    if not os.path.isfile(PYSCRIPT_PATH):
@@ -125,13 +131,22 @@ if __name__ == '__main__':
        else:
           minmax_evts = [ [long(_tmp * opts.nperjob), min(long(i_evtN-1), long(((_tmp+1) * opts.nperjob)-1))] for _tmp in range(long(math.ceil(float(i_evtN)/opts.nperjob)))]
 
+       input_subdirs = []
+       input_dirname = os.path.dirname(i_inpf)
+       while opts.level > len(input_subdirs):
+          input_subdirs.insert(0, os.path.basename(input_dirname))
+          input_dirname = os.path.dirname(input_dirname)
+       del input_dirname
+
+       OUTDIR_PATH = OUT_DIR+'/'+('/'.join(input_subdirs)) if len(input_subdirs) else OUT_DIR
+
        for j_minmax_evt in range(len(minmax_evts)):
 
            OUTEXE_NAME = os.path.splitext(os.path.basename(i_inpf))[0]+'__'+str(j_minmax_evt)
 
-           OUTEXE_PATH     = OUT_DIR+'/'+OUTEXE_NAME+'.sh'
-           OUTPUT_PATH_TMP = OUT_DIR+'/'+OUTEXE_NAME+'.root.tmp'
-           OUTPUT_PATH     = OUT_DIR+'/'+OUTEXE_NAME+'.root'
+           OUTEXE_PATH     = OUTDIR_PATH+'/'+OUTEXE_NAME+'.sh'
+           OUTPUT_PATH_TMP = OUTDIR_PATH+'/'+OUTEXE_NAME+'.root.tmp'
+           OUTPUT_PATH     = OUTDIR_PATH+'/'+OUTEXE_NAME+'.root'
 
            OUTEXE_ABSPATH     = os.path.abspath(os.path.realpath(OUTEXE_PATH))
            OUTPUT_ABSPATH_TMP = os.path.abspath(os.path.realpath(OUTPUT_PATH_TMP))
@@ -169,7 +184,7 @@ if __name__ == '__main__':
            ]
 
            CMDS_2 = [
-             'touch '+OUT_DIR+'/'+OUTEXE_NAME+'.completed',
+             'touch '+OUTDIR_PATH+'/'+OUTEXE_NAME+'.completed',
            ]
 
            EXECS = [
@@ -183,8 +198,8 @@ if __name__ == '__main__':
            ### submission script
            BATCH_DIR = opts.batch
 
-           if not os.path.exists(OUT_DIR):
-              EXE('mkdir -p '+OUT_DIR+'/'+BATCH_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
+           if not os.path.exists(OUTDIR_PATH):
+              EXE('mkdir -p '+OUTDIR_PATH+'/'+BATCH_DIR, verbose=opts.verbose, dry_run=opts.dry_run)
 
            # HTCondor ----------
            if BATCH_HTC:
@@ -194,9 +209,9 @@ if __name__ == '__main__':
 
                 'executable = '+OUTEXE_ABSPATH,
 
-                'output = '+OUT_DIR+'/'+BATCH_DIR+'/'+OUTEXE_NAME+'.out.$(Cluster).$(Process)',
-                'error  = '+OUT_DIR+'/'+BATCH_DIR+'/'+OUTEXE_NAME+'.err.$(Cluster).$(Process)',
-                'log    = '+OUT_DIR+'/'+BATCH_DIR+'/'+OUTEXE_NAME+'.log.$(Cluster).$(Process)',
+                'output = '+OUTDIR_PATH+'/'+BATCH_DIR+'/'+OUTEXE_NAME+'.out.$(Cluster).$(Process)',
+                'error  = '+OUTDIR_PATH+'/'+BATCH_DIR+'/'+OUTEXE_NAME+'.err.$(Cluster).$(Process)',
+                'log    = '+OUTDIR_PATH+'/'+BATCH_DIR+'/'+OUTEXE_NAME+'.log.$(Cluster).$(Process)',
 
                 '#arguments = ',
 
@@ -257,8 +272,8 @@ if __name__ == '__main__':
               # batch configuration options
               OPTS = [
                 '-N '+OUTEXE_NAME,
-                '-o '+OUT_DIR+'/'+BATCH_DIR,
-                '-e '+OUT_DIR+'/'+BATCH_DIR,
+                '-o '+OUTDIR_PATH+'/'+BATCH_DIR,
+                '-e '+OUTDIR_PATH+'/'+BATCH_DIR,
               ]
 
               OPTS = ['#$ '+_opt for _opt in OPTS]
