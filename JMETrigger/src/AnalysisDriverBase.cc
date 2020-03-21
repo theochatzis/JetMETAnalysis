@@ -21,7 +21,10 @@ AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::stri
   TLeaf* leaf(nullptr);
   while((leaf = ((TLeaf*) iter->Next()))){
     const std::string type(leaf->GetTypeName());
-    if(type == "UInt_t"){
+    if(type == "Bool_t"){
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<bool>>(*theReader_, leaf->GetName())));
+    }
+    else if(type == "UInt_t"){
       map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<unsigned int>>(*theReader_, leaf->GetName())));
     }
     else if(type == "Int_t"){
@@ -49,7 +52,7 @@ AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::stri
       map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<double>>>(*theReader_, leaf->GetName())));
     }
     else {
-	std::ostringstream ss_str;
+      std::ostringstream ss_str;
       ss_str << "invalid type for input TLeaf \"" << leaf->GetName() << "\": " << type;
       throw std::runtime_error(ss_str.str());
     }
