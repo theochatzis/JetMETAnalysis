@@ -496,6 +496,31 @@ if __name__ == '__main__':
        elif _hkey_basename.startswith('hltAK4PFJetsCorrected_HE_'): _objLabel = 'HLT AK4PFJets, 1.5<|#eta|<3.0'
        elif _hkey_basename.startswith('hltAK4PFJetsCorrected_HF_'): _objLabel = 'HLT AK4PFJets, 3.0<|#eta|<5.0'
 
+       elif _hkey_basename.startswith('ak4GenJets_EtaIncl_'): _objLabel = 'AK8GenJets'
+       elif _hkey_basename.startswith('ak4GenJets_HB_'): _objLabel = 'AK8GenJets, |#eta|<1.5'
+       elif _hkey_basename.startswith('ak4GenJets_HE_'): _objLabel = 'AK8GenJets, 1.5<|#eta|<3.0'
+       elif _hkey_basename.startswith('ak4GenJets_HF_'): _objLabel = 'AK8GenJets, 3.0<|#eta|<5.0'
+
+       elif _hkey_basename.startswith('hltAK8CaloJets_EtaIncl_'): _objLabel = 'HLT AK8CaloJets Uncorrected'
+       elif _hkey_basename.startswith('hltAK8CaloJets_HB_'): _objLabel = 'HLT AK8CaloJets Uncorrected, |#eta|<1.5'
+       elif _hkey_basename.startswith('hltAK8CaloJets_HE_'): _objLabel = 'HLT AK8CaloJets Uncorrected, 1.5<|#eta|<3.0'
+       elif _hkey_basename.startswith('hltAK8CaloJets_HF_'): _objLabel = 'HLT AK8CaloJets Uncorrected, 3.0<|#eta|<5.0'
+
+       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_EtaIncl_'): _objLabel = 'HLT AK8CaloJets'
+       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_HB_'): _objLabel = 'HLT AK8CaloJets, |#eta|<1.5'
+       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_HE_'): _objLabel = 'HLT AK8CaloJets, 1.5<|#eta|<3.0'
+       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_HF_'): _objLabel = 'HLT AK8CaloJets, 3.0<|#eta|<5.0'
+
+       elif _hkey_basename.startswith('hltAK8PFJets_EtaIncl_'): _objLabel = 'HLT AK8PFJets Uncorrected'
+       elif _hkey_basename.startswith('hltAK8PFJets_HB_'): _objLabel = 'HLT AK8PFJets Uncorrected, |#eta|<1.5'
+       elif _hkey_basename.startswith('hltAK8PFJets_HE_'): _objLabel = 'HLT AK8PFJets Uncorrected, 1.5<|#eta|<3.0'
+       elif _hkey_basename.startswith('hltAK8PFJets_HF_'): _objLabel = 'HLT AK8PFJets Uncorrected, 3.0<|#eta|<5.0'
+
+       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_EtaIncl_'): _objLabel = 'HLT AK8PFJets'
+       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_HB_'): _objLabel = 'HLT AK8PFJets, |#eta|<1.5'
+       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_HE_'): _objLabel = 'HLT AK8PFJets, 1.5<|#eta|<3.0'
+       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_HF_'): _objLabel = 'HLT AK8PFJets, 3.0<|#eta|<5.0'
+
        elif _hkey_basename.startswith('hltCaloMET_'): _objLabel = 'HLT CaloMET'
        elif _hkey_basename.startswith('hltPFMET_'): _objLabel = 'HLT PFMET'
        elif _hkey_basename.startswith('hltPFMETTypeOne_'): _objLabel = 'HLT PFMET Type-1'
@@ -513,9 +538,11 @@ if __name__ == '__main__':
           if 'GenJets' in _hkey_basename:
              if _hkey_basename.endswith('_pt'): _titleX = 'GEN Jet p_{T} [GeV]'
              elif _hkey_basename.endswith('_eta'): _titleX = 'GEN Jet #eta'
+             elif _hkey_basename.endswith('_mass'): _titleX = 'GEN Jet mass'
           elif 'Jets' in _hkey_basename and 'Offline' in _hkey_basename:
              if _hkey_basename.endswith('_pt'): _titleX = 'Offline Jet p_{T} [GeV]'
              elif _hkey_basename.endswith('_eta'): _titleX = 'Offline Jet #eta'
+             elif _hkey_basename.endswith('_mass'): _titleX = 'Offline Jet mass'
           elif _hkey_basename.endswith('genMETTrue_sumEt'): _titleX = 'GEN #sum E_{T} [GeV]'
           elif _hkey_basename.endswith('genMETTrue_pt'): _titleX = 'GEN MET [GeV]'
           elif _hkey_basename.endswith('hltVerticesPF_mult'): _titleX = 'Number of hltVerticesPF'
@@ -559,7 +586,7 @@ if __name__ == '__main__':
        elif '_pt_overOffline_' in _hkey_basename: _titleX = 'p_{T} / p_{T}^{Offl}'
 
        elif '_mass_overGEN_Mean_' in _hkey_basename: _titleY = '#LTmass / mass^{GEN}#GT'
-       elif '_mass_overGEN_RMSScaledByResponse_' in _hkey_basename: _titleY = '#sigma(mass / mass^{GEN}) / #LTmass / mass^{GEN}#GT'
+       elif '_mass_overGEN_RMSScaledByResponse_' in _hkey_basename: _titleY = '#sigma(m / m^{GEN}) / #LTm / m^{GEN}#GT'
        elif '_mass_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(mass / mass^{GEN})'
        elif '_mass_overGEN_' in _hkey_basename: _titleX = 'mass / mass^{GEN}'
 
