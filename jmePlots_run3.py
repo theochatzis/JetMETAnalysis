@@ -558,6 +558,11 @@ if __name__ == '__main__':
        elif '_pt_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{Offl})'
        elif '_pt_overOffline_' in _hkey_basename: _titleX = 'p_{T} / p_{T}^{Offl}'
 
+       elif '_mass_overGEN_Mean_' in _hkey_basename: _titleY = '#LTmass / mass^{GEN}#GT'
+       elif '_mass_overGEN_RMSScaledByResponse_' in _hkey_basename: _titleY = '#sigma(mass / mass^{GEN}) / #LTmass / mass^{GEN}#GT'
+       elif '_mass_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(mass / mass^{GEN})'
+       elif '_mass_overGEN_' in _hkey_basename: _titleX = 'mass / mass^{GEN}'
+
        elif '_sumEt_minusGEN_Mean_' in _hkey_basename: _titleY = '#LTSumEt - SumEt^{GEN}#GT [GeV]'
        elif '_sumEt_minusGEN_RMSScaledByResponse_' in _hkey_basename: _titleY = '#sigma(SumEt - SumEt^{GEN}) / #LTSumEt / SumEt^{GEN}#GT [GeV]'
        elif '_sumEt_minusGEN_RMS_' in _hkey_basename: _titleY = '#sigma(SumEt - SumEt^{GEN}) [GeV]'
