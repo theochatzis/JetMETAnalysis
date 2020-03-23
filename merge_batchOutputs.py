@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """merge outputs of batch jobs"""
+from __future__ import print_function
 import os
 import argparse
 import glob
@@ -105,14 +106,14 @@ if __name__ == '__main__':
        if len(outputs_dict[i_output]) == 1:
 
           if opts.verbose:
-             print colored_text('['+i_output+']', ['1', '93']), 'copying the only input file'
+             print(colored_text('['+i_output+']', ['1', '93']), 'copying the only input file')
 
           EXE('cp '+outputs_dict[i_output][0]+' '+i_output_path, verbose=opts.verbose, dry_run=opts.dry_run)
 
        elif not opts.dry_run:
 
           if opts.verbose:
-             print colored_text('['+i_output+']', ['1', '93']), 'attempting to merge', len(outputs_dict[i_output]), 'input files'
+             print(colored_text('['+i_output+']', ['1', '93']), 'attempting to merge', len(outputs_dict[i_output]), 'input files')
 
           i_input_files = outputs_dict[i_output].sort()
 
@@ -122,10 +123,10 @@ if __name__ == '__main__':
               i_merger.AddFile(_tmp)
 
           if i_merger.HasCompressionChange():
-             print colored_text('[output='+i_output_path+']', ['1']), 'compression-level of output file differs from that of input files, merging will be slower'
+             print(colored_text('[output='+i_output_path+']', ['1']), 'compression-level of output file differs from that of input files, merging will be slower')
 
           ret = i_merger.Merge()
           if not ret:
              WARNING(log_prx+'TFileMerger::Merge() did not succeed for sample "'+i_output+'"')
 
-       print colored_text('['+i_output+']', ['1', '92'])
+       print(colored_text('[output]', ['1','92']), os.path.relpath(i_output))
