@@ -128,6 +128,8 @@ def create_histograms():
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_dRmatch'] = [0.2*_tmp for _tmp in range(25+1)]
 
+                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
+
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_overGEN'] = [0.1*_tmp for _tmp in range(50+1)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_minusGEN']  = [-250+10*_tmp for _tmp in range(50+1)]
 
@@ -147,8 +149,12 @@ def create_histograms():
                     if v_ref == GenJetsCollection+'_EtaIncl_eta':
                        binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_eta'], binEdges_1d[i_sel+v_ref]]
 
+                    binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass_overGEN'], binEdges_1d[i_sel+v_ref]]
                     binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_overGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_overGEN'], binEdges_1d[i_sel+v_ref]]
                     binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+v_ref] = [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_pt_minusGEN'], binEdges_1d[i_sel+v_ref]]
+
+                binEdges_2d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass_overGEN:'+GenJetsCollection+'_EtaIncl_mass'] = \
+                  [binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass_overGEN'], binEdges_1d[i_sel+GenJetsCollection+'_EtaIncl_mass']]
 
         for [i_jet_onl, i_jet_off] in JetOnlineOfflinePairs:
 
@@ -390,6 +396,10 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                  i_jet+i_reg+'_MatchedToGEN_eta',
                  i_jet+i_reg+'_MatchedToGEN_phi',
                  i_jet+i_reg+'_MatchedToGEN_mass',
+                 i_jet+i_reg+'_MatchedToGEN_mass_overGEN',
+                 i_jet+i_reg+'_MatchedToGEN_mass_overGEN:' +GenJetsCollection+'_EtaIncl_pt',
+                 i_jet+i_reg+'_MatchedToGEN_mass_overGEN:' +GenJetsCollection+'_EtaIncl_eta',
+                 i_jet+i_reg+'_MatchedToGEN_mass_overGEN:' +GenJetsCollection+'_EtaIncl_mass',
 #                 i_jet+i_reg+'_MatchedToGEN_chargedHadronEnergyFraction',
 #                 i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction',
 #                 i_jet+i_reg+'_MatchedToGEN_electronEnergyFraction',
@@ -471,6 +481,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                    genJet_match_pt = arrays[GenJetsCollection+'_pt'][index][genJet_match]
                    genJet_match_eta = arrays[GenJetsCollection+'_eta'][index][genJet_match]
                    genJet_match_phi = arrays[GenJetsCollection+'_phi'][index][genJet_match]
+                   genJet_match_mass = arrays[GenJetsCollection+'_mass'][index][genJet_match]
 
                    recoGen_dEta = jet_eta - genJet_match_eta
                    recoGen_dPhi = delta_phi(jet_phi, genJet_match_phi)
@@ -503,6 +514,11 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                       values[i_jet+i_reg+'_MatchedToGEN_eta:'        +GenJetsCollection+'_EtaIncl_eta'] += [(jet_eta, genJet_match_eta)]
                       values[i_jet+i_reg+'_MatchedToGEN_pt_overGEN:' +GenJetsCollection+'_EtaIncl_eta'] += [(jet_pt / genJet_match_pt, genJet_match_eta)]
                       values[i_jet+i_reg+'_MatchedToGEN_pt_minusGEN:'+GenJetsCollection+'_EtaIncl_eta'] += [(jet_pt - genJet_match_pt, genJet_match_eta)]
+
+                      values[i_jet+i_reg+'_MatchedToGEN_mass_overGEN'] += [jet_mass / genJet_match_mass]
+                      values[i_jet+i_reg+'_MatchedToGEN_mass_overGEN:'+GenJetsCollection+'_EtaIncl_pt'] += [(jet_mass / genJet_match_mass, genJet_match_pt)]
+                      values[i_jet+i_reg+'_MatchedToGEN_mass_overGEN:'+GenJetsCollection+'_EtaIncl_eta'] += [(jet_mass / genJet_match_mass, genJet_match_eta)]
+                      values[i_jet+i_reg+'_MatchedToGEN_mass_overGEN:'+GenJetsCollection+'_EtaIncl_mass'] += [(jet_mass / genJet_match_mass, genJet_match_mass)]
 
                 else:
                    values[i_jet+i_reg+'_NotMatchedToGEN_pt'] += [jet_pt]
