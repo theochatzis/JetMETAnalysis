@@ -129,4 +129,4 @@ if __name__ == '__main__':
           if not ret:
              WARNING(log_prx+'TFileMerger::Merge() did not succeed for sample "'+i_output+'"')
 
-       print(colored_text('[output]', ['1','92']), os.path.relpath(i_output))
+       print(colored_text('[output]', ['1','92']), os.path.relpath(i_output_path))
