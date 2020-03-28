@@ -1,6 +1,7 @@
 #include <Analysis/JMETrigger/interface/AnalysisDriverBase.h>
 
 #include <iostream>
+#include <stdexcept>
 
 AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
   : outputFilePath_(outputFilePath), outputFileMode_(outputFileMode) {
@@ -72,7 +73,7 @@ void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEn
   this->init();
 
   if((theReader_.get() == nullptr) || theReader_->IsInvalid()){
-    std::cout << "AnalysisDriverBase::process -- invalid TTreeReader" << std::endl;
+    throw std::runtime_error("AnalysisDriverBase::process -- invalid TTreeReader");
   }
   else {
     while(theReader_->Next()){
@@ -87,10 +88,10 @@ void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEn
 
       this->analyze();
     }
-  }
 
-  if(outputFilePath_ != ""){
-    this->writeToFile(outputFilePath_, outputFileMode_);
+    if(outputFilePath_ != ""){
+      this->writeToFile(outputFilePath_, outputFileMode_);
+    }
   }
 }
 

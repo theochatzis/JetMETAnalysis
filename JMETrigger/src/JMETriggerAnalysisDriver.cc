@@ -26,12 +26,12 @@ void JMETriggerAnalysisDriver::analyze(){
   ++eventsProcessed_;
   h_eventsProcessed_->Fill(0.5, 1.);
 
-//  auto const& eta1 = this->vector<float>("hltAK4PFJetsCorrected_eta");
-//  for(const auto& tmp : eta1){ h_hltAK4PFJetsCorrected_eta_->Fill(tmp, 1.); }
-//
-//  auto const& eta2 = this->vector<float>("hltAK4PFCHSJetsCorrected_eta");
+  auto const& eta1 = this->vector<float>("hltAK4PFJetsCorrected_eta");
+  for(const auto& tmp : eta1){ h_hltAK4PFJetsCorrected_eta_->Fill(tmp, 1.); }
+
+//  auto& eta2 = this->vector<float>("hltAK4PFCHSJetsCorrected_eta");
 //  for(const auto& tmp : eta2){ h_hltAK4PFCHSJetsCorrected_eta_->Fill(tmp, 1.); }
-//
+
 //  auto const& eta3 = this->vector<float>("hltAK4PuppiJetsCorrected_eta");
 //  for(const auto& tmp : eta3){ h_hltAK4PuppiJetsCorrected_eta_->Fill(tmp, 1.); }
 }

@@ -57,7 +57,7 @@ T const& AnalysisDriverBase::value(const std::string& key) const {
     throw std::runtime_error(ss_str.str());
   }
 
-  auto const* ptr = dynamic_cast<TTreeReaderValue<T> const*>(map_TTreeReaderValues_.at(key).get());
+  auto* ptr = dynamic_cast<TTreeReaderValue<T>*>(map_TTreeReaderValues_.at(key).get());
 
   if(not ptr){
     std::ostringstream ss_str;
@@ -77,7 +77,7 @@ std::vector<T> const& AnalysisDriverBase::vector(const std::string& key) const {
     throw std::runtime_error(ss_str.str());
   }
 
-  auto const* ptr = dynamic_cast<TTreeReaderValue<std::vector<T>> const*>(map_TTreeReaderValues_.at(key).get());
+  auto* ptr = dynamic_cast<TTreeReaderValue<std::vector<T>>*>(map_TTreeReaderValues_.at(key).get());
 
   if(not ptr){
     std::ostringstream ss_str;
