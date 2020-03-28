@@ -547,8 +547,13 @@ if __name__ == '__main__':
           elif _hkey_basename.endswith('genMETTrue_pt'): _titleX = 'GEN MET [GeV]'
           elif _hkey_basename.endswith('hltVerticesPF_mult'): _titleX = 'Number of hltVerticesPF'
        else:
-          if 'MET' in _hkey_basename: _titleY = 'Events'
-          elif 'Jets' in _hkey_basename: _titleY = 'Entries'
+          if 'MET' in _hkey_basename:
+             _titleY = 'Events'
+          elif 'Jets' in _hkey_basename:
+             if '_njets' in _hkey_basename:
+                _titleY = 'Events'
+             else:
+                _titleY = 'Entries'
 
        if '_pt_paraToOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel Offl}#GT [GeV]'
        elif '_pt_paraToOffline_RMSScaledByResponse_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
