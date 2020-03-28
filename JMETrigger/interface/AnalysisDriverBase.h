@@ -20,7 +20,7 @@ class AnalysisDriverBase {
 
   virtual void init() = 0;
   virtual void analyze() = 0;
-  virtual void write() = 0;
+  virtual void write(TFile&) = 0;
 
   virtual void process(const Long64_t firstEntry=0, const Long64_t maxEntries=-1);
   virtual void writeToFile(const std::string& output_file, const std::string& output_mode);

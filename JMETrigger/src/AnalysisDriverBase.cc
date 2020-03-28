@@ -1,6 +1,7 @@
 #include <Analysis/JMETrigger/interface/AnalysisDriverBase.h>
 
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
@@ -13,7 +14,7 @@ AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::stri
 
   theReader_.reset(new TTreeReader(ttree.c_str(), theFile_.get()));
   if((theReader_.get() == nullptr) || theReader_->IsInvalid()){
-    return;
+    throw std::runtime_error("AnalysisDriverBase::AnalysisDriverBase -- invalid TTreeReader");
   }
 
   map_TTreeReaderValues_.clear();
@@ -100,17 +101,29 @@ void AnalysisDriverBase::writeToFile(const std::string& output_file, const std::
   TFile outFile(output_file.c_str(), output_mode.c_str());
   if(not outFile.IsZombie()){
     outFile.cd();
-    this->write();
+    this->write(outFile);
+    outFile.Close();
   }
-  outFile.Close();
+  else {
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::writeToFile(\""
+        << output_file << "\", \"" << output_mode << "\") -- "
+        << "failed to open output TFile";
+    throw std::runtime_error(oss.str());
+  }
 }
 
 void AnalysisDriverBase::addOption(const std::string& key, const std::string& opt){
 
   if(map_options_.find(key) != map_options_.end()){
-    std::cout << key << " " << opt << std::endl;
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addOption(\"" << key << "\", \"" << opt
+        << "\") -- option with key \"" << key << "\" already exists:"
+        << " (key = \"" << key << "\", value = \"" << map_options_.at(key) << "\")";
+    throw std::runtime_error(oss.str());
   }
   else {
+    std::cout << ">> added option (key = \"" << key << "\", value = \"" << opt << "\")" << std::endl;
     map_options_.insert(std::make_pair(key, opt));
   }
 }

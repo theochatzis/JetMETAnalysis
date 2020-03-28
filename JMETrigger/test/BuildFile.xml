@@ -1,4 +1,0 @@
-<use name="Analysis/JMETrigger"/>
-
-<bin file="exe.cpp" name="exe">
-</bin>
