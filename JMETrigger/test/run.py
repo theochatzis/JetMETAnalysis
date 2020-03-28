@@ -1,26 +1,161 @@
 #!/usr/bin/env python
 from __future__ import print_function
-
+import argparse
+import os
+import glob
 import time
-start = time.time()
-
 import ROOT
-if ROOT.gSystem.Load('libAnalysisJMETrigger'):
-   raise RuntimeError('failed to load library: libAnalysisJMETrigger.so')
 
-nevts = 0
-plugin = 'JMETriggerAnalysisDriver'
+def colored_text(txt, keys=[]):
+    _tmp_out = ''
+    for _i_tmp in keys:
+        _tmp_out += '\033['+_i_tmp+'m'
+    _tmp_out += txt
+    if len(keys) > 0: _tmp_out += '\033[0m'
+    return _tmp_out
 
-if hasattr(ROOT, plugin):
-   a = getattr(ROOT, plugin)('ntuples/HLT_iter2GlobalPtSeed0p9/Run3Winter20_QCD_Pt_170to300_14TeV.root', 'JMETriggerNTuple/Events')
-   a.setOutputFilePath("out.root")
-   a.setOutputFileMode("recreate")
-   a.addOption("a", "a")
-   a.process(0, -1)
-   nevts = a.eventsProcessed()
+def EXE(cmd, suspend=True, verbose=False, dry_run=False):
+    if verbose: print(colored_text('>', ['1']), cmd)
+    if dry_run: return
+    _exitcode = os.system(cmd)
+    _exitcode = min(255, _exitcode)
+    if _exitcode and suspend:
+       raise SystemExit(_exitcode)
+    return _exitcode
 
-finish = time.time()
-print('-'*35)
-print('events processed: {:d}'.format(nevts))
-print('execution time [sec]: {:.5f}'.format(finish - start))
-print('-'*35)
+#### main
+if __name__ == '__main__':
+   time_start = time.time()
+
+   ### args --------------
+   parser = argparse.ArgumentParser()
+
+   parser.add_argument('-i', '--inputs', dest='inputs', required=True, nargs='+', default=None,
+                       help='path to input files (can also include TTree key, as "FILE:KEY"; if not specified, TTree key is taken from --tree)')
+
+   parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
+                       help='path to output .root file')
+
+   parser.add_argument('-t', '--tree', dest='tree', action='store', default='JMETriggerNTuple/Events',
+                       help='key of TTree in input file(s)')
+
+   parser.add_argument('-l', '--libs', dest='libs', nargs='+', default=[],
+                       help='names of libraries to be loaded via ROOT::gSystem::Load')
+
+   parser.add_argument('-p', '--plugin', dest='plugin', action='store', default='JMETriggerAnalysisDriver',
+                       help='name of analysis plugin')
+
+   parser.add_argument('-e', '--every', dest='every', action='store', type=int, default=1e2,
+                       help='show progress of processing every N events')
+
+   parser.add_argument('-s', '--skipEvents', dest='skipEvents', action='store', type=int, default=0,
+                       help='number of events to be skipped from start of input TTree')
+
+   parser.add_argument('-m', '--maxEvents', dest='maxEvents', action='store', type=int, default=-1,
+                       help='maximum number of events to be processed')
+
+   parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
+                       help='enable verbose mode')
+
+   opts, opts_unknown = parser.parse_known_args()
+   ### -------------------
+
+   ROOT.gROOT.SetBatch()
+   ROOT.gErrorIgnoreLevel = ROOT.kError #kWarning
+
+   log_prx = os.path.basename(__file__)+' -- '
+
+   ### args validation ---
+
+   ## unknown
+   if len(opts_unknown) > 0:
+      raise RuntimeError(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
+
+   ## output
+   if os.path.exists(opts.output):
+      raise RuntimeError(log_prx+'target path to output .root file already exists [-o]: '+opts.output)
+
+   ## libraries
+   LIBS = sorted(list(set(opts.libs)))
+   for _tmp in LIBS:
+       if ROOT.gSystem.Load(_tmp):
+          print(log_prx+'failed to load library via ROOT::gSystem::Load [-l]: '+_tmp)
+
+   ## plugin
+   if not hasattr(ROOT, opts.plugin):
+      raise RuntimeError(log_prx+'analysis plugin unavailable [-p]: '+opts.plugin)
+
+   ## inputs
+   inputFileTreePairs = []
+
+   for i_inpf in opts.inputs:
+
+       i_inpf_fpath, i_inpf_treekey = None, None
+
+       i_inpf_split = i_inpf.split(':')
+
+       if len(i_inpf_split) == 1:
+          i_inpf_fpath = i_inpf_split[0]
+          i_inpf_treekey = opts.tree
+
+       elif len(i_inpf_split) == 2:
+          i_inpf_fpath = i_inpf_split[0]
+          i_inpf_treekey = i_inpf_split[1]
+
+       else:
+          print(log_prx+'invalid format for input entry (will be skipped): '+i_inpf)
+          continue
+
+       i_inpf_ls = glob.glob(i_inpf_fpath)
+
+       for i_inpf_2 in i_inpf_ls:
+           if os.path.isfile(i_inpf_2):
+              inputFileTreePairs += [(os.path.abspath(os.path.realpath(i_inpf_2)), i_inpf_treekey)]
+           elif opts.verbose:
+              print(log_prx+'invalid path to input file (input entry will be skipped) [-i]: '+i_inpf_2)
+
+   inputFileTreePairs = sorted(list(set(inputFileTreePairs)))
+
+   if len(inputFileTreePairs) == 0:
+      raise RuntimeError(log_prx+'empty list of valid input entries [-i]')
+
+   ## show-every flag
+   SHOW_EVERY = opts.every
+   if SHOW_EVERY <= 0:
+      print(log_prx+'invalid (non-positive) value for option "-e/--every" ('+str(SHOW_EVERY)+'), value will be changed to 100')
+      SHOW_EVERY = 1e2
+   ### -------------------
+
+   ## create output directory
+   output_dirname = os.path.dirname(os.path.abspath(opts.output))
+   if not os.path.isdir(output_dirname):
+      EXE('mkdir -p '+output_dirname, verbose=options.verbose, dry_run=options.dry_run)
+   del output_dirname
+
+   skipEvents = opts.skipEvents
+   if (skipEvents != 0) and (len(inputFileTreePairs) != 1):
+      print(log_prx+'WARNING -- option --skipEvents not supported for multiple input files, will be ignored')
+      skipEvents = 0
+
+   nEvtProcessed = 0
+   for [i_inpFile, i_inpTree] in inputFileTreePairs:
+
+       if opts.verbose:
+          print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree)
+
+       i_maxEvents = -1 if (opts.maxEvents < 0) else (opts.maxEvents - nEvtProcessed)
+
+       analyzer = getattr(ROOT, opts.plugin)(i_inpFile, i_inpTree)
+       analyzer.setOutputFilePath(opts.output)
+       analyzer.setOutputFileMode('update' if nEvtProcessed else 'recreate')
+       analyzer.addOption('showEvery', str(SHOW_EVERY))
+       analyzer.process(skipEvents, i_maxEvents)
+       nEvtProcessed += analyzer.eventsProcessed()
+
+   time_finish = time.time()
+   print('-'*35)
+   print('events processed: {:d}'.format(nEvtProcessed))
+   print('execution time [sec]: {:.5f}'.format(time_finish - time_start))
+   print('output:', os.path.relpath(opts.output))
+   print('-'*35)
+   ### -------------------
