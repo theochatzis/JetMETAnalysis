@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """merge outputs of batch jobs"""
+from __future__ import print_function
 import os
 import argparse
 import glob
@@ -34,7 +35,8 @@ def updateDictionary(dictionary, TDirectory, prefix=''):
            dictionary[out_key] = j_obj.Clone()
            dictionary[out_key].SetDirectory(0)
 
-           if opts.verbose: print colored_text('[input]', ['1', '92']), out_key
+           if opts.verbose:
+              print(colored_text('[input]', ['1', '92']), out_key)
 
     return dictionary
 
@@ -254,5 +256,5 @@ if __name__ == '__main__':
 
           output_tfile.Close()
 
-       print colored_text('[output]', ['1','92']), output_file
+       print(colored_text('[output]', ['1','92']), os.path.relpath(output_file))
        ### -------------------
