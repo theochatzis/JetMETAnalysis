@@ -145,14 +145,14 @@ if __name__ == '__main__':
 
        i_maxEvents = -1 if (opts.maxEvents < 0) else (opts.maxEvents - nEvtProcessed)
 
-       if opts.verbosity > 0:
-          print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree, '(skipEvents =', skipEvents, ', maxEvents =', i_maxEvents, ')')
+       if opts.verbosity > -99:
+          print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree, '[ skipEvents =', skipEvents, ', maxEvents =', i_maxEvents, ']')
 
        analyzer = getattr(ROOT, opts.plugin)(i_inpFile, i_inpTree)
+       analyzer.setVerbosity(opts.verbosity)
        analyzer.setOutputFilePath(opts.output)
        analyzer.setOutputFileMode('update' if nEvtProcessed else 'recreate')
        analyzer.addOption('showEvery', str(SHOW_EVERY))
-       analyzer.addOption('verbosity', str(opts.verbosity))
        analyzer.process(skipEvents, i_maxEvents)
        nEvtProcessed += analyzer.eventsProcessed()
 
