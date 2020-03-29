@@ -110,7 +110,7 @@ def apply_style(type_=0):
     s.SetTitleSize(.05*.95, 'XYZ')
     if   type_ == 0:
         s.SetTitleOffset(1.25, 'X')
-        s.SetTitleOffset(1.25, 'Y')
+        s.SetTitleOffset(1.45, 'Y')
     elif type_ == 2:
         s.SetTitleOffset(1.20, 'X')
         s.SetTitleOffset(1.23, 'Y')

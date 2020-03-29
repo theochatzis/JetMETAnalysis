@@ -1,8 +1,8 @@
 #!/bin/bash
 
-export METANA_BASE="${PWD}"
+export JMEANA_BASE="${PWD}"
 
-export PATH=${PATH}:${METANA_BASE}
+export PATH=${PATH}:${JMEANA_BASE}
 
 export PYTHONPATH="${PYTHONPATH}":"${PWD}"
 export PYTHONPATH="${PYTHONPATH}":"${PWD}"/common

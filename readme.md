@@ -13,14 +13,14 @@ source env.sh
 
 * Create output directory with one .root for each crab3 task:
 ```
-hadd_crab3.py -i /pnfs/desy.de/cms/tier2/store/user/missirol/jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191119/* -o ${NTUDIR} # -p _temp
+hadd_ntuples.py -i /pnfs/desy.de/cms/tier2/store/user/missirol/jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191119/* -o ${NTUDIR} # -l 0 -p _temp
 ```
 
 ## Batch Jobs
 
 * Create scripts for submission of batch jobs:
 ```
-batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/prod -n 5000 -s jmeAnalysis.py
+batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/analysis -n 5000 # -l 0 -s jmeAnalysis.py
 ```
 
 * Monitoring and (re)submission of batch jobs:
@@ -32,17 +32,17 @@ batch_monitor.py -i ${OUTDIR}
 
 * Merge outputs of batch jobs:
 ```
-merge_batchOutputs.py -i ${OUTDIR}/prod/*.root -o ${OUTDIR}/outputs
+merge_batchOutputs.py -i ${OUTDIR}/analysis/*.root -o ${OUTDIR}/outputs # -l 0
 ```
 
 * Harvest outputs of `jmeAnalysis.py` script (produces profiles, efficiencies, etc):
 ```
-jmeAnalysisHarvester.py -i ${OUTDIR}/outputs/*.root -o ${OUTDIR}/outputs_postHarvesting
+jmeAnalysisHarvester.py -i ${OUTDIR}/outputs/*.root -o ${OUTDIR}/outputs_postHarvesting # -l 0
 ```
 
 ## Plots
 
-* Produce plots from harvsting outputs:
+* Produce plots from harvesting outputs:
 ```
 jmePlots.py -h
 ```

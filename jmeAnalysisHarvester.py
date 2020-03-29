@@ -63,6 +63,9 @@ if __name__ == '__main__':
    parser.add_argument('-o', '--output', dest='output', required=True, action='store', default='',
                        help='path to output file (1 input) or directory (multiple inputs')
 
+   parser.add_argument('-l', '--level', dest='level', action='store', type=int, default=0,
+                       help='level of directory depth in output directory')
+
    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
                        help='enable verbose mode')
 
@@ -79,6 +82,9 @@ if __name__ == '__main__':
    ROOT.gErrorIgnoreLevel = ROOT.kWarning
 
    ### args validation ---
+   if opts.level < 0:
+      KILL(log_prx+'negative level of directory depth in output directory (must be >=0) [-l]: '+str(opts.level))
+
    INPUT_FILES = []
    for i_inpf in opts.inputs:
        i_inpf_ls = glob.glob(i_inpf)
@@ -204,34 +210,49 @@ if __name__ == '__main__':
        ### -------------------
 
        ### output file -------
-       output_file = opts.output if len(INPUT_FILES) == 1 else opts.output+'/'+os.path.basename(inpf)
+       output_file = None
+       if len(INPUT_FILES) == 1:
+          output_file = opts.output
+       else:
+          input_name_pieces = [os.path.basename(inpf)]
+          input_dirname = os.path.dirname(inpf)
+          while opts.level >= len(input_name_pieces):
+             input_name_pieces.insert(0, os.path.basename(input_dirname))
+             input_dirname = os.path.dirname(input_dirname)
+          del input_dirname
+          output_file = opts.output+'/'+('/'.join(input_name_pieces))
+
+       if os.path.exists(output_file):
+          KILL(log_prx+'logic error - target output file already exists: '+output_file)
 
        output_dirname = os.path.dirname(os.path.abspath(output_file))
-       if not os.path.isdir(output_dirname): EXE('mkdir -p '+output_dirname)
+       if not os.path.isdir(output_dirname):
+          EXE('mkdir -p '+output_dirname, verbose=opts.verbose, dry_run=opts.dry_run)
        del output_dirname
 
-       output_tfile = ROOT.TFile(output_file, 'recreate')
-       if (not output_tfile) or output_tfile.IsZombie() or output_tfile.TestBit(ROOT.TFile.kRecovered):
-          raise SystemExit(1)
+       if not opts.dry_run:
+          output_tfile = ROOT.TFile(output_file, 'create')
+          if (not output_tfile) or output_tfile.IsZombie() or output_tfile.TestBit(ROOT.TFile.kRecovered):
+             raise SystemExit(1)
 
-       for i_idx in sorted(histograms.keys()):
+          for i_idx in sorted(histograms.keys()):
 
-           output_tfile.cd()
+              output_tfile.cd()
 
-           out_key = i_idx
+              out_key = i_idx
 
-           while '/' in out_key:
-              slash_index = out_key.find('/')
-              out_dir = out_key[:slash_index]
-              out_key = out_key[slash_index+1:]
-              out_dir = getattr(output_tfile, 'Get' if output_tfile.Get(out_dir) else 'mkdir')(out_dir)
-              out_dir.cd()
+              while '/' in out_key:
+                 slash_index = out_key.find('/')
+                 out_dir = out_key[:slash_index]
+                 out_key = out_key[slash_index+1:]
+                 out_dir = getattr(output_tfile, 'Get' if output_tfile.Get(out_dir) else 'mkdir')(out_dir)
+                 out_dir.cd()
 
-           histograms[i_idx].SetName(out_key)
-           histograms[i_idx].SetTitle(out_key)
-           histograms[i_idx].Write()
+              histograms[i_idx].SetName(out_key)
+              histograms[i_idx].SetTitle(out_key)
+              histograms[i_idx].Write()
 
-       output_tfile.Close()
+          output_tfile.Close()
 
        print colored_text('[output]', ['1','92']), output_file
        ### -------------------

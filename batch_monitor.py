@@ -268,23 +268,21 @@ def monitor(options, log='', local=False):
                     if os.path.isfile(resub_exe):
                        print colored_text('> executing', ['93']), colored_text(os.path.relpath(resub_exe), ['1', '93'])
                        EXE(resub_exe, verbose=options.verbose, dry_run=options.dry_run)
+                       counter_completed += 1
                  else:
                     print colored_text('> resubmitting', ['93']), colored_text(os.path.relpath(resub_file), ['1', '93'])
 
                     resub_addopt = (' '+(' '.join(ADD_OPTIONS)) if (len(ADD_OPTIONS) > 0) else '')
                     EXE(BATCH_RESUB_EXE+' '+resub_file_abspath+resub_addopt, verbose=options.verbose, dry_run=options.dry_run)
 
-                 counter_resubmitted += 1
-
-                 nJobs_submitted += 1
+                    counter_resubmitted += 1
+                    nJobs_submitted += 1
 
               except:
                  counter_toResubmit += 1
 
            else:
-
               print colored_text('> job to be resubmitted', ['93']), colored_text(os.path.relpath(resub_file), ['1', '93'])
-
               counter_toResubmit += 1
 
     counter_format = '{:>'+str(1+int(math.log10(counter_input)))+'}' if counter_input > 0 else '{:>1}'

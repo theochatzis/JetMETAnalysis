@@ -23,6 +23,9 @@ if __name__ == '__main__':
 #   parser.add_argument('-t', '--tree-name', dest='tree_name', action='store', default='tree',
 #                       help='TTree key in input file(s)')
 
+   parser.add_argument('-l', '--level', dest='level', action='store', type=int, default=0,
+                       help='level of directory depth in output directory')
+
    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
                        help='enable verbose mode')
 
@@ -39,6 +42,9 @@ if __name__ == '__main__':
    ROOT.gErrorIgnoreLevel = ROOT.kWarning
 
    ### args validation ---
+   if opts.level < 0:
+      KILL(log_prx+'negative level of directory depth in output directory (must be >=0) [-l]: '+str(opts.level))
+
    if os.path.exists(opts.output):
       KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
 
@@ -74,17 +80,27 @@ if __name__ == '__main__':
        if not is_int(input_basename_woExt_splits[1]):
           KILL(log_prx+'input file name with invalid format: '+i_input)
 
-       output_name = input_basename_woExt_splits[0]
+       output_name_pieces = [input_basename_woExt_splits[0]]
+       output_dirname = os.path.dirname(i_input)
+       while opts.level >= len(output_name_pieces):
+          output_name_pieces.insert(0, os.path.basename(output_dirname))
+          output_dirname = os.path.dirname(output_dirname)
+       del output_dirname
+       output_name = '/'.join(output_name_pieces)
 
-       if output_name not in outputs_dict: outputs_dict[output_name] = []
+       if output_name not in outputs_dict:
+          outputs_dict[output_name] = []
 
        outputs_dict[output_name] += [i_input]
 
-   EXE('mkdir -p '+opts.output, verbose=opts.verbose, dry_run=opts.dry_run)
-
    for i_output in sorted(outputs_dict.keys()):
 
+       i_output_dirpath = os.path.dirname(opts.output+'/'+i_output)
+       EXE('mkdir -p '+i_output_dirpath, verbose=opts.verbose, dry_run=opts.dry_run)
+
        i_output_path = opts.output+'/'+i_output+'.root'
+       if os.path.exists(i_output_path):
+          KILL(log_prx+'logic error - target output file already exists: '+i_output_path)
 
        if len(outputs_dict[i_output]) == 1:
 
@@ -93,7 +109,7 @@ if __name__ == '__main__':
 
           EXE('cp '+outputs_dict[i_output][0]+' '+i_output_path, verbose=opts.verbose, dry_run=opts.dry_run)
 
-       else:
+       elif not opts.dry_run:
 
           if opts.verbose:
              print colored_text('['+i_output+']', ['1', '93']), 'attempting to merge', len(outputs_dict[i_output]), 'input files'
@@ -102,7 +118,8 @@ if __name__ == '__main__':
 
           i_merger = ROOT.TFileMerger(False, True)
           i_merger.OutputFile(i_output_path)
-          for _tmp in outputs_dict[i_output]: i_merger.AddFile(_tmp)
+          for _tmp in outputs_dict[i_output]:
+              i_merger.AddFile(_tmp)
 
           if i_merger.HasCompressionChange():
              print colored_text('[output='+i_output_path+']', ['1']), 'compression-level of output file differs from that of input files, merging will be slower'

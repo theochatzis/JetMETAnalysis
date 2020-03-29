@@ -16,15 +16,13 @@ EvtSelections = [
 
 #  'hltAK4PFCHS100_EtaIncl/',
 #  'hltAK4PFCHS100_HB/',
-#  'hltAK4PFCHS100_HGCal/',
-#  'hltAK4PFCHS100_HF1/',
-#  'hltAK4PFCHS100_HF2/',
+#  'hltAK4PFCHS100_HE/',
+#  'hltAK4PFCHS100_HF/',
 #
 #  'hltAK4Puppi100_EtaIncl/',
 #  'hltAK4Puppi100_HB/',
-#  'hltAK4Puppi100_HGCal/',
-#  'hltAK4Puppi100_HF1/',
-#  'hltAK4Puppi100_HF2/',
+#  'hltAK4Puppi100_HE/',
+#  'hltAK4Puppi100_HF/',
 #
 #  'hltPFMET200/',
 #  'hltPuppiMET200/',
@@ -38,43 +36,28 @@ GenJetsCollection = 'ak4GenJetsNoNu'
 JetCollections = [
 
   GenJetsCollection,
+  'hltAK4CaloJets',
+  'hltAK4CaloJetsCorrected',
+#  'hltAK8CaloJets',
+#  'hltAK8CaloJetsCorrected',
+  'hltAK4PFJets',
   'hltAK4PFJetsCorrected',
-  'hltAK4PFCHSJetsCorrected',
-  'offlineAK4PFCHSJetsCorrected',
-  'hltAK4PuppiJetsCorrected',
-  'offlineAK4PuppiJetsCorrected',
+#  'hltAK8PFJets',
+#  'hltAK8PFJetsCorrected',
 ]
 
 JetOnlineOfflinePairs = [
-
-  ['hltAK4PFCHSJetsCorrected', 'offlineAK4PFCHSJetsCorrected'],
-  ['hltAK4PuppiJetsCorrected', 'offlineAK4PuppiJetsCorrected'],
 ]
 
 METCollections = [
 
-  'genMetTrue',
+  'genMETTrue',
 
   'hltPFMET',
-  'hltPFMETTypeOne',
-  'hltPFMETNoPileUpJME',
-  'hltPuppiMET',
-  'hltPuppiMETTypeOne',
-  'hltPuppiMETWithPuppiForJets',
-  'hltSoftKillerMET',
-
-  'offlineMETs_Raw',
-  'offlineMETs_Type1',
-  'offlineMETsPuppi_Raw',
-  'offlineMETsPuppi_Type1',
+#  'hltPFMETTypeOne',
 ]
 
 METOnlineOfflinePairs = [
-  ['hltPFMET', 'offlineMETs_Raw'],
-  ['hltPFMETTypeOne', 'offlineMETs_Type1'],
-  ['hltPuppiMET', 'offlineMETsPuppi_Raw'],
-  ['hltPuppiMETTypeOne', 'offlineMETsPuppi_Type1'],
-  ['hltPuppiMETWithPuppiForJets', 'offlineMETsPuppi_Raw'],
 ]
 
 def delta_phi(phi1, phi2):
@@ -93,13 +76,13 @@ def create_histograms():
 
     for i_sel in EvtSelections:
 
-        binEdges_1d[i_sel+'hltNPV'] = [10*_tmp for _tmp in range(40+1)]
-        binEdges_1d[i_sel+'offlineNPV'] = [10*_tmp for _tmp in range(40+1)]
+        binEdges_1d[i_sel+'hltTrimmedPixelVertices_mult'] = [10*_tmp for _tmp in range(40+1)]
+        binEdges_1d[i_sel+'hltVerticesPF_mult'] = [10*_tmp for _tmp in range(40+1)]
 
         ### Jets
         for i_jet in JetCollections:
 
-            for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF1',  '_HF2']:
+            for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_njets'] = [_tmp for _tmp in range(121)]
                 binEdges_1d[i_sel+i_jet+i_reg+'_pt']  = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000]
@@ -110,17 +93,17 @@ def create_histograms():
 
                 binEdges_2d[i_sel+i_jet+i_reg+'_pt:'+i_jet+i_reg+'_eta'] = [binEdges_1d[i_sel+i_jet+i_reg+'_pt'], binEdges_1d[i_sel+i_jet+i_reg+'_eta']]
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_chargedHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_neutralHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_electronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_photonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_muonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-
-                binEdges_1d[i_sel+i_jet+i_reg+'_chargedHadronMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_neutralHadronMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_electronMultiplicity'] = [_tmp for _tmp in range(13)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_photonMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_muonMultiplicity'] = [_tmp for _tmp in range(13)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_chargedHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_neutralHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_electronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_photonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_muonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#
+#                binEdges_1d[i_sel+i_jet+i_reg+'_chargedHadronMultiplicity'] = [_tmp for _tmp in range(61)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_neutralHadronMultiplicity'] = [_tmp for _tmp in range(61)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_electronMultiplicity'] = [_tmp for _tmp in range(13)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_photonMultiplicity'] = [_tmp for _tmp in range(61)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_muonMultiplicity'] = [_tmp for _tmp in range(13)]
 
                 if i_jet == GenJetsCollection: continue
 
@@ -131,17 +114,17 @@ def create_histograms():
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_phi'] = binEdges_1d[i_sel+i_jet+i_reg+'_phi']
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_mass'] = binEdges_1d[i_sel+i_jet+i_reg+'_mass']
 
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_chargedHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_electronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_photonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
-
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_electronMultiplicity'] = [_tmp for _tmp in range(13)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_photonMultiplicity'] = [_tmp for _tmp in range(61)]
-                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_muonMultiplicity'] = [_tmp for _tmp in range(13)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_chargedHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_electronEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_photonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction'] = [_tmp*0.05 for _tmp in range(41)]
+#
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity'] = [_tmp for _tmp in range(61)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity'] = [_tmp for _tmp in range(61)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_electronMultiplicity'] = [_tmp for _tmp in range(13)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_photonMultiplicity'] = [_tmp for _tmp in range(61)]
+#                binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_muonMultiplicity'] = [_tmp for _tmp in range(13)]
 
                 binEdges_1d[i_sel+i_jet+i_reg+'_MatchedToGEN_dRmatch'] = [0.2*_tmp for _tmp in range(25+1)]
 
@@ -169,7 +152,7 @@ def create_histograms():
 
         for [i_jet_onl, i_jet_off] in JetOnlineOfflinePairs:
 
-            for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']:
+            for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
 
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_njets'] = [_tmp for _tmp in range(121)]
                 binEdges_1d[i_sel+i_jet_onl+i_reg+'_MatchedToOffline_pt'] = binEdges_1d[i_sel+i_jet_onl+i_reg+'_pt']
@@ -202,10 +185,10 @@ def create_histograms():
             binEdges_1d[i_sel+i_met+'_sumEt'] = [0, 30, 60, 90, 120, 180, 250, 400, 600, 800, 1000, 1500, 2000, 3000]
 
             for i_var in ['pt', 'phi', 'sumEt']:
-                binEdges_2d[i_sel+i_met+'_'+i_var+':hltNPV'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'hltNPV']]
-                binEdges_2d[i_sel+i_met+'_'+i_var+':offlineNPV'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'offlineNPV']]
+                binEdges_2d[i_sel+i_met+'_'+i_var+':hltTrimmedPixelVertices_mult'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'hltTrimmedPixelVertices_mult']]
+                binEdges_2d[i_sel+i_met+'_'+i_var+':hltVerticesPF_mult'] = [binEdges_1d[i_sel+i_met+'_'+i_var], binEdges_1d[i_sel+'hltVerticesPF_mult']]
 
-            if i_met == 'genMetTrue': continue
+            if i_met == 'genMETTrue': continue
 
             binEdges_1d[i_sel+i_met+'_pt_minusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
             binEdges_1d[i_sel+i_met+'_phi_minusGEN'] = [math.pi/40*_tmp for _tmp in range(40+1)]
@@ -219,7 +202,7 @@ def create_histograms():
             binEdges_1d[i_sel+i_met+'_pt_paraToGENMinusGEN'] = [-250+10*_tmp for _tmp in range(50+1)]
             binEdges_1d[i_sel+i_met+'_pt_perpToGEN'] = [-200+10*_tmp for _tmp in range(60+1)]
 
-            for v_ref in ['genMetTrue_pt', 'genMetTrue_sumEt', 'offlineNPV']:
+            for v_ref in ['genMETTrue_pt', 'genMETTrue_sumEt', 'hltVerticesPF_mult']:
 
                 binEdges_2d[i_sel+i_met+'_pt:'+v_ref] = [binEdges_1d[i_sel+i_met+'_pt'], binEdges_1d[i_sel+v_ref]]
                 binEdges_2d[i_sel+i_met+'_phi:'+v_ref] = [binEdges_1d[i_sel+i_met+'_phi'], binEdges_1d[i_sel+v_ref]]
@@ -346,8 +329,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
     ## Event Values
 
-    values['hltNPV'] = len(arrays['hltPrimaryVertices_z'][index])
-    values['offlineNPV'] = len(arrays['offlinePrimaryVertices_z'][index])
+    values['hltTrimmedPixelVertices_mult'] = len(arrays['hltTrimmedPixelVertices_z'][index])
+    values['hltVerticesPF_mult'] = len(arrays['hltVerticesPF_z'][index])
 
     ## Jets
 
@@ -383,22 +366,22 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
     for i_jet in JetCollections:
 
         # initialize value lists
-        for i_reg in ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']:
+        for i_reg in ['_EtaIncl', '_HB', '_HE', '_HF']:
             _tmp_vlist = [
               i_jet+i_reg+'_pt',
               i_jet+i_reg+'_eta',
               i_jet+i_reg+'_phi',
               i_jet+i_reg+'_mass',
-              i_jet+i_reg+'_chargedHadronEnergyFraction',
-              i_jet+i_reg+'_neutralHadronEnergyFraction',
-              i_jet+i_reg+'_electronEnergyFraction',
-              i_jet+i_reg+'_photonEnergyFraction',
-              i_jet+i_reg+'_muonEnergyFraction',
-              i_jet+i_reg+'_chargedHadronMultiplicity',
-              i_jet+i_reg+'_neutralHadronMultiplicity',
-              i_jet+i_reg+'_electronMultiplicity',
-              i_jet+i_reg+'_photonMultiplicity',
-              i_jet+i_reg+'_muonMultiplicity',
+#              i_jet+i_reg+'_chargedHadronEnergyFraction',
+#              i_jet+i_reg+'_neutralHadronEnergyFraction',
+#              i_jet+i_reg+'_electronEnergyFraction',
+#              i_jet+i_reg+'_photonEnergyFraction',
+#              i_jet+i_reg+'_muonEnergyFraction',
+#              i_jet+i_reg+'_chargedHadronMultiplicity',
+#              i_jet+i_reg+'_neutralHadronMultiplicity',
+#              i_jet+i_reg+'_electronMultiplicity',
+#              i_jet+i_reg+'_photonMultiplicity',
+#              i_jet+i_reg+'_muonMultiplicity',
             ]
 
             if i_jet != GenJetsCollection:
@@ -407,16 +390,16 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                  i_jet+i_reg+'_MatchedToGEN_eta',
                  i_jet+i_reg+'_MatchedToGEN_phi',
                  i_jet+i_reg+'_MatchedToGEN_mass',
-                 i_jet+i_reg+'_MatchedToGEN_chargedHadronEnergyFraction',
-                 i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction',
-                 i_jet+i_reg+'_MatchedToGEN_electronEnergyFraction',
-                 i_jet+i_reg+'_MatchedToGEN_photonEnergyFraction',
-                 i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction',
-                 i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity',
-                 i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity',
-                 i_jet+i_reg+'_MatchedToGEN_electronMultiplicity',
-                 i_jet+i_reg+'_MatchedToGEN_photonMultiplicity',
-                 i_jet+i_reg+'_MatchedToGEN_muonMultiplicity',
+#                 i_jet+i_reg+'_MatchedToGEN_chargedHadronEnergyFraction',
+#                 i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction',
+#                 i_jet+i_reg+'_MatchedToGEN_electronEnergyFraction',
+#                 i_jet+i_reg+'_MatchedToGEN_photonEnergyFraction',
+#                 i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction',
+#                 i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity',
+#                 i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity',
+#                 i_jet+i_reg+'_MatchedToGEN_electronMultiplicity',
+#                 i_jet+i_reg+'_MatchedToGEN_photonMultiplicity',
+#                 i_jet+i_reg+'_MatchedToGEN_muonMultiplicity',
                  i_jet+i_reg+'_MatchedToGEN_dRmatch',
                  i_jet+i_reg+'_MatchedToGEN_pt_overGEN',
                  i_jet+i_reg+'_MatchedToGEN_pt_minusGEN',
@@ -445,40 +428,39 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
             jet_eta = arrays[i_jet+'_eta'][index][jet_idx]
             jet_phi = arrays[i_jet+'_phi'][index][jet_idx]
             jet_mass = arrays[i_jet+'_mass'][index][jet_idx]
-            jet_chargedHadronEnergyFraction = arrays[i_jet+'_chargedHadronEnergyFraction'][index][jet_idx]
-            jet_neutralHadronEnergyFraction = arrays[i_jet+'_neutralHadronEnergyFraction'][index][jet_idx]
-            jet_electronEnergyFraction = arrays[i_jet+'_electronEnergyFraction'][index][jet_idx]
-            jet_photonEnergyFraction = arrays[i_jet+'_photonEnergyFraction'][index][jet_idx]
-            jet_muonEnergyFraction = arrays[i_jet+'_muonEnergyFraction'][index][jet_idx]
-            jet_chargedHadronMultiplicity = arrays[i_jet+'_chargedHadronMultiplicity'][index][jet_idx]
-            jet_neutralHadronMultiplicity = arrays[i_jet+'_neutralHadronMultiplicity'][index][jet_idx]
-            jet_electronMultiplicity = arrays[i_jet+'_electronMultiplicity'][index][jet_idx]
-            jet_photonMultiplicity = arrays[i_jet+'_photonMultiplicity'][index][jet_idx]
-            jet_muonMultiplicity = arrays[i_jet+'_muonMultiplicity'][index][jet_idx]
+#            jet_chargedHadronEnergyFraction = arrays[i_jet+'_chargedHadronEnergyFraction'][index][jet_idx]
+#            jet_neutralHadronEnergyFraction = arrays[i_jet+'_neutralHadronEnergyFraction'][index][jet_idx]
+#            jet_electronEnergyFraction = arrays[i_jet+'_electronEnergyFraction'][index][jet_idx]
+#            jet_photonEnergyFraction = arrays[i_jet+'_photonEnergyFraction'][index][jet_idx]
+#            jet_muonEnergyFraction = arrays[i_jet+'_muonEnergyFraction'][index][jet_idx]
+#            jet_chargedHadronMultiplicity = arrays[i_jet+'_chargedHadronMultiplicity'][index][jet_idx]
+#            jet_neutralHadronMultiplicity = arrays[i_jet+'_neutralHadronMultiplicity'][index][jet_idx]
+#            jet_electronMultiplicity = arrays[i_jet+'_electronMultiplicity'][index][jet_idx]
+#            jet_photonMultiplicity = arrays[i_jet+'_photonMultiplicity'][index][jet_idx]
+#            jet_muonMultiplicity = arrays[i_jet+'_muonMultiplicity'][index][jet_idx]
 
             if (jet_pt < (GenJet_minPt if (i_jet == GenJetsCollection) else RecoJet_minPt)): continue
 
             jet_labels = ['_EtaIncl']
             if abs(jet_eta) < 1.5: jet_labels += ['_HB']
-            elif abs(jet_eta) < 3.0: jet_labels += ['_HGCal']
-            elif abs(jet_eta) < 4.0: jet_labels += ['_HF1']
-            else: jet_labels += ['_HF2']
+            elif abs(jet_eta) < 3.0: jet_labels += ['_HE']
+            else: jet_labels += ['_HF']
 
             for i_reg in jet_labels:
                 values[i_jet+i_reg+'_pt'] += [jet_pt]
                 values[i_jet+i_reg+'_eta'] += [jet_eta]
                 values[i_jet+i_reg+'_phi'] += [jet_phi]
                 values[i_jet+i_reg+'_mass'] += [jet_mass]
-                values[i_jet+i_reg+'_chargedHadronEnergyFraction'] += [jet_chargedHadronEnergyFraction]
-                values[i_jet+i_reg+'_neutralHadronEnergyFraction'] += [jet_neutralHadronEnergyFraction]
-                values[i_jet+i_reg+'_electronEnergyFraction'] += [jet_electronEnergyFraction]
-                values[i_jet+i_reg+'_photonEnergyFraction'] += [jet_photonEnergyFraction]
-                values[i_jet+i_reg+'_muonEnergyFraction'] += [jet_muonEnergyFraction]
-                values[i_jet+i_reg+'_chargedHadronMultiplicity'] += [jet_chargedHadronMultiplicity]
-                values[i_jet+i_reg+'_neutralHadronMultiplicity'] += [jet_neutralHadronMultiplicity]
-                values[i_jet+i_reg+'_electronMultiplicity'] += [jet_electronMultiplicity]
-                values[i_jet+i_reg+'_photonMultiplicity'] += [jet_photonMultiplicity]
-                values[i_jet+i_reg+'_muonMultiplicity'] += [jet_muonMultiplicity]
+#                values[i_jet+i_reg+'_chargedHadronEnergyFraction'] += [jet_chargedHadronEnergyFraction]
+#                values[i_jet+i_reg+'_neutralHadronEnergyFraction'] += [jet_neutralHadronEnergyFraction]
+#                values[i_jet+i_reg+'_electronEnergyFraction'] += [jet_electronEnergyFraction]
+#                values[i_jet+i_reg+'_photonEnergyFraction'] += [jet_photonEnergyFraction]
+#                values[i_jet+i_reg+'_muonEnergyFraction'] += [jet_muonEnergyFraction]
+#                values[i_jet+i_reg+'_chargedHadronMultiplicity'] += [jet_chargedHadronMultiplicity]
+#                values[i_jet+i_reg+'_neutralHadronMultiplicity'] += [jet_neutralHadronMultiplicity]
+#                values[i_jet+i_reg+'_electronMultiplicity'] += [jet_electronMultiplicity]
+#                values[i_jet+i_reg+'_photonMultiplicity'] += [jet_photonMultiplicity]
+#                values[i_jet+i_reg+'_muonMultiplicity'] += [jet_muonMultiplicity]
 
                 if i_jet == GenJetsCollection: continue
 
@@ -498,16 +480,16 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                    values[i_jet+i_reg+'_MatchedToGEN_eta'] += [jet_eta]
                    values[i_jet+i_reg+'_MatchedToGEN_phi'] += [jet_phi]
                    values[i_jet+i_reg+'_MatchedToGEN_mass'] += [jet_mass]
-                   values[i_jet+i_reg+'_MatchedToGEN_chargedHadronEnergyFraction'] += [jet_chargedHadronEnergyFraction]
-                   values[i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction'] += [jet_neutralHadronEnergyFraction]
-                   values[i_jet+i_reg+'_MatchedToGEN_electronEnergyFraction'] += [jet_electronEnergyFraction]
-                   values[i_jet+i_reg+'_MatchedToGEN_photonEnergyFraction'] += [jet_photonEnergyFraction]
-                   values[i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction'] += [jet_muonEnergyFraction]
-                   values[i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity'] += [jet_chargedHadronMultiplicity]
-                   values[i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity'] += [jet_neutralHadronMultiplicity]
-                   values[i_jet+i_reg+'_MatchedToGEN_electronMultiplicity'] += [jet_electronMultiplicity]
-                   values[i_jet+i_reg+'_MatchedToGEN_photonMultiplicity'] += [jet_photonMultiplicity]
-                   values[i_jet+i_reg+'_MatchedToGEN_muonMultiplicity'] += [jet_muonMultiplicity]
+#                   values[i_jet+i_reg+'_MatchedToGEN_chargedHadronEnergyFraction'] += [jet_chargedHadronEnergyFraction]
+#                   values[i_jet+i_reg+'_MatchedToGEN_neutralHadronEnergyFraction'] += [jet_neutralHadronEnergyFraction]
+#                   values[i_jet+i_reg+'_MatchedToGEN_electronEnergyFraction'] += [jet_electronEnergyFraction]
+#                   values[i_jet+i_reg+'_MatchedToGEN_photonEnergyFraction'] += [jet_photonEnergyFraction]
+#                   values[i_jet+i_reg+'_MatchedToGEN_muonEnergyFraction'] += [jet_muonEnergyFraction]
+#                   values[i_jet+i_reg+'_MatchedToGEN_chargedHadronMultiplicity'] += [jet_chargedHadronMultiplicity]
+#                   values[i_jet+i_reg+'_MatchedToGEN_neutralHadronMultiplicity'] += [jet_neutralHadronMultiplicity]
+#                   values[i_jet+i_reg+'_MatchedToGEN_electronMultiplicity'] += [jet_electronMultiplicity]
+#                   values[i_jet+i_reg+'_MatchedToGEN_photonMultiplicity'] += [jet_photonMultiplicity]
+#                   values[i_jet+i_reg+'_MatchedToGEN_muonMultiplicity'] += [jet_muonMultiplicity]
                    values[i_jet+i_reg+'_MatchedToGEN_dRmatch'] += [recoGen_dRmatch]
 
                    if genJet_match_pt != 0:
@@ -528,10 +510,10 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                    values[i_jet+i_reg+'_NotMatchedToGEN_phi'] += [jet_phi]
                    values[i_jet+i_reg+'_NotMatchedToGEN_mass'] += [jet_mass]
 
-        njets_tags = ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']
+        njets_tags = ['_EtaIncl', '_HB', '_HE', '_HF']
         if (i_jet != GenJetsCollection):
-           njets_tags += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HGCal_MatchedToGEN', '_HF1_MatchedToGEN', '_HF2_MatchedToGEN']
-           njets_tags += ['_EtaIncl_NotMatchedToGEN', '_HB_NotMatchedToGEN', '_HGCal_NotMatchedToGEN', '_HF1_NotMatchedToGEN', '_HF2_NotMatchedToGEN']
+           njets_tags += ['_EtaIncl_MatchedToGEN', '_HB_MatchedToGEN', '_HE_MatchedToGEN', '_HF_MatchedToGEN']
+           njets_tags += ['_EtaIncl_NotMatchedToGEN', '_HB_NotMatchedToGEN', '_HE_NotMatchedToGEN', '_HF_NotMatchedToGEN']
 
         for i_jettag in njets_tags:
             values[i_jet+i_jettag+'_njets'] = len(values[i_jet+i_jettag+'_pt']) if (i_jet+i_jettag+'_pt' in values) else 0
@@ -546,7 +528,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
     for [i_onlineJetColl, i_offlineJetColl] in JetOnlineOfflinePairs:
 
         # initialize value-lists
-        for i_onlineJetReg in ['_EtaIncl', '_HB', '_HGCal', '_HF1', '_HF2']:
+        for i_onlineJetReg in ['_EtaIncl', '_HB', '_HE', '_HF']:
             for _tmp in [
               i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt',
               i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_eta',
@@ -579,9 +561,8 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
 
             onlineJet_labels = ['_EtaIncl']
             if abs(onlineJet_eta) < 1.5: onlineJet_labels += ['_HB']
-            elif abs(onlineJet_eta) < 3.0: onlineJet_labels += ['_HGCal']
-            elif abs(onlineJet_eta) < 4.0: onlineJet_labels += ['_HF1']
-            else: onlineJet_labels += ['_HF2']
+            elif abs(onlineJet_eta) < 3.0: onlineJet_labels += ['_HE']
+            else: onlineJet_labels += ['_HF']
 
             for i_onlineJetReg in onlineJet_labels:
 
@@ -617,7 +598,7 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
                       values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_pt'] += [(onlineJet_pt - offlineJet_pt, offlineJet_pt)]
                       values[i_onlineJetColl+i_onlineJetReg+'_MatchedToOffline_pt_minusOffline:'+i_offlineJetColl+'_EtaIncl_eta'] += [(onlineJet_pt - offlineJet_pt, offlineJet_eta)]
 
-        njets_tags = ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HGCal_MatchedToOffline', '_HF1_MatchedToOffline', '_HF2_MatchedToOffline']
+        njets_tags = ['_EtaIncl_MatchedToOffline', '_HB_MatchedToOffline', '_HE_MatchedToOffline', '_HF_MatchedToOffline']
 
         for i_jettag in njets_tags:
             values[i_onlineJetColl+i_jettag+'_njets'] = len(values[i_onlineJetColl+i_jettag+'_pt']) if (i_onlineJetColl+i_jettag+'_pt' in values) else 0
@@ -633,33 +614,33 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
         for i_var in ['pt', 'phi', 'sumEt']:
             values[i_met+'_'+i_var] = arrays[i_met+'_'+i_var][index][0]
 
-    genMetTrue_vec2d = ROOT.TVector2()
-    genMetTrue_vec2d.SetMagPhi(values['genMetTrue_pt'], values['genMetTrue_phi'])
+    genMETTrue_vec2d = ROOT.TVector2()
+    genMETTrue_vec2d.SetMagPhi(values['genMETTrue_pt'], values['genMETTrue_phi'])
 
     for i_met in METCollections:
 
-        if i_met == 'genMetTrue': continue
+        if i_met == 'genMETTrue': continue
 
         values[i_met+'_pt'], values[i_met+'_phi']
 
         iMET_vec2d = ROOT.TVector2()
         iMET_vec2d.SetMagPhi(values[i_met+'_pt'], values[i_met+'_phi'])
 
-        values[i_met+'_pt_paraToGEN'] = iMET_vec2d.Mod() * math.cos(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
-        values[i_met+'_pt_perpToGEN'] = iMET_vec2d.Mod() * math.sin(iMET_vec2d.DeltaPhi(genMetTrue_vec2d))
+        values[i_met+'_pt_paraToGEN'] = iMET_vec2d.Mod() * math.cos(iMET_vec2d.DeltaPhi(genMETTrue_vec2d))
+        values[i_met+'_pt_perpToGEN'] = iMET_vec2d.Mod() * math.sin(iMET_vec2d.DeltaPhi(genMETTrue_vec2d))
 
-        values[i_met+'_pt_paraToGENMinusGEN'] = values[i_met+'_pt_paraToGEN'] - values['genMetTrue_pt']
+        values[i_met+'_pt_paraToGENMinusGEN'] = values[i_met+'_pt_paraToGEN'] - values['genMETTrue_pt']
 
         for i_var in ['pt', 'phi', 'sumEt']:
 
-            values[i_met+'_'+i_var+'_minusGEN'] = values[i_met+'_'+i_var] - values['genMetTrue_'+i_var]
+            values[i_met+'_'+i_var+'_minusGEN'] = values[i_met+'_'+i_var] - values['genMETTrue_'+i_var]
             if i_var == 'phi':
                values[i_met+'_'+i_var+'_minusGEN'] = abs(values[i_met+'_'+i_var+'_minusGEN'])
                if values[i_met+'_'+i_var+'_minusGEN'] > math.pi:
                   values[i_met+'_'+i_var+'_minusGEN'] = 2*math.pi - values[i_met+'_'+i_var+'_minusGEN']
 
-            if values['genMetTrue_'+i_var] != 0:
-               values[i_met+'_'+i_var+'_overGEN'] = values[i_met+'_'+i_var] / values['genMetTrue_'+i_var]
+            if values['genMETTrue_'+i_var] != 0:
+               values[i_met+'_'+i_var+'_overGEN'] = values[i_met+'_'+i_var] / values['genMETTrue_'+i_var]
 
     for [i_met_onl, i_met_off] in METOnlineOfflinePairs:
 
@@ -699,14 +680,11 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
         elif i_sel == 'hltAK4PFCHS100_HB/':
            if not (max([0] + values['hltAK4PFCHSJetsCorrected_HB_pt']) > 100.): continue
 
-        elif i_sel == 'hltAK4PFCHS100_HGCal/':
-           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HGCal_pt']) > 100.): continue
+        elif i_sel == 'hltAK4PFCHS100_HE/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HE_pt']) > 100.): continue
 
-        elif i_sel == 'hltAK4PFCHS100_HF1/':
-           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HF1_pt']) > 100.): continue
-
-        elif i_sel == 'hltAK4PFCHS100_HF2/':
-           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HF2_pt']) > 100.): continue
+        elif i_sel == 'hltAK4PFCHS100_HF/':
+           if not (max([0] + values['hltAK4PFCHSJetsCorrected_HF_pt']) > 100.): continue
 
         elif i_sel == 'hltAK4Puppi100_EtaIncl/':
            if not (max([0] + values['hltAK4PuppiJetsCorrected_EtaIncl_pt']) > 100.): continue
@@ -714,14 +692,11 @@ def analyze_event(arrays, index, th1s={}, th2s={}, verbose=False):
         elif i_sel == 'hltAK4Puppi100_HB/':
            if not (max([0] + values['hltAK4PuppiJetsCorrected_HB_pt']) > 100.): continue
 
-        elif i_sel == 'hltAK4Puppi100_HGCal/':
-           if not (max([0] + values['hltAK4PuppiJetsCorrected_HGCal_pt']) > 100.): continue
+        elif i_sel == 'hltAK4Puppi100_HE/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_HE_pt']) > 100.): continue
 
-        elif i_sel == 'hltAK4Puppi100_HF1/':
-           if not (max([0] + values['hltAK4PuppiJetsCorrected_HF1_pt']) > 100.): continue
-
-        elif i_sel == 'hltAK4Puppi100_HF2/':
-           if not (max([0] + values['hltAK4PuppiJetsCorrected_HF2_pt']) > 100.): continue
+        elif i_sel == 'hltAK4Puppi100_HF/':
+           if not (max([0] + values['hltAK4PuppiJetsCorrected_HF_pt']) > 100.): continue
 
         elif i_sel == 'hltPFMET200/':
            if not (values['hltPFMET_pt'] > 200.): continue
