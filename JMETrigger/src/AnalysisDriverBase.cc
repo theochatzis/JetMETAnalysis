@@ -77,21 +77,19 @@ void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEn
     throw std::runtime_error("AnalysisDriverBase::process -- invalid TTreeReader");
   }
   else {
-    while(theReader_->Next()){
-      if(theReader_->GetCurrentEntry() < firstEntry){
-        continue;
-      }
+    if(maxEntries != 0){
 
-      if(maxEntries == 0){
-        break;
-      }
-      else if(maxEntries > 0){
-        if(theReader_->GetCurrentEntry() >= (firstEntry+maxEntries)){
+      while(theReader_->Next()){
+        if(theReader_->GetCurrentEntry() < firstEntry){
           continue;
         }
-      }
 
-      this->analyze();
+        if((maxEntries > 0) and (theReader_->GetCurrentEntry() >= (firstEntry+maxEntries))){
+          break;
+        }
+
+        this->analyze();
+      }
     }
 
     if(outputFilePath_ != ""){
