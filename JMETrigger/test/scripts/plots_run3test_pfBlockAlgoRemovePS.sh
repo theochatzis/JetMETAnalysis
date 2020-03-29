@@ -19,7 +19,7 @@ if [ ! -f ${outdir%%/*}.tar.gz ]; then
 
     outd_i=${outdir}/${sample}
 
-    jmePlots_run3.py -o ${outd_i} -l ${sample} -e pdf png root -i \
+    jmePlots_compareFiles.py -o ${outd_i} -l ${sample} -e pdf png root -i \
      ${inpdir}/HLT/${sample}.root:'Run-2':1 \
      ${inpdir}/HLT_pfBlockAlgoRemovePS/${sample}.root:'PFBlock w/o PS':2
 
