@@ -54,7 +54,7 @@ if __name__ == '__main__':
    parser.add_argument('-m', '--maxEvents', dest='maxEvents', action='store', type=int, default=-1,
                        help='maximum number of events to be processed')
 
-   parser.add_argument('-v', '--verbosity', dest='verbosity', action='store', type=int, default=0,
+   parser.add_argument('-v', '--verbosity', dest='verbosity', action='store', type=int, default=-1,
                        help='level of verbosity of output')
 
    opts, opts_unknown = parser.parse_known_args()

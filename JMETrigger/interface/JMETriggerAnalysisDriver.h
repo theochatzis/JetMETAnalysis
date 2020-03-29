@@ -41,7 +41,21 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
     std::vector<Match> matches;
   };
 
+  class fillHistoDataMET {
+   public:
+    std::string metCollection = "";
+
+    struct Match {
+      Match(const std::string& theLabel, const std::string& theMETCollection)
+      : label(theLabel), metCollection(theMETCollection) {}
+      std::string label;
+      std::string metCollection;
+    };
+    std::vector<Match> matches;
+  };
+
   void fillHistograms_Jets(const std::string& dir, const fillHistoDataJets& fhDataJets);
+  void fillHistograms_MET(const std::string& dir, const fillHistoDataMET& fhDataMET);
 
   void bookHistograms_Jets(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
   void bookHistograms_MET(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
@@ -56,7 +70,8 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
   void addTH2D(const std::string&, const std::vector<float>&, const std::vector<float>&);
 
   std::vector<std::string> stringTokens(const std::string&, const std::string&) const;
-  float deltaR2(const float eta1, const float phi1, const float eta2, const float phi2);
+  float deltaPhi2(const float phi1, const float phi2) const;
+  float deltaR2(const float eta1, const float phi1, const float eta2, const float phi2) const;
 
   Long64_t eventsProcessed_ = 0;
 
