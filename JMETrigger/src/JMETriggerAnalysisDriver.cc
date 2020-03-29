@@ -2,6 +2,19 @@
 #include <NTupleAnalysis/JMETrigger/interface/Utils.h>
 #include <math.h>
 
+const std::vector<std::string> JMETriggerAnalysisDriver::jetRegionLabels_ = {"_EtaIncl", "_HB", "_HE", "_HF"};
+
+bool JMETriggerAnalysisDriver::jetBelongsToRegion(const std::string& regionLabel, const float jetAbsEta) const {
+
+  bool ret(false);
+  if(regionLabel == "_EtaIncl"){ ret = (jetAbsEta < 5.0); }
+  else if(regionLabel == "_HB"){ ret = (jetAbsEta < 1.5); }
+  else if(regionLabel == "_HE"){ ret = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
+  else if(regionLabel == "_HF"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
+
+  return ret;
+}
+
 void JMETriggerAnalysisDriver::init(){
   // histogram: events counter
   addTH1D("eventsProcessed", {0, 1});
@@ -257,8 +270,6 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-  const std::vector<std::string> regLabels({"_EtaIncl", "_HB", "_HE", "_HF"});
-
   std::vector<float> binEdges_njets(121);
   for(uint idx=0; idx<121; ++idx){ binEdges_njets.at(idx) = idx; }
 
@@ -294,7 +305,7 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   std::vector<float> binEdges_response(51);
   for(uint idx=0; idx<51; ++idx){ binEdges_response.at(idx) = 0.1*idx; }
 
-  for(auto const& regLabel : regLabels){
+  for(auto const& regLabel : jetRegionLabels_){
 
     addTH1D(dirPrefix+jetType+regLabel+"_njets", binEdges_njets);
     addTH1D(dirPrefix+jetType+regLabel+"_pt", binEdges_pt);
@@ -470,9 +481,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
     return;
   }
 
-  const std::vector<std::string> regLabels({"_EtaIncl", "_HB", "_HE", "_HF"});
-
-  for(auto const& regLabel : regLabels){
+  for(auto const& regLabel : jetRegionLabels_){
 
     std::vector<size_t> jetIndices;
     jetIndices.reserve(v_pt->size());
@@ -481,14 +490,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
     for(size_t idx=0; idx<v_pt->size(); ++idx){
       if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
 
-      bool passesJetEtaCut(false);
-      auto const jetAbsEta(std::abs(v_eta->at(idx)));
-      if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
-      else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
-      else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
-      else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
-
-      if(passesJetEtaCut){
+      if(jetBelongsToRegion(regLabel, std::abs(v_eta->at(idx)))){
         jetIndices.emplace_back(idx);
         if((jetIndices.size() == 1) or (v_pt->at(idx) > jetPtMax)){
           jetPtMax = v_pt->at(idx);
@@ -556,21 +558,14 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
       }
     }
 
-    for(auto const& regLabel : regLabels){
+    for(auto const& regLabel : jetRegionLabels_){
 
       std::vector<size_t> jetIndices;
       jetIndices.reserve(v_pt->size());
       for(size_t idx=0; idx<v_pt->size(); ++idx){
         if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
 
-        bool passesJetEtaCut(false);
-        auto const jetAbsEta(std::abs(v_eta->at(idx)));
-        if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
-        else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
-        else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
-        else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
-
-        if(passesJetEtaCut){
+        if(jetBelongsToRegion(regLabel, std::abs(v_eta->at(idx)))){
           jetIndices.emplace_back(idx);
         }
       }
