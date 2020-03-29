@@ -210,7 +210,7 @@ void JMETriggerAnalysisDriver::analyze(){
   // Calo
   fillHistoDataMET fhDataMETCalo;
   fhDataMETCalo.metCollection = "hltCaloMET";
-  fhDataMETCalo.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
+  fhDataMETCalo.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETCalo"));
   fillHistograms_MET("NoSelection", fhDataMETCalo);
 
   // PF
