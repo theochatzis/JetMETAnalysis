@@ -116,7 +116,9 @@ void AnalysisDriverBase::addOption(const std::string& key, const std::string& op
     throw std::runtime_error(oss.str());
   }
   else {
-    std::cout << ">> added option (key = \"" << key << "\", value = \"" << opt << "\")" << std::endl;
+    if(verbosity_ >= 0){
+      std::cout << ">> added option (key = \"" << key << "\", value = \"" << opt << "\")" << std::endl;
+    }
     map_options_.insert(std::make_pair(key, opt));
   }
 }
