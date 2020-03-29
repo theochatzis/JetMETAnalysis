@@ -78,13 +78,17 @@ void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEn
   }
   else {
     while(theReader_->Next()){
-      if(theReader_->GetCurrentEntry() < firstEntry){ continue; }
+      if(theReader_->GetCurrentEntry() < firstEntry){
+        continue;
+      }
 
       if(maxEntries == 0){
         break;
       }
       else if(maxEntries > 0){
-        if(theReader_->GetCurrentEntry() >= (firstEntry+maxEntries)){ continue; }
+        if(theReader_->GetCurrentEntry() >= (firstEntry+maxEntries)){
+          continue;
+        }
       }
 
       this->analyze();
