@@ -1,26 +1,26 @@
-# Tools for Jet/MET Analysis
+### Tools for Jet/MET Analysis
 
 Workflow to produce Jet/MET performance plots from "flat" ROOT NTuples
 
-## Setup
+#### Setup
 
 * Update global environment variables:
 ```
 source env.sh
 ```
 
-## Prepare Analysis NTuples from crab3 outputs
+#### Prepare Analysis NTuples from batch/crab3 outputs
 
 * Create output directory with one .root for each crab3 task:
 ```
-hadd_ntuples.py -i /pnfs/desy.de/cms/tier2/store/user/missirol/jme_trigger/jmeTriggerNtuples/Phase2/trackingV2/191119/* -o ${NTUDIR} # -l 0 -p _temp
+hadd_ntuples.py -i [DIRS] -o [OUTDIR] # -l 0 -p _temp
 ```
 
-## Batch Jobs
+#### Submit Analysis Jobs to Batch System (HT-Condor)
 
 * Create scripts for submission of batch jobs:
 ```
-batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/analysis -n 5000 # -l 0 -s jmeAnalysis.py
+batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/outputs -n 5000 # -l 0 -s jmeAnalysis.py
 ```
 
 * Monitoring and (re)submission of batch jobs:
@@ -28,21 +28,14 @@ batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/analysis -n 5000 # -l 0 -s jmeAn
 batch_monitor.py -i ${OUTDIR}
 ```
 
-## Harvesting of Outputs
+#### Harvesting of Outputs
 
 * Merge outputs of batch jobs:
 ```
-merge_batchOutputs.py -i ${OUTDIR}/analysis/*.root -o ${OUTDIR}/outputs # -l 0
+merge_batchOutputs.py -i ${OUTDIR}/analysis/*.root -o ${OUTDIR}/mergedOutputs # -l 0
 ```
 
-* Harvest outputs of `jmeAnalysis.py` script (produces profiles, efficiencies, etc):
+* Harvest outputs (manipulates histograms, produces profiles, efficiencies, etc):
 ```
-jmeAnalysisHarvester.py -i ${OUTDIR}/outputs/*.root -o ${OUTDIR}/outputs_postHarvesting # -l 0
-```
-
-## Plots
-
-* Produce plots from harvesting outputs:
-```
-jmePlots.py -h
+jmeAnalysisHarvester.py -i ${OUTDIR}/outputs/*.root -o ${OUTDIR}/harvesting # -l 0
 ```
