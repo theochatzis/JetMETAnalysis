@@ -7,9 +7,6 @@
 #include <memory>
 #include <map>
 
-#include <TH1D.h>
-#include <TH2D.h>
-
 class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 
  public:
@@ -19,9 +16,6 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 
   void init() override;
   void analyze() override;
-  void write(TFile&) override;
-
-  Long64_t eventsProcessed() const { return eventsProcessed_; }
 
  protected:
 
@@ -59,28 +53,6 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 
   void bookHistograms_Jets(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
   void bookHistograms_MET(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
-
-  bool hasTH1D(const std::string& key) const { return (mapTH1D_.find(key) != mapTH1D_.end()); }
-  bool hasTH2D(const std::string& key) const { return (mapTH2D_.find(key) != mapTH2D_.end()); }
-
-  TH1D* H1(const std::string&);
-  TH2D* H2(const std::string&);
-
-  void addTH1D(const std::string&, const std::vector<float>&);
-  void addTH2D(const std::string&, const std::vector<float>&, const std::vector<float>&);
-
-  std::vector<std::string> stringTokens(const std::string&, const std::string&) const;
-  float deltaPhi2(const float phi1, const float phi2) const;
-  float deltaR2(const float eta1, const float phi1, const float eta2, const float phi2) const;
-
-  Long64_t eventsProcessed_ = 0;
-
-  int verbosity_ = 0;
-
-  std::map<std::string, std::unique_ptr<TH1D>> mapTH1D_;
-  std::map<std::string, std::unique_ptr<TH2D>> mapTH2D_;
-
-  std::vector<std::string> outputKeys_;
 };
 
 #endif

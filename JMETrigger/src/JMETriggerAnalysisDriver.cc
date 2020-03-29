@@ -1,4 +1,6 @@
-#include "Analysis/JMETrigger/interface/JMETriggerAnalysisDriver.h"
+#include <Analysis/JMETrigger/interface/JMETriggerAnalysisDriver.h>
+#include <Analysis/JMETrigger/interface/Utils.h>
+#include <math.h>
 
 void JMETriggerAnalysisDriver::init(){
   // histogram: events counter
@@ -50,7 +52,6 @@ void JMETriggerAnalysisDriver::analyze(){
     verbosity_ = std::stoi(getOption("verbosity"));
   }
 
-  ++eventsProcessed_;
   H1("eventsProcessed")->Fill(0.5, 1.);
 
   //// AK4 Jets
@@ -250,347 +251,6 @@ void JMETriggerAnalysisDriver::analyze(){
   fillHistograms_MET("NoSelection", fhDataMETPFSoftKiller);
 }
 
-void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const fillHistoDataJets& fhData){
-
-  auto dirPrefix(dir);
-  while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
-  if(not dirPrefix.empty()){ dirPrefix += "/"; }
-
-  auto const* v_pt(this->vector_ptr<float>(fhData.jetCollection+"_pt"));
-  auto const* v_eta(this->vector_ptr<float>(fhData.jetCollection+"_eta"));
-  auto const* v_phi(this->vector_ptr<float>(fhData.jetCollection+"_phi"));
-  auto const* v_mass(this->vector_ptr<float>(fhData.jetCollection+"_mass"));
-
-  auto const* v_numberOfDaughters(this->vector_ptr<uint>(fhData.jetCollection+"_numberOfDaughters"));
-
-  if(not (v_pt and v_eta and v_phi and v_mass)){
-    if(verbosity_ >= 0){
-      std::cout << "JMETriggerAnalysisDriver::fillHistograms_Jets(\"" << dir << "\", const fillHistoDataJets&) -- "
-                << "branches not available (histograms will not be filled): "
-                << fhData.jetCollection+"_pt/eta/phi/mass" << std::endl;
-    }
-    return;
-  }
-
-  const std::vector<std::string> regLabels({"_EtaIncl", "_HB", "_HE", "_HF"});
-
-  for(auto const& regLabel : regLabels){
-
-    std::vector<size_t> jetIndices;
-    jetIndices.reserve(v_pt->size());
-    int indexMaxPtJet(-1);
-    float jetPtMax(-1.);
-    for(size_t idx=0; idx<v_pt->size(); ++idx){
-      if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
-
-      bool passesJetEtaCut(false);
-      auto const jetAbsEta(std::abs(v_eta->at(idx)));
-      if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
-      else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
-      else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
-      else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
-
-      if(passesJetEtaCut){
-        jetIndices.emplace_back(idx);
-        if((jetIndices.size() == 1) or (v_pt->at(idx) > jetPtMax)){
-          jetPtMax = v_pt->at(idx);
-          indexMaxPtJet = idx;
-        }
-      }
-    }
-
-    for(auto const jetIdx : jetIndices){
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt")->Fill(v_pt->at(jetIdx));
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_eta")->Fill(v_eta->at(jetIdx));
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_phi")->Fill(v_phi->at(jetIdx));
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_mass")->Fill(v_mass->at(jetIdx));
-
-      if(v_numberOfDaughters){
-        H1(dirPrefix+fhData.jetCollection+regLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
-      }
-
-      H2(dirPrefix+fhData.jetCollection+regLabel+"_eta__vs__pt")->Fill(v_eta->at(jetIdx), v_pt->at(jetIdx));
-    }
-
-    H1(dirPrefix+fhData.jetCollection+regLabel+"_njets")->Fill(jetIndices.size());
-
-    if(indexMaxPtJet >= 0){
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt0")->Fill(v_pt->at(indexMaxPtJet));
-    }
-  }
-
-  for(auto const& fhDataMatch : fhData.matches){
-
-    auto const matchLabel(fhDataMatch.label);
-    auto const matchJetColl(fhDataMatch.jetCollection);
-    auto const matchJetPtMin(fhDataMatch.jetPtMin);
-    auto const matchJetDeltaRMin(fhDataMatch.jetDeltaRMin);
-
-    auto const* v_match_pt(this->vector_ptr<float>(matchJetColl+"_pt"));
-    auto const* v_match_eta(this->vector_ptr<float>(matchJetColl+"_eta"));
-    auto const* v_match_phi(this->vector_ptr<float>(matchJetColl+"_phi"));
-    auto const* v_match_mass(this->vector_ptr<float>(matchJetColl+"_mass"));
-
-    if(not (v_match_pt and v_match_eta and v_match_phi and v_match_mass)){
-      if(verbosity_ >= 0){
-        std::cout << "JMETriggerAnalysisDriver::fillHistograms_Jets(\"" << dir << "\", const fillHistoDataJets&) -- "
-                  << "branches not available (histograms will not be filled): "
-                  << matchJetColl+"_pt/eta/phi/mass" << std::endl;
-      }
-      continue;
-    }
-
-    std::map<size_t, size_t> mapMatchIndeces;
-    float dR2min(matchJetDeltaRMin * matchJetDeltaRMin);
-    for(size_t idx=0; idx<v_pt->size(); ++idx){
-      if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
-
-      int indexBestMatch(-1);
-      for(size_t idxMatch=0; idxMatch<v_match_pt->size(); ++idxMatch){
-        if(v_match_pt->at(idxMatch) <= matchJetPtMin){ continue; }
-
-        auto const dR2(deltaR2(v_eta->at(idx), v_phi->at(idx), v_match_eta->at(idxMatch), v_match_phi->at(idxMatch)));
-        if(dR2 < dR2min){ dR2min = dR2; indexBestMatch = idxMatch; }
-      }
-
-      if(indexBestMatch > 0){
-        mapMatchIndeces.insert(std::make_pair(idx, indexBestMatch));
-      }
-    }
-
-    for(auto const& regLabel : regLabels){
-
-      std::vector<size_t> jetIndices;
-      jetIndices.reserve(v_pt->size());
-      for(size_t idx=0; idx<v_pt->size(); ++idx){
-        if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
-
-        bool passesJetEtaCut(false);
-        auto const jetAbsEta(std::abs(v_eta->at(idx)));
-        if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
-        else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
-        else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
-        else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
-
-        if(passesJetEtaCut){
-          jetIndices.emplace_back(idx);
-        }
-      }
-
-      size_t nJetsMatched(0), nJetsNotMatched(0);
-      int indexMaxPtJetWithMatch(-1), indexMaxPtJetWithNoMatch(-1);
-      float maxPtJetPtWithMatch(-1.), maxPtJetPtWithNoMatch(-1.);
-
-      for(auto const jetIdx : jetIndices){
-
-        auto const jetPt(v_pt->at(jetIdx));
-        auto const jetEta(v_eta->at(jetIdx));
-        auto const jetPhi(v_phi->at(jetIdx));
-        auto const jetMass(v_mass->at(jetIdx));
-
-        auto const hasMatch(mapMatchIndeces.find(jetIdx) != mapMatchIndeces.end());
-
-        if(hasMatch){
-
-          ++nJetsMatched;
-
-          if((nJetsMatched == 1) or (jetPt > maxPtJetPtWithMatch)){
-	    maxPtJetPtWithMatch = jetPt;
-            indexMaxPtJetWithMatch = jetIdx;
-          }
-
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt")->Fill(jetPt);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta")->Fill(jetEta);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass")->Fill(jetMass);
-
-          if(v_numberOfDaughters){
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
-          }
-
-          auto const jetMatchIdx(mapMatchIndeces.at(jetIdx));
-          auto const jetMatchPt(v_match_pt->at(jetMatchIdx));
-          auto const jetMatchEta(v_match_eta->at(jetMatchIdx));
-          auto const jetMatchPhi(v_match_phi->at(jetMatchIdx));
-          auto const jetMatchMass(v_match_mass->at(jetMatchIdx));
-
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta")->Fill(jetEta, jetMatchEta);
-
-          auto const dR2match(deltaR2(jetEta, jetPhi, jetMatchEta, jetMatchPhi));
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_dRmatch")->Fill(sqrt(dR2match));
-
-          if(jetMatchPt != 0.){
-            auto const jetPtRatio(jetPt / jetMatchPt);
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel)->Fill(jetPtRatio);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetPtRatio, jetMatchPt);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetPtRatio, jetMatchEta);
-          }
-
-          if(jetMatchMass != 0.){
-            auto const jetMassRatio(jetMass / jetMatchMass);
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel)->Fill(jetMassRatio);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetMassRatio, jetMatchMass);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetMassRatio, jetMatchEta);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass")->Fill(jetMassRatio, jetMatchMass);
-          }
-        }
-        else {
-          ++nJetsNotMatched;
-
-          if((nJetsNotMatched == 1) or (jetPt > maxPtJetPtWithNoMatch)){
-	    maxPtJetPtWithNoMatch = jetPt;
-            indexMaxPtJetWithNoMatch = jetIdx;
-          }
-
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt")->Fill(jetPt);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_eta")->Fill(jetEta);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_mass")->Fill(jetMass);
-
-          if(v_numberOfDaughters){
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
-          }
-        }
-      }
-
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_njets")->Fill(nJetsMatched);
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_njets")->Fill(nJetsNotMatched);
-
-      if(indexMaxPtJetWithMatch >= 0){
-        auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithMatch));
-        auto const maxPtJetMatchPt(v_match_pt->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
-        H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
-        H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(maxPtJetPt, maxPtJetMatchPt);
-        if(maxPtJetMatchPt != 0.){
-          auto const maxPtJetPtRatio(maxPtJetPt / maxPtJetMatchPt);
-          auto const maxPtJetMatchEta(v_match_eta->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel)->Fill(maxPtJetPtRatio);
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(maxPtJetPtRatio, maxPtJetMatchPt);
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(maxPtJetPtRatio, maxPtJetMatchEta);
-        }
-      }
-
-      if(indexMaxPtJetWithNoMatch >= 0){
-        auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithNoMatch));
-        H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
-      }
-    }
-  }
-}
-
-void JMETriggerAnalysisDriver::fillHistograms_MET(const std::string& dir, const fillHistoDataMET& fhData){
-
-  auto dirPrefix(dir);
-  while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
-  if(not dirPrefix.empty()){ dirPrefix += "/"; }
-
-  auto const* v_pt(this->vector_ptr<float>(fhData.metCollection+"_pt"));
-  auto const* v_phi(this->vector_ptr<float>(fhData.metCollection+"_phi"));
-  auto const* v_sumEt(this->vector_ptr<float>(fhData.metCollection+"_sumEt"));
-
-  if(not (v_pt and v_phi and v_sumEt)){
-    if(verbosity_ >= 0){
-      std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
-                << "branches not available (histograms will not be filled): "
-                << fhData.metCollection+"_pt/phi/sumEt" << std::endl;
-    }
-    return;
-  }
-
-  if(not ((v_pt->size() == 1) and (v_phi->size() == 1) and (v_sumEt->size() == 1))){
-    if(verbosity_ >= 0){
-      std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
-                << "MET branches have invalid size (histograms will not be filled): "
-                << fhData.metCollection+"_pt/phi/sumEt" << std::endl;
-    }
-    return;
-  }
-
-  auto const metPt(v_pt->at(0));
-  auto const metPhi(v_phi->at(0));
-  auto const metSumEt(v_sumEt->at(0));
-
-  H1(dirPrefix+fhData.metCollection+"_pt")->Fill(metPt);
-  H1(dirPrefix+fhData.metCollection+"_phi")->Fill(metPhi);
-  H1(dirPrefix+fhData.metCollection+"_sumEt")->Fill(metSumEt);
-
-  for(auto const& fhDataMatch : fhData.matches){
-
-    auto const matchLabel(fhDataMatch.label);
-    auto const matchMetColl(fhDataMatch.metCollection);
-
-    auto const* v_match_pt(this->vector_ptr<float>(matchMetColl+"_pt"));
-    auto const* v_match_phi(this->vector_ptr<float>(matchMetColl+"_phi"));
-    auto const* v_match_sumEt(this->vector_ptr<float>(matchMetColl+"_sumEt"));
-
-    if(not (v_match_pt and v_match_phi and v_match_sumEt)){
-      if(verbosity_ >= 0){
-        std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
-                  << "branches not available (histograms will not be filled): "
-                  << matchMetColl+"_pt/phi/sumEt" << std::endl;
-      }
-      continue;
-    }
-
-    if(not ((v_match_pt->size() == 1) and (v_match_phi->size() == 1) and (v_match_sumEt->size() == 1))){
-      if(verbosity_ >= 0){
-        std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
-                  << "MET branches have invalid size (histograms will not be filled): "
-                  << matchMetColl+"_pt/phi/sumEt" << std::endl;
-      }
-      continue;
-    }
-
-    auto const metMatchPt(v_match_pt->at(0));
-    auto const metMatchPhi(v_match_phi->at(0));
-    auto const metMatchSumEt(v_match_sumEt->at(0));
-
-    if(metMatchPt != 0.){
-      auto const metPtRatio(metPt / metMatchPt);
-      H2(dirPrefix+fhData.metCollection+"_pt__vs__"+matchLabel+"_pt")->Fill(metPt, metMatchPt);
-      H1(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel)->Fill(metPtRatio);
-      H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metPtRatio, metMatchPt);
-      H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metPtRatio, metMatchPhi);
-      H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metPtRatio, metMatchSumEt);
-    }
-
-    if(metMatchSumEt != 0.){
-      auto const metSumEtRatio(metSumEt / metMatchSumEt);
-      H2(dirPrefix+fhData.metCollection+"_sumEt__vs__"+matchLabel+"_sumEt")->Fill(metSumEt, metMatchSumEt);
-      H1(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel)->Fill(metSumEtRatio);
-      H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metSumEtRatio, metMatchPt);
-      H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metSumEtRatio, metMatchPhi);
-      H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metSumEtRatio, metMatchSumEt);
-    }
-
-    auto const metDeltaPhiMatch(sqrt(deltaPhi2(metPhi, metMatchPhi)));
-    H2(dirPrefix+fhData.metCollection+"_phi__vs__"+matchLabel+"_phi")->Fill(metPhi, metMatchPhi);
-    H1(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel)->Fill(metDeltaPhiMatch);
-    H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metDeltaPhiMatch, metMatchPt);
-    H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metDeltaPhiMatch, metMatchPhi);
-    H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metDeltaPhiMatch, metMatchSumEt);
-
-    auto const metParaToMatch(metPt*(std::cos(metPhi)*std::cos(metMatchPhi) + std::sin(metPhi)*std::sin(metMatchPhi)));
-    H1(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel)->Fill(metParaToMatch);
-    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metParaToMatch, metMatchPt);
-    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metParaToMatch, metMatchPhi);
-    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metParaToMatch, metMatchSumEt);
-
-    auto const metParaToMatchMinusMatch(metParaToMatch - metMatchPt);
-    H1(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel)->Fill(metParaToMatchMinusMatch);
-    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metParaToMatchMinusMatch, metMatchPt);
-    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metParaToMatchMinusMatch, metMatchPhi);
-    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metParaToMatchMinusMatch, metMatchSumEt);
-
-    auto const metPerpToMatch(metPt*(std::cos(metPhi)*std::sin(metMatchPhi) - std::sin(metPhi)*std::cos(metMatchPhi)));
-    H1(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel)->Fill(metPerpToMatch);
-    H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metPerpToMatch, metMatchPt);
-    H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metPerpToMatch, metMatchPhi);
-    H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metPerpToMatch, metMatchSumEt);
-  }
-}
-
 void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels){
 
   auto dirPrefix(dir);
@@ -788,154 +448,343 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
   }
 }
 
-void JMETriggerAnalysisDriver::write(TFile& outFile){
+void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const fillHistoDataJets& fhData){
 
-  for(auto const& key : outputKeys_){
+  auto dirPrefix(dir);
+  while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
+  if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-    auto keyTokens(stringTokens(key, "/"));
-    if(keyTokens.empty()){ continue; }
+  auto const* v_pt(this->vector_ptr<float>(fhData.jetCollection+"_pt"));
+  auto const* v_eta(this->vector_ptr<float>(fhData.jetCollection+"_eta"));
+  auto const* v_phi(this->vector_ptr<float>(fhData.jetCollection+"_phi"));
+  auto const* v_mass(this->vector_ptr<float>(fhData.jetCollection+"_mass"));
 
-    TDirectory* targetDir(&outFile);
-    while(keyTokens.size() != 1){
-      TDirectory* key = dynamic_cast<TDirectory*>(targetDir->Get(keyTokens.begin()->c_str()));
-      targetDir = key ? key : targetDir->mkdir(keyTokens.begin()->c_str());
-      keyTokens.erase(keyTokens.begin());
+  auto const* v_numberOfDaughters(this->vector_ptr<uint>(fhData.jetCollection+"_numberOfDaughters"));
+
+  if(not (v_pt and v_eta and v_phi and v_mass)){
+    if(verbosity_ >= 0){
+      std::cout << "JMETriggerAnalysisDriver::fillHistograms_Jets(\"" << dir << "\", const fillHistoDataJets&) -- "
+                << "branches not available (histograms will not be filled): "
+                << fhData.jetCollection+"_pt/eta/phi/mass" << std::endl;
+    }
+    return;
+  }
+
+  const std::vector<std::string> regLabels({"_EtaIncl", "_HB", "_HE", "_HF"});
+
+  for(auto const& regLabel : regLabels){
+
+    std::vector<size_t> jetIndices;
+    jetIndices.reserve(v_pt->size());
+    int indexMaxPtJet(-1);
+    float jetPtMax(-1.);
+    for(size_t idx=0; idx<v_pt->size(); ++idx){
+      if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
+
+      bool passesJetEtaCut(false);
+      auto const jetAbsEta(std::abs(v_eta->at(idx)));
+      if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
+      else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
+      else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
+      else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
+
+      if(passesJetEtaCut){
+        jetIndices.emplace_back(idx);
+        if((jetIndices.size() == 1) or (v_pt->at(idx) > jetPtMax)){
+          jetPtMax = v_pt->at(idx);
+          indexMaxPtJet = idx;
+        }
+      }
     }
 
-    targetDir->cd();
+    for(auto const jetIdx : jetIndices){
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt")->Fill(v_pt->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_eta")->Fill(v_eta->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_phi")->Fill(v_phi->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_mass")->Fill(v_mass->at(jetIdx));
 
-    if(hasTH1D(key)){
-      mapTH1D_.at(key)->SetName(keyTokens.begin()->c_str());
-      mapTH1D_.at(key)->SetTitle(keyTokens.begin()->c_str());
-      mapTH1D_.at(key)->Write();
-    }
-    else if(hasTH2D(key)){
-      mapTH2D_.at(key)->SetName(keyTokens.begin()->c_str());
-      mapTH2D_.at(key)->SetTitle(keyTokens.begin()->c_str());
-      mapTH2D_.at(key)->Write();
-    }
-  }
-}
+      if(v_numberOfDaughters){
+        H1(dirPrefix+fhData.jetCollection+regLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
+      }
 
-void JMETriggerAnalysisDriver::addTH1D(const std::string& name, const std::vector<float>& binEdges){
-
-  if(hasTH1D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
-        << "TH1D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
-  }
-  else if(hasTH2D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
-        << "TH2D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
-  }
-  else if(binEdges.size() < 2){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
-        << "std::vector of bin-edges has invalid size (" << binEdges.size() << " < 2)";
-    throw std::runtime_error(oss.str());
-  }
-
-  mapTH1D_.insert(std::make_pair(name, std::unique_ptr<TH1D>(new TH1D(name.c_str(), name.c_str(), binEdges.size()-1, &binEdges[0]))));
-  mapTH1D_.at(name)->SetDirectory(0);
-  mapTH1D_.at(name)->Sumw2();
-
-  outputKeys_.emplace_back(name);
-}
-
-void JMETriggerAnalysisDriver::addTH2D(const std::string& name, const std::vector<float>& binEdgesX, const std::vector<float>& binEdgesY){
-
-  if(hasTH1D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
-        << "TH1D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
-  }
-  else if(hasTH2D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
-        << "TH2D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
-  }
-  else if(binEdgesX.size() < 2){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
-        << "std::vector of X-axis bin-edges has invalid size (" << binEdgesX.size() << " < 2)";
-    throw std::runtime_error(oss.str());
-  }
-  else if(binEdgesY.size() < 2){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
-        << "std::vector of Y-axis bin-edges has invalid size (" << binEdgesY.size() << " < 2)";
-    throw std::runtime_error(oss.str());
-  }
-
-  mapTH2D_.insert(std::make_pair(name, std::unique_ptr<TH2D>(new TH2D(name.c_str(), name.c_str(), binEdgesX.size()-1, &binEdgesX[0], binEdgesY.size()-1, &binEdgesY[0]))));
-  mapTH2D_.at(name)->SetDirectory(0);
-  mapTH2D_.at(name)->Sumw2();
-
-  outputKeys_.emplace_back(name);
-}
-
-TH1D* JMETriggerAnalysisDriver::H1(const std::string& key){
-
-  if(not hasTH1D(key)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::H1(\"" << key << "\") -- no TH1D associated to key \"" << key << "\"";
-    throw std::runtime_error(oss.str());
-  }
-  else if(not mapTH1D_.at(key).get()){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::H1(\"" << key << "\") -- null pointer to TH1D associated to key \"" << key << "\"";
-    throw std::runtime_error(oss.str());
-  }
-
-  return mapTH1D_.at(key).get();
-}
-
-TH2D* JMETriggerAnalysisDriver::H2(const std::string& key){
-
-  if(not hasTH2D(key)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::H2(\"" << key << "\") -- no TH2D associated to key \"" << key << "\"";
-    throw std::runtime_error(oss.str());
-  }
-  else if(not mapTH2D_.at(key).get()){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::H2(\"" << key << "\") -- null pointer to TH2D associated to key \"" << key << "\"";
-    throw std::runtime_error(oss.str());
-  }
-
-  return mapTH2D_.at(key).get();
-}
-
-std::vector<std::string> JMETriggerAnalysisDriver::stringTokens(const std::string& str, const std::string& delimiter) const {
-
-  std::vector<std::string> toks; {
-
-    std::size_t last(0), next(0);
-    while((next = str.find(delimiter, last)) != std::string::npos){
-      std::string substr = str.substr(last, next-last);
-      if(substr != "") toks.push_back(substr);
-      last = next + delimiter.size();
+      H2(dirPrefix+fhData.jetCollection+regLabel+"_eta__vs__pt")->Fill(v_eta->at(jetIdx), v_pt->at(jetIdx));
     }
 
-    if(str.substr(last) != ""){
-      toks.push_back(str.substr(last));
+    H1(dirPrefix+fhData.jetCollection+regLabel+"_njets")->Fill(jetIndices.size());
+
+    if(indexMaxPtJet >= 0){
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt0")->Fill(v_pt->at(indexMaxPtJet));
     }
   }
 
-  return toks;
+  for(auto const& fhDataMatch : fhData.matches){
+
+    auto const matchLabel(fhDataMatch.label);
+    auto const matchJetColl(fhDataMatch.jetCollection);
+    auto const matchJetPtMin(fhDataMatch.jetPtMin);
+    auto const matchJetDeltaRMin(fhDataMatch.jetDeltaRMin);
+
+    auto const* v_match_pt(this->vector_ptr<float>(matchJetColl+"_pt"));
+    auto const* v_match_eta(this->vector_ptr<float>(matchJetColl+"_eta"));
+    auto const* v_match_phi(this->vector_ptr<float>(matchJetColl+"_phi"));
+    auto const* v_match_mass(this->vector_ptr<float>(matchJetColl+"_mass"));
+
+    if(not (v_match_pt and v_match_eta and v_match_phi and v_match_mass)){
+      if(verbosity_ >= 0){
+        std::cout << "JMETriggerAnalysisDriver::fillHistograms_Jets(\"" << dir << "\", const fillHistoDataJets&) -- "
+                  << "branches not available (histograms will not be filled): "
+                  << matchJetColl+"_pt/eta/phi/mass" << std::endl;
+      }
+      continue;
+    }
+
+    std::map<size_t, size_t> mapMatchIndeces;
+    float dR2min(matchJetDeltaRMin * matchJetDeltaRMin);
+    for(size_t idx=0; idx<v_pt->size(); ++idx){
+      if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
+
+      int indexBestMatch(-1);
+      for(size_t idxMatch=0; idxMatch<v_match_pt->size(); ++idxMatch){
+        if(v_match_pt->at(idxMatch) <= matchJetPtMin){ continue; }
+
+        auto const dR2(utils::deltaR2(v_eta->at(idx), v_phi->at(idx), v_match_eta->at(idxMatch), v_match_phi->at(idxMatch)));
+        if(dR2 < dR2min){ dR2min = dR2; indexBestMatch = idxMatch; }
+      }
+
+      if(indexBestMatch > 0){
+        mapMatchIndeces.insert(std::make_pair(idx, indexBestMatch));
+      }
+    }
+
+    for(auto const& regLabel : regLabels){
+
+      std::vector<size_t> jetIndices;
+      jetIndices.reserve(v_pt->size());
+      for(size_t idx=0; idx<v_pt->size(); ++idx){
+        if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
+
+        bool passesJetEtaCut(false);
+        auto const jetAbsEta(std::abs(v_eta->at(idx)));
+        if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
+        else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
+        else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
+        else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
+
+        if(passesJetEtaCut){
+          jetIndices.emplace_back(idx);
+        }
+      }
+
+      size_t nJetsMatched(0), nJetsNotMatched(0);
+      int indexMaxPtJetWithMatch(-1), indexMaxPtJetWithNoMatch(-1);
+      float maxPtJetPtWithMatch(-1.), maxPtJetPtWithNoMatch(-1.);
+
+      for(auto const jetIdx : jetIndices){
+
+        auto const jetPt(v_pt->at(jetIdx));
+        auto const jetEta(v_eta->at(jetIdx));
+        auto const jetPhi(v_phi->at(jetIdx));
+        auto const jetMass(v_mass->at(jetIdx));
+
+        auto const hasMatch(mapMatchIndeces.find(jetIdx) != mapMatchIndeces.end());
+
+        if(hasMatch){
+
+          ++nJetsMatched;
+
+          if((nJetsMatched == 1) or (jetPt > maxPtJetPtWithMatch)){
+	    maxPtJetPtWithMatch = jetPt;
+            indexMaxPtJetWithMatch = jetIdx;
+          }
+
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt")->Fill(jetPt);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass")->Fill(jetMass);
+
+          if(v_numberOfDaughters){
+            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
+          }
+
+          auto const jetMatchIdx(mapMatchIndeces.at(jetIdx));
+          auto const jetMatchPt(v_match_pt->at(jetMatchIdx));
+          auto const jetMatchEta(v_match_eta->at(jetMatchIdx));
+          auto const jetMatchPhi(v_match_phi->at(jetMatchIdx));
+          auto const jetMatchMass(v_match_mass->at(jetMatchIdx));
+
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta")->Fill(jetEta, jetMatchEta);
+
+          auto const dR2match(utils::deltaR2(jetEta, jetPhi, jetMatchEta, jetMatchPhi));
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_dRmatch")->Fill(sqrt(dR2match));
+
+          if(jetMatchPt != 0.){
+            auto const jetPtRatio(jetPt / jetMatchPt);
+            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel)->Fill(jetPtRatio);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetPtRatio, jetMatchPt);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetPtRatio, jetMatchEta);
+          }
+
+          if(jetMatchMass != 0.){
+            auto const jetMassRatio(jetMass / jetMatchMass);
+            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel)->Fill(jetMassRatio);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetMassRatio, jetMatchMass);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetMassRatio, jetMatchEta);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass")->Fill(jetMassRatio, jetMatchMass);
+          }
+        }
+        else {
+          ++nJetsNotMatched;
+
+          if((nJetsNotMatched == 1) or (jetPt > maxPtJetPtWithNoMatch)){
+	    maxPtJetPtWithNoMatch = jetPt;
+            indexMaxPtJetWithNoMatch = jetIdx;
+          }
+
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt")->Fill(jetPt);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_mass")->Fill(jetMass);
+
+          if(v_numberOfDaughters){
+            H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
+          }
+        }
+      }
+
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_njets")->Fill(nJetsMatched);
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_njets")->Fill(nJetsNotMatched);
+
+      if(indexMaxPtJetWithMatch >= 0){
+        auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithMatch));
+        auto const maxPtJetMatchPt(v_match_pt->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
+        H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
+        H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(maxPtJetPt, maxPtJetMatchPt);
+        if(maxPtJetMatchPt != 0.){
+          auto const maxPtJetPtRatio(maxPtJetPt / maxPtJetMatchPt);
+          auto const maxPtJetMatchEta(v_match_eta->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel)->Fill(maxPtJetPtRatio);
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(maxPtJetPtRatio, maxPtJetMatchPt);
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(maxPtJetPtRatio, maxPtJetMatchEta);
+        }
+      }
+
+      if(indexMaxPtJetWithNoMatch >= 0){
+        auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithNoMatch));
+        H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
+      }
+    }
+  }
 }
 
-float JMETriggerAnalysisDriver::deltaPhi2(const float phi1, const float phi2) const {
-  auto dphi(std::abs(phi1 - phi2));
-  if(dphi > M_PI) dphi -= 2*M_PI;
-  return dphi * dphi;
-}
+void JMETriggerAnalysisDriver::fillHistograms_MET(const std::string& dir, const fillHistoDataMET& fhData){
 
-float JMETriggerAnalysisDriver::deltaR2(const float eta1, const float phi1, const float eta2, const float phi2) const {
-  return (eta1 - eta2) * (eta1 - eta2) + deltaPhi2(phi1, phi2);
+  auto dirPrefix(dir);
+  while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
+  if(not dirPrefix.empty()){ dirPrefix += "/"; }
+
+  auto const* v_pt(this->vector_ptr<float>(fhData.metCollection+"_pt"));
+  auto const* v_phi(this->vector_ptr<float>(fhData.metCollection+"_phi"));
+  auto const* v_sumEt(this->vector_ptr<float>(fhData.metCollection+"_sumEt"));
+
+  if(not (v_pt and v_phi and v_sumEt)){
+    if(verbosity_ >= 0){
+      std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
+                << "branches not available (histograms will not be filled): "
+                << fhData.metCollection+"_pt/phi/sumEt" << std::endl;
+    }
+    return;
+  }
+
+  if(not ((v_pt->size() == 1) and (v_phi->size() == 1) and (v_sumEt->size() == 1))){
+    if(verbosity_ >= 0){
+      std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
+                << "MET branches have invalid size (histograms will not be filled): "
+                << fhData.metCollection+"_pt/phi/sumEt" << std::endl;
+    }
+    return;
+  }
+
+  auto const metPt(v_pt->at(0));
+  auto const metPhi(v_phi->at(0));
+  auto const metSumEt(v_sumEt->at(0));
+
+  H1(dirPrefix+fhData.metCollection+"_pt")->Fill(metPt);
+  H1(dirPrefix+fhData.metCollection+"_phi")->Fill(metPhi);
+  H1(dirPrefix+fhData.metCollection+"_sumEt")->Fill(metSumEt);
+
+  for(auto const& fhDataMatch : fhData.matches){
+
+    auto const matchLabel(fhDataMatch.label);
+    auto const matchMetColl(fhDataMatch.metCollection);
+
+    auto const* v_match_pt(this->vector_ptr<float>(matchMetColl+"_pt"));
+    auto const* v_match_phi(this->vector_ptr<float>(matchMetColl+"_phi"));
+    auto const* v_match_sumEt(this->vector_ptr<float>(matchMetColl+"_sumEt"));
+
+    if(not (v_match_pt and v_match_phi and v_match_sumEt)){
+      if(verbosity_ >= 0){
+        std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
+                  << "branches not available (histograms will not be filled): "
+                  << matchMetColl+"_pt/phi/sumEt" << std::endl;
+      }
+      continue;
+    }
+
+    if(not ((v_match_pt->size() == 1) and (v_match_phi->size() == 1) and (v_match_sumEt->size() == 1))){
+      if(verbosity_ >= 0){
+        std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
+                  << "MET branches have invalid size (histograms will not be filled): "
+                  << matchMetColl+"_pt/phi/sumEt" << std::endl;
+      }
+      continue;
+    }
+
+    auto const metMatchPt(v_match_pt->at(0));
+    auto const metMatchPhi(v_match_phi->at(0));
+    auto const metMatchSumEt(v_match_sumEt->at(0));
+
+    if(metMatchPt != 0.){
+      auto const metPtRatio(metPt / metMatchPt);
+      H2(dirPrefix+fhData.metCollection+"_pt__vs__"+matchLabel+"_pt")->Fill(metPt, metMatchPt);
+      H1(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel)->Fill(metPtRatio);
+      H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metPtRatio, metMatchPt);
+      H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metPtRatio, metMatchPhi);
+      H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metPtRatio, metMatchSumEt);
+    }
+
+    if(metMatchSumEt != 0.){
+      auto const metSumEtRatio(metSumEt / metMatchSumEt);
+      H2(dirPrefix+fhData.metCollection+"_sumEt__vs__"+matchLabel+"_sumEt")->Fill(metSumEt, metMatchSumEt);
+      H1(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel)->Fill(metSumEtRatio);
+      H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metSumEtRatio, metMatchPt);
+      H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metSumEtRatio, metMatchPhi);
+      H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metSumEtRatio, metMatchSumEt);
+    }
+
+    auto const metDeltaPhiMatch(sqrt(utils::deltaPhi2(metPhi, metMatchPhi)));
+    H2(dirPrefix+fhData.metCollection+"_phi__vs__"+matchLabel+"_phi")->Fill(metPhi, metMatchPhi);
+    H1(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel)->Fill(metDeltaPhiMatch);
+    H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metDeltaPhiMatch, metMatchPt);
+    H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metDeltaPhiMatch, metMatchPhi);
+    H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metDeltaPhiMatch, metMatchSumEt);
+
+    auto const metParaToMatch(metPt*(std::cos(metPhi)*std::cos(metMatchPhi) + std::sin(metPhi)*std::sin(metMatchPhi)));
+    H1(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel)->Fill(metParaToMatch);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metParaToMatch, metMatchPt);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metParaToMatch, metMatchPhi);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metParaToMatch, metMatchSumEt);
+
+    auto const metParaToMatchMinusMatch(metParaToMatch - metMatchPt);
+    H1(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel)->Fill(metParaToMatchMinusMatch);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metParaToMatchMinusMatch, metMatchPt);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metParaToMatchMinusMatch, metMatchPhi);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metParaToMatchMinusMatch, metMatchSumEt);
+
+    auto const metPerpToMatch(metPt*(std::cos(metPhi)*std::sin(metMatchPhi) - std::sin(metPhi)*std::cos(metMatchPhi)));
+    H1(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel)->Fill(metPerpToMatch);
+    H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metPerpToMatch, metMatchPt);
+    H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metPerpToMatch, metMatchPhi);
+    H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metPerpToMatch, metMatchSumEt);
+  }
 }

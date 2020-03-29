@@ -1,8 +1,7 @@
 #include <Analysis/JMETrigger/interface/AnalysisDriverBase.h>
+#include <Analysis/JMETrigger/interface/Utils.h>
 
 #include <iostream>
-#include <sstream>
-#include <stdexcept>
 
 AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
   : outputFilePath_(outputFilePath), outputFileMode_(outputFileMode) {
@@ -61,14 +60,6 @@ AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::stri
   }
 }
 
-AnalysisDriverBase::~AnalysisDriverBase(){
-}
-
-bool AnalysisDriverBase::find(const std::string& key) const {
-
-  return (map_TTreeReaderValues_.find(key) != map_TTreeReaderValues_.end());
-}
-
 void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEntries){
 
   this->init();
@@ -78,7 +69,6 @@ void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEn
   }
   else {
     if(maxEntries != 0){
-
       while(theReader_->Next()){
         if(theReader_->GetCurrentEntry() < firstEntry){
           continue;
@@ -89,10 +79,11 @@ void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEn
         }
 
         this->analyze();
+        ++eventsProcessed_;
       }
     }
 
-    if(outputFilePath_ != ""){
+    if(not outputFilePath_.empty()){
       this->writeToFile(outputFilePath_, outputFileMode_);
     }
   }
@@ -140,4 +131,127 @@ std::string const& AnalysisDriverBase::getOption(const std::string& key) const {
   }
 
   return map_options_.at(key);
+}
+
+void AnalysisDriverBase::write(TFile& outFile){
+
+  for(auto const& key : outputKeys_){
+
+    auto keyTokens(utils::stringTokens(key, "/"));
+    if(keyTokens.empty()){ continue; }
+
+    TDirectory* targetDir(&outFile);
+    while(keyTokens.size() != 1){
+      TDirectory* key = dynamic_cast<TDirectory*>(targetDir->Get(keyTokens.begin()->c_str()));
+      targetDir = key ? key : targetDir->mkdir(keyTokens.begin()->c_str());
+      keyTokens.erase(keyTokens.begin());
+    }
+
+    targetDir->cd();
+
+    if(hasTH1D(key)){
+      mapTH1D_.at(key)->SetName(keyTokens.begin()->c_str());
+      mapTH1D_.at(key)->SetTitle(keyTokens.begin()->c_str());
+      mapTH1D_.at(key)->Write();
+    }
+    else if(hasTH2D(key)){
+      mapTH2D_.at(key)->SetName(keyTokens.begin()->c_str());
+      mapTH2D_.at(key)->SetTitle(keyTokens.begin()->c_str());
+      mapTH2D_.at(key)->Write();
+    }
+  }
+}
+
+void AnalysisDriverBase::addTH1D(const std::string& name, const std::vector<float>& binEdges){
+
+  if(hasTH1D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH1D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH2D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH2D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdges.size() < 2){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of bin-edges has invalid size (" << binEdges.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+
+  mapTH1D_.insert(std::make_pair(name, std::unique_ptr<TH1D>(new TH1D(name.c_str(), name.c_str(), binEdges.size()-1, &binEdges[0]))));
+  mapTH1D_.at(name)->SetDirectory(0);
+  mapTH1D_.at(name)->Sumw2();
+
+  outputKeys_.emplace_back(name);
+}
+
+void AnalysisDriverBase::addTH2D(const std::string& name, const std::vector<float>& binEdgesX, const std::vector<float>& binEdgesY){
+
+  if(hasTH1D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH1D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH2D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH2D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdgesX.size() < 2){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of X-axis bin-edges has invalid size (" << binEdgesX.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdgesY.size() < 2){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of Y-axis bin-edges has invalid size (" << binEdgesY.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+
+  mapTH2D_.insert(std::make_pair(name, std::unique_ptr<TH2D>(new TH2D(name.c_str(), name.c_str(), binEdgesX.size()-1, &binEdgesX[0], binEdgesY.size()-1, &binEdgesY[0]))));
+  mapTH2D_.at(name)->SetDirectory(0);
+  mapTH2D_.at(name)->Sumw2();
+
+  outputKeys_.emplace_back(name);
+}
+
+TH1D* AnalysisDriverBase::H1(const std::string& key){
+
+  if(not hasTH1D(key)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::H1(\"" << key << "\") -- no TH1D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+  else if(not mapTH1D_.at(key).get()){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::H1(\"" << key << "\") -- null pointer to TH1D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+
+  return mapTH1D_.at(key).get();
+}
+
+TH2D* AnalysisDriverBase::H2(const std::string& key){
+
+  if(not hasTH2D(key)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::H2(\"" << key << "\") -- no TH2D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+  else if(not mapTH2D_.at(key).get()){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::H2(\"" << key << "\") -- null pointer to TH2D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+
+  return mapTH2D_.at(key).get();
 }
