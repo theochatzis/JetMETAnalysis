@@ -2,7 +2,7 @@
 
 set -e
 
-inpdir=${JMEANA_BASE}/analysis_output_run3_v04/harvesting
+inpdir=${JMEANA_BASE}/run3_v04_analysis/harvesting
 outdir=plots_run3test_pfBlockAlgoRemovePS
 
 samples=(
