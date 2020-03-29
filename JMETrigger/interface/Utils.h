@@ -1,5 +1,5 @@
-#ifndef Analysis_JMETrigger_Utils_h
-#define Analysis_JMETrigger_Utils_h
+#ifndef NTupleAnalysis_JMETrigger_Utils_h
+#define NTupleAnalysis_JMETrigger_Utils_h
 
 #include <string>
 #include <vector>

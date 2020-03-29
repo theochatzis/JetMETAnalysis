@@ -1,11 +1,9 @@
-#ifndef Analysis_JMETrigger_JMETriggerAnalysisDriver_h
-#define Analysis_JMETrigger_JMETriggerAnalysisDriver_h
-
-#include "Analysis/JMETrigger/interface/AnalysisDriverBase.h"
+#ifndef NTupleAnalysis_JMETrigger_JMETriggerAnalysisDriver_h
+#define NTupleAnalysis_JMETrigger_JMETriggerAnalysisDriver_h
 
 #include <vector>
-#include <memory>
-#include <map>
+
+#include <NTupleAnalysis/JMETrigger/interface/AnalysisDriverBase.h>
 
 class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 

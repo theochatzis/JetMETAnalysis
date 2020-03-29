@@ -1,5 +1,5 @@
-#ifndef Analysis_JMETrigger_AnalysisDriverBase_h
-#define Analysis_JMETrigger_AnalysisDriverBase_h
+#ifndef NTupleAnalysis_JMETrigger_AnalysisDriverBase_h
+#define NTupleAnalysis_JMETrigger_AnalysisDriverBase_h
 
 #include <map>
 #include <memory>

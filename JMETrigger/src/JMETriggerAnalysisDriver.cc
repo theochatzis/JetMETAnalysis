@@ -1,5 +1,5 @@
-#include <Analysis/JMETrigger/interface/JMETriggerAnalysisDriver.h>
-#include <Analysis/JMETrigger/interface/Utils.h>
+#include <NTupleAnalysis/JMETrigger/interface/JMETriggerAnalysisDriver.h>
+#include <NTupleAnalysis/JMETrigger/interface/Utils.h>
 #include <math.h>
 
 void JMETriggerAnalysisDriver::init(){
