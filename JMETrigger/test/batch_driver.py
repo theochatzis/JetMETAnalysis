@@ -14,7 +14,7 @@ if __name__ == '__main__':
    ### args -----------
    parser = argparse.ArgumentParser(description=__doc__)
 
-   parser.add_argument('-s', '--script', dest='script', action='store', default=os.path.dirname(__file__)+'/jmeAnalysis_run3.py',
+   parser.add_argument('-s', '--script', dest='script', action='store', default=os.path.dirname(__file__)+'/run.py',
                        help='path to python script executed in each batch job')
 
    parser.add_argument('-i', '--inputs', dest='inputs', required=True, nargs='+', default=[],
@@ -176,11 +176,11 @@ if __name__ == '__main__':
            ]
 
            CMDS_1 = [
-             'python -B '+PYSCRIPT_ABSPATH,
+             PYSCRIPT_ABSPATH,
              '-i '+i_inpf,
              '-o '+OUTPUT_ABSPATH,
-             '--firstEvent '+str(EVT_FIRST),
-             '--lastEvent  '+str(EVT_LAST),
+             '--skipEvents '+str(EVT_FIRST),
+             '--maxEvents '+str(1+EVT_LAST-EVT_FIRST),
            ]
 
            CMDS_2 = [
