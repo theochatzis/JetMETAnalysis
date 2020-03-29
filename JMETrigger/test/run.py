@@ -54,8 +54,8 @@ if __name__ == '__main__':
    parser.add_argument('-m', '--maxEvents', dest='maxEvents', action='store', type=int, default=-1,
                        help='maximum number of events to be processed')
 
-   parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
-                       help='enable verbose mode')
+   parser.add_argument('-v', '--verbosity', dest='verbosity', action='store', type=int, default=0,
+                       help='level of verbosity of output')
 
    opts, opts_unknown = parser.parse_known_args()
    ### -------------------
@@ -111,7 +111,7 @@ if __name__ == '__main__':
        for i_inpf_2 in i_inpf_ls:
            if os.path.isfile(i_inpf_2):
               inputFileTreePairs += [(os.path.abspath(os.path.realpath(i_inpf_2)), i_inpf_treekey)]
-           elif opts.verbose:
+           elif opts.verbosity > 0:
               print(log_prx+'invalid path to input file (input entry will be skipped) [-i]: '+i_inpf_2)
 
    inputFileTreePairs = sorted(list(set(inputFileTreePairs)))
@@ -129,7 +129,7 @@ if __name__ == '__main__':
    ## create output directory
    output_dirname = os.path.dirname(os.path.abspath(opts.output))
    if not os.path.isdir(output_dirname):
-      EXE('mkdir -p '+output_dirname, verbose=options.verbose, dry_run=options.dry_run)
+      EXE('mkdir -p '+output_dirname, verbose=options.verbosity > 0, dry_run=options.dry_run)
    del output_dirname
 
    skipEvents = opts.skipEvents
@@ -137,18 +137,22 @@ if __name__ == '__main__':
       print(log_prx+'WARNING -- option --skipEvents not supported for multiple input files, will be ignored')
       skipEvents = 0
 
+   if opts.verbosity > -99:
+      print(colored_text('[plugin]', ['1']), opts.plugin)
+
    nEvtProcessed = 0
    for [i_inpFile, i_inpTree] in inputFileTreePairs:
 
-       if opts.verbose:
-          print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree)
-
        i_maxEvents = -1 if (opts.maxEvents < 0) else (opts.maxEvents - nEvtProcessed)
+
+       if opts.verbosity > 0:
+          print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree, '(skipEvents =', skipEvents, ', maxEvents =', i_maxEvents, ')')
 
        analyzer = getattr(ROOT, opts.plugin)(i_inpFile, i_inpTree)
        analyzer.setOutputFilePath(opts.output)
        analyzer.setOutputFileMode('update' if nEvtProcessed else 'recreate')
        analyzer.addOption('showEvery', str(SHOW_EVERY))
+       analyzer.addOption('verbosity', str(opts.verbosity))
        analyzer.process(skipEvents, i_maxEvents)
        nEvtProcessed += analyzer.eventsProcessed()
 

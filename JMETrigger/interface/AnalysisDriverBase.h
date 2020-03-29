@@ -29,14 +29,16 @@ class AnalysisDriverBase {
   void setOutputFileMode(const std::string& foo){ outputFileMode_ = foo; }
 
   virtual void addOption(const std::string& key, const std::string& opt);
+  virtual bool hasOption(const std::string& key) const { return (map_options_.find(key) != map_options_.end()); }
+  virtual std::string const& getOption(const std::string& key) const;
 
   bool find(const std::string& key) const;
 
-  template<class T>
-  T const& value(const std::string& key) const;
+  template<class T> T const* value_ptr(const std::string& key) const;
+  template<class T> T const& value(const std::string& key) const;
 
-  template<class T>
-  std::vector<T> const& vector(const std::string& key) const;
+  template<class T> std::vector<T> const* vector_ptr(const std::string& key) const;
+  template<class T> std::vector<T> const& vector(const std::string& key) const;
 
  protected:
   std::unique_ptr<TFile> theFile_;
@@ -49,15 +51,25 @@ class AnalysisDriverBase {
 };
 
 template<class T>
-T const& AnalysisDriverBase::value(const std::string& key) const {
+T const* AnalysisDriverBase::value_ptr(const std::string& key) const {
 
   if(not this->find(key)){
-    std::ostringstream ss_str;
-    ss_str << "value -- invalid key (check if TLeaf/TBranch exists): " << key;
-    throw std::runtime_error(ss_str.str());
+    return nullptr;
   }
 
-  auto* ptr = dynamic_cast<TTreeReaderValue<T>*>(map_TTreeReaderValues_.at(key).get());
+  auto* ptr(dynamic_cast<TTreeReaderValue<T>*>(map_TTreeReaderValues_.at(key).get()));
+
+  if(not ptr){
+    return nullptr;
+  }
+
+  return ptr->Get();
+}
+
+template<class T>
+T const& AnalysisDriverBase::value(const std::string& key) const {
+
+  auto const* ptr(this->value_ptr<T>(key));
 
   if(not ptr){
     std::ostringstream ss_str;
@@ -69,15 +81,25 @@ T const& AnalysisDriverBase::value(const std::string& key) const {
 }
 
 template<class T>
-std::vector<T> const& AnalysisDriverBase::vector(const std::string& key) const {
+std::vector<T> const* AnalysisDriverBase::vector_ptr(const std::string& key) const {
 
   if(not this->find(key)){
-    std::ostringstream ss_str;
-    ss_str << "vector -- invalid key (check if TLeaf/TBranch exists): " << key;
-    throw std::runtime_error(ss_str.str());
+    return nullptr;
   }
 
-  auto* ptr = dynamic_cast<TTreeReaderValue<std::vector<T>>*>(map_TTreeReaderValues_.at(key).get());
+  auto* ptr(dynamic_cast<TTreeReaderValue<std::vector<T>>*>(map_TTreeReaderValues_.at(key).get()));
+
+  if(not ptr){
+    return nullptr;
+  }
+
+  return ptr->Get();
+}
+
+template<class T>
+std::vector<T> const& AnalysisDriverBase::vector(const std::string& key) const {
+
+  auto const* ptr(this->vector_ptr<T>(key));
 
   if(not ptr){
     std::ostringstream ss_str;
@@ -85,7 +107,7 @@ std::vector<T> const& AnalysisDriverBase::vector(const std::string& key) const {
     throw std::runtime_error(ss_str.str());
   }
 
-  return *(ptr->Get());
+  return *ptr;
 }
 
 #endif

@@ -115,7 +115,7 @@ void AnalysisDriverBase::writeToFile(const std::string& output_file, const std::
 
 void AnalysisDriverBase::addOption(const std::string& key, const std::string& opt){
 
-  if(map_options_.find(key) != map_options_.end()){
+  if(hasOption(key)){
     std::ostringstream oss;
     oss << "AnalysisDriverBase::addOption(\"" << key << "\", \"" << opt
         << "\") -- option with key \"" << key << "\" already exists:"
@@ -126,4 +126,16 @@ void AnalysisDriverBase::addOption(const std::string& key, const std::string& op
     std::cout << ">> added option (key = \"" << key << "\", value = \"" << opt << "\")" << std::endl;
     map_options_.insert(std::make_pair(key, opt));
   }
+}
+
+std::string const& AnalysisDriverBase::getOption(const std::string& key) const {
+
+  if(not hasOption(key)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::getOption(\"" << key << "\") -- "
+        << "option with key \"" << key << "\" does not exist";
+    throw std::runtime_error(oss.str());
+  }
+
+  return map_options_.at(key);
 }

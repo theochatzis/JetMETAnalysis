@@ -24,16 +24,44 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
   Long64_t eventsProcessed() const { return eventsProcessed_; }
 
  protected:
-  bool hasTH1D(const std::string& key) const { return (mapTH1D_.find(key) != mapTH1D_.end()); }
-  bool hasTH2D(const std::string& key) const { return (mapTH2D_.find(key) != mapTH2D_.end()); }
-  void addTH1D(const std::string&, const std::vector<float>&);
-  void addTH2D(const std::string&, const std::vector<float>&, const std::vector<float>&);
-  std::vector<std::string> stringTokens(const std::string&, const std::string&) const;
+
+  class fillHistoDataJets {
+   public:
+    std::string jetCollection = "";
+    float jetPtMin = -1.;
+
+    struct Match {
+      Match(const std::string& theLabel, const std::string& theJetCollection, const float theJetPtMin, const float theJetDeltaRMin)
+        : label(theLabel), jetCollection(theJetCollection), jetPtMin(theJetPtMin), jetDeltaRMin(theJetDeltaRMin) {}
+      std::string label;
+      std::string jetCollection;
+      float jetPtMin;
+      float jetDeltaRMin;
+    };
+    std::vector<Match> matches;
+  };
+
+  void fillHistograms_Jets(const std::string& dir, const fillHistoDataJets& fhDataJets);
 
   void bookHistograms_Jets(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
   void bookHistograms_MET(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
 
+  bool hasTH1D(const std::string& key) const { return (mapTH1D_.find(key) != mapTH1D_.end()); }
+  bool hasTH2D(const std::string& key) const { return (mapTH2D_.find(key) != mapTH2D_.end()); }
+
+  TH1D* H1(const std::string&);
+  TH2D* H2(const std::string&);
+
+  void addTH1D(const std::string&, const std::vector<float>&);
+  void addTH2D(const std::string&, const std::vector<float>&, const std::vector<float>&);
+
+  std::vector<std::string> stringTokens(const std::string&, const std::string&) const;
+  float deltaR2(const float eta1, const float phi1, const float eta2, const float phi2);
+
   Long64_t eventsProcessed_ = 0;
+
+  int verbosity_ = 0;
+
   std::map<std::string, std::unique_ptr<TH1D>> mapTH1D_;
   std::map<std::string, std::unique_ptr<TH2D>> mapTH2D_;
 

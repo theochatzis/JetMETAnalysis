@@ -1,23 +1,32 @@
 #include "Analysis/JMETrigger/interface/JMETriggerAnalysisDriver.h"
 
-#include <TH1D.h>
-#include <TH2D.h>
-
 void JMETriggerAnalysisDriver::init(){
   // histogram: events counter
   addTH1D("eventsProcessed", {0, 1});
 
   for(auto const& selLabel : {"NoSelection"}){
 
-    // histograms: Jets
-    bookHistograms_Jets(selLabel, "ak4GenJets");
-    bookHistograms_Jets(selLabel, "ak8GenJets");
-
+    // histograms: AK4 Jets
+    bookHistograms_Jets(selLabel, "ak4GenJetsNoNu");
+    bookHistograms_Jets(selLabel, "hltAK4CaloJets", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK4CaloJetsCorrected", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4PFJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4PFJetsCorrected", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK4PFCHSJets", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK4PFCHSJetsCorrected", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK4PuppiJets", {"GEN", "Offline"});
+    bookHistograms_Jets(selLabel, "hltAK4PuppiJetsCorrected", {"GEN", "Offline"});
 
+    // histograms: AK8 Jets
+    bookHistograms_Jets(selLabel, "ak8GenJetsNoNu");
+    bookHistograms_Jets(selLabel, "hltAK8CaloJets", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK8CaloJetsCorrected", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8PFJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8PFJetsCorrected", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK8PFCHSJets", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK8PFCHSJetsCorrected", {"GEN"});
+    bookHistograms_Jets(selLabel, "hltAK8PuppiJets", {"GEN", "Offline"});
+    bookHistograms_Jets(selLabel, "hltAK8PuppiJetsCorrected", {"GEN", "Offline"});
 
     // histograms: MET
     bookHistograms_MET(selLabel, "genMETCalo");
@@ -31,69 +40,370 @@ void JMETriggerAnalysisDriver::init(){
   }
 }
 
-void JMETriggerAnalysisDriver::addTH1D(const std::string& name, const std::vector<float>& binEdges){
-
-  if(hasTH1D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
-        << "TH1D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
-  }
-  else if(hasTH2D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
-        << "TH2D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
+void JMETriggerAnalysisDriver::analyze(){
+  if(hasOption("verbosity")){
+    verbosity_ = std::stoi(getOption("verbosity"));
   }
 
-  if(binEdges.size() < 2){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
-        << "std::vector of bin-edges has invalid size (" << binEdges.size() << " < 2)";
-    throw std::runtime_error(oss.str());
-  }
+  ++eventsProcessed_;
+  H1("eventsProcessed")->Fill(0.5, 1.);
 
-  mapTH1D_.insert(std::make_pair(name, std::unique_ptr<TH1D>(new TH1D(name.c_str(), name.c_str(), binEdges.size()-1, &binEdges[0]))));
-  mapTH1D_.at(name)->SetDirectory(0);
-  mapTH1D_.at(name)->Sumw2();
+  //// AK4
+  const float minAK4JetPt(30.);
+  const float minAK4JetPt_GEN(25.);
+  const float minAK4JetPt_Offline(25.);
+  const float maxAK4JetDeltaRmatch_GEN(0.1);
+  const float maxAK4JetDeltaRmatch_Offline(0.1);
 
-  outputKeys_.emplace_back(name);
+  // AK4 GEN
+  fillHistoDataJets fhDataAK4GEN;
+  fhDataAK4GEN.jetCollection = "ak4GenJetsNoNu";
+  fhDataAK4GEN.jetPtMin = minAK4JetPt_GEN;
+  fillHistograms_Jets("NoSelection", fhDataAK4GEN);
+
+  // AK4 CaloJets
+  fillHistoDataJets fhDataAK4CaloJets;
+  fhDataAK4CaloJets.jetCollection = "hltAK4CaloJets";
+  fhDataAK4CaloJets.jetPtMin = minAK4JetPt;
+  fhDataAK4CaloJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK4CaloJets);
+
+  // AK4 CaloJetsCorrected
+  fillHistoDataJets fhDataAK4CaloJetsCorrected;
+  fhDataAK4CaloJetsCorrected.jetCollection = "hltAK4CaloJetsCorrected";
+  fhDataAK4CaloJetsCorrected.jetPtMin = minAK4JetPt;
+  fhDataAK4CaloJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK4CaloJetsCorrected);
+
+  // AK4 PFJets
+  fillHistoDataJets fhDataAK4PFJets;
+  fhDataAK4PFJets.jetCollection = "hltAK4PFJets";
+  fhDataAK4PFJets.jetPtMin = minAK4JetPt;
+  fhDataAK4PFJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK4PFJets);
+
+  // AK4 PFJetsCorrected
+  fillHistoDataJets fhDataAK4PFJetsCorrected;
+  fhDataAK4PFJetsCorrected.jetCollection = "hltAK4PFJetsCorrected";
+  fhDataAK4PFJetsCorrected.jetPtMin = minAK4JetPt;
+  fhDataAK4PFJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK4PFJetsCorrected);
+
+  // AK4 PFCHSJets
+  fillHistoDataJets fhDataAK4PFCHSJets;
+  fhDataAK4PFCHSJets.jetCollection = "hltAK4PFCHSJets";
+  fhDataAK4PFCHSJets.jetPtMin = minAK4JetPt;
+  fhDataAK4PFCHSJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK4PFCHSJets);
+
+  // AK4 PFCHSJetsCorrected
+  fillHistoDataJets fhDataAK4PFCHSJetsCorrected;
+  fhDataAK4PFCHSJetsCorrected.jetCollection = "hltAK4PFCHSJetsCorrected";
+  fhDataAK4PFCHSJetsCorrected.jetPtMin = minAK4JetPt;
+  fhDataAK4PFCHSJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fhDataAK4PFCHSJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PFCHSJets", minAK4JetPt_Offline, maxAK4JetDeltaRmatch_Offline));
+  fillHistograms_Jets("NoSelection", fhDataAK4PFCHSJetsCorrected);
+
+  // AK4 PuppiJets
+  fillHistoDataJets fhDataAK4PuppiJets;
+  fhDataAK4PuppiJets.jetCollection = "hltAK4PuppiJets";
+  fhDataAK4PuppiJets.jetPtMin = minAK4JetPt;
+  fhDataAK4PuppiJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK4PuppiJets);
+
+  // AK4 PuppiJetsCorrected
+  fillHistoDataJets fhDataAK4PuppiJetsCorrected;
+  fhDataAK4PuppiJetsCorrected.jetCollection = "hltAK4PuppiJetsCorrected";
+  fhDataAK4PuppiJetsCorrected.jetPtMin = minAK4JetPt;
+  fhDataAK4PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fhDataAK4PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PuppiJets", minAK4JetPt_Offline, maxAK4JetDeltaRmatch_Offline));
+  fillHistograms_Jets("NoSelection", fhDataAK4PuppiJetsCorrected);
+
+  //// AK8
+  const float minAK8JetPt(90.);
+  const float minAK8JetPt_GEN(75.);
+  const float minAK8JetPt_Offline(75.);
+  const float maxAK8JetDeltaRmatch_GEN(0.1);
+  const float maxAK8JetDeltaRmatch_Offline(0.1);
+
+  // AK8 GEN
+  fillHistoDataJets fhDataAK8GEN;
+  fhDataAK8GEN.jetCollection = "ak8GenJetsNoNu";
+  fhDataAK8GEN.jetPtMin = minAK8JetPt_GEN;
+  fillHistograms_Jets("NoSelection", fhDataAK8GEN);
+
+  // AK8 CaloJets
+  fillHistoDataJets fhDataAK8CaloJets;
+  fhDataAK8CaloJets.jetCollection = "hltAK8CaloJets";
+  fhDataAK8CaloJets.jetPtMin = minAK8JetPt;
+  fhDataAK8CaloJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK8CaloJets);
+
+  // AK8 CaloJetsCorrected
+  fillHistoDataJets fhDataAK8CaloJetsCorrected;
+  fhDataAK8CaloJetsCorrected.jetCollection = "hltAK8CaloJetsCorrected";
+  fhDataAK8CaloJetsCorrected.jetPtMin = minAK8JetPt;
+  fhDataAK8CaloJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK8CaloJetsCorrected);
+
+  // AK8 PFJets
+  fillHistoDataJets fhDataAK8PFJets;
+  fhDataAK8PFJets.jetCollection = "hltAK8PFJets";
+  fhDataAK8PFJets.jetPtMin = minAK8JetPt;
+  fhDataAK8PFJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK8PFJets);
+
+  // AK8 PFJetsCorrected
+  fillHistoDataJets fhDataAK8PFJetsCorrected;
+  fhDataAK8PFJetsCorrected.jetCollection = "hltAK8PFJetsCorrected";
+  fhDataAK8PFJetsCorrected.jetPtMin = minAK8JetPt;
+  fhDataAK8PFJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK8PFJetsCorrected);
+
+  // AK8 PFCHSJets
+  fillHistoDataJets fhDataAK8PFCHSJets;
+  fhDataAK8PFCHSJets.jetCollection = "hltAK8PFCHSJets";
+  fhDataAK8PFCHSJets.jetPtMin = minAK8JetPt;
+  fhDataAK8PFCHSJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK8PFCHSJets);
+
+  // AK8 PFCHSJetsCorrected
+  fillHistoDataJets fhDataAK8PFCHSJetsCorrected;
+  fhDataAK8PFCHSJetsCorrected.jetCollection = "hltAK8PFCHSJetsCorrected";
+  fhDataAK8PFCHSJetsCorrected.jetPtMin = minAK8JetPt;
+  fhDataAK8PFCHSJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fhDataAK8PFCHSJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK8PFCHSJets", minAK8JetPt_Offline, maxAK8JetDeltaRmatch_Offline));
+  fillHistograms_Jets("NoSelection", fhDataAK8PFCHSJetsCorrected);
+
+  // AK8 PuppiJets
+  fillHistoDataJets fhDataAK8PuppiJets;
+  fhDataAK8PuppiJets.jetCollection = "hltAK8PuppiJets";
+  fhDataAK8PuppiJets.jetPtMin = minAK8JetPt;
+  fhDataAK8PuppiJets.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataAK8PuppiJets);
+
+  // AK8 PuppiJetsCorrected
+  fillHistoDataJets fhDataAK8PuppiJetsCorrected;
+  fhDataAK8PuppiJetsCorrected.jetCollection = "hltAK8PuppiJetsCorrected";
+  fhDataAK8PuppiJetsCorrected.jetPtMin = minAK8JetPt;
+  fhDataAK8PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fhDataAK8PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK8PuppiJets", minAK8JetPt_Offline, maxAK8JetDeltaRmatch_Offline));
+  fillHistograms_Jets("NoSelection", fhDataAK8PuppiJetsCorrected);
 }
 
-void JMETriggerAnalysisDriver::addTH2D(const std::string& name, const std::vector<float>& binEdgesX, const std::vector<float>& binEdgesY){
+void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const fillHistoDataJets& fhData){
 
-  if(hasTH1D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
-        << "TH1D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
-  }
-  else if(hasTH2D(name)){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
-        << "TH2D object associated to key \"" << name << "\" already exists";
-    throw std::runtime_error(oss.str());
-  }
+  auto dirPrefix(dir);
+  while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
+  if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-  if(binEdgesX.size() < 2){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
-        << "std::vector of X-axis bin-edges has invalid size (" << binEdgesX.size() << " < 2)";
-    throw std::runtime_error(oss.str());
+  auto const* v_pt(this->vector_ptr<float>(fhData.jetCollection+"_pt"));
+  auto const* v_eta(this->vector_ptr<float>(fhData.jetCollection+"_eta"));
+  auto const* v_phi(this->vector_ptr<float>(fhData.jetCollection+"_phi"));
+  auto const* v_mass(this->vector_ptr<float>(fhData.jetCollection+"_mass"));
+
+  if(not (v_pt and v_eta and v_phi and v_mass)){
+    if(verbosity_ >= 0){
+      std::cout << "JMETriggerAnalysisDriver::fillHistograms_Jets(\"" << dir << "\", const fillHistoDataJets&) -- "
+                << "branches not available (histograms will not be filled): "
+                << fhData.jetCollection+"_pt/eta/phi/mass" << std::endl;
+    }
+    return;
   }
 
-  if(binEdgesY.size() < 2){
-    std::ostringstream oss;
-    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
-        << "std::vector of Y-axis bin-edges has invalid size (" << binEdgesY.size() << " < 2)";
-    throw std::runtime_error(oss.str());
+  const std::vector<std::string> regLabels({"_EtaIncl", "_HB", "_HE", "_HF"});
+
+  for(auto const& regLabel : regLabels){
+
+    std::vector<size_t> jetIndices;
+    jetIndices.reserve(v_pt->size());
+    int indexMaxPtJet(-1);
+    float jetPtMax(-1.);
+    for(size_t idx=0; idx<v_pt->size(); ++idx){
+      if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
+
+      bool passesJetEtaCut(false);
+      auto const jetAbsEta(std::abs(v_eta->at(idx)));
+      if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
+      else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
+      else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
+      else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
+
+      if(passesJetEtaCut){
+        jetIndices.emplace_back(idx);
+        if((jetIndices.size() == 1) or (v_pt->at(idx) > jetPtMax)){
+          jetPtMax = v_pt->at(idx);
+          indexMaxPtJet = idx;
+        }
+      }
+    }
+
+    for(auto const jetIdx : jetIndices){
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt")->Fill(v_pt->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_eta")->Fill(v_eta->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_phi")->Fill(v_phi->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_mass")->Fill(v_mass->at(jetIdx));
+
+      H2(dirPrefix+fhData.jetCollection+regLabel+"_eta__vs__pt")->Fill(v_eta->at(jetIdx), v_pt->at(jetIdx));
+    }
+
+    H1(dirPrefix+fhData.jetCollection+regLabel+"_njets")->Fill(jetIndices.size());
+
+    if(indexMaxPtJet >= 0){
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt0")->Fill(v_pt->at(indexMaxPtJet));
+    }
   }
 
-  mapTH2D_.insert(std::make_pair(name, std::unique_ptr<TH2D>(new TH2D(name.c_str(), name.c_str(), binEdgesX.size()-1, &binEdgesX[0], binEdgesY.size()-1, &binEdgesY[0]))));
-  mapTH2D_.at(name)->SetDirectory(0);
-  mapTH2D_.at(name)->Sumw2();
+  for(auto const& fhDataMatch : fhData.matches){
 
-  outputKeys_.emplace_back(name);
+    auto const matchLabel(fhDataMatch.label);
+    auto const matchJetColl(fhDataMatch.jetCollection);
+    auto const matchJetPtMin(fhDataMatch.jetPtMin);
+    auto const matchJetDeltaRMin(fhDataMatch.jetDeltaRMin);
+
+    auto const* v_match_pt(this->vector_ptr<float>(matchJetColl+"_pt"));
+    auto const* v_match_eta(this->vector_ptr<float>(matchJetColl+"_eta"));
+    auto const* v_match_phi(this->vector_ptr<float>(matchJetColl+"_phi"));
+    auto const* v_match_mass(this->vector_ptr<float>(matchJetColl+"_mass"));
+
+    if(not (v_match_pt and v_match_eta and v_match_phi and v_match_mass)){
+      if(verbosity_ >= 0){
+        std::cout << "JMETriggerAnalysisDriver::fillHistograms_Jets(\"" << dir << "\", const fillHistoDataJets&) -- "
+                  << "branches not available (histograms will not be filled): "
+                  << matchJetColl+"_pt/eta/phi/mass" << std::endl;
+      }
+      continue;
+    }
+
+    std::map<size_t, size_t> mapMatchIndeces;
+    float dR2min(matchJetDeltaRMin * matchJetDeltaRMin);
+    for(size_t idx=0; idx<v_pt->size(); ++idx){
+      if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
+
+      int indexBestMatch(-1);
+      for(size_t idxMatch=0; idxMatch<v_match_pt->size(); ++idxMatch){
+        if(v_match_pt->at(idxMatch) <= matchJetPtMin){ continue; }
+
+        auto const dR2(deltaR2(v_eta->at(idx), v_phi->at(idx), v_match_eta->at(idxMatch), v_match_phi->at(idxMatch)));
+        if(dR2 < dR2min){ dR2min = dR2; indexBestMatch = idxMatch; }
+      }
+
+      if(indexBestMatch > 0){
+        mapMatchIndeces.insert(std::make_pair(idx, indexBestMatch));
+      }
+    }
+
+    for(auto const& regLabel : regLabels){
+
+      std::vector<size_t> jetIndices;
+      jetIndices.reserve(v_pt->size());
+      for(size_t idx=0; idx<v_pt->size(); ++idx){
+        if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
+
+        bool passesJetEtaCut(false);
+        auto const jetAbsEta(std::abs(v_eta->at(idx)));
+        if(regLabel == "_EtaIncl"){ passesJetEtaCut = (jetAbsEta < 5.0); }
+        else if(regLabel == "_HB"){ passesJetEtaCut = (jetAbsEta < 1.5); }
+        else if(regLabel == "_HE"){ passesJetEtaCut = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
+        else if(regLabel == "_HF"){ passesJetEtaCut = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
+
+        if(passesJetEtaCut){
+          jetIndices.emplace_back(idx);
+        }
+      }
+
+      size_t nJetsMatched(0), nJetsNotMatched(0);
+      int indexMaxPtJetWithMatch(-1), indexMaxPtJetWithNoMatch(-1);
+      float maxPtJetPtWithMatch(-1.), maxPtJetPtWithNoMatch(-1.);
+
+      for(auto const jetIdx : jetIndices){
+
+        auto const jetPt(v_pt->at(jetIdx));
+        auto const jetEta(v_eta->at(jetIdx));
+        auto const jetPhi(v_phi->at(jetIdx));
+        auto const jetMass(v_mass->at(jetIdx));
+
+        auto const hasMatch(mapMatchIndeces.find(jetIdx) != mapMatchIndeces.end());
+
+        if(hasMatch){
+
+          ++nJetsMatched;
+
+          if((nJetsMatched == 1) or (jetPt > maxPtJetPtWithMatch)){
+	    maxPtJetPtWithMatch = jetPt;
+            indexMaxPtJetWithMatch = jetIdx;
+          }
+
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt")->Fill(jetPt);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass")->Fill(jetMass);
+
+          auto const jetMatchIdx(mapMatchIndeces.at(jetIdx));
+          auto const jetMatchPt(v_match_pt->at(jetMatchIdx));
+          auto const jetMatchEta(v_match_eta->at(jetMatchIdx));
+          auto const jetMatchPhi(v_match_phi->at(jetMatchIdx));
+          auto const jetMatchMass(v_match_mass->at(jetMatchIdx));
+
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta")->Fill(jetEta, jetMatchEta);
+
+          auto const dR2match(deltaR2(jetEta, jetPhi, jetMatchEta, jetMatchPhi));
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_dRmatch")->Fill(sqrt(dR2match));
+
+          if(jetMatchPt != 0.){
+            auto const jetPtRatio(jetPt / jetMatchPt);
+            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel)->Fill(jetPtRatio);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetPtRatio, jetMatchPt);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetPtRatio, jetMatchEta);
+          }
+
+          if(jetMatchMass != 0.){
+            auto const jetMassRatio(jetMass / jetMatchMass);
+            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel)->Fill(jetMassRatio);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetMassRatio, jetMatchMass);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetMassRatio, jetMatchEta);
+            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass")->Fill(jetMassRatio, jetMatchMass);
+          }
+        }
+        else {
+          ++nJetsNotMatched;
+
+          if((nJetsNotMatched == 1) or (jetPt > maxPtJetPtWithNoMatch)){
+	    maxPtJetPtWithNoMatch = jetPt;
+            indexMaxPtJetWithNoMatch = jetIdx;
+          }
+
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt")->Fill(jetPt);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_mass")->Fill(jetMass);
+        }
+      }
+
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_njets")->Fill(nJetsMatched);
+      H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_njets")->Fill(nJetsNotMatched);
+
+      if(indexMaxPtJetWithMatch >= 0){
+        auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithMatch));
+        auto const maxPtJetMatchPt(v_match_pt->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
+        H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
+        H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(maxPtJetPt, maxPtJetMatchPt);
+        if(maxPtJetMatchPt != 0.){
+          auto const maxPtJetPtRatio(maxPtJetPt / maxPtJetMatchPt);
+          auto const maxPtJetMatchEta(v_match_eta->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
+          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel)->Fill(maxPtJetPtRatio);
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(maxPtJetPtRatio, maxPtJetMatchPt);
+          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(maxPtJetPtRatio, maxPtJetMatchEta);
+        }
+      }
+
+      if(indexMaxPtJetWithNoMatch >= 0){
+        auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithNoMatch));
+        H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
+      }
+    }
+  }
 }
 
 void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels){
@@ -184,17 +494,23 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
       addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_muonMultiplicity", binEdges_dauMult2);
 
       addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_dRmatch", binEdges_dRmatch);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel, binEdges_response);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel, binEdges_response);
 
       addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
       addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
       addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta", binEdges_eta, binEdges_eta);
+
+      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel, binEdges_response);
+      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
+      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
+
+      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel, binEdges_response);
+      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
+      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
+
+      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel, binEdges_response);
       addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
       addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
       addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass", binEdges_response, binEdges_mass);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
 
       addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_njets", binEdges_njets);
       addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_pt", binEdges_pt);
@@ -289,20 +605,6 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
   }
 }
 
-void JMETriggerAnalysisDriver::analyze(){
- ++eventsProcessed_;
-// h_eventsProcessed_->Fill(0.5, 1.);
-
-// auto const& eta1 = this->vector<float>("hltAK4PFJetsCorrected_eta");
-// for(const auto& tmp : eta1){ h_hltAK4PFJetsCorrected_eta_->Fill(tmp, 1.); }
-
-// auto& eta2 = this->vector<float>("hltAK4PFCHSJetsCorrected_eta");
-// for(const auto& tmp : eta2){ h_hltAK4PFCHSJetsCorrected_eta_->Fill(tmp, 1.); }
-
-// auto const& eta3 = this->vector<float>("hltAK4PuppiJetsCorrected_eta");
-// for(const auto& tmp : eta3){ h_hltAK4PuppiJetsCorrected_eta_->Fill(tmp, 1.); }
-}
-
 void JMETriggerAnalysisDriver::write(TFile& outFile){
 
   for(auto const& key : outputKeys_){
@@ -332,6 +634,100 @@ void JMETriggerAnalysisDriver::write(TFile& outFile){
   }
 }
 
+void JMETriggerAnalysisDriver::addTH1D(const std::string& name, const std::vector<float>& binEdges){
+
+  if(hasTH1D(name)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH1D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH2D(name)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH2D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdges.size() < 2){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of bin-edges has invalid size (" << binEdges.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+
+  mapTH1D_.insert(std::make_pair(name, std::unique_ptr<TH1D>(new TH1D(name.c_str(), name.c_str(), binEdges.size()-1, &binEdges[0]))));
+  mapTH1D_.at(name)->SetDirectory(0);
+  mapTH1D_.at(name)->Sumw2();
+
+  outputKeys_.emplace_back(name);
+}
+
+void JMETriggerAnalysisDriver::addTH2D(const std::string& name, const std::vector<float>& binEdgesX, const std::vector<float>& binEdgesY){
+
+  if(hasTH1D(name)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH1D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH2D(name)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH2D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdgesX.size() < 2){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of X-axis bin-edges has invalid size (" << binEdgesX.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdgesY.size() < 2){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of Y-axis bin-edges has invalid size (" << binEdgesY.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+
+  mapTH2D_.insert(std::make_pair(name, std::unique_ptr<TH2D>(new TH2D(name.c_str(), name.c_str(), binEdgesX.size()-1, &binEdgesX[0], binEdgesY.size()-1, &binEdgesY[0]))));
+  mapTH2D_.at(name)->SetDirectory(0);
+  mapTH2D_.at(name)->Sumw2();
+
+  outputKeys_.emplace_back(name);
+}
+
+TH1D* JMETriggerAnalysisDriver::H1(const std::string& key){
+
+  if(not hasTH1D(key)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::H1(\"" << key << "\") -- no TH1D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+  else if(not mapTH1D_.at(key).get()){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::H1(\"" << key << "\") -- null pointer to TH1D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+
+  return mapTH1D_.at(key).get();
+}
+
+TH2D* JMETriggerAnalysisDriver::H2(const std::string& key){
+
+  if(not hasTH2D(key)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::H2(\"" << key << "\") -- no TH2D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+  else if(not mapTH2D_.at(key).get()){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriver::H2(\"" << key << "\") -- null pointer to TH2D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+
+  return mapTH2D_.at(key).get();
+}
+
 std::vector<std::string> JMETriggerAnalysisDriver::stringTokens(const std::string& str, const std::string& delimiter) const {
 
   std::vector<std::string> toks; {
@@ -349,4 +745,10 @@ std::vector<std::string> JMETriggerAnalysisDriver::stringTokens(const std::strin
   }
 
   return toks;
+}
+
+float JMETriggerAnalysisDriver::deltaR2(const float eta1, const float phi1, const float eta2, const float phi2){
+  auto dphi(std::abs(phi1 - phi2));
+  if(dphi > M_PI){ dphi -= 2*M_PI; }
+  return (eta1 - eta2) * (eta1 - eta2) + dphi * dphi;
 }
