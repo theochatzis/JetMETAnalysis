@@ -65,6 +65,9 @@ if __name__ == '__main__':
    parser.add_argument('-o', '--output', dest='output', required=True, action='store', default='',
                        help='path to output file (1 input) or directory (multiple inputs')
 
+   parser.add_argument('-s', '--separator-2d', dest='separator_2d', action='store', default='__vs__',
+                       help='string used to split name of 2D histograms (to construct profile histograms)')
+
    parser.add_argument('-l', '--level', dest='level', action='store', type=int, default=0,
                        help='level of directory depth in output directory')
 
@@ -114,13 +117,15 @@ if __name__ == '__main__':
 
            if not histograms[i_h2_key].InheritsFrom('TH2'):
               continue
+           elif histograms[i_h2_key].GetEntries() == 0:
+              continue
 
            i_h2_key_basename = os.path.basename(i_h2_key)
 
            i_h2_key_dirname = os.path.dirname(i_h2_key)
            if i_h2_key_dirname: i_h2_key_dirname += '/'
 
-           key_vars_split = i_h2_key_basename.split(':')
+           key_vars_split = i_h2_key_basename.split(opts.separator_2d)
            if len(key_vars_split) != 2:
               KILL('ZZZ '+i_h2_key_basename)
 
@@ -156,13 +161,15 @@ if __name__ == '__main__':
 
            if not histograms[i_h2_key].InheritsFrom('TH2'):
               continue
+           elif histograms[i_h2_key].GetEntries() == 0:
+              continue
 
            i_h2_key_basename = os.path.basename(i_h2_key)
 
            i_h2_key_dirname = os.path.dirname(i_h2_key)
            if i_h2_key_dirname: i_h2_key_dirname += '/'
 
-           key_vars_split = i_h2_key_basename.split(':')
+           key_vars_split = i_h2_key_basename.split(opts.separator_2d)
            if len(key_vars_split) != 2:
               KILL('ZZZ '+i_h2_key_basename)
 
@@ -192,23 +199,25 @@ if __name__ == '__main__':
 
            histograms[h_name1] = tmp_h1_xRMS
 
-           # RMS of X scaled by Response, in bins of Y
-           h_name2 = i_h2_key_dirname+key_varX+'_RMSScaledByResponse_wrt_'+key_varY
+           # RMS of X divided by Mean of X, in bins of Y
+           h_name2 = i_h2_key_dirname+key_varX+'_RMSOverMean_wrt_'+key_varY
            if h_name2 in histograms: KILL('aaa4 '+h_name2)
 
            h_name4 = i_h2_key_dirname+key_varX[:key_varX.rfind('_')]+'_over'+compTag+'_Mean_wrt_'+key_varY
-           if h_name4 not in histograms: KILL('aaa5 '+h_name4)
+           if h_name4 not in histograms:
+              if opts.verbose:
+                 WARNING('aaa5 '+h_name2+' '+h_name4)
+           else:
+              tmp_h1_ratioMeanNoErr = histograms[h_name4].Clone()
+              for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):
+                  tmp_h1_ratioMeanNoErr.SetBinError(_idx, 0)
 
-           tmp_h1_ratioMeanNoErr = histograms[h_name4].Clone()
-           for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):
-               tmp_h1_ratioMeanNoErr.SetBinError(_idx, 0)
+              tmp_h1_xRMSScaled = tmp_h1_xRMS.Clone()
+              tmp_h1_xRMSScaled.SetName(h_name2)
+              tmp_h1_xRMSScaled.SetDirectory(0)
+              tmp_h1_xRMSScaled.Divide(tmp_h1_ratioMeanNoErr)
 
-           tmp_h1_xRMSScaled = tmp_h1_xRMS.Clone()
-           tmp_h1_xRMSScaled.SetName(h_name2)
-           tmp_h1_xRMSScaled.SetDirectory(0)
-           tmp_h1_xRMSScaled.Divide(tmp_h1_ratioMeanNoErr)
-
-           histograms[h_name2] = tmp_h1_xRMSScaled
+              histograms[h_name2] = tmp_h1_xRMSScaled
        ### -------------------
 
        ### output file -------
@@ -238,6 +247,9 @@ if __name__ == '__main__':
              raise SystemExit(1)
 
           for i_idx in sorted(histograms.keys()):
+
+              if histograms[i_idx].GetEntries() == 0:
+                 continue
 
               output_tfile.cd()
 
