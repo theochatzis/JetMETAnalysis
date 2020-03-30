@@ -496,10 +496,10 @@ if __name__ == '__main__':
        elif _hkey_basename.startswith('hltAK4PFJetsCorrected_HE_'): _objLabel = 'HLT AK4PFJets, 1.5<|#eta|<3.0'
        elif _hkey_basename.startswith('hltAK4PFJetsCorrected_HF_'): _objLabel = 'HLT AK4PFJets, 3.0<|#eta|<5.0'
 
-       elif _hkey_basename.startswith('ak4GenJets_EtaIncl_'): _objLabel = 'AK8GenJets'
-       elif _hkey_basename.startswith('ak4GenJets_HB_'): _objLabel = 'AK8GenJets, |#eta|<1.5'
-       elif _hkey_basename.startswith('ak4GenJets_HE_'): _objLabel = 'AK8GenJets, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('ak4GenJets_HF_'): _objLabel = 'AK8GenJets, 3.0<|#eta|<5.0'
+       elif _hkey_basename.startswith('ak8GenJets_EtaIncl_'): _objLabel = 'AK8GenJets'
+       elif _hkey_basename.startswith('ak8GenJets_HB_'): _objLabel = 'AK8GenJets, |#eta|<1.5'
+       elif _hkey_basename.startswith('ak8GenJets_HE_'): _objLabel = 'AK8GenJets, 1.5<|#eta|<3.0'
+       elif _hkey_basename.startswith('ak8GenJets_HF_'): _objLabel = 'AK8GenJets, 3.0<|#eta|<5.0'
 
        elif _hkey_basename.startswith('hltAK8CaloJets_EtaIncl_'): _objLabel = 'HLT AK8CaloJets Uncorrected'
        elif _hkey_basename.startswith('hltAK8CaloJets_HB_'): _objLabel = 'HLT AK8CaloJets Uncorrected, |#eta|<1.5'
@@ -535,17 +535,19 @@ if __name__ == '__main__':
        ## axes' titles
        _titleX, _titleY = _hkey_basename, ''
        if _hIsProfile:
-          if 'GenJets' in _hkey_basename:
-             if _hkey_basename.endswith('_pt'): _titleX = 'GEN Jet p_{T} [GeV]'
-             elif _hkey_basename.endswith('_eta'): _titleX = 'GEN Jet #eta'
-             elif _hkey_basename.endswith('_mass'): _titleX = 'GEN Jet mass'
-          elif 'Jets' in _hkey_basename and 'Offline' in _hkey_basename:
-             if _hkey_basename.endswith('_pt'): _titleX = 'Offline Jet p_{T} [GeV]'
-             elif _hkey_basename.endswith('_eta'): _titleX = 'Offline Jet #eta'
-             elif _hkey_basename.endswith('_mass'): _titleX = 'Offline Jet mass'
-          elif _hkey_basename.endswith('genMETTrue_sumEt'): _titleX = 'GEN #sum E_{T} [GeV]'
-          elif _hkey_basename.endswith('genMETTrue_pt'): _titleX = 'GEN MET [GeV]'
-          elif _hkey_basename.endswith('hltVerticesPF_mult'): _titleX = 'Number of hltVerticesPF'
+          if 'Jets' in _hkey_basename:
+             if _hkey_basename.endswith('_pt'): _titleX = 'Jet p_{T} [GeV]'
+             elif _hkey_basename.endswith('_eta'): _titleX = 'Jet #eta'
+             elif _hkey_basename.endswith('_phi'): _titleX = 'Jet #phi'
+             elif _hkey_basename.endswith('_mass'): _titleX = 'Jet mass [GeV]'
+          elif 'MET' in _hkey_basename:
+             if _hkey_basename.endswith('_pt'): _titleX = 'MET [GeV]'
+             elif _hkey_basename.endswith('_phi'): _titleX = 'MET #phi'
+             elif _hkey_basename.endswith('_sumEt'): _titleX = 'MET Sum-E_{T} [GeV]'
+          if '_GEN_' in _hkey_basename:
+             _titleX = 'GEN '+_titleX
+          elif '_Offline_' in _hkey_basename:
+             _titleX = 'Offline '+_titleX
        else:
           if 'MET' in _hkey_basename:
              _titleY = 'Events'
@@ -570,20 +572,10 @@ if __name__ == '__main__':
        elif '_pt_perpToOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp Offl}) [GeV]'
        elif '_pt_perpToOffline_' in _hkey_basename: _titleX = 'p_{T}^{#perp Offl} [GeV]'
 
-       elif '_pt_minusGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T} - p_{T}^{GEN}#GT [GeV]'
-       elif '_pt_minusGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} - p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
-       elif '_pt_minusGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T} - p_{T}^{GEN}) [GeV]'
-       elif '_pt_minusGEN_' in _hkey_basename: _titleX = 'p_{T} - p_{T}^{GEN} [GeV]'
-
        elif '_pt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
        elif '_pt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
        elif '_pt_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
        elif '_pt_overGEN_' in _hkey_basename: _titleX = 'p_{T} / p_{T}^{GEN}'
-
-       elif '_pt_minusOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T} - p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_minusOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} - p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_minusOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T} - p_{T}^{Offl}) [GeV]'
-       elif '_pt_minusOffline_' in _hkey_basename: _titleX = 'p_{T} - p_{T}^{Offl} [GeV]'
 
        elif '_pt_overOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T} / p_{T}^{Offl}#GT'
        elif '_pt_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT'
@@ -595,45 +587,25 @@ if __name__ == '__main__':
        elif '_mass_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(mass / mass^{GEN})'
        elif '_mass_overGEN_' in _hkey_basename: _titleX = 'mass / mass^{GEN}'
 
-       elif '_sumEt_minusGEN_Mean_' in _hkey_basename: _titleY = '#LTSumEt - SumEt^{GEN}#GT [GeV]'
-       elif '_sumEt_minusGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(SumEt - SumEt^{GEN}) / #LTSumEt / SumEt^{GEN}#GT [GeV]'
-       elif '_sumEt_minusGEN_RMS_' in _hkey_basename: _titleY = '#sigma(SumEt - SumEt^{GEN}) [GeV]'
-       elif '_sumEt_minusGEN_' in _hkey_basename: _titleX = 'SumEt - SumEt^{GEN} [GeV]'
+       elif '_sumEt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
+       elif '_sumEt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN}) / #LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
+       elif '_sumEt_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN})'
+       elif '_sumEt_overGEN_' in _hkey_basename: _titleX = 'Sum-E_{T} / Sum-E_{T}^{GEN}'
 
-       elif '_sumEt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTSumEt / SumEt^{GEN}#GT'
-       elif '_sumEt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(SumEt / SumEt^{GEN}) / #LTSumEt / SumEt^{GEN}#GT'
-       elif '_sumEt_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(SumEt / SumEt^{GEN})'
-       elif '_sumEt_overGEN_' in _hkey_basename: _titleX = 'SumEt / SumEt^{GEN}'
+       elif '_sumEt_overOffline_Mean_' in _hkey_basename: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
+       elif '_sumEt_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl}) / #LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
+       elif '_sumEt_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl})'
+       elif '_sumEt_overOffline_' in _hkey_basename: _titleX = 'Sum-E_{T} / Sum-E_{T}^{Offl}'
 
-       elif '_sumEt_minusOffline_Mean_' in _hkey_basename: _titleY = '#LTSumEt - SumEt^{Offl}#GT [GeV]'
-       elif '_sumEt_minusOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(SumEt - SumEt^{Offl}) / #LTSumEt / SumEt^{Offl}#GT [GeV]'
-       elif '_sumEt_minusOffline_RMS_' in _hkey_basename: _titleY = '#sigma(SumEt - SumEt^{Offl}) [GeV]'
-       elif '_sumEt_minusOffline_' in _hkey_basename: _titleX = 'SumEt - SumEt^{Offl} [GeV]'
+       elif '_deltaPhiGEN_Mean_' in _hkey_basename: _titleY = '#LT#Delta#phi^{GEN}#GT'
+#       elif '_deltaPhiGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{GEN}) / #LT#Delta#phi^{GEN}#GT'
+       elif '_deltaPhiGEN_RMS_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{GEN})'
+       elif '_deltaPhiGEN_' in _hkey_basename: _titleX = '#Delta#phi^{GEN}'
 
-       elif '_sumEt_overOffline_Mean_' in _hkey_basename: _titleY = '#LTSumEt / SumEt^{Offl}#GT'
-       elif '_sumEt_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(SumEt / SumEt^{Offl}) / #LTSumEt / SumEt^{Offl}#GT'
-       elif '_sumEt_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(SumEt / SumEt^{Offl})'
-       elif '_sumEt_overOffline_' in _hkey_basename: _titleX = 'SumEt / SumEt^{Offl}'
-
-       elif '_phi_minusGEN_Mean_' in _hkey_basename: _titleY = '#LT#phi - #phi^{GEN}#GT [GeV]'
-       elif '_phi_minusGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#phi - #phi^{GEN}) / #LT#phi / #phi^{GEN}#GT [GeV]'
-       elif '_phi_minusGEN_RMS_' in _hkey_basename: _titleY = '#sigma(#phi - #phi^{GEN}) [GeV]'
-       elif '_phi_minusGEN_' in _hkey_basename: _titleX = '#phi - #phi^{GEN} [GeV]'
-
-       elif '_phi_overGEN_Mean_' in _hkey_basename: _titleY = '#LT#phi / #phi^{GEN}#GT'
-       elif '_phi_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#phi / #phi^{GEN}) / #LT#phi / #phi^{GEN}#GT'
-       elif '_phi_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(#phi / #phi^{GEN})'
-       elif '_phi_overGEN_' in _hkey_basename: _titleX = '#phi / #phi^{GEN}'
-
-       elif '_phi_minusOffline_Mean_' in _hkey_basename: _titleY = '#LT#phi - #phi^{Offl}#GT [GeV]'
-       elif '_phi_minusOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#phi - #phi^{Offl}) / #LT#phi / #phi^{Offl}#GT [GeV]'
-       elif '_phi_minusOffline_RMS_' in _hkey_basename: _titleY = '#sigma(#phi - #phi^{Offl}) [GeV]'
-       elif '_phi_minusOffline_' in _hkey_basename: _titleX = '#phi - #phi^{Offl} [GeV]'
-
-       elif '_phi_overOffline_Mean_' in _hkey_basename: _titleY = '#LT#phi / #phi^{Offl}#GT'
-       elif '_phi_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#phi / #phi^{Offl}) / #LT#phi / #phi^{Offl}#GT'
-       elif '_phi_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(#phi / #phi^{Offl})'
-       elif '_phi_overOffline_' in _hkey_basename: _titleX = '#phi / #phi^{Offl}'
+       elif '_deltaPhiOffline_Mean_' in _hkey_basename: _titleY = '#LT#Delta#phi^{Offl}#GT'
+#       elif '_deltaPhiOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{Offl}) / #LT#Delta#phi^{Offl}#GT'
+       elif '_deltaPhiOffline_RMS_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{Offl})'
+       elif '_deltaPhiOffline_' in _hkey_basename: _titleX = '#Delta#phi^{Offl}'
 
        elif '_pt0' in _hkey_basename: _titleX = 'p_{T}-Leading Jet p_{T} [GeV]'
        elif '_pt' in _hkey_basename: _titleX = 'MET [GeV]' if 'MET' in _hkey_basename else 'Jet p_{T} [GeV]'
@@ -642,6 +614,7 @@ if __name__ == '__main__':
        elif '_sumEt' in _hkey_basename: _titleX = 'Sum-E_{T} [GeV]'
        elif '_mass' in _hkey_basename: _titleX = 'Jet mass [GeV]'
        elif '_dRmatch' in _hkey_basename: _titleX = '#DeltaR'
+       elif '_numberOfDaughters' in _hkey_basename: _titleX = 'Number of jet constituents'
        elif '_njets' in _hkey_basename: _titleX = 'Number of jets'
        elif '_chargedHadronEnergyFraction' in _hkey_basename: _titleX = 'Charged-Hadron Energy Fraction'
        elif '_chargedHadronMultiplicity' in _hkey_basename: _titleX = 'Charged-Hadron Multiplicity'
