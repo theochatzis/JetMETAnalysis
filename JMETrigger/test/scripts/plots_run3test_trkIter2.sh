@@ -2,6 +2,10 @@
 
 set -e
 
+if [ ! -d ${JMEANA_BASE} ]; then
+  exit 1
+fi
+
 inpdir=${JMEANA_BASE}/run3_v04_analysis/harvesting
 outdir=plots_run3test_trkIter2
 
