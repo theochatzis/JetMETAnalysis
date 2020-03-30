@@ -557,22 +557,7 @@ if __name__ == '__main__':
              else:
                 _titleY = 'Entries'
 
-       if '_pt_paraToOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel Offl}#GT [GeV]'
-       elif '_pt_paraToOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_paraToOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl}) [GeV]'
-       elif '_pt_paraToOffline' in _hkey_basename: _titleX = 'p_{T}^{#parallel Offl} [GeV]'
-
-       elif '_pt_paraToOfflineMinusOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel Offl} - p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_paraToOfflineMinusOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) [GeV]'
-       elif '_pt_paraToOfflineMinusOffline' in _hkey_basename: _titleX = 'p_{T}^{#parallel Offl} - p_{T}^{Offl} [GeV]'
-
-       elif '_pt_perpToOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#perp Offl}#GT [GeV]'
-       elif '_pt_perpToOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_perpToOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp Offl}) [GeV]'
-       elif '_pt_perpToOffline' in _hkey_basename: _titleX = 'p_{T}^{#perp Offl} [GeV]'
-
-       elif '_pt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
+       if   '_pt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
        elif '_pt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
        elif '_pt_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
        elif '_pt_overGEN' in _hkey_basename: _titleX = 'p_{T} / p_{T}^{GEN}'
@@ -586,6 +571,11 @@ if __name__ == '__main__':
        elif '_mass_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(m / m^{GEN}) / #LTm / m^{GEN}#GT'
        elif '_mass_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(mass / mass^{GEN})'
        elif '_mass_overGEN' in _hkey_basename: _titleX = 'mass / mass^{GEN}'
+
+       elif '_mass_overOffline_Mean_' in _hkey_basename: _titleY = '#LTmass / mass^{Offl}#GT'
+       elif '_mass_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(m / m^{Offl}) / #LTm / m^{Offl}#GT'
+       elif '_mass_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(mass / mass^{Offl})'
+       elif '_mass_overOffline' in _hkey_basename: _titleX = 'mass / mass^{Offl}'
 
        elif '_sumEt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
        elif '_sumEt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN}) / #LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
@@ -606,6 +596,36 @@ if __name__ == '__main__':
 #       elif '_deltaPhiOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{Offl}) / #LT#Delta#phi^{Offl}#GT'
        elif '_deltaPhiOffline_RMS_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{Offl})'
        elif '_deltaPhiOffline' in _hkey_basename: _titleX = '#Delta#phi^{Offl}'
+
+       elif '_pt_paraToGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel GEN}#GT [GeV]'
+       elif '_pt_paraToGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+       elif '_pt_paraToGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN}) [GeV]'
+       elif '_pt_paraToGEN' in _hkey_basename: _titleX = 'p_{T}^{#parallel GEN} [GeV]'
+
+       elif '_pt_paraToOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel Offl}#GT [GeV]'
+       elif '_pt_paraToOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+       elif '_pt_paraToOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl}) [GeV]'
+       elif '_pt_paraToOffline' in _hkey_basename: _titleX = 'p_{T}^{#parallel Offl} [GeV]'
+
+       elif '_pt_paraToGENMinusGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel GEN} - p_{T}^{GEN}#GT [GeV]'
+       elif '_pt_paraToGENMinusGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+       elif '_pt_paraToGENMinusGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) [GeV]'
+       elif '_pt_paraToGENMinusGEN' in _hkey_basename: _titleX = 'p_{T}^{#parallel GEN} - p_{T}^{GEN} [GeV]'
+
+       elif '_pt_paraToOfflineMinusOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel Offl} - p_{T}^{Offl}#GT [GeV]'
+       elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+       elif '_pt_paraToOfflineMinusOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) [GeV]'
+       elif '_pt_paraToOfflineMinusOffline' in _hkey_basename: _titleX = 'p_{T}^{#parallel Offl} - p_{T}^{Offl} [GeV]'
+
+       elif '_pt_perpToGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#perp GEN}#GT [GeV]'
+       elif '_pt_perpToGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+       elif '_pt_perpToGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp GEN}) [GeV]'
+       elif '_pt_perpToGEN' in _hkey_basename: _titleX = 'p_{T}^{#perp GEN} [GeV]'
+
+       elif '_pt_perpToOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#perp Offl}#GT [GeV]'
+       elif '_pt_perpToOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+       elif '_pt_perpToOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp Offl}) [GeV]'
+       elif '_pt_perpToOffline' in _hkey_basename: _titleX = 'p_{T}^{#perp Offl} [GeV]'
 
        elif '_pt0' in _hkey_basename: _titleX = 'p_{T}-Leading Jet p_{T} [GeV]'
        elif '_pt' in _hkey_basename: _titleX = 'MET [GeV]' if 'MET' in _hkey_basename else 'Jet p_{T} [GeV]'
