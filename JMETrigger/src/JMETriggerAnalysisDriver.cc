@@ -381,6 +381,7 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
     addTH1D(dirPrefix+jetType+catLabel+"_pt", binEdges_pt);
     addTH1D(dirPrefix+jetType+catLabel+"_pt0", binEdges_pt);
     addTH1D(dirPrefix+jetType+catLabel+"_eta", binEdges_eta);
+    addTH2D(dirPrefix+jetType+catLabel+"_eta__vs__pt", binEdges_eta, binEdges_pt);
     addTH1D(dirPrefix+jetType+catLabel+"_phi", binEdges_phi);
     addTH1D(dirPrefix+jetType+catLabel+"_mass", binEdges_mass);
     addTH1D(dirPrefix+jetType+catLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
@@ -395,14 +396,13 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
     addTH1D(dirPrefix+jetType+catLabel+"_photonMultiplicity", binEdges_dauMult1);
     addTH1D(dirPrefix+jetType+catLabel+"_muonMultiplicity", binEdges_dauMult2);
 
-    addTH2D(dirPrefix+jetType+catLabel+"_eta__vs__pt", binEdges_eta, binEdges_pt);
-
     for(auto const& matchLabel : matchLabels){
 
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_njets", binEdges_njets);
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt", binEdges_pt);
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0", binEdges_pt);
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_eta", binEdges_eta);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_eta__vs__pt", binEdges_eta, binEdges_pt);
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_phi", binEdges_phi);
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_mass", binEdges_mass);
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
@@ -440,6 +440,7 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
       addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_pt", binEdges_pt);
       addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_pt0", binEdges_pt);
       addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_eta", binEdges_eta);
+      addTH2D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_eta__vs__pt", binEdges_eta, binEdges_pt);
       addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_phi", binEdges_phi);
       addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_mass", binEdges_mass);
       addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
@@ -572,14 +573,13 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
     for(auto const jetIdx : jetIndices){
       H1(dirPrefix+fhData.jetCollection+catLabel+"_pt")->Fill(v_pt->at(jetIdx));
       H1(dirPrefix+fhData.jetCollection+catLabel+"_eta")->Fill(v_eta->at(jetIdx));
+      H2(dirPrefix+fhData.jetCollection+catLabel+"_eta__vs__pt")->Fill(v_eta->at(jetIdx), v_pt->at(jetIdx));
       H1(dirPrefix+fhData.jetCollection+catLabel+"_phi")->Fill(v_phi->at(jetIdx));
       H1(dirPrefix+fhData.jetCollection+catLabel+"_mass")->Fill(v_mass->at(jetIdx));
 
       if(v_numberOfDaughters){
         H1(dirPrefix+fhData.jetCollection+catLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
       }
-
-      H2(dirPrefix+fhData.jetCollection+catLabel+"_eta__vs__pt")->Fill(v_eta->at(jetIdx), v_pt->at(jetIdx));
     }
 
     H1(dirPrefix+fhData.jetCollection+catLabel+"_njets")->Fill(jetIndices.size());
@@ -664,6 +664,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
 
           H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt")->Fill(jetPt);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_eta__vs__pt")->Fill(jetEta, jetPt);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass")->Fill(jetMass);
 
@@ -708,6 +709,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
 
           H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_pt")->Fill(jetPt);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_eta__vs__pt")->Fill(jetEta, jetPt);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_mass")->Fill(jetMass);
 
