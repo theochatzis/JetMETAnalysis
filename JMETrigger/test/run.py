@@ -134,10 +134,10 @@ if __name__ == '__main__':
 
    skipEvents = opts.skipEvents
    if (skipEvents != 0) and (len(inputFileTreePairs) != 1):
-      print(log_prx+'WARNING -- option --skipEvents not supported for multiple input files, will be ignored')
-      skipEvents = 0
+      raise RuntimeError(log_prx+' -- invalid argument of --skipEvents option (non-zero value not supported for multiple input files)')
 
    if opts.verbosity > -99:
+      print('-'*50)
       print(colored_text('[plugin]', ['1']), opts.plugin)
 
    nEvtProcessed = 0
@@ -146,7 +146,10 @@ if __name__ == '__main__':
        i_maxEvents = -1 if (opts.maxEvents < 0) else (opts.maxEvents - nEvtProcessed)
 
        if opts.verbosity > -99:
-          print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree, '[ skipEvents =', skipEvents, ', maxEvents =', i_maxEvents, ']')
+          print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree)
+          print('skipEvents =', skipEvents)
+          print('maxEvents =', i_maxEvents)
+          print('-'*50)
 
        analyzer = getattr(ROOT, opts.plugin)(i_inpFile, i_inpTree)
        analyzer.setVerbosity(opts.verbosity)
@@ -156,16 +159,15 @@ if __name__ == '__main__':
        analyzer.process(skipEvents, i_maxEvents)
        nEvtProcessed += analyzer.eventsProcessed()
 
-   print('-'*50)
-   print('events processed: {:d}'.format(nEvtProcessed))
+   if opts.verbosity > -99:
+      print('events processed: {:d}'.format(nEvtProcessed))
 
-   time_finish = time.time()
-   time_exe = time_finish - time_start
-   timereport_str = 'execution time [sec]: {:.2f}'.format(time_exe)
-   if nEvtProcessed > 0:
-      timereport_str += ' ({:.5f} evts/sec)'.format(time_exe/nEvtProcessed)
-   print(timereport_str)
+      time_finish = time.time()
+      time_exe = time_finish - time_start
+      timereport_str = 'execution time [sec]: {:.2f}'.format(time_exe)
+      if nEvtProcessed > 0:
+         timereport_str += ' ({:.5f} evts/sec)'.format(time_exe/nEvtProcessed)
+      print(timereport_str)
 
-   print('output:', os.path.relpath(opts.output))
-   print('-'*50)
-   ### -------------------
+      print('output:', os.path.relpath(opts.output))
+      print('-'*50)
