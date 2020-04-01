@@ -156,10 +156,16 @@ if __name__ == '__main__':
        analyzer.process(skipEvents, i_maxEvents)
        nEvtProcessed += analyzer.eventsProcessed()
 
-   time_finish = time.time()
-   print('-'*35)
+   print('-'*50)
    print('events processed: {:d}'.format(nEvtProcessed))
-   print('execution time [sec]: {:.5f}'.format(time_finish - time_start))
+
+   time_finish = time.time()
+   time_exe = time_finish - time_start
+   timereport_str = 'execution time [sec]: {:.2f}'.format(time_exe)
+   if nEvtProcessed > 0:
+      timereport_str += ' ({:.5f} evts/sec)'.format(time_exe/nEvtProcessed)
+   print(timereport_str)
+
    print('output:', os.path.relpath(opts.output))
-   print('-'*35)
+   print('-'*50)
    ### -------------------
