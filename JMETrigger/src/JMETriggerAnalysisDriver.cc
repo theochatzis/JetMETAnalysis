@@ -2,15 +2,80 @@
 #include <NTupleAnalysis/JMETrigger/interface/Utils.h>
 #include <math.h>
 
-const std::vector<std::string> JMETriggerAnalysisDriver::jetRegionLabels_ = {"_EtaIncl", "_HB", "_HE", "_HF"};
+const std::vector<std::string> JMETriggerAnalysisDriver::jetCategoryLabels_ = {
+  "_EtaIncl",
+  "_EtaInclPt0",
+  "_EtaInclPt1",
+  "_EtaInclPt2",
+  "_EtaInclPt3",
+  "_EtaInclPt4",
 
-bool JMETriggerAnalysisDriver::jetBelongsToRegion(const std::string& regionLabel, const float jetAbsEta) const {
+  "_HB",
+  "_HBPt0",
+  "_HBPt1",
+  "_HBPt2",
+  "_HBPt3",
+  "_HBPt4",
+
+  "_HE1",
+  "_HE1Pt0",
+  "_HE1Pt1",
+  "_HE1Pt2",
+  "_HE1Pt3",
+  "_HE1Pt4",
+
+  "_HE2",
+  "_HE2Pt0",
+  "_HE2Pt1",
+  "_HE2Pt2",
+  "_HE2Pt3",
+  "_HE2Pt4",
+
+  "_HF",
+  "_HFPt0",
+  "_HFPt1",
+  "_HFPt2",
+  "_HFPt3",
+  "_HFPt4",
+};
+
+bool JMETriggerAnalysisDriver::jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const {
 
   bool ret(false);
-  if(regionLabel == "_EtaIncl"){ ret = (jetAbsEta < 5.0); }
-  else if(regionLabel == "_HB"){ ret = (jetAbsEta < 1.5); }
-  else if(regionLabel == "_HE"){ ret = (1.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
-  else if(regionLabel == "_HF"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
+  if(categLabel == "_EtaIncl"){ ret = (jetAbsEta < 5.0); }
+  else if(categLabel == "_EtaInclPt0"){ ret = (jetAbsEta < 5.0) and (30. <= jetPt) and (jetPt < 60.); }
+  else if(categLabel == "_EtaInclPt1"){ ret = (jetAbsEta < 5.0) and (60. <= jetPt) and (jetPt < 110.); }
+  else if(categLabel == "_EtaInclPt2"){ ret = (jetAbsEta < 5.0) and (110. <= jetPt) and (jetPt < 400.); }
+  else if(categLabel == "_EtaInclPt3"){ ret = (jetAbsEta < 5.0) and (400. <= jetPt) and (jetPt < 2000.); }
+  else if(categLabel == "_EtaInclPt4"){ ret = (jetAbsEta < 5.0) and (2000. <= jetPt); }
+
+  else if(categLabel == "_HB"){ ret = (jetAbsEta < 1.3); }
+  else if(categLabel == "_HBPt0"){ ret = (jetAbsEta < 1.3) and (30. <= jetPt) and (jetPt < 60.); }
+  else if(categLabel == "_HBPt1"){ ret = (jetAbsEta < 1.3) and (60. <= jetPt) and (jetPt < 110.); }
+  else if(categLabel == "_HBPt2"){ ret = (jetAbsEta < 1.3) and (110. <= jetPt) and (jetPt < 400.); }
+  else if(categLabel == "_HBPt3"){ ret = (jetAbsEta < 1.3) and (400. <= jetPt) and (jetPt < 2000.); }
+  else if(categLabel == "_HBPt4"){ ret = (jetAbsEta < 1.3) and (2000. <= jetPt); }
+
+  else if(categLabel == "_HE1"){ ret = (1.3 <= jetAbsEta) and (jetAbsEta < 2.5); }
+  else if(categLabel == "_HE1Pt0"){ ret = (1.3 <= jetAbsEta) and (jetAbsEta < 2.5) and (30. <= jetPt) and (jetPt < 60.); }
+  else if(categLabel == "_HE1Pt1"){ ret = (1.3 <= jetAbsEta) and (jetAbsEta < 2.5) and (60. <= jetPt) and (jetPt < 110.); }
+  else if(categLabel == "_HE1Pt2"){ ret = (1.3 <= jetAbsEta) and (jetAbsEta < 2.5) and (110. <= jetPt) and (jetPt < 400.); }
+  else if(categLabel == "_HE1Pt3"){ ret = (1.3 <= jetAbsEta) and (jetAbsEta < 2.5) and (400. <= jetPt) and (jetPt < 2000.); }
+  else if(categLabel == "_HE1Pt4"){ ret = (1.3 <= jetAbsEta) and (jetAbsEta < 2.5) and (2000. <= jetPt); }
+
+  else if(categLabel == "_HE2"){ ret = (2.5 <= jetAbsEta) and (jetAbsEta < 3.0); }
+  else if(categLabel == "_HE2Pt0"){ ret = (2.5 <= jetAbsEta) and (jetAbsEta < 3.0) and (30. <= jetPt) and (jetPt < 60.); }
+  else if(categLabel == "_HE2Pt1"){ ret = (2.5 <= jetAbsEta) and (jetAbsEta < 3.0) and (60. <= jetPt) and (jetPt < 110.); }
+  else if(categLabel == "_HE2Pt2"){ ret = (2.5 <= jetAbsEta) and (jetAbsEta < 3.0) and (110. <= jetPt) and (jetPt < 400.); }
+  else if(categLabel == "_HE2Pt3"){ ret = (2.5 <= jetAbsEta) and (jetAbsEta < 3.0) and (400. <= jetPt) and (jetPt < 2000.); }
+  else if(categLabel == "_HE2Pt4"){ ret = (2.5 <= jetAbsEta) and (jetAbsEta < 3.0) and (2000. <= jetPt); }
+
+  else if(categLabel == "_HF"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0); }
+  else if(categLabel == "_HFPt0"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0) and (30. <= jetPt) and (jetPt < 60.); }
+  else if(categLabel == "_HFPt1"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0) and (60. <= jetPt) and (jetPt < 110.); }
+  else if(categLabel == "_HFPt2"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0) and (110. <= jetPt) and (jetPt < 400.); }
+  else if(categLabel == "_HFPt3"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0) and (400. <= jetPt) and (jetPt < 2000.); }
+  else if(categLabel == "_HFPt4"){ ret = (3.0 <= jetAbsEta) and (jetAbsEta < 5.0) and (2000. <= jetPt); }
 
   return ret;
 }
@@ -22,7 +87,7 @@ void JMETriggerAnalysisDriver::init(){
   for(auto const& selLabel : {"NoSelection"}){
 
     // histograms: AK4 Jets
-    bookHistograms_Jets(selLabel, "ak4GenJetsNoNu");
+    bookHistograms_Jets(selLabel, "ak4GenJetsNoNu", {"Calo", "PF", "PFCHS", "Puppi"});
     bookHistograms_Jets(selLabel, "hltAK4CaloJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4CaloJetsCorrected", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4PFJets", {"GEN"});
@@ -33,7 +98,7 @@ void JMETriggerAnalysisDriver::init(){
     bookHistograms_Jets(selLabel, "hltAK4PuppiJetsCorrected", {"GEN", "Offline"});
 
     // histograms: AK8 Jets
-    bookHistograms_Jets(selLabel, "ak8GenJetsNoNu");
+    bookHistograms_Jets(selLabel, "ak8GenJetsNoNu", {"Calo", "PF", "PFCHS", "Puppi"});
     bookHistograms_Jets(selLabel, "hltAK8CaloJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8CaloJetsCorrected", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8PFJets", {"GEN"});
@@ -61,9 +126,6 @@ void JMETriggerAnalysisDriver::init(){
 }
 
 void JMETriggerAnalysisDriver::analyze(){
-  if(hasOption("verbosity")){
-    verbosity_ = std::stoi(getOption("verbosity"));
-  }
 
   H1("eventsProcessed")->Fill(0.5, 1.);
 
@@ -78,6 +140,10 @@ void JMETriggerAnalysisDriver::analyze(){
   fillHistoDataJets fhDataAK4GEN;
   fhDataAK4GEN.jetCollection = "ak4GenJetsNoNu";
   fhDataAK4GEN.jetPtMin = minAK4JetPt_GEN;
+  fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("Calo", "hltAK4CaloJetsCorrected", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
+  fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("PF", "hltAK4PFJetsCorrected", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
+  fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("PFCHS", "hltAK4PFCHSJetsCorrected", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
+  fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("Puppi", "hltAK4PuppiJetsCorrected", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
   fillHistograms_Jets("NoSelection", fhDataAK4GEN);
 
   // AK4 CaloJets
@@ -149,6 +215,10 @@ void JMETriggerAnalysisDriver::analyze(){
   fillHistoDataJets fhDataAK8GEN;
   fhDataAK8GEN.jetCollection = "ak8GenJetsNoNu";
   fhDataAK8GEN.jetPtMin = minAK8JetPt_GEN;
+  fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("Calo", "hltAK8CaloJetsCorrected", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
+  fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("PF", "hltAK8PFJetsCorrected", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
+  fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("PFCHS", "hltAK8PFCHSJetsCorrected", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
+  fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("Puppi", "hltAK8PuppiJetsCorrected", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
   fillHistograms_Jets("NoSelection", fhDataAK8GEN);
 
   // AK8 CaloJets
@@ -305,84 +375,84 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   std::vector<float> binEdges_response(51);
   for(uint idx=0; idx<51; ++idx){ binEdges_response.at(idx) = 0.1*idx; }
 
-  for(auto const& regLabel : jetRegionLabels_){
+  for(auto const& catLabel : jetCategoryLabels_){
 
-    addTH1D(dirPrefix+jetType+regLabel+"_njets", binEdges_njets);
-    addTH1D(dirPrefix+jetType+regLabel+"_pt", binEdges_pt);
-    addTH1D(dirPrefix+jetType+regLabel+"_pt0", binEdges_pt);
-    addTH1D(dirPrefix+jetType+regLabel+"_eta", binEdges_eta);
-    addTH1D(dirPrefix+jetType+regLabel+"_phi", binEdges_phi);
-    addTH1D(dirPrefix+jetType+regLabel+"_mass", binEdges_mass);
-    addTH1D(dirPrefix+jetType+regLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
-    addTH1D(dirPrefix+jetType+regLabel+"_chargedHadronEnergyFraction", binEdges_energyFrac);
-    addTH1D(dirPrefix+jetType+regLabel+"_neutralHadronEnergyFraction", binEdges_energyFrac);
-    addTH1D(dirPrefix+jetType+regLabel+"_electronEnergyFraction", binEdges_energyFrac);
-    addTH1D(dirPrefix+jetType+regLabel+"_photonEnergyFraction", binEdges_energyFrac);
-    addTH1D(dirPrefix+jetType+regLabel+"_muonEnergyFraction", binEdges_energyFrac);
-    addTH1D(dirPrefix+jetType+regLabel+"_chargedHadronMultiplicity", binEdges_dauMult1);
-    addTH1D(dirPrefix+jetType+regLabel+"_neutralHadronMultiplicity", binEdges_dauMult1);
-    addTH1D(dirPrefix+jetType+regLabel+"_electronMultiplicity", binEdges_dauMult2);
-    addTH1D(dirPrefix+jetType+regLabel+"_photonMultiplicity", binEdges_dauMult1);
-    addTH1D(dirPrefix+jetType+regLabel+"_muonMultiplicity", binEdges_dauMult2);
+    addTH1D(dirPrefix+jetType+catLabel+"_njets", binEdges_njets);
+    addTH1D(dirPrefix+jetType+catLabel+"_pt", binEdges_pt);
+    addTH1D(dirPrefix+jetType+catLabel+"_pt0", binEdges_pt);
+    addTH1D(dirPrefix+jetType+catLabel+"_eta", binEdges_eta);
+    addTH1D(dirPrefix+jetType+catLabel+"_phi", binEdges_phi);
+    addTH1D(dirPrefix+jetType+catLabel+"_mass", binEdges_mass);
+    addTH1D(dirPrefix+jetType+catLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
+    addTH1D(dirPrefix+jetType+catLabel+"_chargedHadronEnergyFraction", binEdges_energyFrac);
+    addTH1D(dirPrefix+jetType+catLabel+"_neutralHadronEnergyFraction", binEdges_energyFrac);
+    addTH1D(dirPrefix+jetType+catLabel+"_electronEnergyFraction", binEdges_energyFrac);
+    addTH1D(dirPrefix+jetType+catLabel+"_photonEnergyFraction", binEdges_energyFrac);
+    addTH1D(dirPrefix+jetType+catLabel+"_muonEnergyFraction", binEdges_energyFrac);
+    addTH1D(dirPrefix+jetType+catLabel+"_chargedHadronMultiplicity", binEdges_dauMult1);
+    addTH1D(dirPrefix+jetType+catLabel+"_neutralHadronMultiplicity", binEdges_dauMult1);
+    addTH1D(dirPrefix+jetType+catLabel+"_electronMultiplicity", binEdges_dauMult2);
+    addTH1D(dirPrefix+jetType+catLabel+"_photonMultiplicity", binEdges_dauMult1);
+    addTH1D(dirPrefix+jetType+catLabel+"_muonMultiplicity", binEdges_dauMult2);
 
-    addTH2D(dirPrefix+jetType+regLabel+"_eta__vs__pt", binEdges_eta, binEdges_pt);
+    addTH2D(dirPrefix+jetType+catLabel+"_eta__vs__pt", binEdges_eta, binEdges_pt);
 
     for(auto const& matchLabel : matchLabels){
 
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_njets", binEdges_njets);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt", binEdges_pt);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0", binEdges_pt);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_eta", binEdges_eta);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_phi", binEdges_phi);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass", binEdges_mass);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_chargedHadronEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_neutralHadronEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_electronEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_photonEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_muonEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_chargedHadronMultiplicity", binEdges_dauMult1);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_neutralHadronMultiplicity", binEdges_dauMult1);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_electronMultiplicity", binEdges_dauMult2);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_photonMultiplicity", binEdges_dauMult1);
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_muonMultiplicity", binEdges_dauMult2);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_njets", binEdges_njets);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt", binEdges_pt);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0", binEdges_pt);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_eta", binEdges_eta);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_phi", binEdges_phi);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_mass", binEdges_mass);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_chargedHadronEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_neutralHadronEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_electronEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_photonEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_muonEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_chargedHadronMultiplicity", binEdges_dauMult1);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_neutralHadronMultiplicity", binEdges_dauMult1);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_electronMultiplicity", binEdges_dauMult2);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_photonMultiplicity", binEdges_dauMult1);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_muonMultiplicity", binEdges_dauMult2);
 
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_dRmatch", binEdges_dRmatch);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_dRmatch", binEdges_dRmatch);
 
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta", binEdges_eta, binEdges_eta);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta", binEdges_eta, binEdges_eta);
 
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel, binEdges_response);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel, binEdges_response);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
 
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel, binEdges_response);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel, binEdges_response);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
 
-      addTH1D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel, binEdges_response);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
-      addTH2D(dirPrefix+jetType+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass", binEdges_response, binEdges_mass);
+      addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel, binEdges_response);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta", binEdges_response, binEdges_eta);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass", binEdges_response, binEdges_mass);
 
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_njets", binEdges_njets);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_pt", binEdges_pt);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_pt0", binEdges_pt);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_eta", binEdges_eta);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_phi", binEdges_phi);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_mass", binEdges_mass);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_chargedHadronEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_neutralHadronEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_electronEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_photonEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_muonEnergyFraction", binEdges_energyFrac);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_chargedHadronMultiplicity", binEdges_dauMult1);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_neutralHadronMultiplicity", binEdges_dauMult1);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_electronMultiplicity", binEdges_dauMult2);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_photonMultiplicity", binEdges_dauMult1);
-      addTH1D(dirPrefix+jetType+regLabel+"_NotMatchedTo"+matchLabel+"_muonMultiplicity", binEdges_dauMult2);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_njets", binEdges_njets);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_pt", binEdges_pt);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_pt0", binEdges_pt);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_eta", binEdges_eta);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_phi", binEdges_phi);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_mass", binEdges_mass);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters", binEdges_numberOfDaughters);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_chargedHadronEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_neutralHadronEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_electronEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_photonEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_muonEnergyFraction", binEdges_energyFrac);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_chargedHadronMultiplicity", binEdges_dauMult1);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_neutralHadronMultiplicity", binEdges_dauMult1);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_electronMultiplicity", binEdges_dauMult2);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_photonMultiplicity", binEdges_dauMult1);
+      addTH1D(dirPrefix+jetType+catLabel+"_NotMatchedTo"+matchLabel+"_muonMultiplicity", binEdges_dauMult2);
     }
   }
 }
@@ -481,7 +551,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
     return;
   }
 
-  for(auto const& regLabel : jetRegionLabels_){
+  for(auto const& catLabel : jetCategoryLabels_){
 
     std::vector<size_t> jetIndices;
     jetIndices.reserve(v_pt->size());
@@ -490,7 +560,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
     for(size_t idx=0; idx<v_pt->size(); ++idx){
       if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
 
-      if(jetBelongsToRegion(regLabel, std::abs(v_eta->at(idx)))){
+      if(jetBelongsToCategory(catLabel, v_pt->at(idx), std::abs(v_eta->at(idx)))){
         jetIndices.emplace_back(idx);
         if((jetIndices.size() == 1) or (v_pt->at(idx) > jetPtMax)){
           jetPtMax = v_pt->at(idx);
@@ -500,22 +570,22 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
     }
 
     for(auto const jetIdx : jetIndices){
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt")->Fill(v_pt->at(jetIdx));
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_eta")->Fill(v_eta->at(jetIdx));
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_phi")->Fill(v_phi->at(jetIdx));
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_mass")->Fill(v_mass->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_pt")->Fill(v_pt->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_eta")->Fill(v_eta->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_phi")->Fill(v_phi->at(jetIdx));
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_mass")->Fill(v_mass->at(jetIdx));
 
       if(v_numberOfDaughters){
-        H1(dirPrefix+fhData.jetCollection+regLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
+        H1(dirPrefix+fhData.jetCollection+catLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
       }
 
-      H2(dirPrefix+fhData.jetCollection+regLabel+"_eta__vs__pt")->Fill(v_eta->at(jetIdx), v_pt->at(jetIdx));
+      H2(dirPrefix+fhData.jetCollection+catLabel+"_eta__vs__pt")->Fill(v_eta->at(jetIdx), v_pt->at(jetIdx));
     }
 
-    H1(dirPrefix+fhData.jetCollection+regLabel+"_njets")->Fill(jetIndices.size());
+    H1(dirPrefix+fhData.jetCollection+catLabel+"_njets")->Fill(jetIndices.size());
 
     if(indexMaxPtJet >= 0){
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_pt0")->Fill(v_pt->at(indexMaxPtJet));
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_pt0")->Fill(v_pt->at(indexMaxPtJet));
     }
   }
 
@@ -558,14 +628,14 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
       }
     }
 
-    for(auto const& regLabel : jetRegionLabels_){
+    for(auto const& catLabel : jetCategoryLabels_){
 
       std::vector<size_t> jetIndices;
       jetIndices.reserve(v_pt->size());
       for(size_t idx=0; idx<v_pt->size(); ++idx){
         if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
 
-        if(jetBelongsToRegion(regLabel, std::abs(v_eta->at(idx)))){
+        if(jetBelongsToCategory(catLabel, v_pt->at(idx), std::abs(v_eta->at(idx)))){
           jetIndices.emplace_back(idx);
         }
       }
@@ -592,13 +662,13 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
             indexMaxPtJetWithMatch = jetIdx;
           }
 
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt")->Fill(jetPt);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta")->Fill(jetEta);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass")->Fill(jetMass);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt")->Fill(jetPt);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass")->Fill(jetMass);
 
           if(v_numberOfDaughters){
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
+            H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
           }
 
           auto const jetMatchIdx(mapMatchIndeces.at(jetIdx));
@@ -607,25 +677,25 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
           auto const jetMatchPhi(v_match_phi->at(jetMatchIdx));
           auto const jetMatchMass(v_match_mass->at(jetMatchIdx));
 
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta")->Fill(jetEta, jetMatchEta);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta")->Fill(jetEta, jetMatchEta);
 
           auto const dR2match(utils::deltaR2(jetEta, jetPhi, jetMatchEta, jetMatchPhi));
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_dRmatch")->Fill(sqrt(dR2match));
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_dRmatch")->Fill(sqrt(dR2match));
 
           if(jetMatchPt != 0.){
             auto const jetPtRatio(jetPt / jetMatchPt);
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel)->Fill(jetPtRatio);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetPtRatio, jetMatchPt);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetPtRatio, jetMatchEta);
+            H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel)->Fill(jetPtRatio);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetPtRatio, jetMatchPt);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetPtRatio, jetMatchEta);
           }
 
           if(jetMatchMass != 0.){
             auto const jetMassRatio(jetMass / jetMatchMass);
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel)->Fill(jetMassRatio);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetMassRatio, jetMatchMass);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetMassRatio, jetMatchEta);
-            H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass")->Fill(jetMassRatio, jetMatchMass);
+            H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel)->Fill(jetMassRatio);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetMassRatio, jetMatchMass);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetMassRatio, jetMatchEta);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass")->Fill(jetMassRatio, jetMatchMass);
           }
         }
         else {
@@ -636,37 +706,37 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
             indexMaxPtJetWithNoMatch = jetIdx;
           }
 
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt")->Fill(jetPt);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_eta")->Fill(jetEta);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_mass")->Fill(jetMass);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_pt")->Fill(jetPt);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_eta")->Fill(jetEta);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_mass")->Fill(jetMass);
 
           if(v_numberOfDaughters){
-            H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
+            H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
           }
         }
       }
 
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_njets")->Fill(nJetsMatched);
-      H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_njets")->Fill(nJetsNotMatched);
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_njets")->Fill(nJetsMatched);
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_njets")->Fill(nJetsNotMatched);
 
       if(indexMaxPtJetWithMatch >= 0){
         auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithMatch));
         auto const maxPtJetMatchPt(v_match_pt->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
-        H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
-        H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(maxPtJetPt, maxPtJetMatchPt);
+        H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
+        H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(maxPtJetPt, maxPtJetMatchPt);
         if(maxPtJetMatchPt != 0.){
           auto const maxPtJetPtRatio(maxPtJetPt / maxPtJetMatchPt);
           auto const maxPtJetMatchEta(v_match_eta->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
-          H1(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel)->Fill(maxPtJetPtRatio);
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(maxPtJetPtRatio, maxPtJetMatchPt);
-          H2(dirPrefix+fhData.jetCollection+regLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(maxPtJetPtRatio, maxPtJetMatchEta);
+          H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel)->Fill(maxPtJetPtRatio);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(maxPtJetPtRatio, maxPtJetMatchPt);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(maxPtJetPtRatio, maxPtJetMatchEta);
         }
       }
 
       if(indexMaxPtJetWithNoMatch >= 0){
         auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithNoMatch));
-        H1(dirPrefix+fhData.jetCollection+regLabel+"_NotMatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
+        H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
       }
     }
   }

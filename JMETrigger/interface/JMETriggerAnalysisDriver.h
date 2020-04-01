@@ -17,8 +17,8 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 
  protected:
 
-  static const std::vector<std::string> jetRegionLabels_;
-  virtual bool jetBelongsToRegion(const std::string& regionLabel, const float jetAbsEta) const;
+  static const std::vector<std::string> jetCategoryLabels_;
+  virtual bool jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const;
 
   class fillHistoDataJets {
    public:
