@@ -7,7 +7,7 @@ if [ ! -d ${JMEANA_BASE} ]; then
 fi
 
 inpdir=${JMEANA_BASE}/run3_v04_analysis/harvesting
-outdir=plots_run3test_pfBlockAlgoRemovePS
+outdir=plots_run3test_pfBlockAlgoRemovePS_compareFiles
 
 samples=(
  Run3Winter20_QCD_Pt_15to3000_Flat_14TeV

@@ -12,9 +12,9 @@ from common.plot_style import *
 JET_CATEGORIES = [
   '_EtaIncl',
   '_HB',
-  '_HGCal',
-  '_HF1',
-  '_HF2',
+  '_HE1',
+  '_HE2',
+  '_HF',
 ]
 
 def clone_histogram(histograms, tag1, tag2, setters={}):
@@ -427,10 +427,13 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          'hltAK8PuppiJetsCorrected': {'LineColor': ROOT.kViolet, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kViolet},
          'offlineAK8PuppiJetsCorrected': {'LineColor': ROOT.kViolet, 'MarkerSize': 1.5, 'MarkerStyle': 20, 'MarkerColor': ROOT.kViolet},
 
+         'genMETCalo': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
          'genMETTrue': {'LineColor': 1, 'MarkerSize': 1.5, 'MarkerStyle': 27, 'MarkerColor': 1},
          'hltPFMET': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kOrange+1},
+         'hltPFMETNoMu': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kOrange+1},
          'hltPFMETTypeOne': {'LineColor': ROOT.kRed, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kRed},
          'hltPuppiMET': {'LineColor': ROOT.kAzure, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kAzure},
+         'hltPuppiMETNoMu': {'LineColor': ROOT.kAzure, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kAzure},
          'hltPuppiMETTypeOne': {'LineColor': ROOT.kViolet, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kViolet},
          'hltPuppiMETWithPuppiForJets': {'LineColor': ROOT.kCyan, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kCyan},
          'hltPFMETCHS': {'LineColor': ROOT.kGray+1, 'LineStyle': 2, 'MarkerSize': 1.5, 'MarkerStyle': 24, 'MarkerColor': ROOT.kGray+1},
@@ -461,10 +464,13 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
          'hltAK8PuppiJetsCorrected': {'LineColor': ROOT.kViolet, 'LineStyle': 2},
          'offlineAK8PuppiJetsCorrected': {'LineColor': ROOT.kViolet},
 
+         'genMETCalo': {'LineColor': 1},
          'genMETTrue': {'LineColor': 1},
          'hltPFMET': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2},
+         'hltPFMETNoMu': {'LineColor': ROOT.kOrange+1, 'LineStyle': 2},
          'hltPFMETTypeOne': {'LineColor': ROOT.kRed, 'LineStyle': 2},
          'hltPuppiMET': {'LineColor': ROOT.kAzure, 'LineStyle': 2},
+         'hltPuppiMETNoMu': {'LineColor': ROOT.kAzure, 'LineStyle': 2},
          'hltPuppiMETTypeOne': {'LineColor': ROOT.kViolet, 'LineStyle': 2},
          'hltPuppiMETWithPuppiForJets': {'LineColor': ROOT.kCyan, 'LineStyle': 2},
          'hltPFMETCHS': {'LineColor': ROOT.kGray+1, 'LineStyle': 2},
@@ -582,7 +588,7 @@ def get_templates(key, histograms, PU_tag, directory, var, skipGEN=False):
 
     elif key in ['METNoMu_Raw_HLT', 'METNoMu_Raw_HLT_p']:
        the_templates += [
-         {'TH1': clone_histogram(histograms, PU_tag, directory+'genCaloTrue_'+var, style_dict['genCaloTrue']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
+         {'TH1': clone_histogram(histograms, PU_tag, directory+'genMETCalo_'+var, style_dict['genMETCalo']), 'draw': opt_draw, 'legendName': 'GEN', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPFMETNoMu_'+var, style_dict['hltPFMETNoMu']), 'draw': opt_draw, 'legendName': 'HLT PF-MET(no #mu) Raw', 'legendDraw': opt_legDraw},
          {'TH1': clone_histogram(histograms, PU_tag, directory+'hltPuppiMETNoMu_'+var, style_dict['hltPuppiMETNoMu']), 'draw': opt_draw, 'legendName': 'HLT Puppi-MET(no #mu) Raw', 'legendDraw': opt_legDraw},
        ]
@@ -735,7 +741,7 @@ if __name__ == '__main__':
 
    ROOT.TGaxis.SetExponentOffset(-Lef+.50*Lef, 0.03, 'y')
 
-   label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .050, opts.label)
+   label_sample = get_text(Lef+(1-Lef-Rig)*0.00, (1-Top)+Top*0.25, 11, .035, opts.label)
 
    GENJetCollections = [
      'ak4GenJetsNoNu',
@@ -757,12 +763,15 @@ if __name__ == '__main__':
    ]
 
    METCollections = [
+     'genMETCalo',
      'genMETTrue',
      'hltPFMET',
+     'hltPFMETNoMu',
      'hltPFMETTypeOne',
      'hltPFMETCHS',
      'hltPFMETSoftKiller',
      'hltPuppiMET',
+     'hltPuppiMETNoMu',
      'hltPuppiMETTypeOne',
      'hltPuppiMETWithPuppiForJets',
      'offlineMETs_Raw',
@@ -908,15 +917,15 @@ if __name__ == '__main__':
 
                # pT Response wrt GEN pT/eta
                for (i_key, i_title, i_ymin, i_ymax) in [
-                 ('pt_overGEN_Mean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
-                 ('pt_overGEN_Mean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;Response <Reco/GEN>', 0.1, 3.0),
-                 ('pt_minusGEN_Mean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];<Reco#minus GEN> [GeV]', -200, 200),
-                 ('pt_minusGEN_Mean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;<Reco#minus GEN> [GeV]', -200, 200),
+                 ('pt_overGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
+                 ('pt_overGEN_Mean_wrt_GEN_eta', ';GEN Jet #eta;Response <Reco/GEN>', 0.1, 3.0),
+                 ('pt_minusGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];<Reco#minus GEN> [GeV]', -200, 200),
+                 ('pt_minusGEN_Mean_wrt_GEN_eta', ';GEN Jet #eta;<Reco#minus GEN> [GeV]', -200, 200),
 
-                 ('pt_overOffline_Mean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];Response <HLT/Offline>', 0.1, 3.0),
-                 ('pt_overOffline_Mean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;Response <HLT/Offline>', 0.1, 3.0),
-                 ('pt_minusOffline_Mean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];<HLT#minus Offline> [GeV]', -200, 200),
-                 ('pt_minusOffline_Mean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;<HLT#minus Offline> [GeV]', -200, 200),
+                 ('pt_overOffline_Mean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];Response <HLT/Offline>', 0.1, 3.0),
+                 ('pt_overOffline_Mean_wrt_Offline_eta', ';Offline Jet #eta;Response <HLT/Offline>', 0.1, 3.0),
+                 ('pt_minusOffline_Mean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];<HLT#minus Offline> [GeV]', -200, 200),
+                 ('pt_minusOffline_Mean_wrt_Offline_eta', ';Offline Jet #eta;<HLT#minus Offline> [GeV]', -200, 200),
                ]:
                  tmp_name = i_jet+i_jetcat+'_'+i_key
 
@@ -935,25 +944,25 @@ if __name__ == '__main__':
 
                # pT Resolution (RMS) wrt GEN pT/eta
                for (i_key, i_title) in [
-                 ('pt_minusGEN_RMS_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
-                 ('pt_minusGEN_RMS_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) [GeV]'),
-                 ('pt_minusGEN_RMSOverMean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
-                 ('pt_minusGEN_RMSOverMean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
+#                 ('pt_minusGEN_RMS_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
+#                 ('pt_minusGEN_RMS_wrt_GEN_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) [GeV]'),
+#                 ('pt_minusGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+#                 ('pt_minusGEN_RMSOverMean_wrt_GEN_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
 
-                 ('pt_overGEN_RMS_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
-                 ('pt_overGEN_RMS_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})'),
-                 ('pt_overGEN_RMSOverMean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
-                 ('pt_overGEN_RMSOverMean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+                 ('pt_overGEN_RMS_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
+                 ('pt_overGEN_RMS_wrt_GEN_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})'),
+                 ('pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+                 ('pt_overGEN_RMSOverMean_wrt_GEN_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
 
-                 ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) [GeV]'),
-                 ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) [GeV]'),
-                 ('pt_minusOffline_RMSOverMean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
-                 ('pt_minusOffline_RMSOverMean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) / Response [GeV]'),
+#                 ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) [GeV]'),
+#                 ('pt_minusOffline_RMS_wrt_Offline_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) [GeV]'),
+#                 ('pt_minusOffline_RMSOverMean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
+#                 ('pt_minusOffline_RMSOverMean_wrt_Offline_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) / Response [GeV]'),
 
-                 ('pt_overOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
-                 ('pt_overOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})'),
-                 ('pt_overOffline_RMSOverMean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
-                 ('pt_overOffline_RMSOverMean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
+                 ('pt_overOffline_RMS_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
+                 ('pt_overOffline_RMS_wrt_Offline_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})'),
+                 ('pt_overOffline_RMSOverMean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
+                 ('pt_overOffline_RMSOverMean_wrt_Offline_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
                ]:
                  tmp_name = i_jet+i_jetcat+'_'+i_key
 
@@ -1147,11 +1156,11 @@ if __name__ == '__main__':
 
            # pT Response: RECO/{REF}
            for (i_key, i_title, i_ymin, i_ymax) in [
-             ('pt_overGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
-             ('pt_minusGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<Reco #minus GEN> [GeV]', -200, 200),
-             ('pt_paraToGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}> [GeV]', -200, 400),
-             ('pt_paraToGENMinusGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}#minus GEN> [GeV]', -250, 250),
-             ('pt_perpToGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#perp GEN)} > [GeV]', -30, 30),
+             ('pt_overGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
+             ('pt_minusGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<Reco #minus GEN> [GeV]', -200, 200),
+             ('pt_paraToGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}> [GeV]', -200, 400),
+             ('pt_paraToGENMinusGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}#minus GEN> [GeV]', -250, 250),
+             ('pt_perpToGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#perp GEN)} > [GeV]', -30, 30),
 
              ('pt_overOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];Response <HLT/Offline>', 0.1, 3.0),
              ('pt_minusOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<HLT#minus Offline> [GeV]', -200, 200),
@@ -1178,16 +1187,16 @@ if __name__ == '__main__':
 
            # pT Resolution (RMS)
            for (i_key, i_title) in [
-             ('pt_minusGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
-             ('pt_overGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
-             ('pt_paraToGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
-             ('pt_paraToGENMinusGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} [GeV]'),
-             ('pt_perpToGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
-             ('pt_minusGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
-             ('pt_overGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
-             ('pt_paraToGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
-             ('pt_paraToGENMinusGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} / Response [GeV]'),
-             ('pt_perpToGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
+             ('pt_minusGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
+             ('pt_overGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
+             ('pt_paraToGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
+             ('pt_paraToGENMinusGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} [GeV]'),
+             ('pt_perpToGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
+             ('pt_minusGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+             ('pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+             ('pt_paraToGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
+             ('pt_paraToGENMinusGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} / Response [GeV]'),
+             ('pt_perpToGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
 
              ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) [GeV]'),
              ('pt_overOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
@@ -1222,7 +1231,7 @@ if __name__ == '__main__':
        ## ----------------------------------------------------------------------------------------------------
        for pu_tag in ['NoPU', 'PU140', 'PU200']:
 
-           label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
+           label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, '') #!! pu_tag)
 
            for comp_tag in ['AK4Jets_PFCHS', 'AK4Jets_Puppi', 'AK4Jets_HLT', 'AK4Jets_Offline']:
 
@@ -1354,15 +1363,15 @@ if __name__ == '__main__':
 
                    # pT Response: RECO/{REF}
                    for (i_key, i_title, i_ymin, i_ymax) in [
-                     ('pt_overGEN_Mean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
-                     ('pt_overGEN_Mean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;Response <Reco/GEN>', 0.1, 3.0),
-                     ('pt_minusGEN_Mean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];<Reco#minus GEN> [GeV]', -200, 200),
-                     ('pt_minusGEN_Mean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;<Reco#minus GEN> [GeV]', -200, 200),
+                     ('pt_overGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];Response <Reco/GEN>', 0.1, 3.0),
+                     ('pt_overGEN_Mean_wrt_GEN_eta', ';GEN Jet #eta;Response <Reco/GEN>', 0.1, 3.0),
+                     ('pt_minusGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];<Reco#minus GEN> [GeV]', -200, 200),
+                     ('pt_minusGEN_Mean_wrt_GEN_eta', ';GEN Jet #eta;<Reco#minus GEN> [GeV]', -200, 200),
 
-                     ('pt_overOffline_Mean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];Response <HLT/Offline>', 0.1, 3.0),
-                     ('pt_overOffline_Mean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;Response <HLT/Offline>', 0.1, 3.0),
-                     ('pt_minusOffline_Mean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];<HLT#minus Offline> [GeV]', -200, 200),
-                     ('pt_minusOffline_Mean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;<HLT#minus Offline> [GeV]', -200, 200),
+                     ('pt_overOffline_Mean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];Response <HLT/Offline>', 0.1, 3.0),
+                     ('pt_overOffline_Mean_wrt_Offline_eta', ';Offline Jet #eta;Response <HLT/Offline>', 0.1, 3.0),
+                     ('pt_minusOffline_Mean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];<HLT#minus Offline> [GeV]', -200, 200),
+                     ('pt_minusOffline_Mean_wrt_Offline_eta', ';Offline Jet #eta;<HLT#minus Offline> [GeV]', -200, 200),
                    ]:
                      plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
 
@@ -1378,25 +1387,25 @@ if __name__ == '__main__':
 
                    # pT Resolution (RMS)
                    for (i_key, i_title) in [
-                     ('pt_minusGEN_RMS_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
-                     ('pt_minusGEN_RMS_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) [GeV]'),
-                     ('pt_minusGEN_RMSOverMean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
-                     ('pt_minusGEN_RMSOverMean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
+                     ('pt_minusGEN_RMS_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) [GeV]'),
+                     ('pt_minusGEN_RMS_wrt_GEN_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) [GeV]'),
+                     ('pt_minusGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                     ('pt_minusGEN_RMSOverMean_wrt_GEN_eta', ';GEN Jet #eta;RMS(Reco#minus GEN) / Response [GeV]'),
 
-                     ('pt_overGEN_RMS_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
-                     ('pt_overGEN_RMS_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})'),
-                     ('pt_overGEN_RMSOverMean_wrt_GEN_EtaIncl_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
-                     ('pt_overGEN_RMSOverMean_wrt_GEN_EtaIncl_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+                     ('pt_overGEN_RMS_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
+                     ('pt_overGEN_RMS_wrt_GEN_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})'),
+                     ('pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+                     ('pt_overGEN_RMSOverMean_wrt_GEN_eta', ';GEN Jet #eta;#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
 
-                     ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) [GeV]'),
-                     ('pt_minusOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) [GeV]'),
-                     ('pt_minusOffline_RMSOverMean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
-                     ('pt_minusOffline_RMSOverMean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) / Response [GeV]'),
+                     ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) [GeV]'),
+                     ('pt_minusOffline_RMS_wrt_Offline_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) [GeV]'),
+                     ('pt_minusOffline_RMSOverMean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];RMS(HLT#minus Offline) / Response [GeV]'),
+                     ('pt_minusOffline_RMSOverMean_wrt_Offline_eta', ';Offline Jet #eta;RMS(HLT#minus Offline) / Response [GeV]'),
 
-                     ('pt_overOffline_RMS_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
-                     ('pt_overOffline_RMS_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/'),
-                     ('pt_overOffline_RMSOverMean_wrt_Offline_EtaIncl_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
-                     ('pt_overOffline_RMSOverMean_wrt_Offline_EtaIncl_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
+                     ('pt_overOffline_RMS_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
+                     ('pt_overOffline_RMS_wrt_Offline_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/'),
+                     ('pt_overOffline_RMSOverMean_wrt_Offline_pt', ';Offline Jet p_{T} [GeV];#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
+                     ('pt_overOffline_RMSOverMean_wrt_Offline_eta', ';Offline Jet #eta;#sigma(p_{T}/p^{Offline}_{T})/<p_{T}/p^{Offline}_{T}>'),
                    ]:
                      plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.50, Bot+(1-Bot-Top)*0.95],
 
@@ -1415,7 +1424,7 @@ if __name__ == '__main__':
        ## ----------------------------------------------------------------------------------------------------
        for pu_tag in ['NoPU', 'PU140', 'PU200']:
 
-           label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, pu_tag)
+           label_PU = get_text((1-Lef-Rig)+Lef*1.00, (1-Top)+Top*0.25, 31, .050, '') #!!pu_tag)
 
            for comp_tag in ['MET_PF', 'MET_PFRaw', 'MET_PFType1', 'MET_Puppi', 'MET_PuppiRaw', 'MET_PuppiType1', 'MET_Raw_HLT', 'METNoMu_Raw_HLT', 'MET_Type1_HLT', 'MET_Raw_Offline', 'MET_Type1_Offline']:
 
@@ -1545,11 +1554,11 @@ if __name__ == '__main__':
 
                # pT Response: RECO/{REF}
                for (i_key, i_title, i_ymin, i_ymax) in [
-                 ('pt_overGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
-                 ('pt_minusGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<Reco#minus GEN> [GeV]', -200, 200),
-                 ('pt_paraToGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}> [GeV]', -200, 400),
-                 ('pt_paraToGENMinusGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}#minus GEN> [GeV]', -250, 250),
-                 ('pt_perpToGEN_Mean_wrt_genMETTrue_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#perp GEN)} > [GeV]', -30, 30),
+                 ('pt_overGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];Response <Reco/GEN>', 0.1, 3.0),
+                 ('pt_minusGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<Reco#minus GEN> [GeV]', -200, 200),
+                 ('pt_paraToGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}> [GeV]', -200, 400),
+                 ('pt_paraToGENMinusGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco #parallel GEN)}#minus GEN> [GeV]', -250, 250),
+                 ('pt_perpToGEN_Mean_wrt_GEN_pt', ';GEN MET [GeV];<MET#scale[0.75]{(Reco#perp GEN)} > [GeV]', -30, 30),
 
                  ('pt_overOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];Response <HLT/Offline>', 0.1, 3.0),
                  ('pt_minusOffline_Mean_wrt_Offline_pt', ';Offline MET [GeV];<HLT#minus Offline> [GeV]', -200, 200),
@@ -1571,16 +1580,16 @@ if __name__ == '__main__':
 
                # pT Resolution (RMS)
                for (i_key, i_title) in [
-                 ('pt_minusGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
-                 ('pt_overGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
-                 ('pt_paraToGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
-                 ('pt_paraToGENMinusGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} [GeV]'),
-                 ('pt_perpToGEN_RMS_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
-                 ('pt_minusGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
-                 ('pt_overGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
-                 ('pt_paraToGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
-                 ('pt_paraToGENMinusGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} / Response [GeV]'),
-                 ('pt_perpToGEN_RMSOverMean_wrt_genMETTrue_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
+                 ('pt_minusGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) [GeV]'),
+                 ('pt_overGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})'),
+                 ('pt_paraToGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} [GeV]'),
+                 ('pt_paraToGENMinusGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} [GeV]'),
+                 ('pt_perpToGEN_RMS_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  [GeV]'),
+                 ('pt_minusGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS(Reco#minus GEN) / Response [GeV]'),
+                 ('pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];#sigma(p_{T}/p^{GEN}_{T})/<p_{T}/p^{GEN}_{T}>'),
+                 ('pt_paraToGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco #parallel GEN)} / Response [GeV]'),
+                 ('pt_paraToGENMinusGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco_{#parallel GEN}#minus GEN)} / Response [GeV]'),
+                 ('pt_perpToGEN_RMSOverMean_wrt_GEN_pt', ';GEN MET [GeV];RMS#scale[0.75]{(Reco#perp GEN)}  / Response [GeV]'),
 
                  ('pt_minusOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];RMS(HLT#minus Offline) [GeV]'),
                  ('pt_overOffline_RMS_wrt_Offline_pt', ';Offline MET [GeV];#sigma(p_{T}/p^{Offline}_{T})'),
@@ -1614,42 +1623,42 @@ if __name__ == '__main__':
 
 #     'hltAK4PFCHS100_EtaIncl': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_pt'],
 #     },
 #
 #     'hltAK4PFCHS100_HB': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HB)',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline_pt0:Offline_pt'],
 #     },
 #
 #     'hltAK4PFCHS100_HGCal': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HGCal)',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_pt'],
 #     },
 #
 #     'hltAK4PFCHS100_HF': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HF)',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline_pt0:Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_EtaIncl': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV',
-#       'wrt': ['hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_HB': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HB)',
-#       'wrt': ['hltAK4PuppiJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HB_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HB_MatchedToOffline_pt0:Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_HGCal': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HGCal)',
-#       'wrt': ['hltAK4PuppiJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_HF': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HF)',
-#       'wrt': ['hltAK4PuppiJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HF_MatchedToOffline_pt0:Offline_EtaIncl_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HF_MatchedToOffline_pt0:Offline_pt'],
 #     },
    }
 
