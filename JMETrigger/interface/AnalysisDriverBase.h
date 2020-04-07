@@ -102,7 +102,7 @@ T const& AnalysisDriverBase::value(const std::string& key) const {
     throw std::runtime_error(ss_str.str());
   }
 
-  return *(ptr->Get());
+  return *ptr;
 }
 
 template<class T>
