@@ -582,7 +582,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
       }
     }
 
-    H1(dirPrefix+fhData.jetCollection+catLabel+"_njets")->Fill(jetIndices.size());
+    H1(dirPrefix+fhData.jetCollection+catLabel+"_njets")->Fill(0.01 + jetIndices.size());
 
     if(indexMaxPtJet >= 0){
       H1(dirPrefix+fhData.jetCollection+catLabel+"_pt0")->Fill(v_pt->at(indexMaxPtJet));
@@ -620,10 +620,13 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
         if(v_match_pt->at(idxMatch) <= matchJetPtMin){ continue; }
 
         auto const dR2(utils::deltaR2(v_eta->at(idx), v_phi->at(idx), v_match_eta->at(idxMatch), v_match_phi->at(idxMatch)));
-        if(dR2 < dR2min){ dR2min = dR2; indexBestMatch = idxMatch; }
+        if(dR2 < dR2min){
+          dR2min = dR2;
+          indexBestMatch = idxMatch;
+        }
       }
 
-      if(indexBestMatch > 0){
+      if(indexBestMatch >= 0){
         mapMatchIndeces.insert(std::make_pair(idx, indexBestMatch));
       }
     }
@@ -700,6 +703,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
           }
         }
         else {
+
           ++nJetsNotMatched;
 
           if((nJetsNotMatched == 1) or (jetPt > maxPtJetPtWithNoMatch)){
@@ -719,8 +723,8 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
         }
       }
 
-      H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_njets")->Fill(nJetsMatched);
-      H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_njets")->Fill(nJetsNotMatched);
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_njets")->Fill(0.01 + nJetsMatched);
+      H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_njets")->Fill(0.01 + nJetsNotMatched);
 
       if(indexMaxPtJetWithMatch >= 0){
         auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithMatch));
