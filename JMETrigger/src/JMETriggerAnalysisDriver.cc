@@ -611,11 +611,11 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
     }
 
     std::map<size_t, size_t> mapMatchIndeces;
-    float dR2min(matchJetDeltaRMin * matchJetDeltaRMin);
     for(size_t idx=0; idx<v_pt->size(); ++idx){
       if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
 
       int indexBestMatch(-1);
+      float dR2min(matchJetDeltaRMin * matchJetDeltaRMin);
       for(size_t idxMatch=0; idxMatch<v_match_pt->size(); ++idxMatch){
         if(v_match_pt->at(idxMatch) <= matchJetPtMin){ continue; }
 
