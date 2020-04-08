@@ -343,6 +343,9 @@ if __name__ == '__main__':
    parser.add_argument('-l', '--label', dest='label', action='store', default='',
                        help='text label (displayed in top-left corner)')
 
+   parser.add_argument('-u', '--upgrade', dest='upgrade', action='store_true', default=False,
+                       help='labels for Phase-2 plots')
+
    parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['pdf'],
                        help='list of extension(s) for output file(s)')
 
@@ -471,75 +474,45 @@ if __name__ == '__main__':
        _labels = [label_sample]
 
        _objLabel = ''
-       if   _hkey_basename.startswith('ak4GenJets_EtaIncl_'): _objLabel = 'AK4GenJets'
-       elif _hkey_basename.startswith('ak4GenJets_HB_'): _objLabel = 'AK4GenJets, |#eta|<1.5'
-       elif _hkey_basename.startswith('ak4GenJets_HE_'): _objLabel = 'AK4GenJets, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('ak4GenJets_HF_'): _objLabel = 'AK4GenJets, 3.0<|#eta|<5.0'
+       if   _hkey_basename.startswith('ak4GenJets_'):              _objLabel = 'AK4GenJets'
+       elif _hkey_basename.startswith('hltAK4CaloJets_'):          _objLabel = 'HLT AK4CaloJets'
+       elif _hkey_basename.startswith('hltAK4CaloJetsCorrected_'): _objLabel = 'HLT AK4CaloJetsCorrected'
+       elif _hkey_basename.startswith('hltAK4PFJets_'):            _objLabel = 'HLT AK4PFJets'
+       elif _hkey_basename.startswith('hltAK4PFJetsCorrected_'):   _objLabel = 'HLT AK4PFJetsCorrected'
+       elif _hkey_basename.startswith('ak8GenJets_'):              _objLabel = 'AK8GenJets'
+       elif _hkey_basename.startswith('hltAK8CaloJets_'):          _objLabel = 'HLT AK8CaloJets'
+       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_'): _objLabel = 'HLT AK8CaloJetsCorrected'
+       elif _hkey_basename.startswith('hltAK8PFJets_'):            _objLabel = 'HLT AK8PFJets'
+       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_'):   _objLabel = 'HLT AK8PFJetsCorrected'
+       elif _hkey_basename.startswith('hltCaloMET_'):              _objLabel = 'HLT CaloMET'
+       elif _hkey_basename.startswith('hltPFMET_'):                _objLabel = 'HLT PFMET'
+       elif _hkey_basename.startswith('hltPFMETNoMu_'):            _objLabel = 'HLT PFMETNoMu'
+       elif _hkey_basename.startswith('hltPFMETTypeOne_'):         _objLabel = 'HLT PFMET Type-1'
+       elif _hkey_basename.startswith('hltPuppiMET_'):             _objLabel = 'HLT PuppiMET'
+       elif _hkey_basename.startswith('hltPuppiMETNoMu_'):         _objLabel = 'HLT PuppiMETNoMu'
 
-       elif _hkey_basename.startswith('hltAK4CaloJets_EtaIncl_'): _objLabel = 'HLT AK4CaloJets'
-       elif _hkey_basename.startswith('hltAK4CaloJets_HB_'): _objLabel = 'HLT AK4CaloJets, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK4CaloJets_HE_'): _objLabel = 'HLT AK4CaloJets, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK4CaloJets_HF_'): _objLabel = 'HLT AK4CaloJets, 3.0<|#eta|<5.0'
+       if   '_EtaIncl_' in _hkey_basename: pass
+       elif '_HB_'      in _hkey_basename: _objLabel += ', |#eta|<'+('1.5' if opts.upgrade else '1.3')
+       elif '_HGCal_'   in _hkey_basename: _objLabel += ', 1.5<|#eta|<3.0'
+       elif '_HE_'      in _hkey_basename: _objLabel += ', 1.3<|#eta|<3.0'
+       elif '_HE1_'     in _hkey_basename: _objLabel += ', 1.3<|#eta|<2.5'
+       elif '_HE2_'     in _hkey_basename: _objLabel += ', 2.5<|#eta|<3.0'
+       elif '_HF_'      in _hkey_basename: _objLabel += ', 3.0<|#eta|<5.0'
+       elif '_HF1_'     in _hkey_basename: _objLabel += ', 3.0<|#eta|<4.0'
+       elif '_HF2_'     in _hkey_basename: _objLabel += ', 4.0<|#eta|<5.0'
 
-       elif _hkey_basename.startswith('hltAK4CaloJetsCorrected_EtaIncl_'): _objLabel = 'HLT AK4CaloJetsCorrected'
-       elif _hkey_basename.startswith('hltAK4CaloJetsCorrected_HB_'): _objLabel = 'HLT AK4CaloJetsCorrected, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK4CaloJetsCorrected_HE_'): _objLabel = 'HLT AK4CaloJetsCorrected, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK4CaloJetsCorrected_HF_'): _objLabel = 'HLT AK4CaloJetsCorrected, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('hltAK4PFJets_EtaIncl_'): _objLabel = 'HLT AK4PFJets'
-       elif _hkey_basename.startswith('hltAK4PFJets_HB_'): _objLabel = 'HLT AK4PFJets, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK4PFJets_HE_'): _objLabel = 'HLT AK4PFJets, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK4PFJets_HF_'): _objLabel = 'HLT AK4PFJets, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('hltAK4PFJetsCorrected_EtaIncl_'): _objLabel = 'HLT AK4PFJetsCorrected'
-       elif _hkey_basename.startswith('hltAK4PFJetsCorrected_HB_'): _objLabel = 'HLT AK4PFJetsCorrected, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK4PFJetsCorrected_HE_'): _objLabel = 'HLT AK4PFJetsCorrected, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK4PFJetsCorrected_HF_'): _objLabel = 'HLT AK4PFJetsCorrected, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('ak8GenJets_EtaIncl_'): _objLabel = 'AK8GenJets'
-       elif _hkey_basename.startswith('ak8GenJets_HB_'): _objLabel = 'AK8GenJets, |#eta|<1.5'
-       elif _hkey_basename.startswith('ak8GenJets_HE_'): _objLabel = 'AK8GenJets, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('ak8GenJets_HF_'): _objLabel = 'AK8GenJets, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('hltAK8CaloJets_EtaIncl_'): _objLabel = 'HLT AK8CaloJets'
-       elif _hkey_basename.startswith('hltAK8CaloJets_HB_'): _objLabel = 'HLT AK8CaloJets, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK8CaloJets_HE_'): _objLabel = 'HLT AK8CaloJets, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK8CaloJets_HF_'): _objLabel = 'HLT AK8CaloJets, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_EtaIncl_'): _objLabel = 'HLT AK8CaloJetsCorrected'
-       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_HB_'): _objLabel = 'HLT AK8CaloJetsCorrected, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_HE_'): _objLabel = 'HLT AK8CaloJetsCorrected, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_HF_'): _objLabel = 'HLT AK8CaloJetsCorrected, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('hltAK8PFJets_EtaIncl_'): _objLabel = 'HLT AK8PFJets'
-       elif _hkey_basename.startswith('hltAK8PFJets_HB_'): _objLabel = 'HLT AK8PFJets, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK8PFJets_HE_'): _objLabel = 'HLT AK8PFJets, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK8PFJets_HF_'): _objLabel = 'HLT AK8PFJets, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_EtaIncl_'): _objLabel = 'HLT AK8PFJetsCorrected'
-       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_HB_'): _objLabel = 'HLT AK8PFJetsCorrected, |#eta|<1.5'
-       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_HE_'): _objLabel = 'HLT AK8PFJetsCorrected, 1.5<|#eta|<3.0'
-       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_HF_'): _objLabel = 'HLT AK8PFJetsCorrected, 3.0<|#eta|<5.0'
-
-       elif _hkey_basename.startswith('hltCaloMET_'): _objLabel = 'HLT CaloMET'
-       elif _hkey_basename.startswith('hltPFMET_'): _objLabel = 'HLT PFMET'
-       elif _hkey_basename.startswith('hltPFMETNoMu_'): _objLabel = 'HLT PFMETNoMu'
-       elif _hkey_basename.startswith('hltPFMETTypeOne_'): _objLabel = 'HLT PFMET Type-1'
-       elif _hkey_basename.startswith('hltPuppiMET_'): _objLabel = 'HLT PuppiMET'
-       elif _hkey_basename.startswith('hltPuppiMETNoMu_'): _objLabel = 'HLT PuppiMETNoMu'
-
-       if   '_NotMatchedToGEN' in _hkey_basename: _objLabel += ' [Not Matched to GEN]'
+       if   '_NotMatchedToGEN'     in _hkey_basename: _objLabel += ' [Not Matched to GEN]'
        elif '_NotMatchedToOffline' in _hkey_basename: _objLabel += ' [Not Matched to Offline]'
-       elif '_NotMatchedToCalo' in _hkey_basename: _objLabel += ' [Not Matched to Calo]'
-       elif '_NotMatchedToPF' in _hkey_basename: _objLabel += ' [Not Matched to PF]'
-       elif '_NotMatchedToPFCHS' in _hkey_basename: _objLabel += ' [Not Matched to PFCHS]'
-       elif '_NotMatchedToPuppi' in _hkey_basename: _objLabel += ' [Not Matched to Puppi]'
-       elif '_MatchedToGEN' in _hkey_basename: _objLabel += ' [Matched to GEN]'
-       elif '_MatchedToOffline' in _hkey_basename: _objLabel += ' [Matched to Offline]'
-       elif '_MatchedToCalo' in _hkey_basename: _objLabel += ' [Matched to Calo]'
-       elif '_MatchedToPF' in _hkey_basename: _objLabel += ' [Matched to PF]'
-       elif '_MatchedToPFCHS' in _hkey_basename: _objLabel += ' [Matched to PFCHS]'
-       elif '_MatchedToPuppi' in _hkey_basename: _objLabel += ' [Matched to Puppi]'
+       elif '_NotMatchedToCalo'    in _hkey_basename: _objLabel += ' [Not Matched to Calo]'
+       elif '_NotMatchedToPF'      in _hkey_basename: _objLabel += ' [Not Matched to PF]'
+       elif '_NotMatchedToPFCHS'   in _hkey_basename: _objLabel += ' [Not Matched to PFCHS]'
+       elif '_NotMatchedToPuppi'   in _hkey_basename: _objLabel += ' [Not Matched to Puppi]'
+       elif '_MatchedToGEN'        in _hkey_basename: _objLabel += ' [Matched to GEN]'
+       elif '_MatchedToOffline'    in _hkey_basename: _objLabel += ' [Matched to Offline]'
+       elif '_MatchedToCalo'       in _hkey_basename: _objLabel += ' [Matched to Calo]'
+       elif '_MatchedToPF'         in _hkey_basename: _objLabel += ' [Matched to PF]'
+       elif '_MatchedToPFCHS'      in _hkey_basename: _objLabel += ' [Matched to PFCHS]'
+       elif '_MatchedToPuppi'      in _hkey_basename: _objLabel += ' [Matched to Puppi]'
 
        label_obj = get_text(Lef+(1-Rig-Lef)*0.95, Bot+(1-Top-Bot)*0.925, 31, .035, _objLabel)
        _labels += [label_obj]
