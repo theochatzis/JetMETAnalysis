@@ -6,14 +6,15 @@
 class JMETriggerAnalysisDriverPhase2 : public JMETriggerAnalysisDriver {
 
  public:
-  explicit JMETriggerAnalysisDriverPhase2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath="", const std::string& outputFileMode="recreate")
-    : JMETriggerAnalysisDriver(tfile, ttree, outputFilePath, outputFileMode) {}
+  explicit JMETriggerAnalysisDriverPhase2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
   ~JMETriggerAnalysisDriverPhase2() {}
+
+  void init() override;
+  void analyze() override;
 
  protected:
 
-  static const std::vector<std::string> jetCategoryLabels_;
-  virtual bool jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const;
+  bool jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const override;
 };
 
 #endif

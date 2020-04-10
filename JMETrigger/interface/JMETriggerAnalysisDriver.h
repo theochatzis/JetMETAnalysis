@@ -8,8 +8,7 @@
 class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 
  public:
-  explicit JMETriggerAnalysisDriver(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath="", const std::string& outputFileMode="recreate")
-    : AnalysisDriverBase(tfile, ttree, outputFilePath, outputFileMode) {}
+  explicit JMETriggerAnalysisDriver(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
   ~JMETriggerAnalysisDriver() {}
 
   void init() override;
@@ -17,7 +16,7 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 
  protected:
 
-  static const std::vector<std::string> jetCategoryLabels_;
+  std::vector<std::string> jetCategoryLabels_;
   virtual bool jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const;
 
   class fillHistoDataJets {
