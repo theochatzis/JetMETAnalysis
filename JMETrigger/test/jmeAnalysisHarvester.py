@@ -9,6 +9,7 @@ import re
 import ROOT
 
 from common.utils import *
+from common.efficiency import *
 
 def updateDictionary(dictionary, TDirectory, prefix=''):
 
@@ -220,6 +221,59 @@ if __name__ == '__main__':
               histograms[h_name2] = tmp_h1_xRMSScaled
        ### -------------------
 
+       ### Matching Efficiencies
+       for hkey_i in sorted(histograms.keys()):
+
+           if histograms[hkey_i].GetEntries() == 0:
+              continue
+
+           hkey_i_basename = os.path.basename(hkey_i)
+
+           if '_wrt_' in hkey_i_basename:
+              continue
+
+           hkey_i_dirname = os.path.dirname(hkey_i)
+           if hkey_i_dirname: hkey_i_dirname += '/'
+
+           if not (('_MatchedTo' in hkey_i_basename) or ('_NotMatchedTo' in hkey_i_basename)):
+              continue
+
+           if (opts.separator_2d in hkey_i_basename) and (not hkey_i_basename.endswith('_eta__vs__pt')):
+              continue
+           elif not (hkey_i_basename.endswith('_pt') or hkey_i_basename.endswith('_eta') or hkey_i_basename.endswith('_phi')):
+              continue
+           print(hkey_i_basename)
+
+           hkey_i_num, hkey_i_den = hkey_i_dirname+hkey_i_basename, None
+           if '_MatchedTo' in hkey_i_basename:
+              hkey_i_den1 = hkey_i_basename.split('_MatchedTo')[0]
+              hkey_i_den2 = hkey_i_basename.split('_MatchedTo')[1]
+              hkey_i_den = hkey_i_dirname+hkey_i_den1+hkey_i_den2[hkey_i_den2.find('_'):]
+           elif '_NotMatchedTo' in hkey_i_basename:
+              hkey_i_den1 = hkey_i_basename.split('_NotMatchedTo')[0]
+              hkey_i_den2 = hkey_i_basename.split('_NotMatchedTo')[1]
+              hkey_i_den = hkey_i_dirname+hkey_i_den1+hkey_i_den2[hkey_i_den2.find('_'):]
+
+           if hkey_i_num not in histograms:
+              KILL(log_prx+'AAA '+hkey_i_num)
+
+           if hkey_i_den not in histograms:
+              KILL(log_prx+'BBB '+hkey_i_den)
+
+           tmp_hnum = histograms[hkey_i_num]
+           tmp_hden = histograms[hkey_i_den]
+
+           if hkey_i_num+'_eff' in histograms:
+              KILL(log_prx+'CCC '+hkey_i_num+'_eff')
+
+           if tmp_hnum.InheritsFrom('TH2') and tmp_hden.InheritsFrom('TH2'):
+              tmp_hratio = tmp_hnum.Clone()
+              tmp_hratio.Divide(tmp_hden)
+              histograms[hkey_i_num+'_eff'] = tmp_hratio
+           else:
+              histograms[hkey_i_num+'_eff'] = get_efficiency_graph(tmp_hnum, tmp_hden)
+       ### -------------------
+
        ### output file -------
        output_file = None
        if len(INPUT_FILES) == 1:
@@ -248,7 +302,7 @@ if __name__ == '__main__':
 
           for i_idx in sorted(histograms.keys()):
 
-              if histograms[i_idx].GetEntries() == 0:
+              if hasattr(histograms[i_idx], 'GetEntries') and (histograms[i_idx].GetEntries() == 0):
                  continue
 
               output_tfile.cd()
