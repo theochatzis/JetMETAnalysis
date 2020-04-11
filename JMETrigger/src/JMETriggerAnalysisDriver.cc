@@ -839,7 +839,7 @@ void JMETriggerAnalysisDriver::fillHistograms_MET(const std::string& dir, const 
       H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metSumEtRatio, metMatchSumEt);
     }
 
-    auto const metDeltaPhiMatch(sqrt(utils::deltaPhi2(metPhi, metMatchPhi)));
+    auto const metDeltaPhiMatch(utils::deltaPhi(metPhi, metMatchPhi));
     H2(dirPrefix+fhData.metCollection+"_phi__vs__"+matchLabel+"_phi")->Fill(metPhi, metMatchPhi);
     H1(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel)->Fill(metDeltaPhiMatch);
     H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metDeltaPhiMatch, metMatchPt);

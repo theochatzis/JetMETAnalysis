@@ -48,11 +48,11 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
     std::vector<Match> matches;
   };
 
-  void fillHistograms_Jets(const std::string& dir, const fillHistoDataJets& fhDataJets);
-  void fillHistograms_MET(const std::string& dir, const fillHistoDataMET& fhDataMET);
-
   void bookHistograms_Jets(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
   void bookHistograms_MET(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels={});
+
+  void fillHistograms_Jets(const std::string& dir, const fillHistoDataJets& fhDataJets);
+  void fillHistograms_MET(const std::string& dir, const fillHistoDataMET& fhDataMET);
 };
 
 #endif

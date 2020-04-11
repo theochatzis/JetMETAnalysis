@@ -126,11 +126,11 @@ void JMETriggerAnalysisDriverPhase2::init(){
     bookHistograms_MET(selLabel, "hltPFMETSoftKiller", {"GEN"});
   }
 
-  for(auto const& algo : {"PF", "PFCHS", "Puppi"}){
+  for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
 
-    for(auto const& categ : jetCategoryLabels_){
+    for(std::string const& categ : jetCategoryLabels_){
 
-      bookHistograms_Jets(std::string("HLT_AK4")+algo+"JetCorrected"+categ+"_100", std::string("hltAK4")+algo+"JetsCorrected", {"GEN", "Offline"});
+      bookHistograms_Jets("HLT_AK4"+algo+"JetCorrected"+categ+"_100", "hltAK4"+algo+"JetsCorrected", {"GEN", "Offline"});
     }
   }
 }
@@ -217,13 +217,13 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
   fillHistograms_Jets("NoSelection", fhDataAK4PuppiJetsCorrected);
 
   //// HLT_AK4*JetCorrected*_100
-  for(auto const& algo : {"PF", "PFCHS", "Puppi"}){
+  for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
 
-    for(auto const& categ : jetCategoryLabels_){
+    for(std::string const& categ : jetCategoryLabels_){
 
-      auto const selLabel(std::string("HLT_AK4")+algo+"JetCorrected"+categ+"_100");
+      auto const selLabel("HLT_AK4"+algo+"JetCorrected"+categ+"_100");
 
-      auto const jetCollection(std::string("hltAK4")+algo+"JetsCorrected");
+      auto const jetCollection("hltAK4"+algo+"JetsCorrected");
       auto const& vec_pt(vector<float>(jetCollection+"_pt"));
       auto const& vec_eta(vector<float>(jetCollection+"_eta"));
       bool pass(false);
