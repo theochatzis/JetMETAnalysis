@@ -1,5 +1,6 @@
 <lcgdict>
   <class name="AnalysisDriverBase"/>
   <class name="JMETriggerAnalysisDriver"/>
+  <class name="JMETriggerAnalysisDriverRun2"/>
   <class name="JMETriggerAnalysisDriverPhase2"/>
 </lcgdict>

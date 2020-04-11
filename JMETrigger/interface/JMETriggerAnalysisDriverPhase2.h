@@ -6,7 +6,8 @@
 class JMETriggerAnalysisDriverPhase2 : public JMETriggerAnalysisDriver {
 
  public:
-  explicit JMETriggerAnalysisDriverPhase2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
+  explicit JMETriggerAnalysisDriverPhase2(const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
+  explicit JMETriggerAnalysisDriverPhase2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode="recreate");
   ~JMETriggerAnalysisDriverPhase2() {}
 
   void init() override;

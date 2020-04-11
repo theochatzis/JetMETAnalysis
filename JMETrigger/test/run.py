@@ -140,7 +140,11 @@ if __name__ == '__main__':
       print('-'*50)
       print(colored_text('[plugin]', ['1']), opts.plugin)
 
-   nEvtProcessed = 0
+   analyzer = getattr(ROOT, opts.plugin)(opts.output, 'recreate')
+   analyzer.setVerbosity(opts.verbosity)
+   analyzer.addOption('showEvery', str(SHOW_EVERY))
+   analyzer.init()
+
    for [i_inpFile, i_inpTree] in inputFileTreePairs:
 
        i_maxEvents = -1 if (opts.maxEvents < 0) else (opts.maxEvents - nEvtProcessed)
@@ -151,13 +155,10 @@ if __name__ == '__main__':
           print('maxEvents =', i_maxEvents)
           print('-'*50)
 
-       analyzer = getattr(ROOT, opts.plugin)(i_inpFile, i_inpTree)
-       analyzer.setVerbosity(opts.verbosity)
-       analyzer.setOutputFilePath(opts.output)
-       analyzer.setOutputFileMode('update' if nEvtProcessed else 'recreate')
-       analyzer.addOption('showEvery', str(SHOW_EVERY))
+       analyzer.setInputTTree(i_inpFile, i_inpTree)
        analyzer.process(skipEvents, i_maxEvents)
-       nEvtProcessed += analyzer.eventsProcessed()
+
+   nEvtProcessed = analyzer.eventsProcessed()
 
    if opts.verbosity > -99:
       print('events processed: {:d}'.format(nEvtProcessed))

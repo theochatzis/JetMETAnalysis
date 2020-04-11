@@ -17,8 +17,11 @@
 class AnalysisDriverBase {
 
  public:
-  explicit AnalysisDriverBase(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
+  explicit AnalysisDriverBase(const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
+  explicit AnalysisDriverBase(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode="recreate");
   virtual ~AnalysisDriverBase() {}
+
+  int setInputTTree(const std::string& tfile, const std::string& ttree);
 
   virtual void init() = 0;
   virtual void analyze() = 0;

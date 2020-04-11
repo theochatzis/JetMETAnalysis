@@ -3,7 +3,13 @@
 #include <math.h>
 
 JMETriggerAnalysisDriverRun2::JMETriggerAnalysisDriverRun2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
-  : AnalysisDriverBase(tfile, ttree, outputFilePath, outputFileMode) {
+  : JMETriggerAnalysisDriverRun2(outputFilePath, outputFileMode) {
+
+  setInputTTree(tfile, ttree);
+}
+
+JMETriggerAnalysisDriverRun2::JMETriggerAnalysisDriverRun2(const std::string& outputFilePath, const std::string& outputFileMode)
+  : AnalysisDriverBase(outputFilePath, outputFileMode) {
 
   jetCategoryLabels_ = {
     "_EtaIncl",
@@ -45,14 +51,14 @@ JMETriggerAnalysisDriverRun2::JMETriggerAnalysisDriverRun2(const std::string& tf
   hltPaths_PFMET_ = {
     "HLT_PFMET170_NotCleaned",
     "HLT_PFMET170_HBHECleaned",
-    "HLT_PFMET170_BeamHaloCleaned",
+//    "HLT_PFMET170_BeamHaloCleaned",
     "HLT_PFMET170_HBHE_BeamHaloCleaned",
     "HLT_PFMETTypeOne190_HBHE_BeamHaloCleaned",
     "HLT_PFMET200_NotCleaned",
     "HLT_PFMET200_HBHECleaned",
-    "HLT_PFMET250_HBHECleaned",
-    "HLT_PFMET300_HBHECleaned",
     "HLT_PFMET200_HBHE_BeamHaloCleaned",
+    "HLT_PFMET250_HBHECleaned",
+//    "HLT_PFMET300_HBHECleaned",
     "HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
   };
 }
@@ -111,7 +117,11 @@ void JMETriggerAnalysisDriverRun2::init(){
 
   // histograms: MET
   for(std::string const& metColl : {"offlineMETs_Raw", "offlineMETs_Type1", "offlineMETsPuppi_Raw", "offlineMETsPuppi_Type1"}){
-    bookHistograms_MET(metColl+"_oneGoodElectron", metColl);
+
+    for(std::string const& metHLT : hltPaths_PFMET_){
+      bookHistograms_MET(metColl+"_"+metHLT+"_total", metColl);
+      bookHistograms_MET(metColl+"_"+metHLT+"_pass", metColl);
+    }
   }
 }
 
@@ -125,10 +135,10 @@ void JMETriggerAnalysisDriverRun2::analyze(){
 
   // electron selection
   size_t nElectronsVeto(0), nElectronsGood(0);
-  auto const& electrons_pt(vector<float>("offlineIsolatedElectrons_pt"));
-  auto const& electrons_etaSC(vector<float>("offlineIsolatedElectrons_etaSC"));
-  auto const& electrons_phi(vector<float>("offlineIsolatedElectrons_phi"));
-  auto const& electrons_id(vector<uint>("offlineIsolatedElectrons_id"));
+  auto const& electrons_pt(vector<float>("offlineElectrons_pt"));
+  auto const& electrons_etaSC(vector<float>("offlineElectrons_etaSC"));
+  auto const& electrons_phi(vector<float>("offlineElectrons_phi"));
+  auto const& electrons_id(vector<uint>("offlineElectrons_id"));
 
   if((electrons_pt.size() != electrons_etaSC.size()) or (electrons_pt.size() != electrons_phi.size()) or (electrons_pt.size() != electrons_id.size())){
     throw std::runtime_error("electrons_pt size");
@@ -152,10 +162,10 @@ void JMETriggerAnalysisDriverRun2::analyze(){
 
   // veto on muons
   size_t nMuonsVeto(0);//, nMuonsGood(0);
-  auto const& muons_pt(vector<float>("offlineIsolatedMuons_pt"));
-  auto const& muons_eta(vector<float>("offlineIsolatedMuons_eta"));
-  auto const& muons_pfIso(vector<float>("offlineIsolatedMuons_pfIso"));
-  auto const& muons_id(vector<uint>("offlineIsolatedMuons_id"));
+  auto const& muons_pt(vector<float>("offlineMuons_pt"));
+  auto const& muons_eta(vector<float>("offlineMuons_eta"));
+  auto const& muons_pfIso(vector<float>("offlineMuons_pfIso"));
+  auto const& muons_id(vector<uint>("offlineMuons_id"));
 
   if((muons_pt.size() != muons_eta.size()) or (muons_pt.size() != muons_pfIso.size()) or (muons_pt.size() != muons_id.size())){
     throw std::runtime_error("muons_pt size");
@@ -188,18 +198,22 @@ void JMETriggerAnalysisDriverRun2::analyze(){
       continue;
     }
 
-    fillHistoDataMET fhDataMET;
-    fhDataMET.metCollection = metColl;
-    fillHistograms_MET(metColl+"_oneGoodElectron", fhDataMET);
-
     for(auto const& metHLT : hltPaths_PFMET_){
+
+      auto const& metHLT_flagL1TSeedPrescaledOrMasked(value<bool>("Flag_"+metHLT+"_L1TSeedPrescaledOrMasked"));
+      if(metHLT_flagL1TSeedPrescaledOrMasked){ continue; }
+
+      auto const& metHLT_flagHLTPathPrescaled(value<bool>("Flag_"+metHLT+"_HLTPathPrescaled"));
+      if(metHLT_flagHLTPathPrescaled){ continue; }
+
+      fillHistoDataMET fhDataMET;
+      fhDataMET.metCollection = metColl;
+      fillHistograms_MET(metColl+"_"+metHLT+"_total", fhDataMET);
 
       auto const& metHLTAccept(value<bool>(metHLT));
       if(not metHLTAccept){ continue; }
 
-      fillHistoDataMET fhDataMET;
-      fhDataMET.metCollection = metColl;
-      fillHistograms_MET(metColl+"_"+metHLT, fhDataMET);
+      fillHistograms_MET(metColl+"_"+metHLT+"_pass", fhDataMET);
     }
   }
 

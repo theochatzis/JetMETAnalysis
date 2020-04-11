@@ -1,7 +1,13 @@
 #include <NTupleAnalysis/JMETrigger/interface/JMETriggerAnalysisDriverPhase2.h>
 
 JMETriggerAnalysisDriverPhase2::JMETriggerAnalysisDriverPhase2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
-  : JMETriggerAnalysisDriver(tfile, ttree, outputFilePath, outputFileMode) {
+  : JMETriggerAnalysisDriverPhase2(outputFilePath, outputFileMode) {
+
+  setInputTTree(tfile, ttree);
+}
+
+JMETriggerAnalysisDriverPhase2::JMETriggerAnalysisDriverPhase2(const std::string& outputFilePath, const std::string& outputFileMode)
+  : JMETriggerAnalysisDriver(outputFilePath, outputFileMode) {
 
   jetCategoryLabels_ = {
     "_EtaIncl",

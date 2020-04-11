@@ -3,7 +3,13 @@
 #include <math.h>
 
 JMETriggerAnalysisDriver::JMETriggerAnalysisDriver(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
-  : AnalysisDriverBase(tfile, ttree, outputFilePath, outputFileMode) {
+  : JMETriggerAnalysisDriver(outputFilePath, outputFileMode) {
+
+  setInputTTree(tfile, ttree);
+}
+
+JMETriggerAnalysisDriver::JMETriggerAnalysisDriver(const std::string& outputFilePath, const std::string& outputFileMode)
+  : AnalysisDriverBase(outputFilePath, outputFileMode) {
 
   jetCategoryLabels_ = {
     "_EtaIncl",

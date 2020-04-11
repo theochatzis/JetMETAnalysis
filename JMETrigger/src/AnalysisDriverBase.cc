@@ -3,12 +3,20 @@
 
 #include <iostream>
 
+AnalysisDriverBase::AnalysisDriverBase(const std::string& outputFilePath, const std::string& outputFileMode)
+  : outputFilePath_(outputFilePath), outputFileMode_(outputFileMode) {}
+
 AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
-  : outputFilePath_(outputFilePath), outputFileMode_(outputFileMode) {
+  : AnalysisDriverBase(outputFilePath, outputFileMode) {
+
+  setInputTTree(tfile, ttree);
+}
+
+int AnalysisDriverBase::setInputTTree(const std::string& tfile, const std::string& ttree){
 
   theFile_.reset(new TFile(tfile.c_str()));
   if((theFile_.get() == nullptr) || theFile_->IsZombie()){
-    return;
+    return 1;
   }
 
   theReader_.reset(new TTreeReader(ttree.c_str(), theFile_.get()));
@@ -58,11 +66,13 @@ AnalysisDriverBase::AnalysisDriverBase(const std::string& tfile, const std::stri
       throw std::runtime_error(ss_str.str());
     }
   }
+
+  return 1;
 }
 
 void AnalysisDriverBase::process(const Long64_t firstEntry, const Long64_t maxEntries){
 
-  this->init();
+//  this->init();
 
   if((theReader_.get() == nullptr) || theReader_->IsInvalid()){
     throw std::runtime_error("AnalysisDriverBase::process -- invalid TTreeReader");

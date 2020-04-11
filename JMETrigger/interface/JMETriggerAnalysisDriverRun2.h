@@ -8,7 +8,8 @@
 class JMETriggerAnalysisDriverRun2 : public AnalysisDriverBase {
 
  public:
-  explicit JMETriggerAnalysisDriverRun2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
+  explicit JMETriggerAnalysisDriverRun2(const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
+  explicit JMETriggerAnalysisDriverRun2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode="recreate");
   ~JMETriggerAnalysisDriverRun2() {}
 
   void init() override;
