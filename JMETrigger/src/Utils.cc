@@ -19,12 +19,13 @@ std::vector<std::string> utils::stringTokens(const std::string& str, const std::
   return toks;
 }
 
-float utils::deltaPhi2(const float phi1, const float phi2){
+float utils::deltaPhi(const float phi1, const float phi2){
   auto dphi(std::abs(phi1 - phi2));
   if(dphi > M_PI) dphi -= 2*M_PI;
-  return dphi * dphi;
+  return dphi;
 }
 
 float utils::deltaR2(const float eta1, const float phi1, const float eta2, const float phi2){
-  return (eta1 - eta2) * (eta1 - eta2) + deltaPhi2(phi1, phi2);
+  auto const dphi(deltaPhi(phi1, phi2));
+  return ((eta1 - eta2) * (eta1 - eta2)) + (dphi * dphi);
 }
