@@ -20,7 +20,8 @@ def clone_histogram(histograms, tag1, tag2, setters={}):
 
     h0 = histograms[tag1][tag2].Clone()
     h0.UseCurrentStyle()
-    h0.SetDirectory(0)
+    if hasattr(h0, 'SetDirectory'):
+       h0.SetDirectory(0)
 
     h0 = th1_mergeUnderflowBinIntoFirstBin(h0)
     h0 = th1_mergeOverflowBinIntoLastBin(h0)
@@ -34,28 +35,6 @@ def clone_histogram(histograms, tag1, tag2, setters={}):
            getattr(h0, 'Set'+i_set)(setters[i_set])
 
     return h0
-
-def clone_graph(graphs, tag1, tag2, setters={}, verbose=False):
-
-    if tag1 not in graphs:
-       if verbose: WARNING('clone_graph -- will skip graphs["'+tag1+'"]["'+tag2+'"] (key "'+tag1+'" not found')
-       return None
-
-    if tag2 not in graphs[tag1]:
-       if verbose: WARNING('clone_graph -- will skip graphs["'+tag1+'"]["'+tag2+'"] (key "'+tag2+'" not found')
-       return None
-
-    g0 = graphs[tag1][tag2].Clone()
-    g0.UseCurrentStyle()
-#    g0.SetDirectory(0)
-
-    g0.SetMarkerSize(0)
-
-    for i_set in setters:
-        if hasattr(g0, 'Set'+i_set):
-           getattr(g0, 'Set'+i_set)(setters[i_set])
-
-    return g0
 
 def updateDictionary(dictionary, TDirectory, prefix='', verbose=False):
 
@@ -72,7 +51,7 @@ def updateDictionary(dictionary, TDirectory, prefix='', verbose=False):
 
            updateDictionary(dictionary, j_obj, prefix=key_prefix+j_key_name, verbose=verbose)
 
-        elif j_obj.InheritsFrom('TH1'):
+        elif j_obj.InheritsFrom('TH1') or j_obj.InheritsFrom('TGraph'):
 
            out_key = key_prefix+j_key_name
 
@@ -80,7 +59,8 @@ def updateDictionary(dictionary, TDirectory, prefix='', verbose=False):
               KILL(log_prx+'input error -> found duplicate of template ["'+out_key+'"] in input file: '+TDirectory.GetName())
 
            dictionary[out_key] = j_obj.Clone()
-           dictionary[out_key].SetDirectory(0)
+           if hasattr(dictionary[out_key], 'SetDirectory'):
+              dictionary[out_key].SetDirectory(0)
 
            if verbose:
               print(colored_text('[input]', ['1','92']), out_key)
@@ -244,21 +224,27 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
        pad2.Draw()
 
        denom = h11.Clone()
-       for _tmp in range(0, denom.GetNbinsX()+2): denom.SetBinError(_tmp, 0.)
-
-       h21 = None
+       if hasattr(denom, 'GetNbinsX'):
+          for _tmp in range(0, denom.GetNbinsX()+2): denom.SetBinError(_tmp, 0.)
+       else:
+          for _tmp in range(denom.GetN()):
+              denom.SetPointEYhigh(_tmp, 0.)
+              denom.SetPointEYlow(_tmp, 0.)
 
        plot_ratios = []
 
        for _tmp in histograms:
-
            histo = Histogram()
            if _tmp.th1 is not None:
               histo.th1 = _tmp.th1.Clone()
-              histo.th1.Divide(denom)
+              if hasattr(histo.th1, 'Divide'):
+                 histo.th1.Divide(denom)
+              else:
+                 histo.th1 = get_ratio_graph(histo.th1, denom)
 
            histo.draw = _tmp.draw
-           if 'same' not in histo.draw: histo.draw += ',same'
+           if _tmp.th1.InheritsFrom('TH1') and ('same' not in histo.draw):
+              histo.draw += ',same'
 
            histo.legendName = _tmp.legendName
            histo.legendDraw = _tmp.legendDraw
@@ -266,14 +252,13 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
            if hasattr(histo.th1, 'SetStats'):
               histo.th1.SetStats(0)
 
-           if h21 is None:
-              h21 = histo.th1
-
            plot_ratios += [histo]
 
        ROOT.SetOwnership(pad2, False)
 
        pad2.cd()
+
+       h21 = pad2.DrawFrame(XMIN, 0., XMAX, 2.)
 
        h21.SetFillStyle(3017)
        h21.SetFillColor(16)
@@ -306,9 +291,8 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
           h2max = max(int(h2max*105.)/100., int(h2max*95.)/100.)
           h21.GetYaxis().SetRangeUser(h2min, h2max)
 
-       h21.Draw('e2')
+#       h21.Draw('e2')
        for _tmp in plot_ratios:
-           if _tmp.th1 == h21: continue
            if _tmp.th1 is not None:
               _tmp.th1.Draw(_tmp.draw)
        h21.Draw('axis,same')
@@ -317,7 +301,6 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
     canvas.Update()
 
     for output_file in outputs:
-
         output_dirname = os.path.dirname(output_file)
         if not os.path.isdir(output_dirname):
            EXE('mkdir -p '+output_dirname)
@@ -415,6 +398,9 @@ if __name__ == '__main__':
 
    for _hkey in th1Keys:
 
+       if ('/' in _hkey) and (not _hkey.startswith('NoSelection/')) and (not _hkey.endswith('_eff')):
+          continue
+
        _hkey_basename = os.path.basename(_hkey)
 
        _hIsProfile = '_wrt_' in _hkey_basename
@@ -429,10 +415,13 @@ if __name__ == '__main__':
 
            h0 = inp['TH1s'][_hkey].Clone()
 
-           if h0.InheritsFrom('TH2'): continue
+           if h0.InheritsFrom('TH2'):
+              continue
 
            h0.UseCurrentStyle()
-           h0.SetDirectory(0)
+           if hasattr(h0, 'SetDirectory'):
+              h0.SetDirectory(0)
+
            h0.SetLineColor(inp['LineColor'])
            h0.SetLineStyle(inp['LineStyle'])
            h0.SetMarkerStyle(inp['MarkerStyle'])
@@ -519,7 +508,7 @@ if __name__ == '__main__':
 
        ## axes' titles
        _titleX, _titleY = _hkey_basename, ''
-       if _hIsProfile:
+       if _hIsProfile or _hkey_basename.endswith('_eff'):
           if 'Jets' in _hkey_basename:
              if _hkey_basename.endswith('_pt'): _titleX = 'Jet p_{T} [GeV]'
              elif _hkey_basename.endswith('_eta'): _titleX = 'Jet #eta'
@@ -541,6 +530,9 @@ if __name__ == '__main__':
                 _titleY = 'Events'
              else:
                 _titleY = 'Entries'
+
+       if _hkey_basename.endswith('_eff'):
+          _titleY = 'Efficiency'
 
        if   '_pt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
        elif '_pt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'

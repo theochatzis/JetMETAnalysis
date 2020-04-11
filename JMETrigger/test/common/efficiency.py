@@ -47,7 +47,7 @@ def get_ratio_graph(g_num_, g_den_, ignore_error=False):
 
         if not yd:
             if ignore_error: return None
-            else           : KILL('get_ratio_graph: null denominator value: N='+str(i))
+            else: KILL('get_ratio_graph: null denominator value: N='+str(i))
 
         for j in range(g_num_.GetN()):
             xn, yn = ROOT.Double(0.), ROOT.Double(0.)
