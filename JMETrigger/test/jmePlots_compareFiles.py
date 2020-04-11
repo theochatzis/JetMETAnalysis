@@ -90,7 +90,10 @@ class Histogram:
 
 def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac=0.3, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False):
 
-    h00 = histograms[0].th1
+    xyMinMax = []
+    if histograms[0].th1.InheritsFrom('TGraph'):
+       xyMinMax = get_xyminmax_from_graph(histograms[0].th1)
+
     nvalid_histograms = len(histograms)
 
     Top = canvas.GetTopMargin()
@@ -111,14 +114,19 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
     canvas.cd()
 
     XMIN, XMAX = xMin, xMax
-    if XMIN is None: XMIN = h00.GetBinLowEdge(1)
-    if XMAX is None: XMAX = h00.GetBinLowEdge(1+h00.GetNbinsX())
+    if XMIN is None: XMIN = xyMinMax[0] if xyMinMax else histograms[0].GetBinLowEdge(1)
+    if XMAX is None: XMAX = xyMinMax[2] if xyMinMax else histograms[0].GetBinLowEdge(1+histograms[0].GetNbinsX())
 
-    HMAX = 0.0
+    HMIN, HMAX = 1e8, -1e8
     for _tmp in histograms:
-        if (_tmp.th1 is not None) and hasattr(_tmp.th1, 'GetNbinsX'):
-           for i_bin in range(1, _tmp.th1.GetNbinsX()+1):
-               HMAX = max(HMAX, (_tmp.th1.GetBinContent(i_bin) + _tmp.th1.GetBinError(i_bin)))
+        if (_tmp.th1 is not None):
+           if hasattr(_tmp.th1, 'GetNbinsX'):
+              for i_bin in range(1, _tmp.th1.GetNbinsX()+1):
+                  HMAX = max(HMAX, (_tmp.th1.GetBinContent(i_bin) + _tmp.th1.GetBinError(i_bin)))
+           else:
+              _tmp_xyMinMax = get_xyminmax_from_graph(_tmp.th1)
+              HMIN = min(HMIN, _tmp_xyMinMax[1])
+              HMAX = max(HMAX, _tmp_xyMinMax[3])
 
     YMIN, YMAX = yMin, yMax
     if YMIN is None: YMIN = .0003 if logY else .0001
@@ -176,21 +184,21 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
 
        if not h11: return 1
 
-       h11.Draw('axis,same')
-       h11.GetXaxis().SetTitle('')
-       h11.GetYaxis().SetTitle(title.split(';')[2])
-       h11.GetXaxis().SetRangeUser(XMIN, XMAX)
+       h0.Draw('axis,same')
+       h0.GetXaxis().SetTitle('')
+       h0.GetYaxis().SetTitle(title.split(';')[2])
+       h0.GetXaxis().SetRangeUser(XMIN, XMAX)
 
-       h11.GetYaxis().SetTitleSize(h11.GetYaxis().GetTitleSize()/pad1H)
-       h11.GetYaxis().SetTitleOffset(h11.GetYaxis().GetTitleOffset()*pad1H)
-       h11.GetXaxis().SetLabelSize(0)
-       h11.GetYaxis().SetLabelSize (h11.GetYaxis().GetLabelSize() /pad1H)
-       h11.GetXaxis().SetTickLength(h11.GetXaxis().GetTickLength()/pad1H)
+       h0.GetYaxis().SetTitleSize(h0.GetYaxis().GetTitleSize()/pad1H)
+       h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset()*pad1H)
+       h0.GetXaxis().SetLabelSize(0)
+       h0.GetYaxis().SetLabelSize (h0.GetYaxis().GetLabelSize() /pad1H)
+       h0.GetXaxis().SetTickLength(h0.GetXaxis().GetTickLength()/pad1H)
 
        if YMIN is None: YMIN = .0003 if logY else .0001
        if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001) *(1./.85))
 
-       h11.GetYaxis().SetRangeUser(YMIN, YMAX)
+       h0.GetYaxis().SetRangeUser(YMIN, YMAX)
 
        if leg:
           leg.Draw('same')

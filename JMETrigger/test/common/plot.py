@@ -61,6 +61,24 @@ def get_ymax_from_graphs(gls, error=True):
 
     return ymax
 
+def get_xyminmax_from_graph(graph, error=True):
+    xmin, ymin, xmax, ymax = None, None, None, None
+    for idx in range(g.GetN()):
+        xval, yval = ROOT.Double(0.), ROOT.Double(0.)
+        graph.GetPoint(idx, xval, yval)
+
+        x0min = xval - (error * graph.GetErrorXlow(idx))
+        x0max = xval + (error * graph.GetErrorXhigh(idx))
+        y0min = yval - (error * graph.GetErrorYlow(idx))
+        y0max = yval + (error * graph.GetErrorYhigh(idx))
+
+        if (xmin is None) or (x0min < xmin): xmin = x0min
+        if (xmax is None) or (x0max > xmax): xmax = x0max
+        if (ymin is None) or (y0min < ymin): ymin = y0min
+        if (ymax is None) or (y0max > ymax): ymax = y0max
+
+    return [xmin, ymin, xmax, ymax]
+
 def poisson_ratio_graph(hN_, hD_, plot_empty_bins=False, plot_errX=True):
 
     g_ = ROOT.TGraphAsymmErrors()

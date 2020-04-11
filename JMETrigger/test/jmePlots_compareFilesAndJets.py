@@ -407,10 +407,17 @@ if __name__ == '__main__':
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
 
-       if 'Puppi' not in _hkey:
-          continue
+       _hkey_jmeColl, _jmeCollTuple = None, []
 
-       jetCollTuple = [('PF', 1), ('PFCHS', 2), ('Puppi', 4)]
+       if 'PuppiMET' in _hkey:
+          _hkey_jmeColl = 'PuppiMET'
+          _jmeCollTuple = [('PFMET', 1), ('PFMETCHS', 2), ('PuppiMET', 4)]
+       elif 'Puppi' in _hkey:
+          _hkey_jmeColl = 'Puppi'
+          _jmeCollTuple = [('PF', 1), ('PFCHS', 2), ('Puppi', 4)]
+
+       if _hkey_jmeColl is None:
+          continue
 
        ## histograms
        _divideByBinWidth = False
@@ -420,8 +427,8 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           for (jetCollName, jetCollColor) in jetCollTuple:
-               _hkeyNew = _hkey.replace('Puppi', jetCollName)
+           for (_jmeCollName, _jmeCollColor) in _jmeCollTuple:
+               _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
 
                h0 = inp['TH1s'][_hkeyNew].Clone()
 
@@ -432,10 +439,10 @@ if __name__ == '__main__':
                if hasattr(h0, 'SetDirectory'):
                   h0.SetDirectory(0)
 
-               h0.SetLineColor(jetCollColor)
+               h0.SetLineColor(_jmeCollColor)
                h0.SetLineStyle(inp['LineStyle'])
                h0.SetMarkerStyle(inp['MarkerStyle'])
-               h0.SetMarkerColor(jetCollColor)
+               h0.SetMarkerColor(_jmeCollColor)
                h0.SetMarkerSize(inp['MarkerSize'] if _hIsProfile else 0.)
 
                h0.SetBit(ROOT.TH1.kNoTitle)
@@ -461,7 +468,7 @@ if __name__ == '__main__':
                hist0 = Histogram()
                hist0.th1 = h0
                hist0.draw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'hist,e0'
-               hist0.legendName = inp['Legend']+' '+jetCollName
+               hist0.legendName = inp['Legend']+' '+_jmeCollName
                hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
                if (len(_hists) > 0) and (not _hIsEfficiency):
                   hist0.draw += ',same'
@@ -647,7 +654,7 @@ if __name__ == '__main__':
          'title': _htitle,
          'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
-         'outputs': [OUTDIR+'/jetsVS_'+_hkey+'.'+_tmp for _tmp in EXTS],
+         'outputs': [OUTDIR+'/jmeVS_'+_hkey+'.'+_tmp for _tmp in EXTS],
 
          'ratio': True,
          'logY': False,
