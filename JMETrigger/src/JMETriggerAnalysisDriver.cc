@@ -425,6 +425,7 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
 
       addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
       addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_eta", binEdges_pt, binEdges_eta);
       addTH2D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta", binEdges_eta, binEdges_eta);
 
       addTH1D(dirPrefix+jetType+catLabel+"_MatchedTo"+matchLabel+"_pt_over"+matchLabel, binEdges_response);
@@ -733,11 +734,12 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
       if(indexMaxPtJetWithMatch >= 0){
         auto const maxPtJetPt(v_pt->at(indexMaxPtJetWithMatch));
         auto const maxPtJetMatchPt(v_match_pt->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
+        auto const maxPtJetMatchEta(v_match_eta->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
         H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0")->Fill(maxPtJetPt);
         H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(maxPtJetPt, maxPtJetMatchPt);
+        H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0__vs__"+matchLabel+"_eta")->Fill(maxPtJetPt, maxPtJetMatchEta);
         if(maxPtJetMatchPt != 0.){
           auto const maxPtJetPtRatio(maxPtJetPt / maxPtJetMatchPt);
-          auto const maxPtJetMatchEta(v_match_eta->at(mapMatchIndeces.at(indexMaxPtJetWithMatch)));
           H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel)->Fill(maxPtJetPtRatio);
           H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(maxPtJetPtRatio, maxPtJetMatchPt);
           H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt0_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(maxPtJetPtRatio, maxPtJetMatchEta);
