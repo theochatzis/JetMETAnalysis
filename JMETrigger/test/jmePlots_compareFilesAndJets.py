@@ -407,6 +407,11 @@ if __name__ == '__main__':
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
 
+       if 'Puppi' not in _hkey:
+          continue
+
+       jetCollTuple = [('PF', 1), ('PFCHS', 2), ('Puppi', 4)]
+
        ## histograms
        _divideByBinWidth = False
        _normalizedToUnity = False
@@ -415,48 +420,52 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           h0 = inp['TH1s'][_hkey].Clone()
+           for (jetCollName, jetCollColor) in jetCollTuple:
+               _hkeyNew = _hkey.replace('Puppi', jetCollName)
 
-           if h0.InheritsFrom('TH2'):
-              continue
+               h0 = inp['TH1s'][_hkeyNew].Clone()
 
-           h0.UseCurrentStyle()
-           if hasattr(h0, 'SetDirectory'):
-              h0.SetDirectory(0)
+               if h0.InheritsFrom('TH2'):
+                  continue
 
-           h0.SetLineColor(inp['LineColor'])
-           h0.SetLineStyle(inp['LineStyle'])
-           h0.SetMarkerStyle(inp['MarkerStyle'])
-           h0.SetMarkerColor(inp['MarkerColor'])
-           h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
+               h0.UseCurrentStyle()
+               if hasattr(h0, 'SetDirectory'):
+                  h0.SetDirectory(0)
 
-           h0.SetBit(ROOT.TH1.kNoTitle)
+               h0.SetLineColor(jetCollColor)
+               h0.SetLineStyle(inp['LineStyle'])
+               h0.SetMarkerStyle(inp['MarkerStyle'])
+               h0.SetMarkerColor(jetCollColor)
+               h0.SetMarkerSize(inp['MarkerSize'] if _hIsProfile else 0.)
 
-           if hasattr(h0, 'SetStats'):
-              h0.SetStats(0)
+               h0.SetBit(ROOT.TH1.kNoTitle)
 
-           if (len(_hists) == 0) and (not (_hIsProfile or _hIsEfficiency)):
-              _tmpBW = None
-              for _tmp in range(1, h0.GetNbinsX()+1):
-                  if _tmpBW is None:
-                     _tmpBW = h0.GetBinWidth(_tmp)
-                  elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
-                     _divideByBinWidth = True
-                     break
+               if hasattr(h0, 'SetStats'):
+                  h0.SetStats(0)
 
-           if _divideByBinWidth:
-              h0.Scale(1., 'width')
+               if (len(_hists) == 0) and (not (_hIsProfile or _hIsEfficiency)):
+                  _tmpBW = None
+                  for _tmp in range(1, h0.GetNbinsX()+1):
+                      if _tmpBW is None:
+                         _tmpBW = h0.GetBinWidth(_tmp)
+                      elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
+                         _divideByBinWidth = True
+                         break
 
-           if _normalizedToUnity:
-              h0.Scale(1. / h0.Integral())
+               if _divideByBinWidth:
+                  h0.Scale(1., 'width')
 
-           hist0 = Histogram()
-           hist0.th1 = h0
-           hist0.draw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'hist,e0'
-           hist0.legendName = inp['Legend']
-           hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
-           if len(_hists) > 0: hist0.draw += ',same'
-           _hists.append(hist0)
+               if _normalizedToUnity:
+                  h0.Scale(1. / h0.Integral())
+
+               hist0 = Histogram()
+               hist0.th1 = h0
+               hist0.draw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'hist,e0'
+               hist0.legendName = inp['Legend']+' '+jetCollName
+               hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
+               if (len(_hists) > 0) and (not _hIsEfficiency):
+                  hist0.draw += ',same'
+               _hists.append(hist0)
 
        if len(_hists) == 0:
           continue
@@ -635,10 +644,10 @@ if __name__ == '__main__':
        plot(**{
          'canvas': canvas,
          'histograms': _hists,
-         'title': _htitle, 
-         'labels': _labels, 
+         'title': _htitle,
+         'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
-         'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
+         'outputs': [OUTDIR+'/jetsVS_'+_hkey+'.'+_tmp for _tmp in EXTS],
 
          'ratio': True,
          'logY': False,
