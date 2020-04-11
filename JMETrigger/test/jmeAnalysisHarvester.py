@@ -242,7 +242,6 @@ if __name__ == '__main__':
               continue
            elif not (hkey_i_basename.endswith('_pt') or hkey_i_basename.endswith('_eta') or hkey_i_basename.endswith('_phi')):
               continue
-           print(hkey_i_basename)
 
            hkey_i_num, hkey_i_den = hkey_i_dirname+hkey_i_basename, None
            if '_MatchedTo' in hkey_i_basename:
@@ -272,6 +271,48 @@ if __name__ == '__main__':
               histograms[hkey_i_num+'_eff'] = tmp_hratio
            else:
               histograms[hkey_i_num+'_eff'] = get_efficiency_graph(tmp_hnum, tmp_hden)
+       ### -------------------
+
+       ### Trigger Efficiencies [HLT_*Jet*]
+       for hkey_i in sorted(histograms.keys()):
+
+           if histograms[hkey_i].GetEntries() == 0:
+              continue
+
+           hkey_i_basename = os.path.basename(hkey_i)
+
+           if '_wrt_' in hkey_i_basename:
+              continue
+
+           if not (('_MatchedTo' in hkey_i_basename) and ('_pt0' in hkey_i_basename) and (opts.separator_2d not in hkey_i_basename)):
+              continue
+
+           hkey_i_dirname = os.path.dirname(hkey_i)
+           if hkey_i_dirname: hkey_i_dirname += '/'
+
+           if not (('HLT_' in hkey_i_dirname) and ('Jet' in hkey_i_dirname)):
+              continue
+
+           hkey_i_num = hkey_i
+           hkey_i_den = 'NoSelection/'+hkey_i_basename
+
+           if hkey_i_num not in histograms: KILL(log_prx+'AAA2 '+hkey_i_num)
+           if hkey_i_den not in histograms: KILL(log_prx+'BBB2 '+hkey_i_den)
+
+           tmp_hnum = histograms[hkey_i_num]
+           tmp_hden = histograms[hkey_i_den]
+
+           if not tmp_hnum.InheritsFrom('TH2'): KILL(log_prx+'AAA3 '+hkey_i_num)
+           if not tmp_hden.InheritsFrom('TH2'): KILL(log_prx+'BBB3 '+hkey_i_den)
+
+           tmp_hnum0 = tmp_hnum.ProjectionY('tmp_hnum0')
+           tmp_hden0 = tmp_hden.ProjectionY('tmp_hden0')
+
+           tmp_effname = hkey_i_num.replace(opts.separator_2d, '_')+'_eff'
+
+           if tmp_effname in histograms: KILL(log_prx+'CCC2 '+tmp_effname)
+
+           histograms[tmp_effname] = get_efficiency_graph(tmp_hnum0, tmp_hden0)
        ### -------------------
 
        ### output file -------

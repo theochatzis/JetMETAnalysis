@@ -1616,42 +1616,42 @@ if __name__ == '__main__':
 
 #     'hltAK4PFCHS100_EtaIncl': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PFCHSJetsCorrected_EtaIncl_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
 #
 #     'hltAK4PFCHS100_HB': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HB)',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_HB_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PFCHSJetsCorrected_HB_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
 #
 #     'hltAK4PFCHS100_HGCal': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HGCal)',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_HGCal_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PFCHSJetsCorrected_HGCal_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
 #
 #     'hltAK4PFCHS100_HF': {
 #       'label': 'HLT AK4 PF+CHS, p_{T} > 100 GeV (HF)',
-#       'wrt': ['hltAK4PFCHSJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PFCHSJetsCorrected_HF_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PFCHSJetsCorrected_HF_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_EtaIncl': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV',
-#       'wrt': ['hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_EtaIncl_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PuppiJetsCorrected_EtaIncl_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_HB': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HB)',
-#       'wrt': ['hltAK4PuppiJetsCorrected_HB_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HB_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_HB_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PuppiJetsCorrected_HB_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_HGCal': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HGCal)',
-#       'wrt': ['hltAK4PuppiJetsCorrected_HGCal_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HGCal_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_HGCal_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PuppiJetsCorrected_HGCal_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
 #
 #     'hltAK4Puppi100_HF': {
 #       'label': 'HLT AK4 Puppi, p_{T} > 100 GeV (HF)',
-#       'wrt': ['hltAK4PuppiJetsCorrected_HF_MatchedToGEN_pt0:ak4GenJetsNoNu_EtaIncl_pt', 'hltAK4PuppiJetsCorrected_HF_MatchedToOffline_pt0:Offline_pt'],
+#       'wrt': ['hltAK4PuppiJetsCorrected_HF_MatchedToGEN_pt0__vs__GEN_pt', 'hltAK4PuppiJetsCorrected_HF_MatchedToOffline_pt0__vs__Offline_pt'],
 #     },
    }
 
