@@ -108,13 +108,6 @@ void JMETriggerAnalysisDriverRun2::init(){
   // histogram: events counter
   addTH1D("eventsProcessed", {0, 1});
 
-//  for(auto const& selLabel : {"NoSelection"}){
-//
-//    // histograms: AK4 Jets
-//    bookHistograms_Jets(selLabel, "offlineAK04PFCHSJetsCorrected");
-//
-//    // histograms: AK8 Jets
-
   // histograms: MET
   for(std::string const& metColl : {"offlineMETs_Raw", "offlineMETs_Type1", "offlineMETsPuppi_Raw", "offlineMETsPuppi_Type1"}){
 
@@ -194,7 +187,7 @@ void JMETriggerAnalysisDriverRun2::analyze(){
     auto const& metPhi(vector<float>(metColl+"_phi").at(0));
 
     // cut on deltaPhi(electron, MET)
-    if(utils::deltaPhi(electronPhi, metPhi) <= (2. * M_PI / 3.)){
+    if(utils::deltaPhi(electronPhi, metPhi) > (-4. * M_PI / 5.)){
       continue;
     }
 
@@ -216,12 +209,6 @@ void JMETriggerAnalysisDriverRun2::analyze(){
       fillHistograms_MET(metColl+"_"+metHLT+"_pass", fhDataMET);
     }
   }
-
-//  //// AK4 Jets
-//  fillHistoDataJets fhDataAK4;
-//  fhDataAK4.jetCollection = "offlineAK04PFCHSJetsCorrected";
-//  fhDataAK4.jetPtMin = 30.;
-//  fillHistograms_Jets(selLabel, fhDataAK4);
 }
 
 void JMETriggerAnalysisDriverRun2::bookHistograms_Jets(const std::string& dir, const std::string& jetType, const std::vector<std::string>& matchLabels){
@@ -356,7 +343,7 @@ void JMETriggerAnalysisDriverRun2::bookHistograms_MET(const std::string& dir, co
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
   const std::vector<float> binEdges_pt(
-    {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000}
+    {0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 480, 540, 600, 700, 800, 1000}
   );
 
   std::vector<float> binEdges_phi(41);
