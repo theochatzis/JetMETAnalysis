@@ -107,7 +107,7 @@ class Histogram:
         self.legendName = ''
         self.legendDraw = ''
 
-def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[], divideByBinWidth=False, normalizedToUnity=False, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False,ratio=False):
+def plot(output_extensions, stickers, output, templates, title, legXY=[], divideByBinWidth=False, normalizedToUnity=False, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False,ratio=False):
 
     h0 = None
 
@@ -146,6 +146,11 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
 
     if h0 is None:
        return 1
+
+    canvas = ROOT.TCanvas()
+    canvas.SetGrid(1,1)
+    canvas.SetTickx()
+    canvas.SetTicky()
 
     Top = canvas.GetTopMargin()
     Rig = canvas.GetRightMargin()
@@ -360,12 +365,12 @@ def plot(canvas, output_extensions, stickers, output, templates, title, legXY=[]
        EXE('mkdir -p '+output_dirname)
 
     for i_ext in output_extensions:
-
         out_file = output_basename_woExt+'.'+i_ext
-
         canvas.SaveAs(out_file)
 
         print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', os.path.relpath(out_file)
+
+    canvas.Close()
 
     return 0
 
@@ -506,15 +511,10 @@ if __name__ == '__main__':
 
    ROOT.TGaxis.SetMaxDigits(4)
 
-   canvas = ROOT.TCanvas()
-   canvas.SetGrid(1,1)
-   canvas.SetTickx()
-   canvas.SetTicky()
-
-   Top = canvas.GetTopMargin()
-   Rig = canvas.GetRightMargin()
-   Bot = canvas.GetBottomMargin()
-   Lef = canvas.GetLeftMargin()
+   Top = ROOT.gStyle.GetPadTopMargin()
+   Rig = ROOT.gStyle.GetPadRightMargin()
+   Bot = ROOT.gStyle.GetPadBottomMargin()
+   Lef = ROOT.gStyle.GetPadLeftMargin()
 
    ROOT.TGaxis.SetExponentOffset(-Lef+.50*Lef, 0.03, 'y')
 
@@ -547,7 +547,7 @@ if __name__ == '__main__':
            kwargs = {'labelA': inputA_label, 'labelB': inputB_label, 'skipGEN': opts.skip_GEN}
 
            # pT
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+           plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_pt',
 
@@ -567,7 +567,7 @@ if __name__ == '__main__':
            )
     
            # phi
-           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
+           plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
     
              stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_phi',
     
@@ -587,7 +587,7 @@ if __name__ == '__main__':
            for i_ref in ['GEN', 'Offline']:
 
                # pT response (Ratio wrt {REF})
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
 
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_pt_over'+i_ref,
 
@@ -605,7 +605,7 @@ if __name__ == '__main__':
                )
         
                # pT Delta {REF} (X - {REF})
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_pt_minus'+i_ref,
     
@@ -623,7 +623,7 @@ if __name__ == '__main__':
                )
 
                # pT component parallel to {REF}
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_pt_paraTo'+i_ref,
     
@@ -641,7 +641,7 @@ if __name__ == '__main__':
                )
     
                # pT component parallel to {REF}, - {REF}
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_pt_paraTo'+i_ref+'Minus'+i_ref,
 
@@ -659,7 +659,7 @@ if __name__ == '__main__':
                )
     
                # pT component perpendicular to {REF}
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
     
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_pt_perpTo'+i_ref,
     
@@ -677,7 +677,7 @@ if __name__ == '__main__':
                )
     
                # phi response (Ratio wrt {REF})
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_phi_over'+i_ref,
     
@@ -695,7 +695,7 @@ if __name__ == '__main__':
                )
         
                # phi Delta {REF} (X - {REF})
-               plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
+               plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.95],
         
                  stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+i_met+'_phi_minus'+i_ref,
     
@@ -728,7 +728,7 @@ if __name__ == '__main__':
            ]:
              tmp_name = i_met+'_'+i_key
 
-             plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.30, Bot+(1-Bot-Top)*0.95],
+             plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.10, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.30, Bot+(1-Bot-Top)*0.95],
 
                stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+tmp_name,
 
@@ -763,7 +763,7 @@ if __name__ == '__main__':
            ]:
              tmp_name = i_met+'_'+i_key
 
-             plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
+             plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.05, Bot+(1-Bot-Top)*0.65, Lef+(1-Rig-Lef)*0.25, Bot+(1-Bot-Top)*0.95],
 
                stickers=[label_sample, label_var], output=opts.output+'/'+i_sel+'/'+tmp_name,
 
@@ -816,7 +816,7 @@ if __name__ == '__main__':
 #
 #           label_var = None #get_text(Lef+(1-Lef-Rig)*1.00, (1-Top)+Top*0.25, 31, .040, i_met)
 #
-#           plot(canvas=canvas, output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
+#           plot(output_extensions=EXTS, legXY=[Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.05, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.35],
 #
 #             stickers=[label_sample, label_var, label_eff], output=opts.output+'/Eff_'+i_eff+'/'+i_met,
 #

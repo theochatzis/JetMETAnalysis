@@ -35,7 +35,7 @@ def get_efficiency_graph(hP, hT, bin_ls=[]):
 
     return eff
 
-def get_ratio_graph(g_num_, g_den_, ignore_error=False):
+def get_ratio_graph(g_num_, g_den_, verbose=False):
 
     ratio = ROOT.TGraphAsymmErrors()
     ratio.SetLineColor(g_num_.GetLineColor())
@@ -58,10 +58,9 @@ def get_ratio_graph(g_num_, g_den_, ignore_error=False):
             if xn != xd: continue
 
             if yn and (not yd):
-               if ignore_error: return None
-               else:
-                 WARNING('get_ratio_graph: null denominator value: N='+str(i)+' [num = '+g_num_.GetName()+', den = '+g_den_.GetName()+']')
-                 continue
+               if verbose:
+                  WARNING('get_ratio_graph: null denominator value: N='+str(i)+' [num = '+g_num_.GetName()+', den = '+g_den_.GetName()+']')
+               continue
 
             n += 1
             r = yn/yd if yd else 1.

@@ -10,31 +10,31 @@ from common.efficiency import *
 from common.plot import *
 from common.plot_style import *
 
-def clone_histogram(histograms, tag1, tag2, setters={}):
-
-    if tag1 not in histograms:
-       return None
-
-    if tag2 not in histograms[tag1]:
-       return None
-
-    h0 = histograms[tag1][tag2].Clone()
-    h0.UseCurrentStyle()
-    if hasattr(h0, 'SetDirectory'):
-       h0.SetDirectory(0)
-
-    h0 = th1_mergeUnderflowBinIntoFirstBin(h0)
-    h0 = th1_mergeOverflowBinIntoLastBin(h0)
-
-    # defaults
-    h0.SetMarkerSize(0)
-    h0.SetLineWidth(2)
-
-    for i_set in setters:
-        if hasattr(h0, 'Set'+i_set):
-           getattr(h0, 'Set'+i_set)(setters[i_set])
-
-    return h0
+#def clone_histogram(histograms, tag1, tag2, setters={}):
+#
+#    if tag1 not in histograms:
+#       return None
+#
+#    if tag2 not in histograms[tag1]:
+#       return None
+#
+#    h0 = histograms[tag1][tag2].Clone()
+#    h0.UseCurrentStyle()
+#    if hasattr(h0, 'SetDirectory'):
+#       h0.SetDirectory(0)
+#
+#    h0 = th1_mergeUnderflowBinIntoFirstBin(h0)
+#    h0 = th1_mergeOverflowBinIntoLastBin(h0)
+#
+#    # defaults
+#    h0.SetMarkerSize(0)
+#    h0.SetLineWidth(2)
+#
+#    for i_set in setters:
+#        if hasattr(h0, 'Set'+i_set):
+#           getattr(h0, 'Set'+i_set)(setters[i_set])
+#
+#    return h0
 
 def updateDictionary(dictionary, TDirectory, prefix='', keywords=[], verbose=False):
 
@@ -96,13 +96,18 @@ class Histogram:
         self.legendName = ''
         self.legendDraw = ''
 
-def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac=0.3, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False):
+def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac=0.3, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False):
 
     xyMinMax = []
     if histograms[0].th1.InheritsFrom('TGraph'):
        xyMinMax = get_xyminmax_from_graph(histograms[0].th1)
 
     nvalid_histograms = len(histograms)
+
+    canvas = ROOT.TCanvas()
+    canvas.SetGrid(1,1)
+    canvas.SetTickx()
+    canvas.SetTicky()
 
     Top = canvas.GetTopMargin()
     Rig = canvas.GetRightMargin()
@@ -336,6 +341,12 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
         canvas.SaveAs(output_file)
 
         print(colored_text('[output]', ['1', '92']), os.path.relpath(output_file))
+
+    canvas.Close()
+
+    if ratio:
+       del plot_ratios
+       del denom
 
     return 0
 
@@ -597,15 +608,10 @@ if __name__ == '__main__':
 
    ROOT.TGaxis.SetMaxDigits(4)
 
-   canvas = ROOT.TCanvas()
-   canvas.SetGrid(1,1)
-   canvas.SetTickx()
-   canvas.SetTicky()
-
-   Top = canvas.GetTopMargin()
-   Rig = canvas.GetRightMargin()
-   Bot = canvas.GetBottomMargin()
-   Lef = canvas.GetLeftMargin()
+   Top = ROOT.gStyle.GetPadTopMargin()
+   Rig = ROOT.gStyle.GetPadRightMargin()
+   Bot = ROOT.gStyle.GetPadBottomMargin()
+   Lef = ROOT.gStyle.GetPadLeftMargin()
 
    ROOT.TGaxis.SetExponentOffset(-Lef+.50*Lef, 0.03, 'y')
 
@@ -692,13 +698,13 @@ if __name__ == '__main__':
 
        ## plot
        plot(**{
-         'canvas': canvas,
          'histograms': _hists,
          'title': _htitle,
          'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
-
          'ratio': True,
          'logY': False,
        })
+
+       del _hists

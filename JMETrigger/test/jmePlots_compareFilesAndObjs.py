@@ -10,7 +10,7 @@ from common.efficiency import *
 from common.plot import *
 from common.plot_style import *
 
-from jmePlots_compareFiles import clone_histogram, updateDictionary, getTH1sFromTFile, Histogram, plot, getPlotLabels
+from jmePlots_compareFiles import updateDictionary, getTH1sFromTFile, Histogram, plot, getPlotLabels
 
 #### main
 if __name__ == '__main__':
@@ -85,15 +85,10 @@ if __name__ == '__main__':
 
    ROOT.TGaxis.SetMaxDigits(4)
 
-   canvas = ROOT.TCanvas()
-   canvas.SetGrid(1,1)
-   canvas.SetTickx()
-   canvas.SetTicky()
-
-   Top = canvas.GetTopMargin()
-   Rig = canvas.GetRightMargin()
-   Bot = canvas.GetBottomMargin()
-   Lef = canvas.GetLeftMargin()
+   Top = ROOT.gStyle.GetPadTopMargin()
+   Rig = ROOT.gStyle.GetPadRightMargin()
+   Bot = ROOT.gStyle.GetPadBottomMargin()
+   Lef = ROOT.gStyle.GetPadLeftMargin()
 
    ROOT.TGaxis.SetExponentOffset(-Lef+.50*Lef, 0.03, 'y')
 
@@ -201,7 +196,6 @@ if __name__ == '__main__':
 
        ## plot
        plot(**{
-         'canvas': canvas,
          'histograms': _hists,
          'title': _htitle,
          'labels': _labels,
@@ -211,3 +205,5 @@ if __name__ == '__main__':
          'ratio': True,
          'logY': False,
        })
+
+       del _hists
