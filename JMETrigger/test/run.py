@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
    for [i_inpFile, i_inpTree] in inputFileTreePairs:
 
-       i_maxEvents = -1 if (opts.maxEvents < 0) else (opts.maxEvents - nEvtProcessed)
+       i_maxEvents = -1 if (opts.maxEvents < 0) else (opts.maxEvents - analyzer.eventsProcessed())
 
        if opts.verbosity > -99:
           print(colored_text('[input]', ['1']), os.path.relpath(i_inpFile)+':'+i_inpTree)
