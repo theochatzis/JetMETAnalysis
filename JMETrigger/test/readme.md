@@ -20,7 +20,7 @@ hadd_ntuples.py -i [DIRS] -o [OUTDIR] -l 0
 
 * Create scripts for submission of batch jobs:
 ```
-batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/jobs -n 5000 -l 0
+batch_driver.py -i ${NTUDIR}/*root -o ${OUTDIR}/jobs -n 50000 -l 0 # -p $PLUGIN
 ```
 
 * Monitoring and (re)submission of batch jobs:

@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
            CMDS_0 = [
              'if [ -f '+OUTPUT_ABSPATH+' ]; then',
-              ' rm -f '+OUTPUT_ABSPATH+'; fi;',
+             '  rm -f '+OUTPUT_ABSPATH+'; fi;',
            ]
 
            CMDS_1 = [
@@ -181,7 +181,7 @@ if __name__ == '__main__':
              '-o '+OUTPUT_ABSPATH,
              '--skipEvents '+str(EVT_FIRST),
              '--maxEvents '+str(1+EVT_LAST-EVT_FIRST),
-           ]
+           ] + [' '.join(opts_unknown)]
 
            CMDS_2 = [
              'touch '+OUTDIR_PATH+'/'+OUTEXE_NAME+'.completed',
@@ -257,9 +257,7 @@ if __name__ == '__main__':
 
               if not opts.dry_run:
                  o_fcfg = open(OFCFG_ABSPATH, 'w')
-
                  for _opt in OPTS: o_fcfg.write(_opt+'\n')
-
                  o_fcfg.close()
 
               if opts.submit:
