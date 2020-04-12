@@ -38,6 +38,12 @@ def get_efficiency_graph(hP, hT, bin_ls=[]):
 def get_ratio_graph(g_num_, g_den_, ignore_error=False):
 
     ratio = ROOT.TGraphAsymmErrors()
+    ratio.SetLineColor(g_num_.GetLineColor())
+    ratio.SetLineStyle(g_num_.GetLineStyle())
+    ratio.SetLineWidth(g_num_.GetLineWidth())
+    ratio.SetMarkerColor(g_num_.GetMarkerColor())
+    ratio.SetMarkerStyle(g_num_.GetMarkerStyle())
+    ratio.SetMarkerSize(g_num_.GetMarkerSize())
 
     n = -1
     for i in range(g_den_.GetN()):
@@ -45,32 +51,38 @@ def get_ratio_graph(g_num_, g_den_, ignore_error=False):
         xd, yd = ROOT.Double(0.), ROOT.Double(0.)
         g_den_.GetPoint(i, xd, yd)
 
-        if not yd:
-            if ignore_error: return None
-            else: KILL('get_ratio_graph: null denominator value: N='+str(i))
-
         for j in range(g_num_.GetN()):
             xn, yn = ROOT.Double(0.), ROOT.Double(0.)
             g_num_.GetPoint(j, xn, yn)
 
             if xn != xd: continue
 
+            if yn and (not yd):
+               if ignore_error: return None
+               else:
+                 WARNING('get_ratio_graph: null denominator value: N='+str(i)+' [num = '+g_num_.GetName()+', den = '+g_den_.GetName()+']')
+                 continue
+
             n += 1
-            r = yn/yd
-            ratio.SetPoint(n, xn, yn/yd)
+            r = yn/yd if yd else 1.
+            ratio.SetPoint(n, xn, r)
             ratio.SetPointEXhigh(n, g_num_.GetErrorXhigh(j))
             ratio.SetPointEXlow (n, g_num_.GetErrorXlow (j))
 
             # up error
-            un = g_num_.GetErrorYhigh(j)
-            ud = g_den_.GetErrorYlow (i) * r
-            up = (1./yd) * math.sqrt(un*un+ud*ud)
+            up = 0.
+            if yd:
+               un = g_num_.GetErrorYhigh(j)
+               ud = g_den_.GetErrorYlow (i) * r
+               up = (1./yd) * math.sqrt(un*un+ud*ud)
             ratio.SetPointEYhigh(n, up)
 
             # down error
-            dn = g_num_.GetErrorYlow (j)
-            dd = g_den_.GetErrorYhigh(i) * r
-            dw = (1./yd) * math.sqrt(dn*dn+dd*dd)
+            dw = 0.
+            if yd:
+               dn = g_num_.GetErrorYlow (j)
+               dd = g_den_.GetErrorYhigh(i) * r
+               dw = (1./yd) * math.sqrt(dn*dn+dd*dd)
             ratio.SetPointEYlow(n, dw)
 
     return ratio

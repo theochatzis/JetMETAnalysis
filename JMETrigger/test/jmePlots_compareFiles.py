@@ -111,11 +111,9 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
            if _tmp.th1 is not None:
               leg.AddEntry(_tmp.th1, _tmp.legendName, _tmp.legendDraw)
 
-    canvas.cd()
-
     XMIN, XMAX = xMin, xMax
-    if XMIN is None: XMIN = xyMinMax[0] if xyMinMax else histograms[0].GetBinLowEdge(1)
-    if XMAX is None: XMAX = xyMinMax[2] if xyMinMax else histograms[0].GetBinLowEdge(1+histograms[0].GetNbinsX())
+    if XMIN is None: XMIN = xyMinMax[0] if xyMinMax else histograms[0].th1.GetBinLowEdge(1)
+    if XMAX is None: XMAX = xyMinMax[2] if xyMinMax else histograms[0].th1.GetBinLowEdge(1+histograms[0].th1.GetNbinsX())
 
     HMIN, HMAX = 1e8, -1e8
     for _tmp in histograms:
@@ -132,9 +130,11 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
     if YMIN is None: YMIN = .0003 if logY else .0001
     if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001) *(1./.85))
 
-    h0 = canvas.DrawFrame(XMIN, YMIN, XMAX, YMAX)
+    canvas.cd()
 
     if not ratio:
+
+       h0 = canvas.DrawFrame(XMIN, YMIN, XMAX, YMAX)
 
        canvas.SetTickx()
        canvas.SetTicky()
@@ -176,6 +176,8 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
 
        pad1.cd()
 
+       h0 = pad1.DrawFrame(XMIN, YMIN, XMAX, YMAX)
+
        h11 = None
        for _tmp in histograms:
            if _tmp.th1 is not None:
@@ -192,11 +194,11 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
        h0.GetYaxis().SetTitleSize(h0.GetYaxis().GetTitleSize()/pad1H)
        h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset()*pad1H)
        h0.GetXaxis().SetLabelSize(0)
-       h0.GetYaxis().SetLabelSize (h0.GetYaxis().GetLabelSize() /pad1H)
+       h0.GetYaxis().SetLabelSize(h0.GetYaxis().GetLabelSize()/pad1H)
        h0.GetXaxis().SetTickLength(h0.GetXaxis().GetTickLength()/pad1H)
 
        if YMIN is None: YMIN = .0003 if logY else .0001
-       if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001) *(1./.85))
+       if YMAX is None: YMAX = .0003*((HMAX/.0003)**(1./.85)) if logY else .0001+((HMAX-.0001)*(1./.85))
 
        h0.GetYaxis().SetRangeUser(YMIN, YMAX)
 
@@ -245,7 +247,7 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
            histo = Histogram()
            if _tmp.th1 is not None:
               histo.th1 = _tmp.th1.Clone()
-              if hasattr(histo.th1, 'Divide'):
+              if histo.th1.InheritsFrom('TH1'):
                  histo.th1.Divide(denom)
               else:
                  histo.th1 = get_ratio_graph(histo.th1, denom)
@@ -275,14 +277,13 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
        h21.GetYaxis().SetTitle('Ratio')
        h21.GetYaxis().CenterTitle()
        h21.GetXaxis().SetTitleSize(h21.GetXaxis().GetTitleSize()/(1-pad1H))
-       h21.GetYaxis().SetTitleSize(h21.GetYaxis().GetTitleSize()/(1-pad1H)*pad1H)
+       h21.GetYaxis().SetTitleSize(h21.GetYaxis().GetTitleSize()/(1-pad1H))
        h21.GetXaxis().SetTitleOffset(h21.GetXaxis().GetTitleOffset())
-       h21.GetYaxis().SetTitleOffset(h21.GetYaxis().GetTitleOffset()*(1-pad1H)/pad1H)
-       h21.GetXaxis().SetLabelSize(h21.GetYaxis().GetLabelSize()/(1-pad1H)*pad1H)
-       h21.GetYaxis().SetLabelSize(h21.GetYaxis().GetLabelSize()/(1-pad1H)*pad1H)
-       h21.GetXaxis().SetTickLength(h21.GetXaxis().GetTickLength()/(1-pad1H)*pad1H)
+       h21.GetYaxis().SetTitleOffset(h21.GetYaxis().GetTitleOffset()*(1-pad1H))
+       h21.GetXaxis().SetLabelSize(h21.GetYaxis().GetLabelSize()/(1-pad1H))
+       h21.GetYaxis().SetLabelSize(h21.GetYaxis().GetLabelSize()/(1-pad1H))
+       h21.GetXaxis().SetTickLength(h21.GetXaxis().GetTickLength()/(1-pad1H))
        h21.GetXaxis().SetLabelOffset(h21.GetXaxis().GetLabelOffset()/(1-pad1H))
-       h21.GetYaxis().SetLabelOffset(h21.GetYaxis().GetLabelOffset())
        h21.GetYaxis().SetNdivisions(404)
 
        h21.GetXaxis().SetRangeUser(XMIN, XMAX)
@@ -290,13 +291,23 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
        h2max, h2min = None, None
        for _tmp in plot_ratios:
            if _tmp.th1 is None: continue
-           for _tmpb in range(1, _tmp.th1.GetNbinsX()+1):
-               if (abs(_tmp.th1.GetBinContent(_tmpb)) > 1e-7) and (abs(_tmp.th1.GetBinError(_tmpb)) > 1e-7):
-                  h2max = max(h2max, _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)) if h2max is not None else _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)
-                  h2min = min(h2min, _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)) if h2min is not None else _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)
+           if hasattr(_tmp.th1, 'GetNbinsX'):
+              for _tmpb in range(1, _tmp.th1.GetNbinsX()+1):
+                  if (abs(_tmp.th1.GetBinContent(_tmpb)) > 1e-7) and (abs(_tmp.th1.GetBinError(_tmpb)) > 1e-7):
+                     h2max = max(h2max, _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)) if (h2max is not None) else _tmp.th1.GetBinContent(_tmpb)+_tmp.th1.GetBinError(_tmpb)
+                     h2min = min(h2min, _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)) if (h2min is not None) else _tmp.th1.GetBinContent(_tmpb)-_tmp.th1.GetBinError(_tmpb)
+           else:
+              _tmp_xyMinMax = get_xyminmax_from_graph(_tmp.th1)
+              h2min = min(h2min, _tmp_xyMinMax[1]) if (h2min is not None) else _tmp_xyMinMax[1]
+              h2max = max(h2max, _tmp_xyMinMax[3]) if (h2max is not None) else _tmp_xyMinMax[3]
+
        if (h2max is not None) and (h2min is not None):
           h2min = min(int(h2min*105.)/100., int(h2min*95.)/100.)
           h2max = max(int(h2max*105.)/100., int(h2max*95.)/100.)
+
+          h2min = max(h2min, -5)
+          h2max = min(h2max, 5)
+
           h21.GetYaxis().SetRangeUser(h2min, h2max)
 
 #       h21.Draw('e2')
@@ -319,6 +330,191 @@ def plot(canvas, histograms, outputs, title, labels, legXY=[], ratio=False, rati
         print(colored_text('[output]', ['1', '92']), os.path.relpath(output_file))
 
     return 0
+
+def getPlotLabels(key, isProfile, isEfficiency, useUpgradeLabels):
+
+    _objLabel = ''
+    if   key.startswith('ak4GenJets_'):              _objLabel = 'AK4GenJets'
+    elif key.startswith('hltAK4CaloJets_'):          _objLabel = 'HLT AK4CaloJets'
+    elif key.startswith('hltAK4CaloJetsCorrected_'): _objLabel = 'HLT AK4CaloJetsCorrected'
+    elif key.startswith('hltAK4PFJets_'):            _objLabel = 'HLT AK4PFJets'
+    elif key.startswith('hltAK4PFJetsCorrected_'):   _objLabel = 'HLT AK4PFJetsCorrected'
+    elif key.startswith('hltAK4PFCHSJets_'):         _objLabel = 'HLT AK4PFCHSJets'
+    elif key.startswith('hltAK4PFCHSJetsCorrected_'):_objLabel = 'HLT AK4PFCHSJetsCorrected'
+    elif key.startswith('hltAK4PuppiJets_'):         _objLabel = 'HLT AK4PuppiJets'
+    elif key.startswith('hltAK4PuppiJetsCorrected_'):_objLabel = 'HLT AK4PuppiJetsCorrected'
+    elif key.startswith('ak8GenJets_'):              _objLabel = 'AK8GenJets'
+    elif key.startswith('hltAK8CaloJets_'):          _objLabel = 'HLT AK8CaloJets'
+    elif key.startswith('hltAK8CaloJetsCorrected_'): _objLabel = 'HLT AK8CaloJetsCorrected'
+    elif key.startswith('hltAK8PFJets_'):            _objLabel = 'HLT AK8PFJets'
+    elif key.startswith('hltAK8PFJetsCorrected_'):   _objLabel = 'HLT AK8PFJetsCorrected'
+    elif key.startswith('hltAK8PFCHSJets_'):         _objLabel = 'HLT AK8PFCHSJets'
+    elif key.startswith('hltAK8PFCHSJetsCorrected_'):_objLabel = 'HLT AK8PFCHSJetsCorrected'
+    elif key.startswith('hltAK8PuppiJets_'):         _objLabel = 'HLT AK8PuppiJets'
+    elif key.startswith('hltAK8PuppiJetsCorrected_'):_objLabel = 'HLT AK8PuppiJetsCorrected'
+    elif key.startswith('hltCaloMET_'):              _objLabel = 'HLT CaloMET'
+    elif key.startswith('hltPFMET_'):                _objLabel = 'HLT PFMET'
+    elif key.startswith('hltPFMETNoMu_'):            _objLabel = 'HLT PFMETNoMu'
+    elif key.startswith('hltPFMETTypeOne_'):         _objLabel = 'HLT PFMET Type-1'
+    elif key.startswith('hltPuppiMET_'):             _objLabel = 'HLT PuppiMET'
+    elif key.startswith('hltPuppiMETNoMu_'):         _objLabel = 'HLT PuppiMETNoMu'
+
+    if   '_EtaIncl_' in key: pass
+    elif '_HB_'      in key: _objLabel += ', |#eta|<'+('1.5' if useUpgradeLabels else '1.3')
+    elif '_HGCal_'   in key: _objLabel += ', 1.5<|#eta|<3.0'
+    elif '_HE_'      in key: _objLabel += ', 1.3<|#eta|<3.0'
+    elif '_HE1_'     in key: _objLabel += ', 1.3<|#eta|<2.5'
+    elif '_HE2_'     in key: _objLabel += ', 2.5<|#eta|<3.0'
+    elif '_HF_'      in key: _objLabel += ', 3.0<|#eta|<5.0'
+    elif '_HF1_'     in key: _objLabel += ', 3.0<|#eta|<4.0'
+    elif '_HF2_'     in key: _objLabel += ', 4.0<|#eta|<5.0'
+
+    if   '_NotMatchedToGEN'     in key: _objLabel += ' [Not Matched to GEN]'
+    elif '_NotMatchedToOffline' in key: _objLabel += ' [Not Matched to Offline]'
+    elif '_NotMatchedToCalo'    in key: _objLabel += ' [Not Matched to Calo]'
+    elif '_NotMatchedToPF'      in key: _objLabel += ' [Not Matched to PF]'
+    elif '_NotMatchedToPFCHS'   in key: _objLabel += ' [Not Matched to PFCHS]'
+    elif '_NotMatchedToPuppi'   in key: _objLabel += ' [Not Matched to Puppi]'
+    elif '_MatchedToGEN'        in key: _objLabel += ' [Matched to GEN]'
+    elif '_MatchedToOffline'    in key: _objLabel += ' [Matched to Offline]'
+    elif '_MatchedToCalo'       in key: _objLabel += ' [Matched to Calo]'
+    elif '_MatchedToPF'         in key: _objLabel += ' [Matched to PF]'
+    elif '_MatchedToPFCHS'      in key: _objLabel += ' [Matched to PFCHS]'
+    elif '_MatchedToPuppi'      in key: _objLabel += ' [Matched to Puppi]'
+
+    ## axes' titles
+    _titleX, _titleY = key, ''
+    if isProfile:
+       if 'Jets' in key:
+          if key.endswith('_pt'): _titleX = 'Jet p_{T} [GeV]'
+          elif key.endswith('_eta'): _titleX = 'Jet #eta'
+          elif key.endswith('_phi'): _titleX = 'Jet #phi'
+          elif key.endswith('_mass'): _titleX = 'Jet mass [GeV]'
+       elif 'MET' in key:
+          if key.endswith('_pt'): _titleX = 'MET [GeV]'
+          elif key.endswith('_phi'): _titleX = 'MET #phi'
+          elif key.endswith('_sumEt'): _titleX = 'MET Sum-E_{T} [GeV]'
+       if '_GEN_' in key:
+          _titleX = 'GEN '+_titleX
+       elif '_Offline_' in key:
+          _titleX = 'Offline '+_titleX
+    elif isEfficiency:
+       if 'Jets' in key:
+          if key.endswith('_pt_eff'): _titleX = 'Jet p_{T} [GeV]'
+          elif key.endswith('_eta_eff'): _titleX = 'Jet #eta'
+          elif key.endswith('_phi_eff'): _titleX = 'Jet #phi'
+          elif key.endswith('_mass_eff'): _titleX = 'Jet mass [GeV]'
+       elif 'MET' in key:
+          if key.endswith('_pt_eff'): _titleX = 'MET [GeV]'
+          elif key.endswith('_phi_eff'): _titleX = 'MET #phi'
+          elif key.endswith('_sumEt_eff'): _titleX = 'MET Sum-E_{T} [GeV]'
+       if '_GEN_' in key:
+          _titleX = 'GEN '+_titleX
+       elif '_Offline_' in key:
+          _titleX = 'Offline '+_titleX
+    else:
+       if 'MET' in key:
+          _titleY = 'Events'
+       elif 'Jets' in key:
+          if '_njets' in key:
+             _titleY = 'Events'
+          else:
+             _titleY = 'Entries'
+
+    if isEfficiency:
+       _titleY = 'Efficiency'
+
+    if   '_pt_overGEN_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
+    elif '_pt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
+    elif '_pt_overGEN_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
+    elif '_pt_overGEN' in key: _titleX = 'p_{T} / p_{T}^{GEN}'
+
+    elif '_pt_overOffline_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{Offl}#GT'
+    elif '_pt_overOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT'
+    elif '_pt_overOffline_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl})'
+    elif '_pt_overOffline' in key: _titleX = 'p_{T} / p_{T}^{Offl}'
+
+    elif '_mass_overGEN_Mean_' in key: _titleY = '#LTmass / mass^{GEN}#GT'
+    elif '_mass_overGEN_RMSOverMean_' in key: _titleY = '#sigma(m / m^{GEN}) / #LTm / m^{GEN}#GT'
+    elif '_mass_overGEN_RMS_' in key: _titleY = '#sigma(mass / mass^{GEN})'
+    elif '_mass_overGEN' in key: _titleX = 'mass / mass^{GEN}'
+
+    elif '_mass_overOffline_Mean_' in key: _titleY = '#LTmass / mass^{Offl}#GT'
+    elif '_mass_overOffline_RMSOverMean_' in key: _titleY = '#sigma(m / m^{Offl}) / #LTm / m^{Offl}#GT'
+    elif '_mass_overOffline_RMS_' in key: _titleY = '#sigma(mass / mass^{Offl})'
+    elif '_mass_overOffline' in key: _titleX = 'mass / mass^{Offl}'
+
+    elif '_sumEt_overGEN_Mean_' in key: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
+    elif '_sumEt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN}) / #LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
+    elif '_sumEt_overGEN_RMS_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN})'
+    elif '_sumEt_overGEN' in key: _titleX = 'Sum-E_{T} / Sum-E_{T}^{GEN}'
+
+    elif '_sumEt_overOffline_Mean_' in key: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
+    elif '_sumEt_overOffline_RMSOverMean_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl}) / #LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
+    elif '_sumEt_overOffline_RMS_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl})'
+    elif '_sumEt_overOffline' in key: _titleX = 'Sum-E_{T} / Sum-E_{T}^{Offl}'
+
+    elif '_deltaPhiGEN_Mean_' in key: _titleY = '#LT#Delta#phi^{GEN}#GT'
+#    elif '_deltaPhiGEN_RMSOverMean_' in key: _titleY = '#sigma(#Delta#phi^{GEN}) / #LT#Delta#phi^{GEN}#GT'
+    elif '_deltaPhiGEN_RMS_' in key: _titleY = '#sigma(#Delta#phi^{GEN})'
+    elif '_deltaPhiGEN' in key: _titleX = '#Delta#phi^{GEN}'
+
+    elif '_deltaPhiOffline_Mean_' in key: _titleY = '#LT#Delta#phi^{Offl}#GT'
+#    elif '_deltaPhiOffline_RMSOverMean_' in key: _titleY = '#sigma(#Delta#phi^{Offl}) / #LT#Delta#phi^{Offl}#GT'
+    elif '_deltaPhiOffline_RMS_' in key: _titleY = '#sigma(#Delta#phi^{Offl})'
+    elif '_deltaPhiOffline' in key: _titleX = '#Delta#phi^{Offl}'
+
+    elif '_pt_paraToGEN_Mean_' in key: _titleY = '#LTp_{T}^{#parallel GEN}#GT [GeV]'
+    elif '_pt_paraToGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_paraToGEN_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN}) [GeV]'
+    elif '_pt_paraToGEN' in key: _titleX = 'p_{T}^{#parallel GEN} [GeV]'
+
+    elif '_pt_paraToOffline_Mean_' in key: _titleY = '#LTp_{T}^{#parallel Offl}#GT [GeV]'
+    elif '_pt_paraToOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_paraToOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl}) [GeV]'
+    elif '_pt_paraToOffline' in key: _titleX = 'p_{T}^{#parallel Offl} [GeV]'
+
+    elif '_pt_paraToGENMinusGEN_Mean_' in key: _titleY = '#LTp_{T}^{#parallel GEN} - p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_paraToGENMinusGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_paraToGENMinusGEN_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) [GeV]'
+    elif '_pt_paraToGENMinusGEN' in key: _titleX = 'p_{T}^{#parallel GEN} - p_{T}^{GEN} [GeV]'
+
+    elif '_pt_paraToOfflineMinusOffline_Mean_' in key: _titleY = '#LTp_{T}^{#parallel Offl} - p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_paraToOfflineMinusOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) [GeV]'
+    elif '_pt_paraToOfflineMinusOffline' in key: _titleX = 'p_{T}^{#parallel Offl} - p_{T}^{Offl} [GeV]'
+
+    elif '_pt_perpToGEN_Mean_' in key: _titleY = '#LTp_{T}^{#perp GEN}#GT [GeV]'
+    elif '_pt_perpToGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#perp GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_perpToGEN_RMS_' in key: _titleY = '#sigma(p_{T}^{#perp GEN}) [GeV]'
+    elif '_pt_perpToGEN' in key: _titleX = 'p_{T}^{#perp GEN} [GeV]'
+
+    elif '_pt_perpToOffline_Mean_' in key: _titleY = '#LTp_{T}^{#perp Offl}#GT [GeV]'
+    elif '_pt_perpToOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#perp Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_perpToOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#perp Offl}) [GeV]'
+    elif '_pt_perpToOffline' in key: _titleX = 'p_{T}^{#perp Offl} [GeV]'
+
+    elif key.endswith('_pt0'): _titleX = 'p_{T}-Leading Jet p_{T} [GeV]'
+    elif key.endswith('_pt'): _titleX = 'MET [GeV]' if 'MET' in key else 'Jet p_{T} [GeV]'
+    elif key.endswith('_eta'): _titleX = 'Jet #eta'
+    elif key.endswith('_phi'): _titleX = 'MET #phi' if 'MET' in key else 'Jet #phi'
+    elif key.endswith('_sumEt'): _titleX = 'Sum-E_{T} [GeV]'
+    elif key.endswith('_mass'): _titleX = 'Jet mass [GeV]'
+    elif key.endswith('_dRmatch'): _titleX = '#DeltaR'
+    elif key.endswith('_numberOfDaughters'): _titleX = 'Number of jet constituents'
+    elif key.endswith('_njets'): _titleX = 'Number of jets'
+    elif key.endswith('_chargedHadronEnergyFraction'): _titleX = 'Charged-Hadron Energy Fraction'
+    elif key.endswith('_chargedHadronMultiplicity'): _titleX = 'Charged-Hadron Multiplicity'
+    elif key.endswith('_neutralHadronEnergyFraction'): _titleX = 'Neutral-Hadron Energy Fraction'
+    elif key.endswith('_neutralHadronMultiplicity'): _titleX = 'Neutral-Hadron Multiplicity'
+    elif key.endswith('_electronEnergyFraction'): _titleX = 'Electron Energy Fraction'
+    elif key.endswith('_electronMultiplicity'): _titleX = 'Electron Multiplicity'
+    elif key.endswith('_photonEnergyFraction'): _titleX = 'Photon Energy Fraction'
+    elif key.endswith('_photonMultiplicity'): _titleX = 'Photon Multiplicity'
+    elif key.endswith('_muonEnergyFraction'): _titleX = 'Muon Energy Fraction'
+    elif key.endswith('_muonMultiplicity'): _titleX = 'Muon Multiplicity'
+
+    return _titleX, _titleY, _objLabel
 
 #### main
 if __name__ == '__main__':
@@ -406,10 +602,14 @@ if __name__ == '__main__':
 
    for _hkey in th1Keys:
 
-       if ('/' in _hkey) and (not _hkey.startswith('NoSelection/')) and (not _hkey.endswith('_eff')):
+       if ('_wrt_' not in _hkey) and (not _hkey.endswith('_eff')):
           continue
 
        _hkey_basename = os.path.basename(_hkey)
+
+       if ('/' in _hkey) and (not _hkey.startswith('NoSelection/')):
+          if ('_pt0' not in _hkey_basename) or _hkey_basename.endswith('pt0_eff') or _hkey_basename.endswith('pt0') or ('pt0_over' in _hkey_basename):
+             continue
 
        _hIsProfile = '_wrt_' in _hkey_basename
 
@@ -460,179 +660,19 @@ if __name__ == '__main__':
 
            hist0 = Histogram()
            hist0.th1 = h0
-           hist0.draw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'hist,e0'
+           hist0.draw = 'ep,same' if (_hIsProfile or _hIsEfficiency) else 'hist,e0,same'
            hist0.legendName = inp['Legend']
            hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
-           if len(_hists) > 0: hist0.draw += ',same'
            _hists.append(hist0)
 
        if len(_hists) == 0:
           continue
 
-       ## labels
-       _labels = [label_sample]
-
-       _objLabel = ''
-       if   _hkey_basename.startswith('ak4GenJets_'):              _objLabel = 'AK4GenJets'
-       elif _hkey_basename.startswith('hltAK4CaloJets_'):          _objLabel = 'HLT AK4CaloJets'
-       elif _hkey_basename.startswith('hltAK4CaloJetsCorrected_'): _objLabel = 'HLT AK4CaloJetsCorrected'
-       elif _hkey_basename.startswith('hltAK4PFJets_'):            _objLabel = 'HLT AK4PFJets'
-       elif _hkey_basename.startswith('hltAK4PFJetsCorrected_'):   _objLabel = 'HLT AK4PFJetsCorrected'
-       elif _hkey_basename.startswith('ak8GenJets_'):              _objLabel = 'AK8GenJets'
-       elif _hkey_basename.startswith('hltAK8CaloJets_'):          _objLabel = 'HLT AK8CaloJets'
-       elif _hkey_basename.startswith('hltAK8CaloJetsCorrected_'): _objLabel = 'HLT AK8CaloJetsCorrected'
-       elif _hkey_basename.startswith('hltAK8PFJets_'):            _objLabel = 'HLT AK8PFJets'
-       elif _hkey_basename.startswith('hltAK8PFJetsCorrected_'):   _objLabel = 'HLT AK8PFJetsCorrected'
-       elif _hkey_basename.startswith('hltCaloMET_'):              _objLabel = 'HLT CaloMET'
-       elif _hkey_basename.startswith('hltPFMET_'):                _objLabel = 'HLT PFMET'
-       elif _hkey_basename.startswith('hltPFMETNoMu_'):            _objLabel = 'HLT PFMETNoMu'
-       elif _hkey_basename.startswith('hltPFMETTypeOne_'):         _objLabel = 'HLT PFMET Type-1'
-       elif _hkey_basename.startswith('hltPuppiMET_'):             _objLabel = 'HLT PuppiMET'
-       elif _hkey_basename.startswith('hltPuppiMETNoMu_'):         _objLabel = 'HLT PuppiMETNoMu'
-
-       if   '_EtaIncl_' in _hkey_basename: pass
-       elif '_HB_'      in _hkey_basename: _objLabel += ', |#eta|<'+('1.5' if opts.upgrade else '1.3')
-       elif '_HGCal_'   in _hkey_basename: _objLabel += ', 1.5<|#eta|<3.0'
-       elif '_HE_'      in _hkey_basename: _objLabel += ', 1.3<|#eta|<3.0'
-       elif '_HE1_'     in _hkey_basename: _objLabel += ', 1.3<|#eta|<2.5'
-       elif '_HE2_'     in _hkey_basename: _objLabel += ', 2.5<|#eta|<3.0'
-       elif '_HF_'      in _hkey_basename: _objLabel += ', 3.0<|#eta|<5.0'
-       elif '_HF1_'     in _hkey_basename: _objLabel += ', 3.0<|#eta|<4.0'
-       elif '_HF2_'     in _hkey_basename: _objLabel += ', 4.0<|#eta|<5.0'
-
-       if   '_NotMatchedToGEN'     in _hkey_basename: _objLabel += ' [Not Matched to GEN]'
-       elif '_NotMatchedToOffline' in _hkey_basename: _objLabel += ' [Not Matched to Offline]'
-       elif '_NotMatchedToCalo'    in _hkey_basename: _objLabel += ' [Not Matched to Calo]'
-       elif '_NotMatchedToPF'      in _hkey_basename: _objLabel += ' [Not Matched to PF]'
-       elif '_NotMatchedToPFCHS'   in _hkey_basename: _objLabel += ' [Not Matched to PFCHS]'
-       elif '_NotMatchedToPuppi'   in _hkey_basename: _objLabel += ' [Not Matched to Puppi]'
-       elif '_MatchedToGEN'        in _hkey_basename: _objLabel += ' [Matched to GEN]'
-       elif '_MatchedToOffline'    in _hkey_basename: _objLabel += ' [Matched to Offline]'
-       elif '_MatchedToCalo'       in _hkey_basename: _objLabel += ' [Matched to Calo]'
-       elif '_MatchedToPF'         in _hkey_basename: _objLabel += ' [Matched to PF]'
-       elif '_MatchedToPFCHS'      in _hkey_basename: _objLabel += ' [Matched to PFCHS]'
-       elif '_MatchedToPuppi'      in _hkey_basename: _objLabel += ' [Matched to Puppi]'
+       ## labels and axes titles
+       _titleX, _titleY, _objLabel = getPlotLabels(_hkey_basename, isProfile=_hIsProfile, isEfficiency=_hIsEfficiency, useUpgradeLabels=opts.upgrade)
 
        label_obj = get_text(Lef+(1-Rig-Lef)*0.95, Bot+(1-Top-Bot)*0.925, 31, .035, _objLabel)
-       _labels += [label_obj]
-
-       ## axes' titles
-       _titleX, _titleY = _hkey_basename, ''
-       if _hIsProfile or _hIsEfficiency:
-          if 'Jets' in _hkey_basename:
-             if _hkey_basename.endswith('_pt'): _titleX = 'Jet p_{T} [GeV]'
-             elif _hkey_basename.endswith('_eta'): _titleX = 'Jet #eta'
-             elif _hkey_basename.endswith('_phi'): _titleX = 'Jet #phi'
-             elif _hkey_basename.endswith('_mass'): _titleX = 'Jet mass [GeV]'
-          elif 'MET' in _hkey_basename:
-             if _hkey_basename.endswith('_pt'): _titleX = 'MET [GeV]'
-             elif _hkey_basename.endswith('_phi'): _titleX = 'MET #phi'
-             elif _hkey_basename.endswith('_sumEt'): _titleX = 'MET Sum-E_{T} [GeV]'
-          if '_GEN_' in _hkey_basename:
-             _titleX = 'GEN '+_titleX
-          elif '_Offline_' in _hkey_basename:
-             _titleX = 'Offline '+_titleX
-       else:
-          if 'MET' in _hkey_basename:
-             _titleY = 'Events'
-          elif 'Jets' in _hkey_basename:
-             if '_njets' in _hkey_basename:
-                _titleY = 'Events'
-             else:
-                _titleY = 'Entries'
-
-       if _hIsEfficiency:
-          _titleY = 'Efficiency'
-
-       if   '_pt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
-       elif '_pt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
-       elif '_pt_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
-       elif '_pt_overGEN' in _hkey_basename: _titleX = 'p_{T} / p_{T}^{GEN}'
-
-       elif '_pt_overOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T} / p_{T}^{Offl}#GT'
-       elif '_pt_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT'
-       elif '_pt_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T} / p_{T}^{Offl})'
-       elif '_pt_overOffline' in _hkey_basename: _titleX = 'p_{T} / p_{T}^{Offl}'
-
-       elif '_mass_overGEN_Mean_' in _hkey_basename: _titleY = '#LTmass / mass^{GEN}#GT'
-       elif '_mass_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(m / m^{GEN}) / #LTm / m^{GEN}#GT'
-       elif '_mass_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(mass / mass^{GEN})'
-       elif '_mass_overGEN' in _hkey_basename: _titleX = 'mass / mass^{GEN}'
-
-       elif '_mass_overOffline_Mean_' in _hkey_basename: _titleY = '#LTmass / mass^{Offl}#GT'
-       elif '_mass_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(m / m^{Offl}) / #LTm / m^{Offl}#GT'
-       elif '_mass_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(mass / mass^{Offl})'
-       elif '_mass_overOffline' in _hkey_basename: _titleX = 'mass / mass^{Offl}'
-
-       elif '_sumEt_overGEN_Mean_' in _hkey_basename: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
-       elif '_sumEt_overGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN}) / #LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
-       elif '_sumEt_overGEN_RMS_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN})'
-       elif '_sumEt_overGEN' in _hkey_basename: _titleX = 'Sum-E_{T} / Sum-E_{T}^{GEN}'
-
-       elif '_sumEt_overOffline_Mean_' in _hkey_basename: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
-       elif '_sumEt_overOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl}) / #LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
-       elif '_sumEt_overOffline_RMS_' in _hkey_basename: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl})'
-       elif '_sumEt_overOffline' in _hkey_basename: _titleX = 'Sum-E_{T} / Sum-E_{T}^{Offl}'
-
-       elif '_deltaPhiGEN_Mean_' in _hkey_basename: _titleY = '#LT#Delta#phi^{GEN}#GT'
-#       elif '_deltaPhiGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{GEN}) / #LT#Delta#phi^{GEN}#GT'
-       elif '_deltaPhiGEN_RMS_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{GEN})'
-       elif '_deltaPhiGEN' in _hkey_basename: _titleX = '#Delta#phi^{GEN}'
-
-       elif '_deltaPhiOffline_Mean_' in _hkey_basename: _titleY = '#LT#Delta#phi^{Offl}#GT'
-#       elif '_deltaPhiOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{Offl}) / #LT#Delta#phi^{Offl}#GT'
-       elif '_deltaPhiOffline_RMS_' in _hkey_basename: _titleY = '#sigma(#Delta#phi^{Offl})'
-       elif '_deltaPhiOffline' in _hkey_basename: _titleX = '#Delta#phi^{Offl}'
-
-       elif '_pt_paraToGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel GEN}#GT [GeV]'
-       elif '_pt_paraToGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
-       elif '_pt_paraToGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN}) [GeV]'
-       elif '_pt_paraToGEN' in _hkey_basename: _titleX = 'p_{T}^{#parallel GEN} [GeV]'
-
-       elif '_pt_paraToOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel Offl}#GT [GeV]'
-       elif '_pt_paraToOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_paraToOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl}) [GeV]'
-       elif '_pt_paraToOffline' in _hkey_basename: _titleX = 'p_{T}^{#parallel Offl} [GeV]'
-
-       elif '_pt_paraToGENMinusGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel GEN} - p_{T}^{GEN}#GT [GeV]'
-       elif '_pt_paraToGENMinusGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
-       elif '_pt_paraToGENMinusGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) [GeV]'
-       elif '_pt_paraToGENMinusGEN' in _hkey_basename: _titleX = 'p_{T}^{#parallel GEN} - p_{T}^{GEN} [GeV]'
-
-       elif '_pt_paraToOfflineMinusOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#parallel Offl} - p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_paraToOfflineMinusOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) [GeV]'
-       elif '_pt_paraToOfflineMinusOffline' in _hkey_basename: _titleX = 'p_{T}^{#parallel Offl} - p_{T}^{Offl} [GeV]'
-
-       elif '_pt_perpToGEN_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#perp GEN}#GT [GeV]'
-       elif '_pt_perpToGEN_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
-       elif '_pt_perpToGEN_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp GEN}) [GeV]'
-       elif '_pt_perpToGEN' in _hkey_basename: _titleX = 'p_{T}^{#perp GEN} [GeV]'
-
-       elif '_pt_perpToOffline_Mean_' in _hkey_basename: _titleY = '#LTp_{T}^{#perp Offl}#GT [GeV]'
-       elif '_pt_perpToOffline_RMSOverMean_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
-       elif '_pt_perpToOffline_RMS_' in _hkey_basename: _titleY = '#sigma(p_{T}^{#perp Offl}) [GeV]'
-       elif '_pt_perpToOffline' in _hkey_basename: _titleX = 'p_{T}^{#perp Offl} [GeV]'
-
-       elif '_pt0' in _hkey_basename: _titleX = 'p_{T}-Leading Jet p_{T} [GeV]'
-       elif '_pt' in _hkey_basename: _titleX = 'MET [GeV]' if 'MET' in _hkey_basename else 'Jet p_{T} [GeV]'
-       elif '_eta' in _hkey_basename: _titleX = 'Jet #eta'
-       elif '_phi' in _hkey_basename: _titleX = 'MET #phi' if 'MET' in _hkey_basename else 'Jet #phi'
-       elif '_sumEt' in _hkey_basename: _titleX = 'Sum-E_{T} [GeV]'
-       elif '_mass' in _hkey_basename: _titleX = 'Jet mass [GeV]'
-       elif '_dRmatch' in _hkey_basename: _titleX = '#DeltaR'
-       elif '_numberOfDaughters' in _hkey_basename: _titleX = 'Number of jet constituents'
-       elif '_njets' in _hkey_basename: _titleX = 'Number of jets'
-       elif '_chargedHadronEnergyFraction' in _hkey_basename: _titleX = 'Charged-Hadron Energy Fraction'
-       elif '_chargedHadronMultiplicity' in _hkey_basename: _titleX = 'Charged-Hadron Multiplicity'
-       elif '_neutralHadronEnergyFraction' in _hkey_basename: _titleX = 'Neutral-Hadron Energy Fraction'
-       elif '_neutralHadronMultiplicity' in _hkey_basename: _titleX = 'Neutral-Hadron Multiplicity'
-       elif '_electronEnergyFraction' in _hkey_basename: _titleX = 'Electron Energy Fraction'
-       elif '_electronMultiplicity' in _hkey_basename: _titleX = 'Electron Multiplicity'
-       elif '_photonEnergyFraction' in _hkey_basename: _titleX = 'Photon Energy Fraction'
-       elif '_photonMultiplicity' in _hkey_basename: _titleX = 'Photon Multiplicity'
-       elif '_muonEnergyFraction' in _hkey_basename: _titleX = 'Muon Energy Fraction'
-       elif '_muonMultiplicity' in _hkey_basename: _titleX = 'Muon Multiplicity'
+       _labels = [label_sample, label_obj]
 
        if _divideByBinWidth:
           _titleY += ' / Bin width'
@@ -643,8 +683,8 @@ if __name__ == '__main__':
        plot(**{
          'canvas': canvas,
          'histograms': _hists,
-         'title': _htitle, 
-         'labels': _labels, 
+         'title': _htitle,
+         'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
 

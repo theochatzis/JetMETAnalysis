@@ -63,7 +63,7 @@ def get_ymax_from_graphs(gls, error=True):
 
 def get_xyminmax_from_graph(graph, error=True):
     xmin, ymin, xmax, ymax = None, None, None, None
-    for idx in range(g.GetN()):
+    for idx in range(graph.GetN()):
         xval, yval = ROOT.Double(0.), ROOT.Double(0.)
         graph.GetPoint(idx, xval, yval)
 
