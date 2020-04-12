@@ -413,7 +413,7 @@ def getPlotLabels(key, isProfile, isEfficiency, useUpgradeLabels):
           if key.endswith('_pt'): _titleX = 'MET [GeV]'
           elif key.endswith('_phi'): _titleX = 'MET #phi'
           elif key.endswith('_sumEt'): _titleX = 'MET Sum-E_{T} [GeV]'
-       if '_GEN_' in key:
+       if ('_GEN_' in key) or ('GenJets' in key):
           _titleX = 'GEN '+_titleX
        elif '_Offline_' in key:
           _titleX = 'Offline '+_titleX
@@ -427,7 +427,7 @@ def getPlotLabels(key, isProfile, isEfficiency, useUpgradeLabels):
           if key.endswith('_pt_eff'): _titleX = 'MET [GeV]'
           elif key.endswith('_phi_eff'): _titleX = 'MET #phi'
           elif key.endswith('_sumEt_eff'): _titleX = 'MET Sum-E_{T} [GeV]'
-       if '_GEN_' in key:
+       if ('_GEN_' in key) or ('GenJets' in key):
           _titleX = 'GEN '+_titleX
        elif '_Offline_' in key:
           _titleX = 'Offline '+_titleX
