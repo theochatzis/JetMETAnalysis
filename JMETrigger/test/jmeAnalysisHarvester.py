@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
    ROOT.gROOT.SetBatch()
 
-   ROOT.gErrorIgnoreLevel = ROOT.kWarning
+   ROOT.gErrorIgnoreLevel = ROOT.kError
 
    ### args validation ---
    if opts.level < 0:
@@ -224,7 +224,9 @@ if __name__ == '__main__':
        ### Matching Efficiencies
        for hkey_i in sorted(histograms.keys()):
 
-           if histograms[hkey_i].GetEntries() == 0:
+           if histograms[hkey_i].InheritsFrom('TH1') and (histograms[hkey_i].GetEntries() == 0):
+              continue
+           elif histograms[hkey_i].InheritsFrom('TGraph') and (histograms[hkey_i].GetN() == 0):
               continue
 
            hkey_i_basename = os.path.basename(hkey_i)
@@ -276,7 +278,9 @@ if __name__ == '__main__':
        ### Trigger Efficiencies [HLT_*Jet*]
        for hkey_i in sorted(histograms.keys()):
 
-           if histograms[hkey_i].GetEntries() == 0:
+           if histograms[hkey_i].InheritsFrom('TH1') and (histograms[hkey_i].GetEntries() == 0):
+              continue
+           elif histograms[hkey_i].InheritsFrom('TGraph') and (histograms[hkey_i].GetN() == 0):
               continue
 
            hkey_i_basename = os.path.basename(hkey_i)
@@ -284,7 +288,7 @@ if __name__ == '__main__':
            if '_wrt_' in hkey_i_basename:
               continue
 
-           if not (('_MatchedTo' in hkey_i_basename) and ('_pt0' in hkey_i_basename) and (opts.separator_2d not in hkey_i_basename)):
+           if not (('_MatchedTo' in hkey_i_basename) and ('_pt0' in hkey_i_basename) and (opts.separator_2d in hkey_i_basename)):
               continue
 
            hkey_i_dirname = os.path.dirname(hkey_i)
