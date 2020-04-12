@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
            CMDS_0 = [
              'if [ -f '+OUTPUT_ABSPATH+' ]; then',
-             '  rm -f '+OUTPUT_ABSPATH+'; fi;',
+              ' rm -f '+OUTPUT_ABSPATH+'; fi;',
            ]
 
            CMDS_1 = [
