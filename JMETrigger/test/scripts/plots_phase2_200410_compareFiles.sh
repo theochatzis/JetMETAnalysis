@@ -21,15 +21,20 @@ if [ ! -f ${outdir%%/*}.tar.gz ]; then
 
     outd_i=${outdir}/${sample}
 
-    jmePlots_compareFiles.py -u -o ${outd_i} -l ${sample} -e pdf root -i \
+    opts_i=""
+    if [[ ${sample} == *"QCD_"* ]]; then opts_i="-k Jets"
+    elif [[ ${sample} == *"ToInv"* ]]; then opts_i="-k MET"
+    fi
+
+    jmePlots_compareFiles.py ${opts_i} -u -o ${outd_i} -l ${sample} -e pdf root -i \
      ${inpdir}/hltPhase2_TRKv02/${sample}.root:'TRK v02':2:1:20 \
      ${inpdir}/hltPhase2_TRKv06/${sample}.root:'TRK v06':4:1:24 \
 
-    jmePlots_compareFilesAndObjs.py -u -o ${outd_i}/objs -l ${sample} -e pdf root -i \
+    jmePlots_compareFilesAndObjs.py ${opts_i} -u -o ${outd_i}/objs -l ${sample} -e pdf root -i \
      ${inpdir}/hltPhase2_TRKv02/${sample}.root:'TRK v02':2:1:20 \
      ${inpdir}/hltPhase2_TRKv06/${sample}.root:'TRK v06':4:1:24 \
 
-    unset -v outd_i
+    unset -v outd_i opts_i
   done
   unset -v sample
 

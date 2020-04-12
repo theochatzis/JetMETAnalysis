@@ -36,7 +36,7 @@ def clone_histogram(histograms, tag1, tag2, setters={}):
 
     return h0
 
-def updateDictionary(dictionary, TDirectory, prefix='', verbose=False):
+def updateDictionary(dictionary, TDirectory, prefix='', keywords=[], verbose=False):
 
     key_prefix = ''
     if len(prefix) > 0: key_prefix = prefix+'/'
@@ -49,11 +49,19 @@ def updateDictionary(dictionary, TDirectory, prefix='', verbose=False):
 
         if j_obj.InheritsFrom('TDirectory'):
 
-           updateDictionary(dictionary, j_obj, prefix=key_prefix+j_key_name, verbose=verbose)
+           updateDictionary(dictionary, j_obj, prefix=key_prefix+j_key_name, keywords=keywords, verbose=verbose)
 
         elif j_obj.InheritsFrom('TH1') or j_obj.InheritsFrom('TGraph'):
 
            out_key = key_prefix+j_key_name
+
+           if keywords:
+              skip = True
+              for _keyw in keywords:
+                  if _keyw in out_key:
+                     skip = False
+                     break
+              if skip: continue
 
            if out_key in dictionary:
               KILL(log_prx+'input error -> found duplicate of template ["'+out_key+'"] in input file: '+TDirectory.GetName())
@@ -67,7 +75,7 @@ def updateDictionary(dictionary, TDirectory, prefix='', verbose=False):
 
     return dictionary
 
-def getTH1sFromTFile(path, verbose=False):
+def getTH1sFromTFile(path, keywords, verbose=False):
 
     input_histos_dict = {}
 
@@ -75,7 +83,7 @@ def getTH1sFromTFile(path, verbose=False):
     if (not i_inptfile) or i_inptfile.IsZombie() or i_inptfile.TestBit(ROOT.TFile.kRecovered):
        return input_histos_dict
 
-    updateDictionary(input_histos_dict, i_inptfile, prefix='', verbose=verbose)
+    updateDictionary(input_histos_dict, i_inptfile, prefix='', keywords=keywords, verbose=verbose)
 
     i_inptfile.Close()
 
@@ -527,6 +535,9 @@ if __name__ == '__main__':
    parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                        help='path to output directory')
 
+   parser.add_argument('-k', '--keywords', dest='keywords', nargs='+', default=[],
+                       help='list of keywords to skim inputs (input is a match if any of the keywords is part of the input\'s name)')
+
    parser.add_argument('-l', '--label', dest='label', action='store', default='',
                        help='text label (displayed in top-left corner)')
 
@@ -548,15 +559,15 @@ if __name__ == '__main__':
    log_prx = os.path.basename(__file__)+' -- '
 
    ### args validation ---
-   INPUTS = []
+   if len(opts_unknown) > 0:
+      KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
 
    if os.path.exists(opts.output):
       KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
 
    OUTDIR = os.path.abspath(os.path.realpath(opts.output))
 
-   if len(opts_unknown) > 0:
-      KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
+   KEYWORDS = sorted(list(set(opts.keywords)))
 
    EXTS = list(set(opts.exts))
    ### -------------------
@@ -568,7 +579,7 @@ if __name__ == '__main__':
        _input_pieces = [_tmp for _tmp in _input_pieces if _tmp]
        if len(_input_pieces) >= 3:
           _tmp = {}
-          _tmp['TH1s'] = getTH1sFromTFile(_input_pieces[0], verbose=(opts.verbosity > 20))
+          _tmp['TH1s'] = getTH1sFromTFile(_input_pieces[0], keywords=KEYWORDS, verbose=(opts.verbosity > 20))
           th1Keys += _tmp['TH1s'].keys()
           _tmp['Legend'] = _input_pieces[1]
           _tmp['LineColor'] = int(_input_pieces[2])

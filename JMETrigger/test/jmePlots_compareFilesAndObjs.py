@@ -23,6 +23,9 @@ if __name__ == '__main__':
    parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                        help='path to output directory')
 
+   parser.add_argument('-k', '--keywords', dest='keywords', nargs='+', default=[],
+                       help='list of keywords to skim inputs (input is a match if any of the keywords is part of the input\'s name)')
+
    parser.add_argument('-l', '--label', dest='label', action='store', default='',
                        help='text label (displayed in top-left corner)')
 
@@ -44,15 +47,15 @@ if __name__ == '__main__':
    log_prx = os.path.basename(__file__)+' -- '
 
    ### args validation ---
-   INPUTS = []
+   if len(opts_unknown) > 0:
+      KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
 
    if os.path.exists(opts.output):
       KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
 
    OUTDIR = os.path.abspath(os.path.realpath(opts.output))
 
-   if len(opts_unknown) > 0:
-      KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
+   KEYWORDS = sorted(list(set(opts.keywords)))
 
    EXTS = list(set(opts.exts))
    ### -------------------
@@ -64,7 +67,7 @@ if __name__ == '__main__':
        _input_pieces = [_tmp for _tmp in _input_pieces if _tmp]
        if len(_input_pieces) >= 3:
           _tmp = {}
-          _tmp['TH1s'] = getTH1sFromTFile(_input_pieces[0], verbose=(opts.verbosity > 20))
+          _tmp['TH1s'] = getTH1sFromTFile(_input_pieces[0], keywords=KEYWORDS, verbose=(opts.verbosity > 20))
           th1Keys += _tmp['TH1s'].keys()
           _tmp['Legend'] = _input_pieces[1]
           _tmp['LineColor'] = int(_input_pieces[2])
@@ -115,10 +118,10 @@ if __name__ == '__main__':
 
        if 'PuppiMET' in _hkey:
           _hkey_jmeColl = 'PuppiMET'
-          _jmeCollTuple = [('PFMET', 1), ('PFMETCHS', 2), ('PuppiMET', 4)]
+          _jmeCollTuple = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PuppiMET', 4)]
        elif 'Puppi' in _hkey:
           _hkey_jmeColl = 'Puppi'
-          _jmeCollTuple = [('PF', 1), ('PFCHS', 2), ('Puppi', 4)]
+          _jmeCollTuple = [('PF', 1), ('PFCluster', 801), ('PFCHS', 2), ('Puppi', 4)]
 
        if _hkey_jmeColl is None:
           continue
@@ -133,6 +136,9 @@ if __name__ == '__main__':
 
            for (_jmeCollName, _jmeCollColor) in _jmeCollTuple:
                _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
+
+               if _hkeyNew not in inp['TH1s']:
+                  continue
 
                h0 = inp['TH1s'][_hkeyNew].Clone()
 
@@ -172,10 +178,9 @@ if __name__ == '__main__':
                hist0 = Histogram()
                hist0.th1 = h0
                hist0.draw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'hist,e0'
+               hist0.draw += ',same'
                hist0.legendName = inp['Legend']+' '+_jmeCollName
                hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
-               if (len(_hists) > 0) and (not _hIsEfficiency):
-                  hist0.draw += ',same'
                _hists.append(hist0)
 
        if len(_hists) == 0:
@@ -183,6 +188,8 @@ if __name__ == '__main__':
 
        ## labels and axes titles
        _titleX, _titleY, _objLabel = getPlotLabels(_hkey_basename, isProfile=_hIsProfile, isEfficiency=_hIsEfficiency, useUpgradeLabels=opts.upgrade)
+
+       _objLabel = _objLabel.replace(_hkey_jmeColl, '')
 
        label_obj = get_text(Lef+(1-Rig-Lef)*0.95, Bot+(1-Top-Bot)*0.925, 31, .035, _objLabel)
        _labels = [label_sample, label_obj]
@@ -199,7 +206,7 @@ if __name__ == '__main__':
          'title': _htitle,
          'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
-         'outputs': [OUTDIR+'/jmeVS_'+_hkey+'.'+_tmp for _tmp in EXTS],
+         'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
 
          'ratio': True,
          'logY': False,
