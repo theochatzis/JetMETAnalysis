@@ -96,10 +96,10 @@ if __name__ == '__main__':
 
    for _hkey in th1Keys:
 
-       if ('_wrt_' not in _hkey) and (not _hkey.endswith('_eff')):
-          continue
-
        _hkey_basename = os.path.basename(_hkey)
+
+       if ('_wrt_' not in _hkey_basename) and (not _hkey_basename.endswith('_eff')) and (not ('MET' in _hkey_basename and _hkey_basename.endswith('_pt'))) and ('pt_over' not in _hkey_basename):
+          continue
 
        if ('/' in _hkey) and (not _hkey.startswith('NoSelection/')):
           if ('_pt0' not in _hkey_basename) or _hkey_basename.endswith('pt0_eff') or _hkey_basename.endswith('pt0') or ('pt0_over' in _hkey_basename):
@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
        if 'PuppiMET' in _hkey:
           _hkey_jmeColl = 'PuppiMET'
-          _jmeCollTuple = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PuppiMET', 4)]
+          _jmeCollTuple = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PFMETSoftKiller', 901), ('PuppiMET', 4)]
        elif 'Puppi' in _hkey:
           _hkey_jmeColl = 'Puppi'
           _jmeCollTuple = [('PF', 1), ('PFCluster', 801), ('PFCHS', 2), ('Puppi', 4)]
@@ -132,6 +132,8 @@ if __name__ == '__main__':
            for (_jmeCollName, _jmeCollColor) in _jmeCollTuple:
                _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
 
+               _hkeyNew = _hkeyNew.replace('PFClusterJetsCorrected', 'PFClusterJets')
+
                if _hkeyNew not in inp['TH1s']:
                   continue
 
@@ -145,7 +147,7 @@ if __name__ == '__main__':
                   h0.SetDirectory(0)
 
                h0.SetLineColor(_jmeCollColor)
-               h0.SetLineStyle(inp['LineStyle'])
+               h0.SetLineStyle(1 if (_hIsProfile or _hIsEfficiency) else inp['LineStyle'])
                h0.SetMarkerStyle(inp['MarkerStyle'])
                h0.SetMarkerColor(_jmeCollColor)
                h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)

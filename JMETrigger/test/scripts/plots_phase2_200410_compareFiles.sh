@@ -6,7 +6,7 @@ if [ ! -d ${JMEANA_BASE} ]; then
   exit 1
 fi
 
-inpdir=${JMEANA_BASE}/output_200410_v01/harvesting
+inpdir=${JMEANA_BASE}/output_200410_v02/harvesting
 outdir=plots_phase2_200410_compareFiles
 
 samples=(
@@ -15,31 +15,35 @@ samples=(
  Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
 )
 
-if [ ! -f ${outdir%%/*}.tar.gz ]; then
+outdirbase=${outdir%%/*}
+
+if [ ! -f ${outdirbase}.tar.gz ]; then
 
   for sample in "${samples[@]}"; do
 
     outd_i=${outdir}/${sample}
 
     opts_i=""
-    if [[ ${sample} == *"QCD_"* ]]; then opts_i="-k Jets"
-    elif [[ ${sample} == *"ToInv"* ]]; then opts_i="-k MET"
+    if [[ ${sample} == *"QCD_"* ]]; then opts_i="-k *Jets* *MET*_pt"
+    elif [[ ${sample} == *"ToInv"* ]]; then opts_i="-k *MET*"
     fi
 
     jmePlots_compareFiles.py ${opts_i} -u -o ${outd_i} -l ${sample} -e pdf root -i \
      ${inpdir}/hltPhase2_TRKv02/${sample}.root:'TRK v02':2:1:20 \
-     ${inpdir}/hltPhase2_TRKv06/${sample}.root:'TRK v06':4:1:24 \
+     ${inpdir}/hltPhase2_TRKv06/${sample}.root:'TRK v06':4:2:24
 
     jmePlots_compareFilesAndObjs.py ${opts_i} -u -o ${outd_i}/objs -l ${sample} -e pdf root -i \
      ${inpdir}/hltPhase2_TRKv02/${sample}.root:'TRK v02':2:1:20 \
-     ${inpdir}/hltPhase2_TRKv06/${sample}.root:'TRK v06':4:1:24 \
+     ${inpdir}/hltPhase2_TRKv06/${sample}.root:'TRK v06':4:2:24
 
     unset -v outd_i opts_i
   done
   unset -v sample
 
-  tar cfz ${outdir%%/*}.tar.gz ${outdir%%/*}
-  rm -rf ${outdir%%/*}
+  if [ -d ${outdirbase} ]; then
+    tar cfz ${outdirbase}.tar.gz ${outdirbase}
+    rm -rf ${outdirbase}
+  fi
 fi
 
-unset -v inpdir outdir samples
+unset -v inpdir outdir samples outdirbase
