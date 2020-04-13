@@ -49,10 +49,11 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
            else:
               if verbosity > 10:
                  print('merge_rootfiles --', colored_text('[input will be skipped]', ['1','94']), os.path.relpath(_tmp))
-       for fi in _good_files:
 
+       for fi in _good_files:
            _tf = ROOT.TFile.Open(fi)
-           if (not _tf) or _tf.IsZombie() or _tf.TestBit(ROOT.TFile.kRecovered): continue
+           if (not _tf) or _tf.IsZombie() or _tf.TestBit(ROOT.TFile.kRecovered):
+              continue
 
            if _compressionLevel is None:
               _compressionLevel = _tf.GetCompressionLevel()
