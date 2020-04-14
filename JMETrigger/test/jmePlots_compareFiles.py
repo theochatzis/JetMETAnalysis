@@ -2,6 +2,7 @@
 from __future__ import print_function
 import argparse
 import os
+import fnmatch
 import ROOT
 
 from common.utils import *
@@ -58,7 +59,7 @@ def updateDictionary(dictionary, TDirectory, prefix='', keywords=[], verbose=Fal
            if keywords:
               skip = True
               for _keyw in keywords:
-                  if _keyw in out_key:
+                  if fnmatch.fnmatch(out_key, _keyw):
                      skip = False
                      break
               if skip: continue
@@ -377,6 +378,8 @@ def getPlotLabels(key, isProfile, isEfficiency, useUpgradeLabels):
     elif key.startswith('hltPFMETTypeOne_'):         _objLabel = 'HLT PFMET Type-1'
     elif key.startswith('hltPuppiMET_'):             _objLabel = 'HLT PuppiMET'
     elif key.startswith('hltPuppiMETNoMu_'):         _objLabel = 'HLT PuppiMETNoMu'
+    elif key.startswith('hltPFMETCHS_'):             _objLabel = 'HLT PF+CHS MET'
+    elif key.startswith('hltPFMETSoftKiller_'):      _objLabel = 'HLT PF+SoftKiller MET'
 
     if   '_EtaIncl_' in key: pass
     elif '_HB_'      in key: _objLabel += ', |#eta|<'+('1.5' if useUpgradeLabels else '1.3')
@@ -619,10 +622,10 @@ if __name__ == '__main__':
 
    for _hkey in th1Keys:
 
-       if ('_wrt_' not in _hkey) and (not _hkey.endswith('_eff')):
-          continue
-
        _hkey_basename = os.path.basename(_hkey)
+
+       if ('_wrt_' not in _hkey_basename) and (not _hkey_basename.endswith('_eff')) and (not ('MET' in _hkey_basename and _hkey_basename.endswith('_pt'))):
+          continue
 
        if ('/' in _hkey) and (not _hkey.startswith('NoSelection/')):
           if ('_pt0' not in _hkey_basename) or _hkey_basename.endswith('pt0_eff') or _hkey_basename.endswith('pt0') or ('pt0_over' in _hkey_basename):
@@ -650,7 +653,7 @@ if __name__ == '__main__':
               h0.SetDirectory(0)
 
            h0.SetLineColor(inp['LineColor'])
-           h0.SetLineStyle(inp['LineStyle'])
+           h0.SetLineStyle(1 if (_hIsProfile or _hIsEfficiency) else inp['LineStyle'])
            h0.SetMarkerStyle(inp['MarkerStyle'])
            h0.SetMarkerColor(inp['MarkerColor'])
            h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
