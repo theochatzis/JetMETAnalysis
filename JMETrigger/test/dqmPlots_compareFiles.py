@@ -150,7 +150,7 @@ if __name__ == '__main__':
            hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
            _hists.append(hist0)
 
-       if len(_hists) == 0:
+       if len(_hists) < 2:
           continue
 
        ## labels and axes titles
