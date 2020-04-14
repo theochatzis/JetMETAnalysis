@@ -9,59 +9,7 @@ JMETriggerAnalysisDriverRun2::JMETriggerAnalysisDriverRun2(const std::string& tf
 }
 
 JMETriggerAnalysisDriverRun2::JMETriggerAnalysisDriverRun2(const std::string& outputFilePath, const std::string& outputFileMode)
-  : AnalysisDriverBase(outputFilePath, outputFileMode) {
-
-  jetCategoryLabels_ = {
-    "_EtaIncl",
-//  "_EtaInclPt0",
-//  "_EtaInclPt1",
-//  "_EtaInclPt2",
-//  "_EtaInclPt3",
-//  "_EtaInclPt4",
-
-    "_HB",
-//  "_HBPt0",
-//  "_HBPt1",
-//  "_HBPt2",
-//  "_HBPt3",
-//  "_HBPt4",
-
-    "_HE1",
-//  "_HE1Pt0",
-//  "_HE1Pt1",
-//  "_HE1Pt2",
-//  "_HE1Pt3",
-//  "_HE1Pt4",
-
-    "_HE2",
-//  "_HE2Pt0",
-//  "_HE2Pt1",
-//  "_HE2Pt2",
-//  "_HE2Pt3",
-//  "_HE2Pt4",
-
-    "_HF",
-//  "_HFPt0",
-//  "_HFPt1",
-//  "_HFPt2",
-//  "_HFPt3",
-//  "_HFPt4",
-  };
-
-  hltPaths_PFMET_ = {
-    "HLT_PFMET170_NotCleaned",
-    "HLT_PFMET170_HBHECleaned",
-//    "HLT_PFMET170_BeamHaloCleaned",
-    "HLT_PFMET170_HBHE_BeamHaloCleaned",
-    "HLT_PFMETTypeOne190_HBHE_BeamHaloCleaned",
-    "HLT_PFMET200_NotCleaned",
-    "HLT_PFMET200_HBHECleaned",
-    "HLT_PFMET200_HBHE_BeamHaloCleaned",
-    "HLT_PFMET250_HBHECleaned",
-//    "HLT_PFMET300_HBHECleaned",
-    "HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
-  };
-}
+  : AnalysisDriverBase(outputFilePath, outputFileMode) {}
 
 bool JMETriggerAnalysisDriverRun2::jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const {
 
@@ -105,6 +53,61 @@ bool JMETriggerAnalysisDriverRun2::jetBelongsToCategory(const std::string& categ
 }
 
 void JMETriggerAnalysisDriverRun2::init(){
+
+  jetCategoryLabels_ = {
+    "_EtaIncl",
+//  "_EtaInclPt0",
+//  "_EtaInclPt1",
+//  "_EtaInclPt2",
+//  "_EtaInclPt3",
+//  "_EtaInclPt4",
+
+    "_HB",
+//  "_HBPt0",
+//  "_HBPt1",
+//  "_HBPt2",
+//  "_HBPt3",
+//  "_HBPt4",
+
+    "_HE1",
+//  "_HE1Pt0",
+//  "_HE1Pt1",
+//  "_HE1Pt2",
+//  "_HE1Pt3",
+//  "_HE1Pt4",
+
+    "_HE2",
+//  "_HE2Pt0",
+//  "_HE2Pt1",
+//  "_HE2Pt2",
+//  "_HE2Pt3",
+//  "_HE2Pt4",
+
+    "_HF",
+//  "_HFPt0",
+//  "_HFPt1",
+//  "_HFPt2",
+//  "_HFPt3",
+//  "_HFPt4",
+  };
+
+  //!! era
+  //!! jetletponclesaning, pt, eta, pfid, hltmatching
+
+  hltPaths_PFMET_ = {
+    "HLT_PFMET170_NotCleaned",
+    "HLT_PFMET170_HBHECleaned",
+//    "HLT_PFMET170_BeamHaloCleaned",
+    "HLT_PFMET170_HBHE_BeamHaloCleaned",
+    "HLT_PFMETTypeOne190_HBHE_BeamHaloCleaned",
+    "HLT_PFMET200_NotCleaned",
+    "HLT_PFMET200_HBHECleaned",
+    "HLT_PFMET200_HBHE_BeamHaloCleaned",
+    "HLT_PFMET250_HBHECleaned",
+//    "HLT_PFMET300_HBHECleaned",
+    "HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
+  };
+
   // histogram: events counter
   addTH1D("eventsProcessed", {0, 1});
 
@@ -187,7 +190,7 @@ void JMETriggerAnalysisDriverRun2::analyze(){
     auto const& metPhi(vector<float>(metColl+"_phi").at(0));
 
     // cut on deltaPhi(electron, MET)
-    if(utils::deltaPhi(electronPhi, metPhi) > (-4. * M_PI / 5.)){
+    if(utils::deltaPhi(electronPhi, metPhi) > (6. * M_PI / 5.)){
       continue;
     }
 
