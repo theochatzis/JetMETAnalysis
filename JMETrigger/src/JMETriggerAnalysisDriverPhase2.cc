@@ -104,6 +104,8 @@ void JMETriggerAnalysisDriverPhase2::init(){
     bookHistograms_Jets(selLabel, "hltAK4PFCHSJetsCorrected", {"GEN", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK4PuppiJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4PuppiJetsCorrected", {"GEN", "Offline"});
+    bookHistograms_Jets(selLabel, "offlineAK4PFCHSJetsCorrected", {"GEN"});
+    bookHistograms_Jets(selLabel, "offlineAK4PuppiJetsCorrected", {"GEN"});
 
     // histograms: AK8 Jets
     bookHistograms_Jets(selLabel, "ak8GenJetsNoNu", {"Calo", "PFCluster", "PF", "PFCHS", "Puppi"});
@@ -115,6 +117,8 @@ void JMETriggerAnalysisDriverPhase2::init(){
     bookHistograms_Jets(selLabel, "hltAK8PFCHSJetsCorrected", {"GEN", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK8PuppiJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8PuppiJetsCorrected", {"GEN", "Offline"});
+    bookHistograms_Jets(selLabel, "offlineAK8PFCHSJetsCorrected", {"GEN"});
+    bookHistograms_Jets(selLabel, "offlineAK8PuppiJetsCorrected", {"GEN"});
 
     // histograms: MET
     bookHistograms_MET(selLabel, "genMETCalo");
@@ -226,6 +230,20 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
   fhDataAK4PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PuppiJetsCorrected", minAK4JetPt_Offline, maxAK4JetDeltaRmatch_Offline));
   fillHistograms_Jets("NoSelection", fhDataAK4PuppiJetsCorrected);
 
+  // Offline: AK4 PFCHSJetsCorrected
+  fillHistoDataJets fhDataOfflineAK4PFCHSJetsCorrected;
+  fhDataOfflineAK4PFCHSJetsCorrected.jetCollection = "offlineAK4PFCHSJetsCorrected";
+  fhDataOfflineAK4PFCHSJetsCorrected.jetPtMin = minAK4JetPt;
+  fhDataOfflineAK4PFCHSJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataOfflineAK4PFCHSJetsCorrected);
+
+  // Offline: AK4 PuppiJetsCorrected
+  fillHistoDataJets fhDataOfflineAK4PuppiJetsCorrected;
+  fhDataOfflineAK4PuppiJetsCorrected.jetCollection = "offlineAK4PuppiJetsCorrected";
+  fhDataOfflineAK4PuppiJetsCorrected.jetPtMin = minAK4JetPt;
+  fhDataOfflineAK4PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPt_GEN, maxAK4JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataOfflineAK4PuppiJetsCorrected);
+
   //// HLT_AK4*JetCorrected*_100
   for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
 
@@ -334,6 +352,20 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
   fhDataAK8PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
   fhDataAK8PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK8PuppiJetsCorrected", minAK8JetPt_Offline, maxAK8JetDeltaRmatch_Offline));
   fillHistograms_Jets("NoSelection", fhDataAK8PuppiJetsCorrected);
+
+  // Offline: AK8 PFCHSJetsCorrected
+  fillHistoDataJets fhDataOfflineAK8PFCHSJetsCorrected;
+  fhDataOfflineAK8PFCHSJetsCorrected.jetCollection = "offlineAK8PFCHSJetsCorrected";
+  fhDataOfflineAK8PFCHSJetsCorrected.jetPtMin = minAK8JetPt;
+  fhDataOfflineAK8PFCHSJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataOfflineAK8PFCHSJetsCorrected);
+
+  // Offline: AK8 PuppiJetsCorrected
+  fillHistoDataJets fhDataOfflineAK8PuppiJetsCorrected;
+  fhDataOfflineAK8PuppiJetsCorrected.jetCollection = "offlineAK8PuppiJetsCorrected";
+  fhDataOfflineAK8PuppiJetsCorrected.jetPtMin = minAK8JetPt;
+  fhDataOfflineAK8PuppiJetsCorrected.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak8GenJetsNoNu", minAK8JetPt_GEN, maxAK8JetDeltaRmatch_GEN));
+  fillHistograms_Jets("NoSelection", fhDataOfflineAK8PuppiJetsCorrected);
 
   //// MET
 
