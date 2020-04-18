@@ -181,7 +181,9 @@ if __name__ == '__main__':
              '-o '+OUTPUT_ABSPATH,
              '--skipEvents '+str(EVT_FIRST),
              '--maxEvents '+str(1+EVT_LAST-EVT_FIRST),
-           ] + [' '.join(opts_unknown)]
+           ]
+           if opts_unknown:
+              CMDS_1 += [' '.join(opts_unknown)]
 
            CMDS_2 = [
              'touch '+OUTDIR_PATH+'/'+OUTEXE_NAME+'.completed',
