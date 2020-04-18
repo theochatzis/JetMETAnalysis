@@ -59,6 +59,9 @@ if __name__ == '__main__':
    EXTS = list(set(opts.exts))
    ### -------------------
 
+   if len(opts.inputs) > 1:
+      raise RuntimeError('unexpected number of input files [-i]: '+str(opts.inputs))
+
    inputList = []
    th1Keys = []
    for _input in opts.inputs:
@@ -100,6 +103,22 @@ if __name__ == '__main__':
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
 
+       _hkey_pfColl, _pfCollList = None, []
+
+       if '_hltParticleFlow' in _hkey:
+          _hkey_pfColl = '_hltParticleFlow'
+          _pfCollList = [
+            ('_hltParticleFlow'     , ROOT.kBlack),
+            ('_hltParticleFlowCHSv1', ROOT.kBlue),
+            ('_hltParticleFlowCHSv2', ROOT.kViolet),
+            ('_hltPuppiV1'          , ROOT.kRed),
+            ('_hltPuppiV3'          , ROOT.kOrange+1),
+            ('_offlineParticleFlow' , ROOT.kGray+1),
+          ]
+
+       if _hkey_pfColl is None:
+          continue
+
        ## histograms
        _divideByBinWidth = False
        _normalizedToUnity = False
@@ -108,47 +127,53 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           h0 = inp['TH1s'][_hkey].Clone()
+           for (_pfCollName, _pfCollColor) in _pfCollList:
+               _hkeyNew = _hkey.replace(_hkey_pfColl, _pfCollName)
 
-           if not (h0.InheritsFrom('TH1') and (not h0.InheritsFrom('TH2'))):
-              continue
+               if _hkeyNew not in inp['TH1s']:
+                  continue
 
-           h0.UseCurrentStyle()
-           if hasattr(h0, 'SetDirectory'):
-              h0.SetDirectory(0)
+               h0 = inp['TH1s'][_hkeyNew].Clone()
 
-           h0.SetLineColor(inp['LineColor'])
-           h0.SetLineStyle(inp['LineStyle'])
-           h0.SetMarkerStyle(inp['MarkerStyle'])
-           h0.SetMarkerColor(inp['MarkerColor'])
-           h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
+               if not (h0.InheritsFrom('TH1') and (not h0.InheritsFrom('TH2'))):
+                  continue
 
-           h0.SetBit(ROOT.TH1.kNoTitle)
+               h0.UseCurrentStyle()
+               if hasattr(h0, 'SetDirectory'):
+                  h0.SetDirectory(0)
+    
+               h0.SetLineColor(_pfCollColor)
+               h0.SetLineStyle(inp['LineStyle'])
+               h0.SetMarkerStyle(inp['MarkerStyle'])
+               h0.SetMarkerColor(_pfCollColor)
+               h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
 
-           if hasattr(h0, 'SetStats'):
-              h0.SetStats(0)
+               h0.SetBit(ROOT.TH1.kNoTitle)
+    
+               if hasattr(h0, 'SetStats'):
+                  h0.SetStats(0)
 
-           if (len(_hists) == 0) and (not (_hIsProfile or _hIsEfficiency)):
-              _tmpBW = None
-              for _tmp in range(1, h0.GetNbinsX()+1):
-                  if _tmpBW is None:
-                     _tmpBW = h0.GetBinWidth(_tmp)
-                  elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
-                     _divideByBinWidth = True
-                     break
-
-           if _divideByBinWidth:
-              h0.Scale(1., 'width')
-
-           if _normalizedToUnity:
-              h0.Scale(1. / h0.Integral())
-
-           hist0 = Histogram()
-           hist0.th1 = h0
-           hist0.draw = 'ep,same' if (_hIsProfile or _hIsEfficiency) else 'hist,e0,same'
-           hist0.legendName = inp['Legend']
-           hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
-           _hists.append(hist0)
+               if (len(_hists) == 0) and (not (_hIsProfile or _hIsEfficiency)):
+                  _tmpBW = None
+                  for _tmp in range(1, h0.GetNbinsX()+1):
+                      if _tmpBW is None:
+                         _tmpBW = h0.GetBinWidth(_tmp)
+                      elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
+                         _divideByBinWidth = True
+                         break
+    
+               if _divideByBinWidth:
+                  h0.Scale(1., 'width')
+    
+               if _normalizedToUnity:
+                  h0.Scale(1. / h0.Integral())
+    
+               hist0 = Histogram()
+               hist0.th1 = h0
+               hist0.draw = 'ep,same' if (_hIsProfile or _hIsEfficiency) else 'hist,e0,same'
+               hist0.legendName = inp['Legend']+_pfCollName
+               hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
+               _hists.append(hist0)
 
        if len(_hists) < 2:
           continue
@@ -169,7 +194,7 @@ if __name__ == '__main__':
          'histograms': _hists,
          'title': _htitle,
          'labels': _labels,
-         'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
+         'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
          'logY': False,

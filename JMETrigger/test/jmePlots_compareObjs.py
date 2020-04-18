@@ -2,7 +2,6 @@
 from __future__ import print_function
 import argparse
 import os
-import fnmatch
 import ROOT
 
 from common.utils import *
@@ -11,7 +10,7 @@ from common.efficiency import *
 from common.plot import *
 from common.plot_style import *
 
-from jmePlots_compareFiles import updateDictionary, getTH1sFromTFile, Histogram, plot
+from jmePlots_compareFiles import updateDictionary, getTH1sFromTFile, Histogram, plot, getPlotLabels
 
 #### main
 if __name__ == '__main__':
@@ -29,6 +28,9 @@ if __name__ == '__main__':
 
    parser.add_argument('-l', '--label', dest='label', action='store', default='',
                        help='text label (displayed in top-left corner)')
+
+   parser.add_argument('-u', '--upgrade', dest='upgrade', action='store_true', default=False,
+                       help='labels for Phase-2 plots')
 
    parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['pdf'],
                        help='list of extension(s) for output file(s)')
@@ -58,6 +60,9 @@ if __name__ == '__main__':
 
    EXTS = list(set(opts.exts))
    ### -------------------
+
+   if len(opts.inputs) > 1:
+      raise RuntimeError('')
 
    inputList = []
    th1Keys = []
@@ -96,9 +101,46 @@ if __name__ == '__main__':
 
        _hkey_basename = os.path.basename(_hkey)
 
+       if ('_wrt_' not in _hkey_basename) and (not _hkey_basename.endswith('_eff')) and (not ('MET' in _hkey_basename and _hkey_basename.endswith('_pt'))) and ('pt_over' not in _hkey_basename):
+          continue
+
+       if ('/' in _hkey) and (not _hkey.startswith('NoSelection/')):
+          if ('_pt0' not in _hkey_basename) or _hkey_basename.endswith('pt0_eff') or _hkey_basename.endswith('pt0') or ('pt0_over' in _hkey_basename):
+             continue
+
        _hIsProfile = '_wrt_' in _hkey_basename
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
+
+       _hkey_jmeColl, _leg_jmeColl, _jmeCollTuple = None, '', []
+
+       if 'hltPFMET_' in _hkey:
+          _hkey_jmeColl = 'hltPFMET'
+          _leg_jmeColl = 'MET'
+          _jmeCollTuple = [
+            ('hltPFMET', 1),
+            ('hltCaloMET', ROOT.kGray+1),
+            ('hltPFCHSv1MET', ROOT.kAzure),
+            ('hltPFCHSv2MET', ROOT.kBlue),
+            ('hltPuppiV2MET', ROOT.kOrange+1),
+             ('hltPuppiV4MET', ROOT.kRed),
+#            ('offlineMETs_Raw', ROOT.kPink+1),
+            ('offlineMETsPuppi_Raw', ROOT.kViolet),
+          ]
+       elif 'hltAK4PFJets_' in _hkey:
+          _hkey_jmeColl = 'hltAK4PFJets'
+          _leg_jmeColl = 'HLT AK4'
+          _jmeCollTuple = [
+            ('hltAK4CaloJets', ROOT.kGray+1),
+            ('hltAK4PFJets', ROOT.kBlack),
+            ('hltAK4PFCHSv1Jets', ROOT.kAzure),
+            ('hltAK4PFCHSv2Jets', ROOT.kBlue),
+            ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
+            ('hltAK4PuppiV3Jets', ROOT.kRed),
+          ]
+
+       if _hkey_jmeColl is None:
+          continue
 
        ## histograms
        _divideByBinWidth = False
@@ -108,53 +150,64 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           h0 = inp['TH1s'][_hkey].Clone()
+           for (_jmeCollName, _jmeCollColor) in _jmeCollTuple:
+               _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
 
-           if not (h0.InheritsFrom('TH1') and (not h0.InheritsFrom('TH2'))):
-              continue
+               _hkeyNew = _hkeyNew.replace('PFClusterJetsCorrected', 'PFClusterJets')
 
-           h0.UseCurrentStyle()
-           if hasattr(h0, 'SetDirectory'):
-              h0.SetDirectory(0)
+               if _hkeyNew not in inp['TH1s']:
+                  continue
 
-           h0.SetLineColor(inp['LineColor'])
-           h0.SetLineStyle(inp['LineStyle'])
-           h0.SetMarkerStyle(inp['MarkerStyle'])
-           h0.SetMarkerColor(inp['MarkerColor'])
-           h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
+               h0 = inp['TH1s'][_hkeyNew].Clone()
 
-           h0.SetBit(ROOT.TH1.kNoTitle)
+               if h0.InheritsFrom('TH2'):
+                  continue
 
-           if hasattr(h0, 'SetStats'):
-              h0.SetStats(0)
+               h0.UseCurrentStyle()
+               if hasattr(h0, 'SetDirectory'):
+                  h0.SetDirectory(0)
 
-           if (len(_hists) == 0) and (not (_hIsProfile or _hIsEfficiency)):
-              _tmpBW = None
-              for _tmp in range(1, h0.GetNbinsX()+1):
-                  if _tmpBW is None:
-                     _tmpBW = h0.GetBinWidth(_tmp)
-                  elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
-                     _divideByBinWidth = True
-                     break
+               h0.SetLineColor(_jmeCollColor)
+               h0.SetLineStyle(1 if (_hIsProfile or _hIsEfficiency) else inp['LineStyle'])
+               h0.SetMarkerStyle(inp['MarkerStyle'])
+               h0.SetMarkerColor(_jmeCollColor)
+               h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
 
-           if _divideByBinWidth:
-              h0.Scale(1., 'width')
+               h0.SetBit(ROOT.TH1.kNoTitle)
 
-           if _normalizedToUnity:
-              h0.Scale(1. / h0.Integral())
+               if hasattr(h0, 'SetStats'):
+                  h0.SetStats(0)
 
-           hist0 = Histogram()
-           hist0.th1 = h0
-           hist0.draw = 'ep,same' if (_hIsProfile or _hIsEfficiency) else 'hist,e0,same'
-           hist0.legendName = inp['Legend']
-           hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
-           _hists.append(hist0)
+               if (len(_hists) == 0) and (not (_hIsProfile or _hIsEfficiency)):
+                  _tmpBW = None
+                  for _tmp in range(1, h0.GetNbinsX()+1):
+                      if _tmpBW is None:
+                         _tmpBW = h0.GetBinWidth(_tmp)
+                      elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
+                         _divideByBinWidth = True
+                         break
+
+               if _divideByBinWidth:
+                  h0.Scale(1., 'width')
+
+               if _normalizedToUnity:
+                  h0.Scale(1. / h0.Integral())
+
+               hist0 = Histogram()
+               hist0.th1 = h0
+               hist0.draw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'hist,e0'
+               hist0.draw += ',same'
+               hist0.legendName = inp['Legend']+_jmeCollName
+               hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
+               _hists.append(hist0)
 
        if len(_hists) < 2:
           continue
 
        ## labels and axes titles
-       _titleX, _titleY, _objLabel = _hkey_basename, 'Entries', ''
+       _titleX, _titleY, _objLabel = getPlotLabels(_hkey_basename, isProfile=_hIsProfile, isEfficiency=_hIsEfficiency, useUpgradeLabels=opts.upgrade)
+
+       _objLabel = _objLabel.replace(_hkey_jmeColl, _leg_jmeColl)
 
        label_obj = get_text(Lef+(1-Rig-Lef)*0.95, Bot+(1-Top-Bot)*0.925, 31, .035, _objLabel)
        _labels = [label_sample, label_obj]
@@ -169,8 +222,9 @@ if __name__ == '__main__':
          'histograms': _hists,
          'title': _htitle,
          'labels': _labels,
-         'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
+         'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
+
          'ratio': True,
          'logY': False,
        })

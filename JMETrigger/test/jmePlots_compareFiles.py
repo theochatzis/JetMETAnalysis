@@ -354,32 +354,48 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
 def getPlotLabels(key, isProfile, isEfficiency, useUpgradeLabels):
 
     _objLabel = ''
-    if   key.startswith('ak4GenJets_'):              _objLabel = 'AK4GenJets'
-    elif key.startswith('hltAK4CaloJets_'):          _objLabel = 'HLT AK4CaloJets'
-    elif key.startswith('hltAK4CaloJetsCorrected_'): _objLabel = 'HLT AK4CaloJetsCorrected'
-    elif key.startswith('hltAK4PFJets_'):            _objLabel = 'HLT AK4PFJets'
-    elif key.startswith('hltAK4PFJetsCorrected_'):   _objLabel = 'HLT AK4PFJetsCorrected'
-    elif key.startswith('hltAK4PFCHSJets_'):         _objLabel = 'HLT AK4PFCHSJets'
-    elif key.startswith('hltAK4PFCHSJetsCorrected_'):_objLabel = 'HLT AK4PFCHSJetsCorrected'
-    elif key.startswith('hltAK4PuppiJets_'):         _objLabel = 'HLT AK4PuppiJets'
-    elif key.startswith('hltAK4PuppiJetsCorrected_'):_objLabel = 'HLT AK4PuppiJetsCorrected'
-    elif key.startswith('ak8GenJets_'):              _objLabel = 'AK8GenJets'
-    elif key.startswith('hltAK8CaloJets_'):          _objLabel = 'HLT AK8CaloJets'
-    elif key.startswith('hltAK8CaloJetsCorrected_'): _objLabel = 'HLT AK8CaloJetsCorrected'
-    elif key.startswith('hltAK8PFJets_'):            _objLabel = 'HLT AK8PFJets'
-    elif key.startswith('hltAK8PFJetsCorrected_'):   _objLabel = 'HLT AK8PFJetsCorrected'
-    elif key.startswith('hltAK8PFCHSJets_'):         _objLabel = 'HLT AK8PFCHSJets'
-    elif key.startswith('hltAK8PFCHSJetsCorrected_'):_objLabel = 'HLT AK8PFCHSJetsCorrected'
-    elif key.startswith('hltAK8PuppiJets_'):         _objLabel = 'HLT AK8PuppiJets'
-    elif key.startswith('hltAK8PuppiJetsCorrected_'):_objLabel = 'HLT AK8PuppiJetsCorrected'
-    elif key.startswith('hltCaloMET_'):              _objLabel = 'HLT CaloMET'
-    elif key.startswith('hltPFMET_'):                _objLabel = 'HLT PFMET'
-    elif key.startswith('hltPFMETNoMu_'):            _objLabel = 'HLT PFMETNoMu'
-    elif key.startswith('hltPFMETTypeOne_'):         _objLabel = 'HLT PFMET Type-1'
-    elif key.startswith('hltPuppiMET_'):             _objLabel = 'HLT PuppiMET'
-    elif key.startswith('hltPuppiMETNoMu_'):         _objLabel = 'HLT PuppiMETNoMu'
-    elif key.startswith('hltPFMETCHS_'):             _objLabel = 'HLT PF+CHS MET'
-    elif key.startswith('hltPFMETSoftKiller_'):      _objLabel = 'HLT PF+SoftKiller MET'
+    if   key.startswith('ak4GenJets_'):                _objLabel = 'AK4GenJets'
+    elif key.startswith('hltAK4CaloJets_'):            _objLabel = 'HLT AK4CaloJets'
+    elif key.startswith('hltAK4CaloJetsCorrected_'):   _objLabel = 'HLT AK4CaloJetsCorrected'
+    elif key.startswith('hltAK4PFJets_'):              _objLabel = 'HLT AK4PFJets'
+    elif key.startswith('hltAK4PFJetsCorrected_'):     _objLabel = 'HLT AK4PFJetsCorrected'
+    elif key.startswith('hltAK4PFCHSJets_'):           _objLabel = 'HLT AK4PFCHSJets'
+    elif key.startswith('hltAK4PFCHSJetsCorrected_'):  _objLabel = 'HLT AK4PFCHSJetsCorrected'
+    elif key.startswith('hltAK4PFCHSv1Jets_'):         _objLabel = 'HLT AK4PFCHSv1Jets'
+    elif key.startswith('hltAK4PFCHSv1JetsCorrected_'):_objLabel = 'HLT AK4PFCHSv1JetsCorrected'
+    elif key.startswith('hltAK4PFCHSv2Jets_'):         _objLabel = 'HLT AK4PFCHSv2Jets'
+    elif key.startswith('hltAK4PFCHSv2JetsCorrected_'):_objLabel = 'HLT AK4PFCHSv2JetsCorrected'
+    elif key.startswith('hltAK4PuppiJets_'):           _objLabel = 'HLT AK4PuppiJets'
+    elif key.startswith('hltAK4PuppiJetsCorrected_'):  _objLabel = 'HLT AK4PuppiJetsCorrected'
+    elif key.startswith('hltAK4PuppiV1Jets_'):         _objLabel = 'HLT AK4PuppiV1Jets'
+    elif key.startswith('hltAK4PuppiV3Jets_'):         _objLabel = 'HLT AK4PuppiV3Jets'
+    elif key.startswith('ak8GenJets_'):                _objLabel = 'AK8GenJets'
+    elif key.startswith('hltAK8CaloJets_'):            _objLabel = 'HLT AK8CaloJets'
+    elif key.startswith('hltAK8CaloJetsCorrected_'):   _objLabel = 'HLT AK8CaloJetsCorrected'
+    elif key.startswith('hltAK8PFJets_'):              _objLabel = 'HLT AK8PFJets'
+    elif key.startswith('hltAK8PFJetsCorrected_'):     _objLabel = 'HLT AK8PFJetsCorrected'
+    elif key.startswith('hltAK8PFCHSJets_'):           _objLabel = 'HLT AK8PFCHSJets'
+    elif key.startswith('hltAK8PFCHSJetsCorrected_'):  _objLabel = 'HLT AK8PFCHSJetsCorrected'
+    elif key.startswith('hltAK8PuppiJets_'):           _objLabel = 'HLT AK8PuppiJets'
+    elif key.startswith('hltAK8PuppiJetsCorrected_'):  _objLabel = 'HLT AK8PuppiJetsCorrected'
+    elif key.startswith('hltCaloMET_'):                _objLabel = 'HLT CaloMET'
+    elif key.startswith('hltPFMET_'):                  _objLabel = 'HLT PFMET'
+    elif key.startswith('hltPFMETNoMu_'):              _objLabel = 'HLT PFMETNoMu'
+    elif key.startswith('hltPFMETTypeOne_'):           _objLabel = 'HLT PFMET Type-1'
+    elif key.startswith('hltPuppiMET_'):               _objLabel = 'HLT PuppiMET'
+    elif key.startswith('hltPuppiMETNoMu_'):           _objLabel = 'HLT PuppiMETNoMu'
+    elif key.startswith('hltPuppiV1MET_'):             _objLabel = 'HLT PuppiV1MET'
+    elif key.startswith('hltPuppiV1METNoMu_'):         _objLabel = 'HLT PuppiV1METNoMu'
+    elif key.startswith('hltPuppiV2MET_'):             _objLabel = 'HLT PuppiV2MET'
+    elif key.startswith('hltPuppiV2METNoMu_'):         _objLabel = 'HLT PuppiV2METNoMu'
+    elif key.startswith('hltPuppiV3MET_'):             _objLabel = 'HLT PuppiV3MET'
+    elif key.startswith('hltPuppiV3METNoMu_'):         _objLabel = 'HLT PuppiV3METNoMu'
+    elif key.startswith('hltPuppiV4MET_'):             _objLabel = 'HLT PuppiV4MET'
+    elif key.startswith('hltPuppiV4METNoMu_'):         _objLabel = 'HLT PuppiV4METNoMu'
+    elif key.startswith('hltPFMETCHS_'):               _objLabel = 'HLT PF+CHS MET'
+    elif key.startswith('hltPFMETSoftKiller_'):        _objLabel = 'HLT PF+SoftKiller MET'
+    elif key.startswith('hltPFCHSv2MET_'):             _objLabel = 'HLT PF+CHSv1 MET'
+    elif key.startswith('hltPFCHSv2MET_'):             _objLabel = 'HLT PF+CHSv2 MET'
 
     if   '_EtaIncl_' in key: pass
     elif '_HB_'      in key: _objLabel += ', |#eta|<'+('1.5' if useUpgradeLabels else '1.3')
@@ -582,6 +598,7 @@ if __name__ == '__main__':
    OUTDIR = os.path.abspath(os.path.realpath(opts.output))
 
    KEYWORDS = sorted(list(set(opts.keywords)))
+   KEYWORDS = [_tmp.replace('\'','').replace('"','') for _tmp in KEYWORDS]
 
    EXTS = list(set(opts.exts))
    ### -------------------
@@ -590,7 +607,6 @@ if __name__ == '__main__':
    th1Keys = []
    for _input in opts.inputs:
        _input_pieces = _input.split(':')
-       _input_pieces = [_tmp for _tmp in _input_pieces if _tmp]
        if len(_input_pieces) >= 3:
           _tmp = {}
           _tmp['TH1s'] = getTH1sFromTFile(_input_pieces[0], keywords=KEYWORDS, verbose=(opts.verbosity > 20))

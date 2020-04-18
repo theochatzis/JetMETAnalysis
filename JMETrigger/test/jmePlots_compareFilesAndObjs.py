@@ -56,6 +56,7 @@ if __name__ == '__main__':
    OUTDIR = os.path.abspath(os.path.realpath(opts.output))
 
    KEYWORDS = sorted(list(set(opts.keywords)))
+   KEYWORDS = [_tmp.replace('\'','').replace('"','') for _tmp in KEYWORDS]
 
    EXTS = list(set(opts.exts))
    ### -------------------
@@ -64,7 +65,6 @@ if __name__ == '__main__':
    th1Keys = []
    for _input in opts.inputs:
        _input_pieces = _input.split(':')
-       _input_pieces = [_tmp for _tmp in _input_pieces if _tmp]
        if len(_input_pieces) >= 3:
           _tmp = {}
           _tmp['TH1s'] = getTH1sFromTFile(_input_pieces[0], keywords=KEYWORDS, verbose=(opts.verbosity > 20))
