@@ -1,6 +1,17 @@
 #include <NTupleAnalysis/JMETrigger/interface/Utils.h>
 #include <math.h>
 
+float utils::deltaPhi(const float phi1, const float phi2){
+  auto dphi(std::abs(phi1 - phi2));
+  if(dphi > M_PI) dphi -= 2*M_PI;
+  return dphi;
+}
+
+float utils::deltaR2(const float eta1, const float phi1, const float eta2, const float phi2){
+  auto const dphi(deltaPhi(phi1, phi2));
+  return ((eta1 - eta2) * (eta1 - eta2)) + (dphi * dphi);
+}
+
 std::vector<std::string> utils::stringTokens(const std::string& str, const std::string& delimiter){
 
   std::vector<std::string> toks;
@@ -19,13 +30,15 @@ std::vector<std::string> utils::stringTokens(const std::string& str, const std::
   return toks;
 }
 
-float utils::deltaPhi(const float phi1, const float phi2){
-  auto dphi(std::abs(phi1 - phi2));
-  if(dphi > M_PI) dphi -= 2*M_PI;
-  return dphi;
+bool utils::stringStartsWith(const std::string& str, const std::string& substr){
+  return (str.find(substr) == 0);
 }
 
-float utils::deltaR2(const float eta1, const float phi1, const float eta2, const float phi2){
-  auto const dphi(deltaPhi(phi1, phi2));
-  return ((eta1 - eta2) * (eta1 - eta2)) + (dphi * dphi);
+bool utils::stringEndsWith(const std::string& str, const std::string& substr){
+
+  if(str.length() >= substr.length()){
+    return (str.compare(str.length()-substr.length(), substr.length(), substr) == 0);
+  }
+
+  return false;
 }
