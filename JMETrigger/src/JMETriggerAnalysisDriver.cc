@@ -97,7 +97,7 @@ void JMETriggerAnalysisDriver::init(){
   for(auto const& selLabel : {"NoSelection"}){
 
     // histograms: AK4 Jets
-    bookHistograms_Jets(selLabel, "ak4GenJetsNoNu", {"CaloCorr", "PFCorr", "PFCHSv1", "PFCHSv2", "PuppiV1", "PuppiV3"});
+    bookHistograms_Jets(selLabel, "ak4GenJetsNoNu", {"CaloCorr", "PFCorr", "PFCHSv1", "PFCHSv2", "PuppiV1", "PuppiV3", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK4CaloJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4CaloJetsCorrected", {"GEN", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK4PFJets", {"GEN"});
@@ -110,7 +110,7 @@ void JMETriggerAnalysisDriver::init(){
     bookHistograms_Jets(selLabel, "offlineAK4PuppiJetsCorrected", {"GEN"});
 
     // histograms: AK8 Jets
-    bookHistograms_Jets(selLabel, "ak8GenJetsNoNu", {"CaloCorr", "PFCorr", "PFCHSv1", "PFCHSv2", "PuppiV1", "PuppiV3"});
+    bookHistograms_Jets(selLabel, "ak8GenJetsNoNu", {"CaloCorr", "PFCorr", "PFCHSv1", "PFCHSv2", "PuppiV1", "PuppiV3", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK8CaloJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8CaloJetsCorrected", {"GEN", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK8PFJets", {"GEN"});
