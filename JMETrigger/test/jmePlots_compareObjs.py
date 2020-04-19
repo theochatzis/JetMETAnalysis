@@ -140,6 +140,19 @@ if __name__ == '__main__':
                ('hltAK4PFCHSv2Jets', ROOT.kViolet),
                ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
                ('hltAK4PuppiV3Jets', ROOT.kRed),
+               ('offlineAK4PuppiJetsCorrected', ROOT.kPink+1),
+             ]
+          elif 'hltAK8PFJets_' in _hkey:
+             _hkey_jmeColl = 'hltAK8PFJets'
+             _leg_jmeColl = 'HLT AK8'
+             _jmeCollTuple = [
+               ('hltAK8CaloJets', ROOT.kGray+1),
+               ('hltAK8PFJets', ROOT.kBlack),
+               ('hltAK8PFCHSv1Jets', ROOT.kBlue),
+               ('hltAK8PFCHSv2Jets', ROOT.kViolet),
+               ('hltAK8PuppiV1Jets', ROOT.kOrange+1),
+               ('hltAK8PuppiV3Jets', ROOT.kRed),
+               ('offlineAK8PuppiJetsCorrected', ROOT.kPink+1),
              ]
           elif 'MatchedToPFCorr_' in _hkey:
              _hkey_jmeColl = 'PFCorr'
@@ -151,6 +164,7 @@ if __name__ == '__main__':
                ('PFCHSv2', ROOT.kViolet),
                ('PuppiV1', ROOT.kOrange+1),
                ('PuppiV3', ROOT.kRed),
+               ('Offline', ROOT.kPink+1),
              ]
 
        if _hkey_jmeColl is None:
@@ -241,6 +255,7 @@ if __name__ == '__main__':
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
          'logY': False,
+         'autoRangeX': True,
        })
 
        del _hists

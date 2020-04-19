@@ -97,7 +97,7 @@ class Histogram:
         self.legendName = ''
         self.legendDraw = ''
 
-def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac=0.3, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False):
+def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac=0.3, xMin=None, xMax=None, yMin=None, yMax=None, logX=False, logY=False, autoRangeX=False):
 
     xyMinMax = []
     if histograms[0].th1.InheritsFrom('TGraph'):
@@ -125,9 +125,30 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
            if _tmp.th1 is not None:
               leg.AddEntry(_tmp.th1, _tmp.legendName, _tmp.legendDraw)
 
-    XMIN, XMAX = xMin, xMax
-    if XMIN is None: XMIN = xyMinMax[0] if xyMinMax else histograms[0].th1.GetBinLowEdge(1)
-    if XMAX is None: XMAX = xyMinMax[2] if xyMinMax else histograms[0].th1.GetBinLowEdge(1+histograms[0].th1.GetNbinsX())
+    if autoRangeX:
+       xMinCalc, xMaxCalc = None, None
+       for _tmp in histograms:
+           if (_tmp.th1 is not None):
+              if hasattr(_tmp.th1, 'GetNbinsX'):
+                 tmpXMin, tmpXMax = _tmp.th1.GetBinLowEdge(1), _tmp.th1.GetBinLowEdge(1+_tmp.th1.GetNbinsX())
+                 for i_bin in range(1, _tmp.th1.GetNbinsX()+1):
+                     if (_tmp.th1.GetBinContent(i_bin) != 0.) or (_tmp.th1.GetBinError(i_bin) != 0.): break
+                     tmpXMin = _tmp.th1.GetBinLowEdge(i_bin)
+                 for i_bin in reversed(range(1, _tmp.th1.GetNbinsX()+1)):
+                     if (_tmp.th1.GetBinContent(i_bin) != 0.) or (_tmp.th1.GetBinError(i_bin) != 0.): break
+                     tmpXMax = _tmp.th1.GetBinLowEdge(i_bin)
+                 xMinCalc = min(xMinCalc, tmpXMin) if xMinCalc is not None else tmpXMin
+                 xMaxCalc = max(xMaxCalc, tmpXMax) if xMaxCalc is not None else tmpXMax
+              else:
+                 _tmp_xyMinMax = get_xyminmax_from_graph(_tmp.th1)
+                 xMinCalc = min(xMinCalc, _tmp_xyMinMax[0]) if xMinCalc is not None else _tmp_xyMinMax[0]
+                 xMaxCalc = max(xMaxCalc, _tmp_xyMinMax[2]) if xMaxCalc is not None else _tmp_xyMinMax[2]
+    else:
+       xMinCalc = xyMinMax[0] if xyMinMax else histograms[0].th1.GetBinLowEdge(1)
+       xMaxCalc = xyMinMax[2] if xyMinMax else histograms[0].th1.GetBinLowEdge(1+histograms[0].th1.GetNbinsX())
+
+    XMIN = xMin if xMin is not None else xMinCalc
+    XMAX = xMax if xMax is not None else xMaxCalc
 
     HMIN, HMAX = 1e8, -1e8
     for _tmp in histograms:
@@ -726,6 +747,7 @@ if __name__ == '__main__':
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
          'logY': False,
+         'autoRangeX': True,
        })
 
        del _hists

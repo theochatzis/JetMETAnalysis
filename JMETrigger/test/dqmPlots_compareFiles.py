@@ -173,6 +173,7 @@ if __name__ == '__main__':
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
          'logY': False,
+         'autoRangeX': True,
        })
 
        del _hists
