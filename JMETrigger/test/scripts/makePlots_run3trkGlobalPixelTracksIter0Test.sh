@@ -28,7 +28,7 @@ if [ ! -f ${outdirbase}.tar.gz ]; then
 
     opts_i=""
     if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-k '*Jets*' '*MET_pt' '*/offlineMETs*_pt'"
-    elif [[ ${sample} == *"DYToLL"* ]]; then opts_i="-k '*MET_*'"
+    elif [[ ${sample} == *"DYToLL"* ]]; then opts_i="-k '*MET_*' '*/offlineMETs*_pt'"
     elif [[ ${sample} == *"ZprimeToMuMu"* ]]; then opts_i="-k '*METNoMu_*'"
     elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-k '*MET_*' '*/offlineMETs*_pt'"
     fi
