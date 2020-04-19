@@ -114,30 +114,44 @@ if __name__ == '__main__':
 
        _hkey_jmeColl, _leg_jmeColl, _jmeCollTuple = None, '', []
 
-       if 'hltPFMET_' in _hkey:
-          _hkey_jmeColl = 'hltPFMET'
-          _leg_jmeColl = 'MET'
-          _jmeCollTuple = [
-            ('hltPFMET', 1),
-            ('hltCaloMET', ROOT.kGray+1),
-            ('hltPFCHSv1MET', ROOT.kAzure),
-            ('hltPFCHSv2MET', ROOT.kBlue),
-            ('hltPuppiV2MET', ROOT.kOrange+1),
-             ('hltPuppiV4MET', ROOT.kRed),
-#            ('offlineMETs_Raw', ROOT.kPink+1),
-            ('offlineMETsPuppi_Raw', ROOT.kViolet),
-          ]
-       elif 'hltAK4PFJets_' in _hkey:
-          _hkey_jmeColl = 'hltAK4PFJets'
-          _leg_jmeColl = 'HLT AK4'
-          _jmeCollTuple = [
-            ('hltAK4CaloJets', ROOT.kGray+1),
-            ('hltAK4PFJets', ROOT.kBlack),
-            ('hltAK4PFCHSv1Jets', ROOT.kAzure),
-            ('hltAK4PFCHSv2Jets', ROOT.kBlue),
-            ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
-            ('hltAK4PuppiV3Jets', ROOT.kRed),
-          ]
+       if opts.upgrade:
+          pass
+       else:
+          if 'hltPFMET_' in _hkey:
+             _hkey_jmeColl = 'hltPFMET'
+             _leg_jmeColl = 'MET'
+             _jmeCollTuple = [
+               ('hltPFMET', 1),
+               ('hltCaloMET', ROOT.kGray+1),
+               ('hltPFCHSv1MET', ROOT.kBlue),
+               ('hltPFCHSv2MET', ROOT.kViolet),
+               ('hltPuppiV2MET', ROOT.kRed),
+               ('hltPuppiV4MET', ROOT.kOrange+1),
+#               ('offlineMETs_Raw', ROOT.kPink+3),
+               ('offlineMETsPuppi_Raw', ROOT.kPink+1),
+             ]
+          elif 'hltAK4PFJets_' in _hkey:
+             _hkey_jmeColl = 'hltAK4PFJets'
+             _leg_jmeColl = 'HLT AK4'
+             _jmeCollTuple = [
+               ('hltAK4CaloJets', ROOT.kGray+1),
+               ('hltAK4PFJets', ROOT.kBlack),
+               ('hltAK4PFCHSv1Jets', ROOT.kBlue),
+               ('hltAK4PFCHSv2Jets', ROOT.kViolet),
+               ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
+               ('hltAK4PuppiV3Jets', ROOT.kRed),
+             ]
+          elif 'MatchedToPFCorr_' in _hkey:
+             _hkey_jmeColl = 'PFCorr'
+             _leg_jmeColl = 'GEN-HLT Matching'
+             _jmeCollTuple = [
+               ('CaloCorr', ROOT.kGray+1),
+               ('PFCorr', ROOT.kBlack),
+               ('PFCHSv1', ROOT.kBlue),
+               ('PFCHSv2', ROOT.kViolet),
+               ('PuppiV1', ROOT.kOrange+1),
+               ('PuppiV3', ROOT.kRed),
+             ]
 
        if _hkey_jmeColl is None:
           continue
@@ -153,7 +167,8 @@ if __name__ == '__main__':
            for (_jmeCollName, _jmeCollColor) in _jmeCollTuple:
                _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
 
-               _hkeyNew = _hkeyNew.replace('PFClusterJetsCorrected', 'PFClusterJets')
+               if opts.upgrade:
+                  _hkeyNew = _hkeyNew.replace('PFClusterJetsCorrected', 'PFClusterJets')
 
                if _hkeyNew not in inp['TH1s']:
                   continue
@@ -224,7 +239,6 @@ if __name__ == '__main__':
          'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
-
          'ratio': True,
          'logY': False,
        })

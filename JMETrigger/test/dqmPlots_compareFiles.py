@@ -169,7 +169,7 @@ if __name__ == '__main__':
          'histograms': _hists,
          'title': _htitle,
          'labels': _labels,
-         'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
+         'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.70, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
          'logY': False,

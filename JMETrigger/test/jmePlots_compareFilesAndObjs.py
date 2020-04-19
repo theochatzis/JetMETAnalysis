@@ -98,11 +98,14 @@ if __name__ == '__main__':
 
        _hkey_basename = os.path.basename(_hkey)
 
-       if ('_wrt_' not in _hkey_basename) and (not _hkey_basename.endswith('_eff')) and (not ('MET' in _hkey_basename and _hkey_basename.endswith('_pt'))) and ('pt_over' not in _hkey_basename):
+       if ('_wrt_' not in _hkey_basename) and (not _hkey_basename.endswith('_eff')) and \
+          (not ('MET' in _hkey_basename and _hkey_basename.endswith('_pt'))) and \
+          ('pt_over' not in _hkey_basename):
           continue
 
        if ('/' in _hkey) and (not _hkey.startswith('NoSelection/')):
-          if ('_pt0' not in _hkey_basename) or _hkey_basename.endswith('pt0_eff') or _hkey_basename.endswith('pt0') or ('pt0_over' in _hkey_basename):
+          if ('_pt0' not in _hkey_basename) or _hkey_basename.endswith('pt0_eff') or \
+             _hkey_basename.endswith('pt0') or ('pt0_over' in _hkey_basename):
              continue
 
        _hIsProfile = '_wrt_' in _hkey_basename
@@ -111,12 +114,49 @@ if __name__ == '__main__':
 
        _hkey_jmeColl, _jmeCollTuple = None, []
 
-       if 'PuppiMET' in _hkey:
-          _hkey_jmeColl = 'PuppiMET'
-          _jmeCollTuple = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PFMETSoftKiller', 901), ('PuppiMET', 4)]
-       elif 'Puppi' in _hkey:
-          _hkey_jmeColl = 'Puppi'
-          _jmeCollTuple = [('PF', 1), ('PFCluster', 801), ('PFCHS', 2), ('Puppi', 4)]
+       if opts.upgrade:
+          if 'PuppiMET' in _hkey:
+             _hkey_jmeColl = 'PuppiMET'
+             _jmeCollTuple = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PFMETSoftKiller', 901), ('PuppiMET', 4)]
+          elif 'Puppi' in _hkey:
+             _hkey_jmeColl = 'Puppi'
+             _jmeCollTuple = [('PF', 1), ('PFCluster', 801), ('PFCHS', 2), ('Puppi', 4)]
+       else:
+          if 'hltPFMET_' in _hkey:
+             _hkey_jmeColl = 'hltPFMET'
+             _leg_jmeColl = 'MET'
+             _jmeCollTuple = [
+               ('hltPFMET', 1),
+               ('hltCaloMET', ROOT.kGray+1),
+#               ('hltPFCHSv1MET', ROOT.kBlue),
+               ('hltPFCHSv2MET', ROOT.kViolet),
+#               ('hltPuppiV2MET', ROOT.kRed),
+               ('hltPuppiV4MET', ROOT.kOrange+1),
+#               ('offlineMETs_Raw', ROOT.kPink+3),
+               ('offlineMETsPuppi_Raw', ROOT.kPink+1),
+             ]
+          elif 'hltAK4PFJets_' in _hkey:
+             _hkey_jmeColl = 'hltAK4PFJets'
+             _leg_jmeColl = 'HLT AK4'
+             _jmeCollTuple = [
+               ('hltAK4CaloJets', ROOT.kGray+1),
+               ('hltAK4PFJets', ROOT.kBlack),
+#               ('hltAK4PFCHSv1Jets', ROOT.kBlue),
+               ('hltAK4PFCHSv2Jets', ROOT.kViolet),
+#               ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
+               ('hltAK4PuppiV3Jets', ROOT.kRed),
+             ]
+          elif 'MatchedToPFCorr_' in _hkey:
+             _hkey_jmeColl = 'PFCorr'
+             _leg_jmeColl = 'GEN-HLT Matching'
+             _jmeCollTuple = [
+               ('CaloCorr', ROOT.kGray+1),
+               ('PFCorr', ROOT.kBlack),
+               ('PFCHSv1', ROOT.kBlue),
+               ('PFCHSv2', ROOT.kViolet),
+               ('PuppiV1', ROOT.kOrange+1),
+               ('PuppiV3', ROOT.kRed),
+             ]
 
        if _hkey_jmeColl is None:
           continue
@@ -132,7 +172,8 @@ if __name__ == '__main__':
            for (_jmeCollName, _jmeCollColor) in _jmeCollTuple:
                _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
 
-               _hkeyNew = _hkeyNew.replace('PFClusterJetsCorrected', 'PFClusterJets')
+               if opts.upgrade:
+                  _hkeyNew = _hkeyNew.replace('PFClusterJetsCorrected', 'PFClusterJets')
 
                if _hkeyNew not in inp['TH1s']:
                   continue
@@ -203,7 +244,6 @@ if __name__ == '__main__':
          'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
-
          'ratio': True,
          'logY': False,
        })

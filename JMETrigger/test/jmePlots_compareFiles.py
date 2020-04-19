@@ -349,6 +349,8 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
        del plot_ratios
        del denom
 
+#    raise SystemExit(0)
+
     return 0
 
 def getPlotLabels(key, isProfile, isEfficiency, useUpgradeLabels):

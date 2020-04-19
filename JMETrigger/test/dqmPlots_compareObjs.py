@@ -105,15 +105,15 @@ if __name__ == '__main__':
 
        _hkey_pfColl, _pfCollList = None, []
 
-       if '_hltParticleFlow' in _hkey:
-          _hkey_pfColl = '_hltParticleFlow'
+       if ('_hltParticleFlow/' in _hkey) or ('_hltParticleFlow_' in _hkey):
+          _hkey_pfColl = 'hltParticleFlow'
           _pfCollList = [
-            ('_hltParticleFlow'     , ROOT.kBlack),
-            ('_hltParticleFlowCHSv1', ROOT.kBlue),
-            ('_hltParticleFlowCHSv2', ROOT.kViolet),
-            ('_hltPuppiV1'          , ROOT.kRed),
-            ('_hltPuppiV3'          , ROOT.kOrange+1),
-            ('_offlineParticleFlow' , ROOT.kGray+1),
+            ('hltParticleFlow'     , ROOT.kBlack),
+            ('hltParticleFlowCHSv1', ROOT.kBlue),
+            ('hltParticleFlowCHSv2', ROOT.kViolet),
+            ('hltPuppiV1'          , ROOT.kRed),
+            ('hltPuppiV3'          , ROOT.kOrange+1),
+            ('offlineParticleFlow' , ROOT.kGray+1),
           ]
 
        if _hkey_pfColl is None:
