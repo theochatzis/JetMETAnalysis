@@ -6,8 +6,8 @@ if [ ! -d ${JMEANA_BASE} ]; then
   exit 1
 fi
 
-inpdir=${JMEANA_BASE}/output_run3trkGlobalPixelTracksIter0Test_v05
-outdir=plots_run3trkGlobalPixelTracksIter0Test_v05
+inpdir=${JMEANA_BASE}/output_run3trkGlobalPixelTracksIter0Test_v07
+outdir=plots_run3trkGlobalPixelTracksIter0Test_v07
 
 samples=(
   Run3Winter20_QCD_Pt_15to3000_Flat_14TeV
@@ -46,11 +46,11 @@ if [ ! -f ${outdirbase}.tar.gz ]; then
       ${inpdir}/harvesting/HLT_globalPixelTracks_v01/${sample}.root:'Patatrack PixTrk + Iter-0':2:2:24
 
     if [ ${sample} == "Run3Winter20_QCD_Pt_15to3000_Flat_14TeV" ]; then
-      dqmPlots_compareObjs.py -o ${outdir}/run2/pf_compareObjs/${sample} -l ${sample} -e pdf root -i \
+      dqmPlots_compareObjs.py -o ${outdir}/run2/${sample}/pf_compareObjs -l ${sample} -e pdf root -i \
         ${inpdir}/ntuples/HLT/${sample}.root:'':1:1:20
     fi
 
-    jmePlots_compareObjs.py ${opts_i} -o ${outdir}/run2/jme_compareObjs/${sample} -l ${sample} -e pdf root -i \
+    jmePlots_compareObjs.py ${opts_i} -o ${outdir}/run2/${sample}/jme_compareObjs -l ${sample} -e pdf root -i \
       ${inpdir}/harvesting/HLT/${sample}.root:'':1:1:20
 
     unset -v outd_i opts_i
