@@ -738,6 +738,8 @@ if __name__ == '__main__':
 
        _htitle = ';'+_titleX+';'+_titleY
 
+       _logY = ('_NotMatchedTo' in _hkey_basename) and _hkey_basename.endswith('pt_eff')
+
        ## plot
        plot(**{
          'histograms': _hists,
@@ -746,7 +748,7 @@ if __name__ == '__main__':
          'legXY': [Lef+(1-Rig-Lef)*0.75, Bot+(1-Bot-Top)*0.60, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
-         'logY': False,
+         'logY': _logY,
          'autoRangeX': True,
        })
 

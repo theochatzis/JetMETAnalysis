@@ -39,7 +39,7 @@ if [ ! -f ${outdirbase}.tar.gz ]; then
 
     jmePlots_compareFiles.py ${opts_i} -o ${outd_i}/jme -l ${sample} -e pdf root -i \
       ${inpdir}/harvesting/HLT/${sample}.root:'Run-2':1:1:20 \
-      ${inpdir}/harvesting/HLT_globalPixelTracks_v01/${sample}.root:'Patatrack PixTrk + Iter-0':2:2:24
+      ${inpdir}/harvesting/HLT_globalPixelTracks_v01/${sample}.root:'Patatrack PixTrk + Iter-0':2:1:24
 
     jmePlots_compareFilesAndObjs.py ${opts_i} -o ${outd_i}/jme_compareObjs -l ${sample} -e pdf root -i \
       ${inpdir}/harvesting/HLT/${sample}.root:'Run-2':1:1:20 \

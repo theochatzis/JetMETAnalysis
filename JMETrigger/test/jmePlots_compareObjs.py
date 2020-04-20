@@ -154,12 +154,12 @@ if __name__ == '__main__':
                ('hltAK8PuppiV3Jets', ROOT.kRed),
                ('offlineAK8PuppiJetsCorrected', ROOT.kPink+1),
              ]
-          elif 'MatchedToPFCorr_' in _hkey:
-             _hkey_jmeColl = 'PFCorr'
+          elif 'MatchedToPF_' in _hkey:
+             _hkey_jmeColl = 'PF'
              _leg_jmeColl = 'GEN-HLT Matching'
              _jmeCollTuple = [
-               ('CaloCorr', ROOT.kGray+1),
-               ('PFCorr', ROOT.kBlack),
+               ('Calo', ROOT.kGray+1),
+               ('PF', ROOT.kBlack),
                ('PFCHSv1', ROOT.kBlue),
                ('PFCHSv2', ROOT.kViolet),
                ('PuppiV1', ROOT.kOrange+1),
@@ -246,6 +246,8 @@ if __name__ == '__main__':
 
        _htitle = ';'+_titleX+';'+_titleY
 
+       _logY = ('_NotMatchedTo' in _hkey_basename) and _hkey_basename.endswith('pt_eff')
+
        ## plot
        plot(**{
          'histograms': _hists,
@@ -254,7 +256,7 @@ if __name__ == '__main__':
          'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
-         'logY': False,
+         'logY': _logY,
          'autoRangeX': True,
        })
 
