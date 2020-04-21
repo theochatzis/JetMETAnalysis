@@ -142,6 +142,18 @@ if __name__ == '__main__':
                ('hltAK4PuppiV3Jets', ROOT.kRed),
                ('offlineAK4PuppiJetsCorrected', ROOT.kPink+1),
              ]
+          elif 'hltAK4PFJetsCorrected_' in _hkey:
+             _hkey_jmeColl = 'hltAK4PFJetsCorrected'
+             _leg_jmeColl = 'HLT AK4'
+             _jmeCollTuple = [
+               ('hltAK4CaloJetsCorrected', ROOT.kGray+1),
+               ('hltAK4PFJetsCorrected', ROOT.kBlack),
+               ('hltAK4PFCHSv1Jets', ROOT.kBlue),
+               ('hltAK4PFCHSv2Jets', ROOT.kViolet),
+               ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
+               ('hltAK4PuppiV3Jets', ROOT.kRed),
+               ('offlineAK4PuppiJetsCorrected', ROOT.kPink+1),
+             ]
           elif 'hltAK8PFJets_' in _hkey:
              _hkey_jmeColl = 'hltAK8PFJets'
              _leg_jmeColl = 'HLT AK8'
@@ -154,12 +166,36 @@ if __name__ == '__main__':
                ('hltAK8PuppiV3Jets', ROOT.kRed),
                ('offlineAK8PuppiJetsCorrected', ROOT.kPink+1),
              ]
+          elif 'hltAK8PFJetsCorrected_' in _hkey:
+             _hkey_jmeColl = 'hltAK8PFJetsCorrected'
+             _leg_jmeColl = 'HLT AK8'
+             _jmeCollTuple = [
+               ('hltAK8CaloJetsCorrected', ROOT.kGray+1),
+               ('hltAK8PFJetsCorrected', ROOT.kBlack),
+               ('hltAK8PFCHSv1Jets', ROOT.kBlue),
+               ('hltAK8PFCHSv2Jets', ROOT.kViolet),
+               ('hltAK8PuppiV1Jets', ROOT.kOrange+1),
+               ('hltAK8PuppiV3Jets', ROOT.kRed),
+               ('offlineAK8PuppiJetsCorrected', ROOT.kPink+1),
+             ]
           elif 'MatchedToPF_' in _hkey:
              _hkey_jmeColl = 'PF'
-             _leg_jmeColl = 'GEN-HLT Matching'
+             _leg_jmeColl = 'HLT'
              _jmeCollTuple = [
                ('Calo', ROOT.kGray+1),
                ('PF', ROOT.kBlack),
+               ('PFCHSv1', ROOT.kBlue),
+               ('PFCHSv2', ROOT.kViolet),
+               ('PuppiV1', ROOT.kOrange+1),
+               ('PuppiV3', ROOT.kRed),
+               ('Offline', ROOT.kPink+1),
+             ]
+          elif 'MatchedToPFCorr_' in _hkey:
+             _hkey_jmeColl = 'PFCorr'
+             _leg_jmeColl = 'HLT'
+             _jmeCollTuple = [
+               ('CaloCorr', ROOT.kGray+1),
+               ('PFCorr', ROOT.kBlack),
                ('PFCHSv1', ROOT.kBlue),
                ('PFCHSv2', ROOT.kViolet),
                ('PuppiV1', ROOT.kOrange+1),
