@@ -2,7 +2,6 @@
 from __future__ import print_function
 import argparse
 import os
-import fnmatch
 import ROOT
 
 from common.utils import *
@@ -59,9 +58,6 @@ if __name__ == '__main__':
    EXTS = list(set(opts.exts))
    ### -------------------
 
-   if len(opts.inputs) > 1:
-      raise RuntimeError('unexpected number of input files [-i]: '+str(opts.inputs))
-
    inputList = []
    th1Keys = []
    for _input in opts.inputs:
@@ -103,20 +99,29 @@ if __name__ == '__main__':
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
 
-       _hkey_pfColl, _pfCollList = None, []
+       _hkey_dqmColl, _dqmCollList = None, []
+
+       _legXY = [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99]
 
        if ('_hltParticleFlow/' in _hkey) or ('_hltParticleFlow_' in _hkey):
-          _hkey_pfColl = 'hltParticleFlow'
-          _pfCollList = [
+          _hkey_dqmColl = 'hltParticleFlow'
+          _dqmCollList = [
             ('hltParticleFlow'     , ROOT.kBlack),
-            ('hltParticleFlowCHSv1', ROOT.kBlue),
+#            ('hltParticleFlowCHSv1', ROOT.kBlue),
             ('hltParticleFlowCHSv2', ROOT.kViolet),
-            ('hltPuppiV1'          , ROOT.kOrange+1),
+#            ('hltPuppiV1'          , ROOT.kOrange+1),
             ('hltPuppiV3'          , ROOT.kRed),
             ('offlineParticleFlow' , ROOT.kPink+1),
           ]
+       elif '_hltMergedTracks/' in _hkey:
+          _hkey_dqmColl = 'hltMergedTracks'
+          _dqmCollList = [
+            ('hltIter0PFlowTrackSelectionHighPurity', ROOT.kBlack),
+            ('hltMergedTracks', ROOT.kRed),
+          ]
+          _legXY = [Lef+(1-Rig-Lef)*0.45, Bot+(1-Bot-Top)*0.70, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99]
 
-       if _hkey_pfColl is None:
+       if _hkey_dqmColl is None:
           continue
 
        ## histograms
@@ -127,29 +132,29 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           for (_pfCollName, _pfCollColor) in _pfCollList:
-               _hkeyNew = _hkey.replace(_hkey_pfColl, _pfCollName)
+           for (_dqmCollName, _dqmCollColor) in _dqmCollList:
+               _hkeyNew = _hkey.replace(_hkey_dqmColl, _dqmCollName)
 
                if _hkeyNew not in inp['TH1s']:
                   continue
 
                h0 = inp['TH1s'][_hkeyNew].Clone()
 
-               if not (h0.InheritsFrom('TH1') and (not h0.InheritsFrom('TH2'))):
+               if h0.InheritsFrom('TH2'):
                   continue
 
                h0.UseCurrentStyle()
                if hasattr(h0, 'SetDirectory'):
                   h0.SetDirectory(0)
-    
-               h0.SetLineColor(_pfCollColor)
-               h0.SetLineStyle(inp['LineStyle'])
+
+               h0.SetLineColor(_dqmCollColor)
+               h0.SetLineStyle(1 if (_hIsProfile or _hIsEfficiency) else inp['LineStyle'])
                h0.SetMarkerStyle(inp['MarkerStyle'])
-               h0.SetMarkerColor(_pfCollColor)
+               h0.SetMarkerColor(_dqmCollColor)
                h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
 
                h0.SetBit(ROOT.TH1.kNoTitle)
-    
+
                if hasattr(h0, 'SetStats'):
                   h0.SetStats(0)
 
@@ -161,17 +166,18 @@ if __name__ == '__main__':
                       elif (abs(_tmpBW-h0.GetBinWidth(_tmp))/max(abs(_tmpBW), abs(h0.GetBinWidth(_tmp)))) > 1e-4:
                          _divideByBinWidth = True
                          break
-    
+
                if _divideByBinWidth:
                   h0.Scale(1., 'width')
-    
+
                if _normalizedToUnity:
                   h0.Scale(1. / h0.Integral())
-    
+
                hist0 = Histogram()
                hist0.th1 = h0
-               hist0.draw = 'ep,same' if (_hIsProfile or _hIsEfficiency) else 'hist,e0,same'
-               hist0.legendName = inp['Legend']+_pfCollName
+               hist0.draw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'hist,e0'
+               hist0.draw += ',same'
+               hist0.legendName = inp['Legend']+' '+_dqmCollName
                hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
                _hists.append(hist0)
 
@@ -181,6 +187,8 @@ if __name__ == '__main__':
        ## labels and axes titles
        _titleX, _titleY, _objLabel = _hkey_basename, 'Entries', ''
 
+       _objLabel = _objLabel.replace(_hkey_dqmColl, '')
+
        label_obj = get_text(Lef+(1-Rig-Lef)*0.95, Bot+(1-Top-Bot)*0.925, 31, .035, _objLabel)
        _labels = [label_sample, label_obj]
 
@@ -189,15 +197,17 @@ if __name__ == '__main__':
 
        _htitle = ';'+_titleX+';'+_titleY
 
+       _logY = ('_NotMatchedTo' in _hkey_basename) and _hkey_basename.endswith('pt_eff')
+
        ## plot
        plot(**{
          'histograms': _hists,
          'title': _htitle,
          'labels': _labels,
-         'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99],
+         'legXY': _legXY,
          'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
-         'logY': False,
+         'logY': _logY,
          'autoRangeX': True,
        })
 

@@ -123,7 +123,8 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
        leg.SetFillColor(0)
        for _tmp in histograms:
            if _tmp.th1 is not None:
-              leg.AddEntry(_tmp.th1, _tmp.legendName, _tmp.legendDraw)
+              if (_tmp.th1.InheritsFrom('TH1') and _tmp.th1.GetEntries()) or (_tmp.th1.InheritsFrom('TGraph') and _tmp.th1.GetN()):
+                 leg.AddEntry(_tmp.th1, _tmp.legendName, _tmp.legendDraw)
 
     if autoRangeX:
        xMinCalc, xMaxCalc = None, None

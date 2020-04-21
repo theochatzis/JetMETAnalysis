@@ -112,33 +112,33 @@ if __name__ == '__main__':
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
 
-       _hkey_jmeColl, _jmeCollTuple = None, []
+       _hkey_jmeColl, _jmeCollList = None, []
 
        if opts.upgrade:
           if 'PuppiMET' in _hkey:
              _hkey_jmeColl = 'PuppiMET'
-             _jmeCollTuple = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PFMETSoftKiller', 901), ('PuppiMET', 4)]
+             _jmeCollList = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PFMETSoftKiller', 901), ('PuppiMET', 4)]
           elif 'Puppi' in _hkey:
              _hkey_jmeColl = 'Puppi'
-             _jmeCollTuple = [('PF', 1), ('PFCluster', 801), ('PFCHS', 2), ('Puppi', 4)]
+             _jmeCollList = [('PF', 1), ('PFCluster', 801), ('PFCHS', 2), ('Puppi', 4)]
        else:
           if 'hltPFMET_' in _hkey:
              _hkey_jmeColl = 'hltPFMET'
              _leg_jmeColl = 'MET'
-             _jmeCollTuple = [
+             _jmeCollList = [
                ('hltPFMET', 1),
                ('hltCaloMET', ROOT.kGray+1),
 #               ('hltPFCHSv1MET', ROOT.kBlue),
                ('hltPFCHSv2MET', ROOT.kViolet),
-#               ('hltPuppiV2MET', ROOT.kRed),
-               ('hltPuppiV4MET', ROOT.kOrange+1),
+#               ('hltPuppiV2MET', ROOT.kOrange+1),
+               ('hltPuppiV4MET', ROOT.kRed),
 #               ('offlineMETs_Raw', ROOT.kPink+3),
                ('offlineMETsPuppi_Raw', ROOT.kPink+1),
              ]
           elif 'hltAK4PFJets_' in _hkey:
              _hkey_jmeColl = 'hltAK4PFJets'
              _leg_jmeColl = 'HLT AK4'
-             _jmeCollTuple = [
+             _jmeCollList = [
                ('hltAK4CaloJets', ROOT.kGray+1),
                ('hltAK4PFJets', ROOT.kBlack),
 #               ('hltAK4PFCHSv1Jets', ROOT.kBlue),
@@ -149,7 +149,7 @@ if __name__ == '__main__':
           elif 'MatchedToPF_' in _hkey:
              _hkey_jmeColl = 'PF'
              _leg_jmeColl = 'GEN-HLT Matching'
-             _jmeCollTuple = [
+             _jmeCollList = [
                ('Calo', ROOT.kGray+1),
                ('PF', ROOT.kBlack),
 #               ('PFCHSv1', ROOT.kBlue),
@@ -169,7 +169,7 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           for (_jmeCollName, _jmeCollColor) in _jmeCollTuple:
+           for (_jmeCollName, _jmeCollColor) in _jmeCollList:
                _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
 
                if opts.upgrade:
