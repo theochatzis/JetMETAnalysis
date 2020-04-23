@@ -129,11 +129,16 @@ void JMETriggerAnalysisDriverPhase2::init(){
     bookHistograms_MET(selLabel, "hltPFMET", {"GEN", "Offline"});
     bookHistograms_MET(selLabel, "hltPFMETNoMu", {"GEN"});
 
+    bookHistograms_MET(selLabel, "hltPFCHSMET", {"GEN"});
+    bookHistograms_MET(selLabel, "hltPFSoftKillerMET", {"GEN"});
+
     bookHistograms_MET(selLabel, "hltPuppiMET", {"GEN", "Offline"});
     bookHistograms_MET(selLabel, "hltPuppiMETNoMu", {"GEN"});
 
-    bookHistograms_MET(selLabel, "hltPFMETCHS", {"GEN"});
-    bookHistograms_MET(selLabel, "hltPFMETSoftKiller", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePFMET_Raw", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePFMET_Type1", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePuppiMET_Raw", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePuppiMET_Type1", {"GEN"});
   }
 
   for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
@@ -256,7 +261,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
       auto const& vec_eta(vector<float>(jetCollection+"_eta"));
       bool pass(false);
       for(size_t jetIdx=0; jetIdx<vec_eta.size(); ++jetIdx){
-	if((vec_pt.at(jetIdx) > 100.) and jetBelongsToCategory(categ, vec_pt.at(jetIdx), std::abs(vec_eta.at(jetIdx)))){
+        if((vec_pt.at(jetIdx) > 100.) and jetBelongsToCategory(categ, vec_pt.at(jetIdx), std::abs(vec_eta.at(jetIdx)))){
           pass = true;
           break;
         }
@@ -379,45 +384,44 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
   fhDataGENMETTrue.metCollection = "genMETTrue";
   fillHistograms_MET("NoSelection", fhDataGENMETTrue);
 
-  // PFCluster
-  fillHistoDataMET fhDataMETPFCluster;
-  fhDataMETPFCluster.metCollection = "hltPFClusterMET";
-  fhDataMETPFCluster.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETCalo"));
-  fillHistograms_MET("NoSelection", fhDataMETPFCluster);
-
   // PF
   fillHistoDataMET fhDataMETPF;
   fhDataMETPF.metCollection = "hltPFMET";
   fhDataMETPF.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
+  fhDataMETPF.matches.emplace_back(fillHistoDataMET::Match("Offline", "offlinePFMET_Raw"));
   fillHistograms_MET("NoSelection", fhDataMETPF);
-
-  // PFNoMu
-  fillHistoDataMET fhDataMETPFNoMu;
-  fhDataMETPFNoMu.metCollection = "hltPFMETNoMu";
-  fhDataMETPFNoMu.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETCalo"));
-  fillHistograms_MET("NoSelection", fhDataMETPFNoMu);
 
   // Puppi
   fillHistoDataMET fhDataMETPuppi;
   fhDataMETPuppi.metCollection = "hltPuppiMET";
   fhDataMETPuppi.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
+  fhDataMETPuppi.matches.emplace_back(fillHistoDataMET::Match("Offline", "offlinePuppiMET_Raw"));
   fillHistograms_MET("NoSelection", fhDataMETPuppi);
 
-  // PuppiNoMu
-  fillHistoDataMET fhDataMETPuppiNoMu;
-  fhDataMETPuppiNoMu.metCollection = "hltPuppiMETNoMu";
-  fhDataMETPuppiNoMu.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETCalo"));
-  fillHistograms_MET("NoSelection", fhDataMETPuppiNoMu);
+  // METNoMu
+  for(std::string const& metLabel : {
+    "hltPFClusterMET",
+    "hltPFMETNoMu",
+    "hltPuppiMETNoMu",
+  }){
+    fillHistoDataMET fhDataMET;
+    fhDataMET.metCollection = metLabel;
+    fhDataMET.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETCalo"));
+    fillHistograms_MET("NoSelection", fhDataMET);
+  }
 
-  // PF+CHS
-  fillHistoDataMET fhDataMETPFCHS;
-  fhDataMETPFCHS.metCollection = "hltPFMETCHS";
-  fhDataMETPFCHS.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
-  fillHistograms_MET("NoSelection", fhDataMETPFCHS);
-
-  // PF+SoftKiller
-  fillHistoDataMET fhDataMETPFSoftKiller;
-  fhDataMETPFSoftKiller.metCollection = "hltPFMETSoftKiller";
-  fhDataMETPFSoftKiller.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
-  fillHistograms_MET("NoSelection", fhDataMETPFSoftKiller);
+  // MET
+  for(std::string const& metLabel : {
+    "hltPFCHSMET",
+    "hltPFSoftKillerMET",
+    "offlinePFMET_Raw",
+    "offlinePFMET_Type1",
+    "offlinePuppiMET_Raw",
+    "offlinePuppiMET_Type1",
+  }){
+    fillHistoDataMET fhDataMET;
+    fhDataMET.metCollection = metLabel;
+    fhDataMET.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
+    fillHistograms_MET("NoSelection", fhDataMET);
+  }
 }
