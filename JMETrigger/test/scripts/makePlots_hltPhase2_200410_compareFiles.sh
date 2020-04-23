@@ -6,13 +6,13 @@ if [ ! -d ${JMEANA_BASE} ]; then
   exit 1
 fi
 
-inpdir=${JMEANA_BASE}/output_200410_v02/harvesting
-outdir=plots_phase2_200410_compareFiles
+inpdir=${JMEANA_BASE}/output_200410_v03/harvesting
+outdir=plots_phase2_200410_v03
 
 samples=(
  Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200
- Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU
- Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
+# Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU
+# Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
 )
 
 outdirbase=${outdir%%/*}
