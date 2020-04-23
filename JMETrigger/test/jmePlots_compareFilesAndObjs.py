@@ -115,12 +115,72 @@ if __name__ == '__main__':
        _hkey_jmeColl, _jmeCollList = None, []
 
        if opts.upgrade:
-          if 'PuppiMET' in _hkey:
-             _hkey_jmeColl = 'PuppiMET'
-             _jmeCollList = [('PFMET', 1), ('PFClusterMET', 801), ('PFMETCHS', 2), ('PFMETSoftKiller', 901), ('PuppiMET', 4)]
-          elif 'Puppi' in _hkey:
-             _hkey_jmeColl = 'Puppi'
-             _jmeCollList = [('PF', 1), ('PFCluster', 801), ('PFCHS', 2), ('Puppi', 4)]
+          if 'hltPFMET_' in _hkey:
+             _hkey_jmeColl = 'hltPFMET'
+             _leg_jmeColl = 'MET'
+             _jmeCollList = [
+               ('hltPFClusterMET', ROOT.kGray+1),
+               ('hltPFMET', 1),
+               ('PFSoftKillerMET', ROOT.kBlue),
+               ('hltPFCHSMET', ROOT.kViolet),
+               ('hltPuppiMET', ROOT.kRed),
+#               ('offlineMETs_Raw', ROOT.kPink+3),
+               ('offlinePuppiMET_Raw', ROOT.kPink+1),
+             ]
+          elif 'hltAK4PFJets_' in _hkey:
+             _hkey_jmeColl = 'hltAK4PFJets'
+             _leg_jmeColl = 'HLT AK4'
+             _jmeCollList = [
+               ('hltAK4PFClusterJets', ROOT.kGray+1),
+               ('hltAK4PFJets', ROOT.kBlack),
+               ('hltAK4PFCHSJets', ROOT.kViolet),
+               ('hltAK4PuppiJets', ROOT.kRed),
+             ]
+          elif 'hltAK4PFJetsCorrected_' in _hkey:
+             _hkey_jmeColl = 'hltAK4PFJetsCorrected'
+             _leg_jmeColl = 'HLT AK4'
+             _jmeCollList = [
+               ('hltAK4PFClusterJets', ROOT.kGray+1),
+               ('hltAK4PFJetsCorrected', ROOT.kBlack),
+               ('hltAK4PFCHSJetsCorrected', ROOT.kViolet),
+               ('hltAK4PuppiJetsCorrected', ROOT.kRed),
+             ]
+          elif 'hltAK8PFJets_' in _hkey:
+             _hkey_jmeColl = 'hltAK8PFJets'
+             _leg_jmeColl = 'HLT AK8'
+             _jmeCollList = [
+               ('hltAK8PFClusterJets', ROOT.kGray+1),
+               ('hltAK8PFJets', ROOT.kBlack),
+               ('hltAK8PFCHSJets', ROOT.kViolet),
+               ('hltAK8PuppiJets', ROOT.kRed),
+             ]
+          elif 'hltAK8PFJetsCorrected_' in _hkey:
+             _hkey_jmeColl = 'hltAK8PFJetsCorrected'
+             _leg_jmeColl = 'HLT AK8'
+             _jmeCollList = [
+               ('hltAK8PFClusterJets', ROOT.kGray+1),
+               ('hltAK8PFJetsCorrected', ROOT.kBlack),
+               ('hltAK8PFCHSJetsCorrected', ROOT.kViolet),
+               ('hltAK8PuppiJetsCorrected', ROOT.kRed),
+             ]
+          elif 'MatchedToPF_' in _hkey:
+             _hkey_jmeColl = 'PF'
+             _leg_jmeColl = 'HLT'
+             _jmeCollList = [
+               ('PFCluster', ROOT.kGray+1),
+               ('PF', ROOT.kBlack),
+               ('PFCHS', ROOT.kViolet),
+               ('Puppi', ROOT.kRed),
+             ]
+          elif 'MatchedToPFCorr_' in _hkey:
+             _hkey_jmeColl = 'PFCorr'
+             _leg_jmeColl = 'HLT'
+             _jmeCollList = [
+               ('PFClusterCorr', ROOT.kGray+1),
+               ('PFCorr', ROOT.kBlack),
+               ('PFCHS', ROOT.kViolet),
+               ('Puppi', ROOT.kRed),
+             ]
        else:
           if 'hltPFMET_' in _hkey:
              _hkey_jmeColl = 'hltPFMET'
@@ -215,9 +275,6 @@ if __name__ == '__main__':
 
            for (_jmeCollName, _jmeCollColor) in _jmeCollList:
                _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
-
-               if opts.upgrade:
-                  _hkeyNew = _hkeyNew.replace('PFClusterJetsCorrected', 'PFClusterJets')
 
                if _hkeyNew not in inp['TH1s']:
                   continue

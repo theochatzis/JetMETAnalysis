@@ -18,24 +18,42 @@ samples=(
 
 outdirbase=${outdir%%/*}
 
-if [ ! -f ${outdirbase}.tar.gz ]; then
+if [ ! -f ${outdirbase}.tar.gz ] && [ ! -d ${outdirbase} ]; then
 
   for sample in "${samples[@]}"; do
 
-    outd_i=${outdir}/${sample}
+    outd_i=${outdir}/run2_vs_iter0withPatatrack/${sample}
 
     opts_i=""
-    if [[ ${sample} == *"QCD"* ]]; then opts_i="-k *Jets* *MET_pt"
-    elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-k *MET*"
+    if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-k '*Jets*' '*MET_pt'"
+    elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-k '*MET_*'"
+    elif [[ ${sample} == *"DYToLL"* ]]; then opts_i="-k '*MET_*'"
+    elif [[ ${sample} == *"ZprimeToMuMu"* ]]; then opts_i="-k '*METNoMu_*'"
     fi
 
-    jmePlots_compareFiles.py ${opts_i} -u -o ${outd_i} -l ${sample} -e pdf root -i \
-     ${inpdir}/HLT_TRKv02/${sample}.root:'TRK v02':2:1:20 \
-     ${inpdir}/HLT_TRKv06/${sample}.root:'TRK v06':4:2:24
+    dqmPlots_compareFiles.py -o ${outd_i}/dqm -l ${sample} -e pdf root -i \
+      ${inpdir}/ntuples/HLT_TRKv06/${sample}.root:'TRKv06':1:1:20 \
+      ${inpdir}/ntuples/HLT_TRKv06_TICL/${sample}.root:'TRKv06 + TICL':2:1:24
 
-    jmePlots_compareFilesAndObjs.py ${opts_i} -u -o ${outd_i}/objs -l ${sample} -e pdf root -i \
-     ${inpdir}/HLT_TRKv02/${sample}.root:'TRK v02':2:1:20 \
-     ${inpdir}/HLT_TRKv06/${sample}.root:'TRK v06':4:2:24
+    if [ ${sample} == "Run3Winter20_QCD_Pt_15to3000_Flat_14TeV" ]; then
+      dqmPlots_compareObjs.py -o ${outdir}/run2/${sample}/dqm_compareObjs -l ${sample} -e pdf root -i \
+        ${inpdir}/ntuples/HLT_TRKv06/${sample}.root:'':1:1:20
+
+      dqmPlots_compareFilesAndObjs.py -o ${outd_i}/dqm_compareObjs -l ${sample} -e pdf root -i \
+        ${inpdir}/ntuples/HLT_TRKv06/${sample}.root:'TRKv06':1:1:20 \
+        ${inpdir}/ntuples/HLT_TRKv06_TICL/${sample}.root:'TRKv06 + TICL':2:2:24
+    fi
+
+    jmePlots_compareFiles.py -u ${opts_i} -o ${outd_i}/jme -l ${sample} -e pdf root -i \
+      ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRKv06':1:1:20 \
+      ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRKv06 + TICL':2:1:24
+
+    jmePlots_compareObjs.py -u ${opts_i} -o ${outdir}/run2/${sample}/jme_compareObjs -l ${sample} -e pdf root -i \
+      ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20
+
+    jmePlots_compareFilesAndObjs.py -u ${opts_i} -o ${outd_i}/jme_compareObjs -l ${sample} -e pdf root -i \
+      ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRKv06':1:1:20 \
+      ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRKv06 + TICL':2:2:24
 
     unset -v outd_i opts_i
   done
