@@ -7,45 +7,7 @@ JMETriggerAnalysisDriverPhase2::JMETriggerAnalysisDriverPhase2(const std::string
 }
 
 JMETriggerAnalysisDriverPhase2::JMETriggerAnalysisDriverPhase2(const std::string& outputFilePath, const std::string& outputFileMode)
-  : JMETriggerAnalysisDriver(outputFilePath, outputFileMode) {
-
-  jetCategoryLabels_ = {
-    "_EtaIncl",
-//  "_EtaInclPt0",
-//  "_EtaInclPt1",
-//  "_EtaInclPt2",
-//  "_EtaInclPt3",
-//  "_EtaInclPt4",
-
-    "_HB",
-//  "_HBPt0",
-//  "_HBPt1",
-//  "_HBPt2",
-//  "_HBPt3",
-//  "_HBPt4",
-
-    "_HGCal",
-//  "_HGCalPt0",
-//  "_HGCalPt1",
-//  "_HGCalPt2",
-//  "_HGCalPt3",
-//  "_HGCalPt4",
-
-    "_HF1",
-//  "_HF1Pt0",
-//  "_HF1Pt1",
-//  "_HF1Pt2",
-//  "_HF1Pt3",
-//  "_HF1Pt4",
-
-    "_HF2",
-//  "_HF2Pt0",
-//  "_HF2Pt1",
-//  "_HF2Pt2",
-//  "_HF2Pt3",
-//  "_HF2Pt4",
-  };
-}
+  : JMETriggerAnalysisDriver(outputFilePath, outputFileMode) {}
 
 bool JMETriggerAnalysisDriverPhase2::jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const {
 
@@ -89,6 +51,44 @@ bool JMETriggerAnalysisDriverPhase2::jetBelongsToCategory(const std::string& cat
 }
 
 void JMETriggerAnalysisDriverPhase2::init(){
+
+  jetCategoryLabels_ = {
+    "_EtaIncl",
+//  "_EtaInclPt0",
+//  "_EtaInclPt1",
+//  "_EtaInclPt2",
+//  "_EtaInclPt3",
+//  "_EtaInclPt4",
+
+    "_HB",
+//  "_HBPt0",
+//  "_HBPt1",
+//  "_HBPt2",
+//  "_HBPt3",
+//  "_HBPt4",
+
+    "_HGCal",
+//  "_HGCalPt0",
+//  "_HGCalPt1",
+//  "_HGCalPt2",
+//  "_HGCalPt3",
+//  "_HGCalPt4",
+
+    "_HF1",
+//  "_HF1Pt0",
+//  "_HF1Pt1",
+//  "_HF1Pt2",
+//  "_HF1Pt3",
+//  "_HF1Pt4",
+
+    "_HF2",
+//  "_HF2Pt0",
+//  "_HF2Pt1",
+//  "_HF2Pt2",
+//  "_HF2Pt3",
+//  "_HF2Pt4",
+  };
+
   // histogram: events counter
   addTH1D("eventsProcessed", {0, 1});
 
