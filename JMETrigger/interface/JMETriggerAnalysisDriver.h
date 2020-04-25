@@ -10,7 +10,7 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
  public:
   explicit JMETriggerAnalysisDriver(const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
   explicit JMETriggerAnalysisDriver(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode="recreate");
-  ~JMETriggerAnalysisDriver() {}
+  virtual ~JMETriggerAnalysisDriver() {}
 
   void init() override;
   void analyze() override;
