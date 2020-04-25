@@ -6,7 +6,7 @@ if [ ! -d ${JMEANA_BASE} ]; then
   exit 1
 fi
 
-inpdir=${JMEANA_BASE}/output_hltPhase2_200423_v01/harvesting
+inpdir=${JMEANA_BASE}/output_hltPhase2_200423_v01
 outdir=plots_hltPhase2_200423_v01
 
 samples=(
