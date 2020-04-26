@@ -119,7 +119,7 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'hltPFMET'
              _leg_jmeColl = 'MET'
              _jmeCollList = [
-               ('hltPFClusterMET', ROOT.kGray+1),
+               ('hltPFClusterMET', ROOT.kOrange+1),
                ('hltPFMET', 1),
                ('PFSoftKillerMET', ROOT.kBlue),
                ('hltPFCHSMET', ROOT.kViolet),
@@ -131,7 +131,8 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'hltAK4PFJets'
              _leg_jmeColl = 'HLT AK4'
              _jmeCollList = [
-               ('hltAK4PFClusterJets', ROOT.kGray+1),
+               ('hltAK4CaloJets', ROOT.kGray+1),
+               ('hltAK4PFClusterJets', ROOT.kOrange+1),
                ('hltAK4PFJets', ROOT.kBlack),
                ('hltAK4PFCHSJets', ROOT.kViolet),
                ('hltAK4PuppiJets', ROOT.kRed),
@@ -140,7 +141,8 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'hltAK4PFJetsCorrected'
              _leg_jmeColl = 'HLT AK4'
              _jmeCollList = [
-               ('hltAK4PFClusterJets', ROOT.kGray+1),
+               ('hltAK4CaloJets', ROOT.kGray+1),
+               ('hltAK4PFClusterJets', ROOT.kOrange+1),
                ('hltAK4PFJetsCorrected', ROOT.kBlack),
                ('hltAK4PFCHSJetsCorrected', ROOT.kViolet),
                ('hltAK4PuppiJetsCorrected', ROOT.kRed),
@@ -150,7 +152,8 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'hltAK8PFJets'
              _leg_jmeColl = 'HLT AK8'
              _jmeCollList = [
-               ('hltAK8PFClusterJets', ROOT.kGray+1),
+               ('hltAK8CaloJets', ROOT.kGray+1),
+               ('hltAK8PFClusterJets', ROOT.kOrange+1),
                ('hltAK8PFJets', ROOT.kBlack),
                ('hltAK8PFCHSJets', ROOT.kViolet),
                ('hltAK8PuppiJets', ROOT.kRed),
@@ -159,7 +162,8 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'hltAK8PFJetsCorrected'
              _leg_jmeColl = 'HLT AK8'
              _jmeCollList = [
-               ('hltAK8PFClusterJets', ROOT.kGray+1),
+               ('hltAK8CaloJets', ROOT.kGray+1),
+               ('hltAK8PFClusterJets', ROOT.kOrange+1),
                ('hltAK8PFJetsCorrected', ROOT.kBlack),
                ('hltAK8PFCHSJetsCorrected', ROOT.kViolet),
                ('hltAK8PuppiJetsCorrected', ROOT.kRed),
@@ -169,7 +173,8 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'PF'
              _leg_jmeColl = 'HLT'
              _jmeCollList = [
-               ('PFCluster', ROOT.kGray+1),
+               ('Calo', ROOT.kGray+1),
+               ('PFCluster', ROOT.kOrange+1),
                ('PF', ROOT.kBlack),
                ('PFCHS', ROOT.kViolet),
                ('Puppi', ROOT.kRed),
@@ -178,7 +183,8 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'PFCorr'
              _leg_jmeColl = 'HLT'
              _jmeCollList = [
-               ('PFClusterCorr', ROOT.kGray+1),
+               ('Calo', ROOT.kGray+1),
+               ('PFCluster', ROOT.kOrange+1),
                ('PFCorr', ROOT.kBlack),
                ('PFCHS', ROOT.kViolet),
                ('Puppi', ROOT.kRed),

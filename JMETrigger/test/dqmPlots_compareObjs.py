@@ -27,6 +27,9 @@ if __name__ == '__main__':
    parser.add_argument('-k', '--keywords', dest='keywords', nargs='+', default=[],
                        help='list of keywords to skim inputs (input is a match if any of the keywords is part of the input\'s name)')
 
+   parser.add_argument('-u', '--upgrade', dest='upgrade', action='store_true', default=False,
+                       help='labels for Phase-2 plots')
+
    parser.add_argument('-l', '--label', dest='label', action='store', default='',
                        help='text label (displayed in top-left corner)')
 
@@ -103,20 +106,30 @@ if __name__ == '__main__':
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
 
-       _hkey_pfColl, _pfCollList = None, []
+       _hkey_dqmColl, _dqmCollList = None, []
 
-       if ('_hltParticleFlow/' in _hkey) or ('_hltParticleFlow_' in _hkey):
-          _hkey_pfColl = 'hltParticleFlow'
-          _pfCollList = [
-            ('hltParticleFlow'     , ROOT.kBlack),
-            ('hltParticleFlowCHSv1', ROOT.kBlue),
-            ('hltParticleFlowCHSv2', ROOT.kViolet),
-            ('hltPuppiV1'          , ROOT.kOrange+1),
-            ('hltPuppiV3'          , ROOT.kRed),
-            ('offlineParticleFlow' , ROOT.kPink+1),
-          ]
+       if opts.upgrade:
+          if ('_hltPFCands/' in _hkey) or ('_hltPFCands_' in _hkey):
+             _hkey_dqmColl = 'hltPFCands'
+             _dqmCollList = [
+               ('simPFCands', ROOT.kOrange+1),
+               ('hltPFCands', ROOT.kBlack),
+#               ('hltPuppiCands', ROOT.kRed),
+               ('offlinePFCands', ROOT.kPink+1),
+             ]
+       else:
+          if ('_hltParticleFlow/' in _hkey) or ('_hltParticleFlow_' in _hkey):
+             _hkey_dqmColl = 'hltParticleFlow'
+             _dqmCollList = [
+               ('hltParticleFlow'     , ROOT.kBlack),
+               ('hltParticleFlowCHSv1', ROOT.kBlue),
+               ('hltParticleFlowCHSv2', ROOT.kViolet),
+               ('hltPuppiV1'          , ROOT.kOrange+1),
+               ('hltPuppiV3'          , ROOT.kRed),
+               ('offlineParticleFlow' , ROOT.kPink+1),
+             ]
 
-       if _hkey_pfColl is None:
+       if _hkey_dqmColl is None:
           continue
 
        ## histograms
@@ -127,8 +140,8 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           for (_pfCollName, _pfCollColor) in _pfCollList:
-               _hkeyNew = _hkey.replace(_hkey_pfColl, _pfCollName)
+           for (_dqmCollName, _dqmCollColor) in _dqmCollList:
+               _hkeyNew = _hkey.replace(_hkey_dqmColl, _dqmCollName)
 
                if _hkeyNew not in inp['TH1s']:
                   continue
@@ -142,10 +155,10 @@ if __name__ == '__main__':
                if hasattr(h0, 'SetDirectory'):
                   h0.SetDirectory(0)
     
-               h0.SetLineColor(_pfCollColor)
+               h0.SetLineColor(_dqmCollColor)
                h0.SetLineStyle(inp['LineStyle'])
                h0.SetMarkerStyle(inp['MarkerStyle'])
-               h0.SetMarkerColor(_pfCollColor)
+               h0.SetMarkerColor(_dqmCollColor)
                h0.SetMarkerSize(inp['MarkerSize'] if (_hIsProfile or _hIsEfficiency) else 0.)
 
                h0.SetBit(ROOT.TH1.kNoTitle)
@@ -171,7 +184,7 @@ if __name__ == '__main__':
                hist0 = Histogram()
                hist0.th1 = h0
                hist0.draw = 'ep,same' if (_hIsProfile or _hIsEfficiency) else 'hist,e0,same'
-               hist0.legendName = inp['Legend']+_pfCollName
+               hist0.legendName = inp['Legend']+' '+_dqmCollName
                hist0.legendDraw = 'ep' if (_hIsProfile or _hIsEfficiency) else 'l'
                _hists.append(hist0)
 

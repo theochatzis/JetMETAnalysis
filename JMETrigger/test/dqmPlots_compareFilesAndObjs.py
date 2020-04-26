@@ -26,6 +26,9 @@ if __name__ == '__main__':
    parser.add_argument('-k', '--keywords', dest='keywords', nargs='+', default=[],
                        help='list of keywords to skim inputs (input is a match if any of the keywords is part of the input\'s name)')
 
+   parser.add_argument('-u', '--upgrade', dest='upgrade', action='store_true', default=False,
+                       help='labels for Phase-2 plots')
+
    parser.add_argument('-l', '--label', dest='label', action='store', default='',
                        help='text label (displayed in top-left corner)')
 
@@ -103,23 +106,33 @@ if __name__ == '__main__':
 
        _legXY = [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99]
 
-       if ('_hltParticleFlow/' in _hkey) or ('_hltParticleFlow_' in _hkey):
-          _hkey_dqmColl = 'hltParticleFlow'
-          _dqmCollList = [
-            ('hltParticleFlow'     , ROOT.kBlack),
-#            ('hltParticleFlowCHSv1', ROOT.kBlue),
-            ('hltParticleFlowCHSv2', ROOT.kViolet),
-#            ('hltPuppiV1'          , ROOT.kOrange+1),
-            ('hltPuppiV3'          , ROOT.kRed),
-            ('offlineParticleFlow' , ROOT.kPink+1),
-          ]
-       elif '_hltMergedTracks/' in _hkey:
-          _hkey_dqmColl = 'hltMergedTracks'
-          _dqmCollList = [
-            ('hltIter0PFlowTrackSelectionHighPurity', ROOT.kBlack),
-            ('hltMergedTracks', ROOT.kRed),
-          ]
-          _legXY = [Lef+(1-Rig-Lef)*0.45, Bot+(1-Bot-Top)*0.70, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99]
+       if opts.upgrade:
+          if ('_hltPFCands/' in _hkey) or ('_hltPFCands_' in _hkey):
+             _hkey_dqmColl = 'hltPFCands'
+             _dqmCollList = [
+               ('simPFCands', ROOT.kOrange+1),
+               ('hltPFCands', ROOT.kBlack),
+#               ('hltPuppiCands', ROOT.kRed),
+               ('offlinePFCands', ROOT.kPink+1),
+             ]
+       else:
+          if ('_hltParticleFlow/' in _hkey) or ('_hltParticleFlow_' in _hkey):
+             _hkey_dqmColl = 'hltParticleFlow'
+             _dqmCollList = [
+               ('hltParticleFlow'     , ROOT.kBlack),
+#               ('hltParticleFlowCHSv1', ROOT.kBlue),
+               ('hltParticleFlowCHSv2', ROOT.kViolet),
+#               ('hltPuppiV1'          , ROOT.kOrange+1),
+               ('hltPuppiV3'          , ROOT.kRed),
+               ('offlineParticleFlow' , ROOT.kPink+1),
+             ]
+          elif '_hltMergedTracks/' in _hkey:
+             _hkey_dqmColl = 'hltMergedTracks'
+             _dqmCollList = [
+               ('hltIter0PFlowTrackSelectionHighPurity', ROOT.kBlack),
+               ('hltMergedTracks', ROOT.kRed),
+             ]
+             _legXY = [Lef+(1-Rig-Lef)*0.45, Bot+(1-Bot-Top)*0.70, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99]
 
        if _hkey_dqmColl is None:
           continue

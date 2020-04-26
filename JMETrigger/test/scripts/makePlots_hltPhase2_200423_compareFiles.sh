@@ -38,10 +38,10 @@ if [ ! -f ${outdirbase}.tar.gz ] && [ ! -d ${outdirbase} ]; then
         ${inpdir}/ntuples/HLT_${reco_key}_TICL/${sample}.root:${reco_key}" + TICL":2:1:24
 
       if [[ ${sample} == *"Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV"* ]]; then
-        dqmPlots_compareObjs.py -o ${outdir}/${reco_key}/${sample}/dqm_compareObjs -l ${sample} -e pdf root -i \
+        dqmPlots_compareObjs.py -u -o ${outdir}/${reco_key}/${sample}/dqm_compareObjs -l ${sample} -e pdf root -i \
           ${inpdir}/ntuples/HLT_${reco_key}/${sample}.root:'':1:1:20
 
-        dqmPlots_compareFilesAndObjs.py -o ${outd_i}/dqm_compareObjs -l ${sample} -e pdf root -i \
+        dqmPlots_compareFilesAndObjs.py -u -o ${outd_i}/dqm_compareObjs -l ${sample} -e pdf root -i \
           ${inpdir}/ntuples/HLT_${reco_key}/${sample}.root:${reco_key}:1:1:20 \
           ${inpdir}/ntuples/HLT_${reco_key}_TICL/${sample}.root:${reco_key}" + TICL":2:2:24
       fi
