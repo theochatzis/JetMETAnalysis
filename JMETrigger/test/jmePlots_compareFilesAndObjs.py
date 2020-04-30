@@ -79,6 +79,9 @@ if __name__ == '__main__':
        else:
           KILL(log_prx+'argument of --inputs has invalid format: '+_input)
 
+   if not inputList:
+      raise SystemExit(0)
+
    th1Keys = sorted(list(set(th1Keys)))
 
    apply_style(0)
@@ -119,153 +122,156 @@ if __name__ == '__main__':
              _hkey_jmeColl = 'hltPFMET'
              _leg_jmeColl = 'MET'
              _jmeCollList = [
-               ('hltPFClusterMET', ROOT.kOrange+1),
-               ('hltPFMET', 1),
-               ('PFSoftKillerMET', ROOT.kBlue),
-               ('hltPFCHSMET', ROOT.kViolet),
-               ('hltPuppiMET', ROOT.kRed),
-#               ('offlineMETs_Raw', ROOT.kPink+3),
-               ('offlinePuppiMET_Raw', ROOT.kPink+1),
+               ('hltPFClusterMET'    , ROOT.kOrange+1, [inputList[0]]),
+               ('hltPFMET'           , ROOT.kBlack   ,  inputList    ),
+               ('PFSoftKillerMET'    , ROOT.kBlue    ,  inputList    ),
+               ('hltPFCHSMET'        , ROOT.kViolet  ,  inputList    ),
+               ('hltPuppiMET'        , ROOT.kRed     ,  inputList    ),
+#              ('offlineMETs_Raw'    , ROOT.kPink+3  , [inputList[0]]),
+               ('offlinePuppiMET_Raw', ROOT.kPink+1  , [inputList[0]]),
              ]
           elif 'hltAK4PFJets_' in _hkey:
              _hkey_jmeColl = 'hltAK4PFJets'
              _leg_jmeColl = 'HLT AK4'
              _jmeCollList = [
-               ('hltAK4CaloJets', ROOT.kGray+1),
-               ('hltAK4PFClusterJets', ROOT.kOrange+1),
-               ('hltAK4PFJets', ROOT.kBlack),
-               ('hltAK4PFCHSJets', ROOT.kViolet),
-               ('hltAK4PuppiJets', ROOT.kRed),
+               ('hltAK4CaloJets'     , ROOT.kGray+1  , [inputList[0]]),
+               ('hltAK4PFClusterJets', ROOT.kOrange+1, [inputList[0]]),
+               ('hltAK4PFJets'       , ROOT.kBlack   ,  inputList    ),
+#              ('hltAK4PFCHSJets'    , ROOT.kViolet  ,  inputList    ),
+               ('hltAK4PuppiJets'    , ROOT.kRed     ,  inputList    ),
              ]
           elif 'hltAK4PFJetsCorrected_' in _hkey:
              _hkey_jmeColl = 'hltAK4PFJetsCorrected'
              _leg_jmeColl = 'HLT AK4'
              _jmeCollList = [
-               ('hltAK4CaloJets', ROOT.kGray+1),
-               ('hltAK4PFClusterJets', ROOT.kOrange+1),
-               ('hltAK4PFJetsCorrected', ROOT.kBlack),
-               ('hltAK4PFCHSJetsCorrected', ROOT.kViolet),
-               ('hltAK4PuppiJetsCorrected', ROOT.kRed),
+#              ('hltAK4CaloJets'              , ROOT.kGray+1  , [inputList[0]]),
+#              ('hltAK4PFClusterJets'         , ROOT.kOrange+1, [inputList[0]]),
+               ('hltAK4PFJetsCorrected'       , ROOT.kBlack   ,  inputList    ),
+               ('hltAK4PFCHSJetsCorrected'    , ROOT.kViolet  ,  inputList    ),
+               ('hltAK4PuppiJetsCorrected'    , ROOT.kRed     ,  inputList    ),
+#              ('offlineAK4PuppiJetsCorrected', ROOT.kPink+1  , [inputList[0]]),
              ]
           elif 'hltAK8PFJets_' in _hkey:
              _hkey_jmeColl = 'hltAK8PFJets'
              _leg_jmeColl = 'HLT AK8'
              _jmeCollList = [
-               ('hltAK8CaloJets', ROOT.kGray+1),
-               ('hltAK8PFClusterJets', ROOT.kOrange+1),
-               ('hltAK8PFJets', ROOT.kBlack),
-               ('hltAK8PFCHSJets', ROOT.kViolet),
-               ('hltAK8PuppiJets', ROOT.kRed),
+               ('hltAK8CaloJets'     , ROOT.kGray+1  , [inputList[0]]),
+               ('hltAK8PFClusterJets', ROOT.kOrange+1, [inputList[0]]),
+               ('hltAK8PFJets'       , ROOT.kBlack   ,  inputList    ),
+#              ('hltAK8PFCHSJets'    , ROOT.kViolet  ,  inputList    ),
+               ('hltAK8PuppiJets'    , ROOT.kRed     ,  inputList    ),
              ]
           elif 'hltAK8PFJetsCorrected_' in _hkey:
              _hkey_jmeColl = 'hltAK8PFJetsCorrected'
              _leg_jmeColl = 'HLT AK8'
              _jmeCollList = [
-               ('hltAK8CaloJets', ROOT.kGray+1),
-               ('hltAK8PFClusterJets', ROOT.kOrange+1),
-               ('hltAK8PFJetsCorrected', ROOT.kBlack),
-               ('hltAK8PFCHSJetsCorrected', ROOT.kViolet),
-               ('hltAK8PuppiJetsCorrected', ROOT.kRed),
+#              ('hltAK8CaloJets'              , ROOT.kGray+1  , [inputList[0]]),
+#              ('hltAK8PFClusterJets'         , ROOT.kOrange+1, [inputList[0]]),
+               ('hltAK8PFJetsCorrected'       , ROOT.kBlack   ,  inputList    ),
+               ('hltAK8PFCHSJetsCorrected'    , ROOT.kViolet  ,  inputList    ),
+               ('hltAK8PuppiJetsCorrected'    , ROOT.kRed     ,  inputList    ),
+#              ('offlineAK8PuppiJetsCorrected', ROOT.kPink+1  , [inputList[0]]),
              ]
           elif 'MatchedToPF_' in _hkey:
              _hkey_jmeColl = 'PF'
              _leg_jmeColl = 'HLT'
              _jmeCollList = [
-               ('Calo', ROOT.kGray+1),
-               ('PFCluster', ROOT.kOrange+1),
-               ('PF', ROOT.kBlack),
-               ('PFCHS', ROOT.kViolet),
-               ('Puppi', ROOT.kRed),
+               ('Calo'     , ROOT.kGray+1  , [inputList[0]]),
+               ('PFCluster', ROOT.kOrange+1, [inputList[0]]),
+               ('PF'       , ROOT.kBlack   ,  inputList    ),
+#              ('PFCHS'    , ROOT.kViolet  ,  inputList    ),
+               ('Puppi'    , ROOT.kRed     ,  inputList    ),
              ]
           elif 'MatchedToPFCorr_' in _hkey:
              _hkey_jmeColl = 'PFCorr'
              _leg_jmeColl = 'HLT'
              _jmeCollList = [
-               ('Calo', ROOT.kGray+1),
-               ('PFCluster', ROOT.kOrange+1),
-               ('PFCorr', ROOT.kBlack),
-               ('PFCHS', ROOT.kViolet),
-               ('Puppi', ROOT.kRed),
+#              ('Calo'            , ROOT.kGray+1  , [inputList[0]]),
+#              ('PFCluster'       , ROOT.kOrange+1, [inputList[0]]),
+               ('PFCorr'          , ROOT.kBlack   ,  inputList    ),
+               ('PFCHSCorr'       , ROOT.kViolet  ,  inputList    ),
+               ('PuppiCorr'       , ROOT.kRed     ,  inputList    ),
+#              ('OfflinePuppiCorr', ROOT.kPink+1  , [inputList[0]]),
              ]
        else:
           if 'hltPFMET_' in _hkey:
              _hkey_jmeColl = 'hltPFMET'
              _leg_jmeColl = 'MET'
              _jmeCollList = [
-               ('hltPFMET', 1),
-               ('hltCaloMET', ROOT.kGray+1),
-#               ('hltPFCHSv1MET', ROOT.kBlue),
-               ('hltPFCHSv2MET', ROOT.kViolet),
-#               ('hltPuppiV2MET', ROOT.kOrange+1),
-               ('hltPuppiV4MET', ROOT.kRed),
-#               ('offlineMETs_Raw', ROOT.kPink+3),
-               ('offlineMETsPuppi_Raw', ROOT.kPink+1),
+               ('hltPFMET', 1, inputList),
+               ('hltCaloMET', ROOT.kGray+1, [inputList[0]]),
+#              ('hltPFCHSv1MET', ROOT.kBlue, inputList),
+               ('hltPFCHSv2MET', ROOT.kViolet, inputList),
+#              ('hltPuppiV2MET', ROOT.kOrange+1, inputList),
+               ('hltPuppiV4MET', ROOT.kRed, inputList),
+#              ('offlineMETs_Raw', ROOT.kPink+3, [inputList[0]]),
+               ('offlineMETsPuppi_Raw', ROOT.kPink+1, [inputList[0]]),
              ]
           elif 'hltAK4PFJets_' in _hkey:
              _hkey_jmeColl = 'hltAK4PFJets'
              _leg_jmeColl = 'HLT AK4'
              _jmeCollList = [
-               ('hltAK4CaloJets', ROOT.kGray+1),
-               ('hltAK4PFJets', ROOT.kBlack),
-#               ('hltAK4PFCHSv1Jets', ROOT.kBlue),
-               ('hltAK4PFCHSv2Jets', ROOT.kViolet),
-#               ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
-               ('hltAK4PuppiV3Jets', ROOT.kRed),
+               ('hltAK4CaloJets', ROOT.kGray+1, [inputList[0]]),
+               ('hltAK4PFJets', ROOT.kBlack, inputList),
+#              ('hltAK4PFCHSv1Jets', ROOT.kBlue, inputList),
+               ('hltAK4PFCHSv2Jets', ROOT.kViolet, inputList),
+#              ('hltAK4PuppiV1Jets', ROOT.kOrange+1, inputList),
+               ('hltAK4PuppiV3Jets', ROOT.kRed, inputList),
              ]
           elif 'hltAK4PFJetsCorrected_' in _hkey:
              _hkey_jmeColl = 'hltAK4PFJetsCorrected'
              _leg_jmeColl = 'HLT AK4'
              _jmeCollList = [
-               ('hltAK4CaloJetsCorrected', ROOT.kGray+1),
-               ('hltAK4PFJetsCorrected', ROOT.kBlack),
-#               ('hltAK4PFCHSv1Jets', ROOT.kBlue),
-               ('hltAK4PFCHSv2Jets', ROOT.kViolet),
-#               ('hltAK4PuppiV1Jets', ROOT.kOrange+1),
-               ('hltAK4PuppiV3Jets', ROOT.kRed),
+               ('hltAK4CaloJetsCorrected', ROOT.kGray+1, [inputList[0]]),
+               ('hltAK4PFJetsCorrected', ROOT.kBlack, inputList),
+#              ('hltAK4PFCHSv1Jets', ROOT.kBlue, inputList),
+               ('hltAK4PFCHSv2Jets', ROOT.kViolet, inputList),
+#              ('hltAK4PuppiV1Jets', ROOT.kOrange+1, inputList),
+               ('hltAK4PuppiV3Jets', ROOT.kRed, inputList),
              ]
           elif 'hltAK8PFJets_' in _hkey:
              _hkey_jmeColl = 'hltAK8PFJets'
              _leg_jmeColl = 'HLT AK8'
              _jmeCollList = [
-               ('hltAK8CaloJets', ROOT.kGray+1),
-               ('hltAK8PFJets', ROOT.kBlack),
-#               ('hltAK8PFCHSv1Jets', ROOT.kBlue),
-               ('hltAK8PFCHSv2Jets', ROOT.kViolet),
-#               ('hltAK8PuppiV1Jets', ROOT.kOrange+1),
-               ('hltAK8PuppiV3Jets', ROOT.kRed),
+               ('hltAK8CaloJets', ROOT.kGray+1, [inputList[0]]),
+               ('hltAK8PFJets', ROOT.kBlack, inputList),
+#              ('hltAK8PFCHSv1Jets', ROOT.kBlue, inputList),
+               ('hltAK8PFCHSv2Jets', ROOT.kViolet, inputList),
+#              ('hltAK8PuppiV1Jets', ROOT.kOrange+1, inputList),
+               ('hltAK8PuppiV3Jets', ROOT.kRed, inputList),
              ]
           elif 'hltAK8PFJetsCorrected_' in _hkey:
              _hkey_jmeColl = 'hltAK8PFJetsCorrected'
              _leg_jmeColl = 'HLT AK8'
              _jmeCollList = [
-               ('hltAK8CaloJetsCorrected', ROOT.kGray+1),
-               ('hltAK8PFJetsCorrected', ROOT.kBlack),
-#               ('hltAK8PFCHSv1Jets', ROOT.kBlue),
-               ('hltAK8PFCHSv2Jets', ROOT.kViolet),
-#               ('hltAK8PuppiV1Jets', ROOT.kOrange+1),
-               ('hltAK8PuppiV3Jets', ROOT.kRed),
+               ('hltAK8CaloJetsCorrected', ROOT.kGray+1, [inputList[0]]),
+               ('hltAK8PFJetsCorrected', ROOT.kBlack, inputList),
+#              ('hltAK8PFCHSv1Jets', ROOT.kBlue, inputList),
+               ('hltAK8PFCHSv2Jets', ROOT.kViolet, inputList),
+#              ('hltAK8PuppiV1Jets', ROOT.kOrange+1, inputList),
+               ('hltAK8PuppiV3Jets', ROOT.kRed, inputList),
              ]
           elif 'MatchedToPF_' in _hkey:
              _hkey_jmeColl = 'PF'
              _leg_jmeColl = 'HLT'
              _jmeCollList = [
-               ('Calo', ROOT.kGray+1),
-               ('PF', ROOT.kBlack),
-#               ('PFCHSv1', ROOT.kBlue),
-               ('PFCHSv2', ROOT.kViolet),
-#               ('PuppiV1', ROOT.kOrange+1),
-               ('PuppiV3', ROOT.kRed),
+               ('Calo', ROOT.kGray+1, [inputList[0]]),
+               ('PF', ROOT.kBlack, inputList),
+#              ('PFCHSv1', ROOT.kBlue, inputList),
+               ('PFCHSv2', ROOT.kViolet, inputList),
+#              ('PuppiV1', ROOT.kOrange+1, inputList),
+               ('PuppiV3', ROOT.kRed, inputList),
              ]
           elif 'MatchedToPFCorr_' in _hkey:
              _hkey_jmeColl = 'PFCorr'
              _leg_jmeColl = 'HLT'
              _jmeCollList = [
-               ('CaloCorr', ROOT.kGray+1),
-               ('PFCorr', ROOT.kBlack),
-#               ('PFCHSv1', ROOT.kBlue),
-               ('PFCHSv2', ROOT.kViolet),
-#               ('PuppiV1', ROOT.kOrange+1),
-               ('PuppiV3', ROOT.kRed),
+               ('CaloCorr', ROOT.kGray+1, [inputList[0]]),
+               ('PFCorr', ROOT.kBlack, inputList),
+#              ('PFCHSv1', ROOT.kBlue, inputList),
+               ('PFCHSv2', ROOT.kViolet, inputList),
+#              ('PuppiV1', ROOT.kOrange+1, inputList),
+               ('PuppiV3', ROOT.kRed, inputList),
              ]
 
        if _hkey_jmeColl is None:
@@ -279,7 +285,9 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           for (_jmeCollName, _jmeCollColor) in _jmeCollList:
+           for (_jmeCollName, _jmeCollColor, _jmeInputFiles) in _jmeCollList:
+               if inp not in _jmeInputFiles: continue
+
                _hkeyNew = _hkey.replace(_hkey_jmeColl, _jmeCollName)
 
                if _hkeyNew not in inp['TH1s']:

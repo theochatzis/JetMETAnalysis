@@ -94,11 +94,27 @@ if __name__ == '__main__':
 
    for _hkey in th1Keys:
 
+       _outname = _hkey
+
        _hkey_basename = os.path.basename(_hkey)
 
        _hIsProfile = '_wrt_' in _hkey_basename
 
        _hIsEfficiency = _hkey_basename.endswith('_eff')
+
+       _logY = False
+       _xMin, _xMax = None, None
+
+       if _hkey.endswith('pfcand_pt_2'):
+          _logY, _xMin, _xMax = True, 0., 100.
+
+       _skip = False
+       _hkey_dirname = os.path.dirname(_hkey)
+       for _pfTypeTag in ['_h', '_e', '_mu', '_gamma', '_h0']:
+          if _hkey_dirname.endswith(_pfTypeTag) and _hkey_basename.startswith('pfcand_mult_') and (not _hkey_basename.endswith(_pfTypeTag)):
+             _skip = True
+             break
+       if _skip: continue
 
        ## histograms
        _divideByBinWidth = False
@@ -170,9 +186,11 @@ if __name__ == '__main__':
          'title': _htitle,
          'labels': _labels,
          'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.70, Lef+(1-Rig-Lef)*0.95, Bot+(1-Bot-Top)*0.90],
-         'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
+         'outputs': [OUTDIR+'/'+_outname+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
-         'logY': False,
+         'logY': _logY,
+         'xMin': _xMin,
+         'xMax': _xMax,
          'autoRangeX': True,
        })
 

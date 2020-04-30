@@ -83,6 +83,9 @@ if __name__ == '__main__':
        else:
           KILL(log_prx+'argument of --inputs has invalid format: '+_input)
 
+   if not inputList:
+      raise SystemExit(0)
+
    th1Keys = sorted(list(set(th1Keys)))
 
    apply_style(0)
@@ -100,6 +103,8 @@ if __name__ == '__main__':
 
    for _hkey in th1Keys:
 
+       _outname = _hkey
+
        _hkey_basename = os.path.basename(_hkey)
 
        _hIsProfile = '_wrt_' in _hkey_basename
@@ -108,25 +113,45 @@ if __name__ == '__main__':
 
        _hkey_dqmColl, _dqmCollList = None, []
 
+       _legXY = [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99]
+
+       _logY = False
+       _xMin, _xMax = None, None
+
+       if _hkey.endswith('pfcand_pt_2'):
+          _logY, _xMin, _xMax = True, 0., 100.
+
+       _skip = False
+       _hkey_dirname = os.path.dirname(_hkey)
+       for _pfTypeTag in ['_h', '_e', '_mu', '_gamma', '_h0']:
+          if _hkey_dirname.endswith(_pfTypeTag) and _hkey_basename.startswith('pfcand_mult_') and (not _hkey_basename.endswith(_pfTypeTag)):
+             _skip = True
+             break
+       if _skip: continue
+
        if opts.upgrade:
-          if ('_hltPFCands/' in _hkey) or ('_hltPFCands_' in _hkey):
-             _hkey_dqmColl = 'hltPFCands'
+          if ('_particleFlowTmp/' in _hkey) or ('_particleFlowTmp_' in _hkey):
+             _hkey_dqmColl = 'particleFlowTmp'
+             _outname = _hkey.replace('_particleFlowTmp', '')
              _dqmCollList = [
-               ('simPFCands', ROOT.kOrange+1),
-               ('hltPFCands', ROOT.kBlack),
-#               ('hltPuppiCands', ROOT.kRed),
-               ('offlinePFCands', ROOT.kPink+1),
+               ('offlineParticleFlow', ROOT.kPink+1  , inputList),
+               ('simPFProducer'      , ROOT.kOrange+1, inputList),
+               ('pfTICL'             , ROOT.kBlue    , inputList),
+               ('particleFlowTmp'    , ROOT.kBlack   , inputList),
+#              ('hltPuppi'           , ROOT.kRed     , inputList),
              ]
+             _legXY = [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.70, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99]
        else:
           if ('_hltParticleFlow/' in _hkey) or ('_hltParticleFlow_' in _hkey):
              _hkey_dqmColl = 'hltParticleFlow'
+             _outname = _hkey.replace('_hltParticleFlow', '')
              _dqmCollList = [
-               ('hltParticleFlow'     , ROOT.kBlack),
-               ('hltParticleFlowCHSv1', ROOT.kBlue),
-               ('hltParticleFlowCHSv2', ROOT.kViolet),
-               ('hltPuppiV1'          , ROOT.kOrange+1),
-               ('hltPuppiV3'          , ROOT.kRed),
-               ('offlineParticleFlow' , ROOT.kPink+1),
+               ('hltParticleFlow'     , ROOT.kBlack   , inputList),
+               ('hltParticleFlowCHSv1', ROOT.kBlue    , inputList),
+               ('hltParticleFlowCHSv2', ROOT.kViolet  , inputList),
+               ('hltPuppiV1'          , ROOT.kOrange+1, inputList),
+               ('hltPuppiV3'          , ROOT.kRed     , inputList),
+               ('offlineParticleFlow' , ROOT.kPink+1  , inputList),
              ]
 
        if _hkey_dqmColl is None:
@@ -140,7 +165,9 @@ if __name__ == '__main__':
        for inp in inputList:
            if _hkey not in inp['TH1s']: continue
 
-           for (_dqmCollName, _dqmCollColor) in _dqmCollList:
+           for (_dqmCollName, _dqmCollColor, _dqmInputFiles) in _dqmCollList:
+               if inp not in _dqmInputFiles: continue
+
                _hkeyNew = _hkey.replace(_hkey_dqmColl, _dqmCollName)
 
                if _hkeyNew not in inp['TH1s']:
@@ -207,10 +234,10 @@ if __name__ == '__main__':
          'histograms': _hists,
          'title': _htitle,
          'labels': _labels,
-         'legXY': [Lef+(1-Rig-Lef)*0.55, Bot+(1-Bot-Top)*0.50, Lef+(1-Rig-Lef)*0.99, Bot+(1-Bot-Top)*0.99],
-         'outputs': [OUTDIR+'/'+_hkey+'.'+_tmp for _tmp in EXTS],
+         'legXY': _legXY,
+         'outputs': [OUTDIR+'/'+_outname+'.'+_tmp for _tmp in EXTS],
          'ratio': True,
-         'logY': False,
+         'logY': _logY,
          'autoRangeX': True,
        })
 

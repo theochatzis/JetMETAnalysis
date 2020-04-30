@@ -11,32 +11,6 @@ from common.efficiency import *
 from common.plot import *
 from common.plot_style import *
 
-#def clone_histogram(histograms, tag1, tag2, setters={}):
-#
-#    if tag1 not in histograms:
-#       return None
-#
-#    if tag2 not in histograms[tag1]:
-#       return None
-#
-#    h0 = histograms[tag1][tag2].Clone()
-#    h0.UseCurrentStyle()
-#    if hasattr(h0, 'SetDirectory'):
-#       h0.SetDirectory(0)
-#
-#    h0 = th1_mergeUnderflowBinIntoFirstBin(h0)
-#    h0 = th1_mergeOverflowBinIntoLastBin(h0)
-#
-#    # defaults
-#    h0.SetMarkerSize(0)
-#    h0.SetLineWidth(2)
-#
-#    for i_set in setters:
-#        if hasattr(h0, 'Set'+i_set):
-#           getattr(h0, 'Set'+i_set)(setters[i_set])
-#
-#    return h0
-
 def updateDictionary(dictionary, TDirectory, prefix='', keywords=[], verbose=False):
 
     key_prefix = ''
@@ -132,12 +106,13 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
            if (_tmp.th1 is not None):
               if hasattr(_tmp.th1, 'GetNbinsX'):
                  tmpXMin, tmpXMax = _tmp.th1.GetBinLowEdge(1), _tmp.th1.GetBinLowEdge(1+_tmp.th1.GetNbinsX())
-                 for i_bin in range(1, _tmp.th1.GetNbinsX()+1):
-                     if (_tmp.th1.GetBinContent(i_bin) != 0.) or (_tmp.th1.GetBinError(i_bin) != 0.): break
-                     tmpXMin = _tmp.th1.GetBinLowEdge(i_bin)
-                 for i_bin in reversed(range(1, _tmp.th1.GetNbinsX()+1)):
-                     if (_tmp.th1.GetBinContent(i_bin) != 0.) or (_tmp.th1.GetBinError(i_bin) != 0.): break
-                     tmpXMax = _tmp.th1.GetBinLowEdge(i_bin)
+                 if _tmp.th1.Integral() > 0.:
+                    for i_bin in range(1, _tmp.th1.GetNbinsX()+1):
+                        if (_tmp.th1.GetBinContent(i_bin) != 0.) or (_tmp.th1.GetBinError(i_bin) != 0.): break
+                        tmpXMin = _tmp.th1.GetBinLowEdge(i_bin)
+                    for i_bin in reversed(range(1, _tmp.th1.GetNbinsX()+1)):
+                        if (_tmp.th1.GetBinContent(i_bin) != 0.) or (_tmp.th1.GetBinError(i_bin) != 0.): break
+                        tmpXMax = _tmp.th1.GetBinLowEdge(i_bin)
                  xMinCalc = min(xMinCalc, tmpXMin) if xMinCalc is not None else tmpXMin
                  xMaxCalc = max(xMaxCalc, tmpXMax) if xMaxCalc is not None else tmpXMax
               else:
@@ -148,8 +123,8 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
        xMinCalc = xyMinMax[0] if xyMinMax else histograms[0].th1.GetBinLowEdge(1)
        xMaxCalc = xyMinMax[2] if xyMinMax else histograms[0].th1.GetBinLowEdge(1+histograms[0].th1.GetNbinsX())
 
-    XMIN = xMin if xMin is not None else xMinCalc
-    XMAX = xMax if xMax is not None else xMaxCalc
+    XMIN = xMinCalc if xMin is None else (max(xMin, xMinCalc) if autoRangeX else xMin)
+    XMAX = xMaxCalc if xMax is None else (min(xMax, xMaxCalc) if autoRangeX else xMax)
 
     HMIN, HMAX = 1e8, -1e8
     for _tmp in histograms:
@@ -370,8 +345,6 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
     if ratio:
        del plot_ratios
        del denom
-
-#    raise SystemExit(0)
 
     return 0
 
