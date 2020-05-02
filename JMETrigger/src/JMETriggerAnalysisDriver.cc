@@ -145,10 +145,10 @@ void JMETriggerAnalysisDriver::init(){
     bookHistograms_MET(selLabel, "hltPuppiV4MET", {"GEN", "Offline"});
     bookHistograms_MET(selLabel, "hltPuppiV4METNoMu", {"GEN"});
 
-    bookHistograms_MET(selLabel, "offlineMETs_Raw", {"GEN"});
-    bookHistograms_MET(selLabel, "offlineMETs_Type1", {"GEN"});
-    bookHistograms_MET(selLabel, "offlineMETsPuppi_Raw", {"GEN"});
-    bookHistograms_MET(selLabel, "offlineMETsPuppi_Type1", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePFMET_Raw", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePFMET_Type1", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePuppiMET_Raw", {"GEN"});
+    bookHistograms_MET(selLabel, "offlinePuppiMET_Type1", {"GEN"});
   }
 }
 
@@ -278,10 +278,10 @@ void JMETriggerAnalysisDriver::analyze(){
   for(std::string const& metLabel : {
     "hltPFCHSv1MET",
     "hltPFCHSv2MET",
-    "offlineMETs_Raw",
-    "offlineMETs_Type1",
-    "offlineMETsPuppi_Raw",
-    "offlineMETsPuppi_Type1",
+    "offlinePFMET_Raw",
+    "offlinePFMET_Type1",
+    "offlinePuppiMET_Raw",
+    "offlinePuppiMET_Type1",
   }){
     fillHistoDataMET fhDataMET;
     fhDataMET.metCollection = metLabel;
@@ -296,7 +296,7 @@ void JMETriggerAnalysisDriver::analyze(){
     fillHistoDataMET fhDataMETPF;
     fhDataMETPF.metCollection = pfLabel;
     fhDataMETPF.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
-    fhDataMETPF.matches.emplace_back(fillHistoDataMET::Match("Offline", "offlineMETs_Raw"));
+    fhDataMETPF.matches.emplace_back(fillHistoDataMET::Match("Offline", "offlinePFMET_Raw"));
     fillHistograms_MET("NoSelection", fhDataMETPF);
   }
 
@@ -310,7 +310,7 @@ void JMETriggerAnalysisDriver::analyze(){
     fillHistoDataMET fhDataMETPuppi;
     fhDataMETPuppi.metCollection = puppiLabel;
     fhDataMETPuppi.matches.emplace_back(fillHistoDataMET::Match("GEN", "genMETTrue"));
-    fhDataMETPuppi.matches.emplace_back(fillHistoDataMET::Match("Offline", "offlineMETsPuppi_Raw"));
+    fhDataMETPuppi.matches.emplace_back(fillHistoDataMET::Match("Offline", "offlinePuppiMET_Raw"));
     fillHistograms_MET("NoSelection", fhDataMETPuppi);
   }
 }
