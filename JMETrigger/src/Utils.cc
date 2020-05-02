@@ -1,5 +1,5 @@
 #include <NTupleAnalysis/JMETrigger/interface/Utils.h>
-#include <math.h>
+#include <cmath>
 
 float utils::deltaPhi(const float phi1, const float phi2){
   auto dphi(std::abs(phi1 - phi2));

@@ -1,6 +1,6 @@
 #include <NTupleAnalysis/JMETrigger/interface/JMETriggerAnalysisDriverRun2.h>
 #include <NTupleAnalysis/JMETrigger/interface/Utils.h>
-#include <math.h>
+#include <cmath>
 
 JMETriggerAnalysisDriverRun2::JMETriggerAnalysisDriverRun2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
   : JMETriggerAnalysisDriverRun2(outputFilePath, outputFileMode) {
@@ -91,32 +91,59 @@ void JMETriggerAnalysisDriverRun2::init(){
 //  "_HFPt4",
   };
 
-  //!! era
   //!! jetletponclesaning, pt, eta, pfid, hltmatching
 
-  hltPaths_PFMET_ = {
-    "HLT_PFMET170_NotCleaned",
-    "HLT_PFMET170_HBHECleaned",
-//    "HLT_PFMET170_BeamHaloCleaned",
-    "HLT_PFMET170_HBHE_BeamHaloCleaned",
-    "HLT_PFMETTypeOne190_HBHE_BeamHaloCleaned",
-    "HLT_PFMET200_NotCleaned",
-    "HLT_PFMET200_HBHECleaned",
-    "HLT_PFMET200_HBHE_BeamHaloCleaned",
-    "HLT_PFMET250_HBHECleaned",
-//    "HLT_PFMET300_HBHECleaned",
-    "HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
-  };
+  auto const& opt_era(getOption("era"));
+
+  if(opt_era == "2016"){
+
+    hltPaths_PFMET_ = {
+      "HLT_PFMET170_NotCleaned",
+      "HLT_PFMET170_HBHECleaned",
+      "HLT_PFMET170_BeamHaloCleaned",
+      "HLT_PFMET170_HBHE_BeamHaloCleaned",
+      "HLT_PFMETTypeOne190_HBHE_BeamHaloCleaned",
+    };
+  }
+  else if(opt_era == "2017"){
+
+    hltPaths_PFMET_ = {
+      "HLT_PFMET200_NotCleaned",
+      "HLT_PFMET200_HBHECleaned",
+      "HLT_PFMET200_HBHE_BeamHaloCleaned",
+      "HLT_PFMET250_HBHECleaned",
+      "HLT_PFMET300_HBHECleaned",
+      "HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
+    };
+  }
+  else if(opt_era == "2018"){
+
+    hltPaths_PFMET_ = {
+      "HLT_PFMET200_NotCleaned",
+      "HLT_PFMET200_HBHECleaned",
+      "HLT_PFMET200_HBHE_BeamHaloCleaned",
+      "HLT_PFMET250_HBHECleaned",
+      "HLT_PFMET300_HBHECleaned",
+      "HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned",
+    };
+  }
+  else {
+    throw std::runtime_error("JMETriggerAnalysisDriverRun2::init -- invalid value for option \"era\": "+opt_era);
+  }
 
   // histogram: events counter
   addTH1D("eventsProcessed", {0, 1});
 
   // histograms: MET
-  for(std::string const& metColl : {"offlineMETs_Raw", "offlineMETs_Type1", "offlineMETsPuppi_Raw", "offlineMETsPuppi_Type1"}){
-
+  for(std::string const& metColl : {
+    "offlineMETs_Raw",
+    "offlineMETs_Type1",
+    "offlineMETsPuppi_Raw",
+    "offlineMETsPuppi_Type1",
+  }){
     for(std::string const& metHLT : hltPaths_PFMET_){
-      bookHistograms_MET(metColl+"_"+metHLT+"_total", metColl);
-      bookHistograms_MET(metColl+"_"+metHLT+"_pass", metColl);
+      bookHistograms_MET(metHLT+"_total", metColl);
+      bookHistograms_MET(metHLT+"_pass", metColl);
     }
   }
 }
@@ -126,8 +153,23 @@ void JMETriggerAnalysisDriverRun2::analyze(){
   H1("eventsProcessed")->Fill(0.5, 1.);
 
   // single-electron trigger
-  auto const& HLT_Ele32(value<bool>("HLT_Ele32_WPTight_Gsf"));
-  if(not HLT_Ele32){ return; }
+  auto const& opt_era(getOption("era"));
+
+  if(opt_era == "2016"){
+    auto const& ele_trig(value<bool>("HLT_Ele27_WPTight_Gsf"));
+    if(not ele_trig){ return; }
+  }
+  else if(opt_era == "2017"){
+    auto const& ele_trig(value<bool>("HLT_Ele32_WPTight_Gsf_L1DoubleEG") and value<bool>("Flag_ele32DoubleL1ToSingleL1"));
+    if(not ele_trig){ return; }
+  }
+  else if(opt_era == "2018"){
+    auto const& ele_trig(value<bool>("HLT_Ele32_WPTight_Gsf"));
+    if(not ele_trig){ return; }
+  }
+  else {
+    throw std::runtime_error("JMETriggerAnalysisDriverRun2::analyze -- invalid value for option \"era\": "+opt_era);
+  }
 
   // electron selection
   size_t nElectronsVeto(0), nElectronsGood(0);
@@ -140,17 +182,22 @@ void JMETriggerAnalysisDriverRun2::analyze(){
     throw std::runtime_error("electrons_pt size");
   }
 
-  size_t goodElectronIdx(0);
+//  size_t goodElectronIdx(0);
   for(size_t eleIdx=0; eleIdx<electrons_pt.size(); ++eleIdx){
     auto const& pt(electrons_pt.at(eleIdx));
     auto const& absEtaSC(std::abs(electrons_etaSC.at(eleIdx)));
     auto const& id(electrons_id.at(eleIdx));
 
+    if((1.4442 < absEtaSC) and (absEtaSC < 1.566)){ continue; }
+
     auto const isVeto((pt > 20.) and (absEtaSC < 2.5) and (id & (1 << 1)));
     auto const isGood((pt > 35.) and (absEtaSC < 2.5) and (id & (1 << 2)));
 
     if(isVeto){ ++nElectronsVeto; }
-    if(isGood){ ++nElectronsGood; goodElectronIdx = eleIdx; }
+    if(isGood){
+      ++nElectronsGood;
+//      goodElectronIdx = eleIdx;
+    }
   }
 
   if(nElectronsVeto > 1){ return; }
@@ -183,16 +230,16 @@ void JMETriggerAnalysisDriverRun2::analyze(){
 
   if(nMuonsVeto > 0){ return; }
 
-  auto const& electronPhi(electrons_phi.at(goodElectronIdx));
+//  auto const& electronPhi(electrons_phi.at(goodElectronIdx));
 
   for(std::string const& metColl : {"offlineMETs_Raw", "offlineMETs_Type1", "offlineMETsPuppi_Raw", "offlineMETsPuppi_Type1"}){
 
-    auto const& metPhi(vector<float>(metColl+"_phi").at(0));
-
-    // cut on deltaPhi(electron, MET)
-    if(utils::deltaPhi(electronPhi, metPhi) > (6. * M_PI / 5.)){
-      continue;
-    }
+//    auto const& metPhi(vector<float>(metColl+"_phi").at(0));
+//
+//    // cut on deltaPhi(electron, MET)
+//    if(utils::deltaPhi(electronPhi, metPhi) > (6. * M_PI / 5.)){
+//      continue;
+//    }
 
     for(auto const& metHLT : hltPaths_PFMET_){
 
@@ -204,12 +251,12 @@ void JMETriggerAnalysisDriverRun2::analyze(){
 
       fillHistoDataMET fhDataMET;
       fhDataMET.metCollection = metColl;
-      fillHistograms_MET(metColl+"_"+metHLT+"_total", fhDataMET);
+      fillHistograms_MET(metHLT+"_total", fhDataMET);
 
       auto const& metHLTAccept(value<bool>(metHLT));
       if(not metHLTAccept){ continue; }
 
-      fillHistograms_MET(metColl+"_"+metHLT+"_pass", fhDataMET);
+      fillHistograms_MET(metHLT+"_pass", fhDataMET);
     }
   }
 }
@@ -542,7 +589,7 @@ void JMETriggerAnalysisDriverRun2::fillHistograms_Jets(const std::string& dir, c
           ++nJetsMatched;
 
           if((nJetsMatched == 1) or (jetPt > maxPtJetPtWithMatch)){
-	    maxPtJetPtWithMatch = jetPt;
+            maxPtJetPtWithMatch = jetPt;
             indexMaxPtJetWithMatch = jetIdx;
           }
 
@@ -588,7 +635,7 @@ void JMETriggerAnalysisDriverRun2::fillHistograms_Jets(const std::string& dir, c
           ++nJetsNotMatched;
 
           if((nJetsNotMatched == 1) or (jetPt > maxPtJetPtWithNoMatch)){
-	    maxPtJetPtWithNoMatch = jetPt;
+            maxPtJetPtWithNoMatch = jetPt;
             indexMaxPtJetWithNoMatch = jetIdx;
           }
 
