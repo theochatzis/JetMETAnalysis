@@ -23,6 +23,9 @@ if __name__ == '__main__':
    parser.add_argument('-t', '--tree-name', dest='tree_name', action='store', default='JMETriggerNTuple/Events',
                        help='TTree key in input file(s)')
 
+   parser.add_argument('-p', '--plugin', dest='plugin', action='store', default=None, required=True,
+                       help='name of analysis plugin')
+
    parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                        help='path to output directory')
 
@@ -179,6 +182,7 @@ if __name__ == '__main__':
              PYSCRIPT_ABSPATH,
              '-i '+i_inpf,
              '-o '+OUTPUT_ABSPATH,
+             '-p '+opts.plugin,
              '--skipEvents '+str(EVT_FIRST),
              '--maxEvents '+str(1+EVT_LAST-EVT_FIRST),
            ]

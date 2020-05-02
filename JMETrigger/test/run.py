@@ -39,10 +39,13 @@ if __name__ == '__main__':
    parser.add_argument('-t', '--tree', dest='tree', action='store', default='JMETriggerNTuple/Events',
                        help='key of TTree in input file(s)')
 
+   parser.add_argument('--options', dest='options', nargs='+', default=[],
+                       help='list of plugin options (format: "option1=value1 option2=value2 [..]")')
+
    parser.add_argument('-l', '--libs', dest='libs', nargs='+', default=[],
                        help='names of libraries to be loaded via ROOT::gSystem::Load')
 
-   parser.add_argument('-p', '--plugin', dest='plugin', action='store', default='JMETriggerAnalysisDriver',
+   parser.add_argument('-p', '--plugin', dest='plugin', action='store', default=None, required=True,
                        help='name of analysis plugin')
 
    parser.add_argument('-e', '--every', dest='every', action='store', type=int, default=1e2,
@@ -74,6 +77,20 @@ if __name__ == '__main__':
    ## output
    if os.path.exists(opts.output):
       raise RuntimeError(log_prx+'target path to output .root file already exists [-o]: '+opts.output)
+
+   ## options
+   optionsDict = {}
+   for i_opt in opts.options:
+       i_opt_split = i_opt.split('=')
+
+       if len(i_opt_split) != 2:
+          WARNING(log_prx+'plugin option with invalid format (will be ignored) [--options]: '+i_opt)
+          continue
+
+       if i_opt_split[0] in optionsDict:
+          KILL(log_prx+'attempt to redefine plugin option [--options]: '+i_opt_split[0])
+
+       optionsDict[i_opt_split[0]] = i_opt_split[1]
 
    ## libraries
    LIBS = sorted(list(set(opts.libs)))
@@ -143,6 +160,7 @@ if __name__ == '__main__':
    analyzer = getattr(ROOT, opts.plugin)(opts.output, 'recreate')
    analyzer.setVerbosity(opts.verbosity)
    analyzer.addOption('showEvery', str(SHOW_EVERY))
+   for i_opt in optionsDict: analyzer.addOption(i_opt, optionsDict[i_opt])
    analyzer.init()
 
    for [i_inpFile, i_inpTree] in inputFileTreePairs:
