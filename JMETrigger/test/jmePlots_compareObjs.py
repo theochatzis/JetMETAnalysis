@@ -127,7 +127,7 @@ if __name__ == '__main__':
                ('PFSoftKillerMET'    , ROOT.kBlue    ,  inputList    ),
                ('hltPFCHSMET'        , ROOT.kViolet  ,  inputList    ),
                ('hltPuppiMET'        , ROOT.kRed     ,  inputList    ),
-#              ('offlineMETs_Raw'    , ROOT.kPink+3  , [inputList[0]]),
+#              ('offlinePFMET_Raw'   , ROOT.kPink+3  , [inputList[0]]),
                ('offlinePuppiMET_Raw', ROOT.kPink+1  , [inputList[0]]),
              ]
           elif 'hltAK4PFJets_' in _hkey:
@@ -204,8 +204,8 @@ if __name__ == '__main__':
                ('hltPFCHSv2MET', ROOT.kViolet, inputList),
                ('hltPuppiV2MET', ROOT.kRed, inputList),
                ('hltPuppiV4MET', ROOT.kOrange+1, inputList),
-#              ('offlineMETs_Raw', ROOT.kPink+3, inputList),
-               ('offlineMETsPuppi_Raw', ROOT.kPink+1, [inputList[0]]),
+#              ('offlinePFMET_Raw', ROOT.kPink+3, [inputList[0]]),
+               ('offlinePuppiMET_Raw', ROOT.kPink+1, [inputList[0]]),
              ]
           elif 'hltAK4PFJets_' in _hkey:
              _hkey_jmeColl = 'hltAK4PFJets'
