@@ -72,6 +72,9 @@ if __name__ == '__main__':
    parser.add_argument('-l', '--level', dest='level', action='store', type=int, default=0,
                        help='level of directory depth in output directory')
 
+   parser.add_argument('--copy-only', dest='copy_only', action='store_true', default=False,
+                       help='disable addition of new objects (e.g. profiles)')
+
    parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
                        help='enable verbose mode')
 
@@ -113,211 +116,212 @@ if __name__ == '__main__':
        ### Input Histograms
        histograms = getTH1sFromTFile(inpf)
 
-       ### Histograms for profile of Mean
-       for i_h2_key in sorted(histograms.keys()):
-
-           if not histograms[i_h2_key].InheritsFrom('TH2'):
-              continue
-           elif histograms[i_h2_key].GetEntries() == 0:
-              continue
-
-           i_h2_key_basename = os.path.basename(i_h2_key)
-
-           i_h2_key_dirname = os.path.dirname(i_h2_key)
-           if i_h2_key_dirname: i_h2_key_dirname += '/'
-
-           key_vars_split = i_h2_key_basename.split(opts.separator_2d)
-           if len(key_vars_split) != 2:
-              KILL('ZZZ '+i_h2_key_basename)
-
-           key_varX = key_vars_split[0]
-           key_varY = key_vars_split[1]
-
-           if not (key_varX.endswith('GEN') or key_varX.endswith('Offline')):
-              continue
-
-           tmp_h2 = histograms[i_h2_key]
-
-           # Mean of X, in bins of Y
-           h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
-           if h_name0 in histograms: KILL('aaa1 '+h_name0)
-
-           tmp_h1_xMean = tmp_h2.ProjectionY(h_name0)
-           tmp_h1_xMean.SetDirectory(0)
-           tmp_h1_xMean.Reset()
-
-           for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-               _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-               _htmp.SetDirectory(0)
-               tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
-               tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
-               del _htmp
-
-           histograms[h_name0] = tmp_h1_xMean
-       ### -------------------
-
-       ### Histograms for profile of RMS
-       ### (requires mean-Response histograms created in previous block)
-       for i_h2_key in sorted(histograms.keys()):
-
-           if not histograms[i_h2_key].InheritsFrom('TH2'):
-              continue
-           elif histograms[i_h2_key].GetEntries() == 0:
-              continue
-
-           i_h2_key_basename = os.path.basename(i_h2_key)
-
-           i_h2_key_dirname = os.path.dirname(i_h2_key)
-           if i_h2_key_dirname: i_h2_key_dirname += '/'
-
-           key_vars_split = i_h2_key_basename.split(opts.separator_2d)
-           if len(key_vars_split) != 2:
-              KILL('ZZZ '+i_h2_key_basename)
-
-           key_varX = key_vars_split[0]
-           key_varY = key_vars_split[1]
-
-           if key_varX.endswith('GEN'): compTag = 'GEN'
-           elif key_varX.endswith('Offline'): compTag = 'Offline'
-           else: continue
-
-           tmp_h2 = histograms[i_h2_key]
-
-           # RMS of X, in bins of Y
-           h_name1 = i_h2_key_dirname+key_varX+'_RMS_wrt_'+key_varY
-           if h_name1 in histograms: KILL('aaa3 '+h_name1)
-
-           tmp_h1_xRMS = tmp_h2.ProjectionY(h_name1)
-           tmp_h1_xRMS.SetDirectory(0)
-           tmp_h1_xRMS.Reset()
-
-           for _idx in range(1, 1+tmp_h2.GetNbinsY()):
-               _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-               _htmp.SetDirectory(0)
-               tmp_h1_xRMS.SetBinContent(_idx, _htmp.GetRMS())
-               tmp_h1_xRMS.SetBinError(_idx, _htmp.GetRMSError())
-               del _htmp
-
-           histograms[h_name1] = tmp_h1_xRMS
-
-           # RMS of X divided by Mean of X, in bins of Y
-           h_name2 = i_h2_key_dirname+key_varX+'_RMSOverMean_wrt_'+key_varY
-           if h_name2 in histograms: KILL('aaa4 '+h_name2)
-
-           h_name4 = i_h2_key_dirname+key_varX[:key_varX.rfind('_')]+'_over'+compTag+'_Mean_wrt_'+key_varY
-           if h_name4 not in histograms:
-              if opts.verbose:
-                 WARNING('aaa5 '+h_name2+' '+h_name4)
-           else:
-              tmp_h1_ratioMeanNoErr = histograms[h_name4].Clone()
-              for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):
-                  tmp_h1_ratioMeanNoErr.SetBinError(_idx, 0)
-
-              tmp_h1_xRMSScaled = tmp_h1_xRMS.Clone()
-              tmp_h1_xRMSScaled.SetName(h_name2)
-              tmp_h1_xRMSScaled.SetDirectory(0)
-              tmp_h1_xRMSScaled.Divide(tmp_h1_ratioMeanNoErr)
-
-              histograms[h_name2] = tmp_h1_xRMSScaled
-       ### -------------------
-
-       ### Matching Efficiencies
-       for hkey_i in sorted(histograms.keys()):
-
-           if histograms[hkey_i].InheritsFrom('TH1') and (histograms[hkey_i].GetEntries() == 0):
-              continue
-           elif histograms[hkey_i].InheritsFrom('TGraph') and (histograms[hkey_i].GetN() == 0):
-              continue
-
-           hkey_i_basename = os.path.basename(hkey_i)
-
-           if '_wrt_' in hkey_i_basename:
-              continue
-
-           hkey_i_dirname = os.path.dirname(hkey_i)
-           if hkey_i_dirname: hkey_i_dirname += '/'
-
-           if not (('_MatchedTo' in hkey_i_basename) or ('_NotMatchedTo' in hkey_i_basename)):
-              continue
-
-           if (opts.separator_2d in hkey_i_basename) and (not hkey_i_basename.endswith('_eta__vs__pt')):
-              continue
-           elif not (hkey_i_basename.endswith('_pt') or hkey_i_basename.endswith('_eta') or hkey_i_basename.endswith('_phi')):
-              continue
-
-           hkey_i_num, hkey_i_den = hkey_i_dirname+hkey_i_basename, None
-           if '_MatchedTo' in hkey_i_basename:
-              hkey_i_den1 = hkey_i_basename.split('_MatchedTo')[0]
-              hkey_i_den2 = hkey_i_basename.split('_MatchedTo')[1]
-              hkey_i_den = hkey_i_dirname+hkey_i_den1+hkey_i_den2[hkey_i_den2.find('_'):]
-           elif '_NotMatchedTo' in hkey_i_basename:
-              hkey_i_den1 = hkey_i_basename.split('_NotMatchedTo')[0]
-              hkey_i_den2 = hkey_i_basename.split('_NotMatchedTo')[1]
-              hkey_i_den = hkey_i_dirname+hkey_i_den1+hkey_i_den2[hkey_i_den2.find('_'):]
-
-           if hkey_i_num not in histograms:
-              KILL(log_prx+'AAA '+hkey_i_num)
-
-           if hkey_i_den not in histograms:
-              KILL(log_prx+'BBB '+hkey_i_den)
-
-           tmp_hnum = histograms[hkey_i_num]
-           tmp_hden = histograms[hkey_i_den]
-
-           if hkey_i_num+'_eff' in histograms:
-              KILL(log_prx+'CCC '+hkey_i_num+'_eff')
-
-           if tmp_hnum.InheritsFrom('TH2') and tmp_hden.InheritsFrom('TH2'):
-              tmp_hratio = tmp_hnum.Clone()
-              tmp_hratio.Divide(tmp_hden)
-              histograms[hkey_i_num+'_eff'] = tmp_hratio
-           else:
-              histograms[hkey_i_num+'_eff'] = get_efficiency_graph(tmp_hnum, tmp_hden)
-       ### -------------------
-
-       ### Trigger Efficiencies [HLT_*Jet*]
-       for hkey_i in sorted(histograms.keys()):
-
-           if histograms[hkey_i].InheritsFrom('TH1') and (histograms[hkey_i].GetEntries() == 0):
-              continue
-           elif histograms[hkey_i].InheritsFrom('TGraph') and (histograms[hkey_i].GetN() == 0):
-              continue
-
-           hkey_i_basename = os.path.basename(hkey_i)
-
-           if '_wrt_' in hkey_i_basename:
-              continue
-
-           if not (('_MatchedTo' in hkey_i_basename) and ('_pt0' in hkey_i_basename) and (opts.separator_2d in hkey_i_basename)):
-              continue
-
-           hkey_i_dirname = os.path.dirname(hkey_i)
-           if hkey_i_dirname: hkey_i_dirname += '/'
-
-           if not (('HLT_' in hkey_i_dirname) and ('Jet' in hkey_i_dirname)):
-              continue
-
-           hkey_i_num = hkey_i
-           hkey_i_den = 'NoSelection/'+hkey_i_basename
-
-           if hkey_i_num not in histograms: KILL(log_prx+'AAA2 '+hkey_i_num)
-           if hkey_i_den not in histograms: KILL(log_prx+'BBB2 '+hkey_i_den)
-
-           tmp_hnum = histograms[hkey_i_num]
-           tmp_hden = histograms[hkey_i_den]
-
-           if not tmp_hnum.InheritsFrom('TH2'): KILL(log_prx+'AAA3 '+hkey_i_num)
-           if not tmp_hden.InheritsFrom('TH2'): KILL(log_prx+'BBB3 '+hkey_i_den)
-
-           tmp_hnum0 = tmp_hnum.ProjectionY('tmp_hnum0')
-           tmp_hden0 = tmp_hden.ProjectionY('tmp_hden0')
-
-           tmp_effname = hkey_i_num.replace(opts.separator_2d, '_')+'_eff'
-
-           if tmp_effname in histograms: KILL(log_prx+'CCC2 '+tmp_effname)
-
-           histograms[tmp_effname] = get_efficiency_graph(tmp_hnum0, tmp_hden0)
-       ### -------------------
+       if not opts.copy_only:
+          ### Histograms for profile of Mean
+          for i_h2_key in sorted(histograms.keys()):
+   
+              if not histograms[i_h2_key].InheritsFrom('TH2'):
+                 continue
+              elif histograms[i_h2_key].GetEntries() == 0:
+                 continue
+   
+              i_h2_key_basename = os.path.basename(i_h2_key)
+   
+              i_h2_key_dirname = os.path.dirname(i_h2_key)
+              if i_h2_key_dirname: i_h2_key_dirname += '/'
+   
+              key_vars_split = i_h2_key_basename.split(opts.separator_2d)
+              if len(key_vars_split) != 2:
+                 KILL('ZZZ '+i_h2_key_basename)
+   
+              key_varX = key_vars_split[0]
+              key_varY = key_vars_split[1]
+   
+              if not (key_varX.endswith('GEN') or key_varX.endswith('Offline')):
+                 continue
+   
+              tmp_h2 = histograms[i_h2_key]
+   
+              # Mean of X, in bins of Y
+              h_name0 = i_h2_key_dirname+key_varX+'_Mean_wrt_'+key_varY
+              if h_name0 in histograms: KILL('aaa1 '+h_name0)
+   
+              tmp_h1_xMean = tmp_h2.ProjectionY(h_name0)
+              tmp_h1_xMean.SetDirectory(0)
+              tmp_h1_xMean.Reset()
+   
+              for _idx in range(1, 1+tmp_h2.GetNbinsY()):
+                  _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
+                  _htmp.SetDirectory(0)
+                  tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
+                  tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
+                  del _htmp
+   
+              histograms[h_name0] = tmp_h1_xMean
+          ### -------------------
+   
+          ### Histograms for profile of RMS
+          ### (requires mean-Response histograms created in previous block)
+          for i_h2_key in sorted(histograms.keys()):
+   
+              if not histograms[i_h2_key].InheritsFrom('TH2'):
+                 continue
+              elif histograms[i_h2_key].GetEntries() == 0:
+                 continue
+   
+              i_h2_key_basename = os.path.basename(i_h2_key)
+   
+              i_h2_key_dirname = os.path.dirname(i_h2_key)
+              if i_h2_key_dirname: i_h2_key_dirname += '/'
+   
+              key_vars_split = i_h2_key_basename.split(opts.separator_2d)
+              if len(key_vars_split) != 2:
+                 KILL('ZZZ '+i_h2_key_basename)
+   
+              key_varX = key_vars_split[0]
+              key_varY = key_vars_split[1]
+   
+              if key_varX.endswith('GEN'): compTag = 'GEN'
+              elif key_varX.endswith('Offline'): compTag = 'Offline'
+              else: continue
+   
+              tmp_h2 = histograms[i_h2_key]
+   
+              # RMS of X, in bins of Y
+              h_name1 = i_h2_key_dirname+key_varX+'_RMS_wrt_'+key_varY
+              if h_name1 in histograms: KILL('aaa3 '+h_name1)
+   
+              tmp_h1_xRMS = tmp_h2.ProjectionY(h_name1)
+              tmp_h1_xRMS.SetDirectory(0)
+              tmp_h1_xRMS.Reset()
+   
+              for _idx in range(1, 1+tmp_h2.GetNbinsY()):
+                  _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
+                  _htmp.SetDirectory(0)
+                  tmp_h1_xRMS.SetBinContent(_idx, _htmp.GetRMS())
+                  tmp_h1_xRMS.SetBinError(_idx, _htmp.GetRMSError())
+                  del _htmp
+   
+              histograms[h_name1] = tmp_h1_xRMS
+   
+              # RMS of X divided by Mean of X, in bins of Y
+              h_name2 = i_h2_key_dirname+key_varX+'_RMSOverMean_wrt_'+key_varY
+              if h_name2 in histograms: KILL('aaa4 '+h_name2)
+   
+              h_name4 = i_h2_key_dirname+key_varX[:key_varX.rfind('_')]+'_over'+compTag+'_Mean_wrt_'+key_varY
+              if h_name4 not in histograms:
+                 if opts.verbose:
+                    WARNING('aaa5 '+h_name2+' '+h_name4)
+              else:
+                 tmp_h1_ratioMeanNoErr = histograms[h_name4].Clone()
+                 for _idx in range(tmp_h1_ratioMeanNoErr.GetNbinsX()+2):
+                     tmp_h1_ratioMeanNoErr.SetBinError(_idx, 0)
+   
+                 tmp_h1_xRMSScaled = tmp_h1_xRMS.Clone()
+                 tmp_h1_xRMSScaled.SetName(h_name2)
+                 tmp_h1_xRMSScaled.SetDirectory(0)
+                 tmp_h1_xRMSScaled.Divide(tmp_h1_ratioMeanNoErr)
+   
+                 histograms[h_name2] = tmp_h1_xRMSScaled
+          ### -------------------
+   
+          ### Matching Efficiencies
+          for hkey_i in sorted(histograms.keys()):
+   
+              if histograms[hkey_i].InheritsFrom('TH1') and (histograms[hkey_i].GetEntries() == 0):
+                 continue
+              elif histograms[hkey_i].InheritsFrom('TGraph') and (histograms[hkey_i].GetN() == 0):
+                 continue
+   
+              hkey_i_basename = os.path.basename(hkey_i)
+   
+              if '_wrt_' in hkey_i_basename:
+                 continue
+   
+              hkey_i_dirname = os.path.dirname(hkey_i)
+              if hkey_i_dirname: hkey_i_dirname += '/'
+   
+              if not (('_MatchedTo' in hkey_i_basename) or ('_NotMatchedTo' in hkey_i_basename)):
+                 continue
+   
+              if (opts.separator_2d in hkey_i_basename) and (not hkey_i_basename.endswith('_eta__vs__pt')):
+                 continue
+              elif not (hkey_i_basename.endswith('_pt') or hkey_i_basename.endswith('_eta') or hkey_i_basename.endswith('_phi')):
+                 continue
+   
+              hkey_i_num, hkey_i_den = hkey_i_dirname+hkey_i_basename, None
+              if '_MatchedTo' in hkey_i_basename:
+                 hkey_i_den1 = hkey_i_basename.split('_MatchedTo')[0]
+                 hkey_i_den2 = hkey_i_basename.split('_MatchedTo')[1]
+                 hkey_i_den = hkey_i_dirname+hkey_i_den1+hkey_i_den2[hkey_i_den2.find('_'):]
+              elif '_NotMatchedTo' in hkey_i_basename:
+                 hkey_i_den1 = hkey_i_basename.split('_NotMatchedTo')[0]
+                 hkey_i_den2 = hkey_i_basename.split('_NotMatchedTo')[1]
+                 hkey_i_den = hkey_i_dirname+hkey_i_den1+hkey_i_den2[hkey_i_den2.find('_'):]
+   
+              if hkey_i_num not in histograms:
+                 KILL(log_prx+'AAA '+hkey_i_num)
+   
+              if hkey_i_den not in histograms:
+                 KILL(log_prx+'BBB '+hkey_i_den)
+   
+              tmp_hnum = histograms[hkey_i_num]
+              tmp_hden = histograms[hkey_i_den]
+   
+              if hkey_i_num+'_eff' in histograms:
+                 KILL(log_prx+'CCC '+hkey_i_num+'_eff')
+   
+              if tmp_hnum.InheritsFrom('TH2') and tmp_hden.InheritsFrom('TH2'):
+                 tmp_hratio = tmp_hnum.Clone()
+                 tmp_hratio.Divide(tmp_hden)
+                 histograms[hkey_i_num+'_eff'] = tmp_hratio
+              else:
+                 histograms[hkey_i_num+'_eff'] = get_efficiency_graph(tmp_hnum, tmp_hden)
+          ### -------------------
+   
+          ### Trigger Efficiencies [HLT_*Jet*]
+          for hkey_i in sorted(histograms.keys()):
+   
+              if histograms[hkey_i].InheritsFrom('TH1') and (histograms[hkey_i].GetEntries() == 0):
+                 continue
+              elif histograms[hkey_i].InheritsFrom('TGraph') and (histograms[hkey_i].GetN() == 0):
+                 continue
+   
+              hkey_i_basename = os.path.basename(hkey_i)
+   
+              if '_wrt_' in hkey_i_basename:
+                 continue
+   
+              if not (('_MatchedTo' in hkey_i_basename) and ('_pt0' in hkey_i_basename) and (opts.separator_2d in hkey_i_basename)):
+                 continue
+   
+              hkey_i_dirname = os.path.dirname(hkey_i)
+              if hkey_i_dirname: hkey_i_dirname += '/'
+   
+              if not (('HLT_' in hkey_i_dirname) and ('Jet' in hkey_i_dirname)):
+                 continue
+   
+              hkey_i_num = hkey_i
+              hkey_i_den = 'NoSelection/'+hkey_i_basename
+   
+              if hkey_i_num not in histograms: KILL(log_prx+'AAA2 '+hkey_i_num)
+              if hkey_i_den not in histograms: KILL(log_prx+'BBB2 '+hkey_i_den)
+   
+              tmp_hnum = histograms[hkey_i_num]
+              tmp_hden = histograms[hkey_i_den]
+   
+              if not tmp_hnum.InheritsFrom('TH2'): KILL(log_prx+'AAA3 '+hkey_i_num)
+              if not tmp_hden.InheritsFrom('TH2'): KILL(log_prx+'BBB3 '+hkey_i_den)
+   
+              tmp_hnum0 = tmp_hnum.ProjectionY('tmp_hnum0')
+              tmp_hden0 = tmp_hden.ProjectionY('tmp_hden0')
+   
+              tmp_effname = hkey_i_num.replace(opts.separator_2d, '_')+'_eff'
+   
+              if tmp_effname in histograms: KILL(log_prx+'CCC2 '+tmp_effname)
+   
+              histograms[tmp_effname] = get_efficiency_graph(tmp_hnum0, tmp_hden0)
+          ### -------------------
 
        ### output file -------
        output_file = None
