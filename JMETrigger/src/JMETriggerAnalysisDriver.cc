@@ -98,13 +98,14 @@ void JMETriggerAnalysisDriver::init(){
 
     // histograms: AK4 Jets
     bookHistograms_Jets(selLabel, "ak4GenJetsNoNu", {
-      "Calo", "CaloCorr", "PF", "PFCorr",
+      "Calo", "CaloCorr", "PFCluster", "PF", "PFCorr",
       "PFCHSv1", "PFCHSv1Corr", "PFCHSv2", "PFCHSv2Corr",
       "PuppiV1", "PuppiV1Corr", "PuppiV3", "PuppiV3Corr",
       "Offline",
     });
     bookHistograms_Jets(selLabel, "hltAK4CaloJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4CaloJetsCorrected", {"GEN", "Offline"});
+    bookHistograms_Jets(selLabel, "hltAK4PFClusterJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4PFJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK4PFJetsCorrected", {"GEN", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK4PFCHSv1Jets", {"GEN"});
@@ -120,13 +121,14 @@ void JMETriggerAnalysisDriver::init(){
 
     // histograms: AK8 Jets
     bookHistograms_Jets(selLabel, "ak8GenJetsNoNu", {
-      "Calo", "CaloCorr", "PF", "PFCorr",
+      "Calo", "CaloCorr", "PFCluster", "PF", "PFCorr",
       "PFCHSv1", "PFCHSv1Corr", "PFCHSv2", "PFCHSv2Corr",
       "PuppiV1", "PuppiV1Corr", "PuppiV3", "PuppiV3Corr",
       "Offline",
     });
     bookHistograms_Jets(selLabel, "hltAK8CaloJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8CaloJetsCorrected", {"GEN", "Offline"});
+    bookHistograms_Jets(selLabel, "hltAK8PFClusterJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8PFJets", {"GEN"});
     bookHistograms_Jets(selLabel, "hltAK8PFJetsCorrected", {"GEN", "Offline"});
     bookHistograms_Jets(selLabel, "hltAK8PFCHSv1Jets", {"GEN"});
@@ -144,6 +146,7 @@ void JMETriggerAnalysisDriver::init(){
     bookHistograms_MET(selLabel, "genMETTrue");
 
     bookHistograms_MET(selLabel, "hltCaloMET", {"GEN"});
+    bookHistograms_MET(selLabel, "hltPFClusterMET", {"GEN"});
 
     bookHistograms_MET(selLabel, "hltPFMET", {"GEN", "Offline"});
     bookHistograms_MET(selLabel, "hltPFMETNoMu", {"GEN"});
@@ -187,6 +190,7 @@ void JMETriggerAnalysisDriver::analyze(){
   fhDataAK4GEN.jetPtMin = minAK4JetPt_GEN;
   fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("Calo", "hltAK4CaloJets", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
   fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("CaloCorr", "hltAK4CaloJetsCorrected", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
+  fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("PFCluster", "hltAK4PFClusterJets", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
   fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("PF", "hltAK4PFJets", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
   fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("PFCorr", "hltAK4PFJetsCorrected", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
   fhDataAK4GEN.matches.emplace_back(fillHistoDataJets::Match("PFCHSv1", "hltAK4PFCHSv1Jets", minAK4JetPt, maxAK4JetDeltaRmatch_GEN));
@@ -203,6 +207,7 @@ void JMETriggerAnalysisDriver::analyze(){
   for(std::string const& jetLabel : {
     "hltAK4CaloJets",
     "hltAK4CaloJetsCorrected",
+    "hltAK4PFClusterJets",
     "hltAK4PFJets",
     "hltAK4PFJetsCorrected",
     "hltAK4PFCHSv1Jets",
@@ -241,6 +246,7 @@ void JMETriggerAnalysisDriver::analyze(){
   fhDataAK8GEN.jetPtMin = minAK8JetPt_GEN;
   fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("Calo", "hltAK8CaloJets", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
   fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("CaloCorr", "hltAK8CaloJetsCorrected", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
+  fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("PFCluster", "hltAK8PFClusterJets", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
   fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("PF", "hltAK8PFJets", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
   fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("PFCorr", "hltAK8PFJetsCorrected", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
   fhDataAK8GEN.matches.emplace_back(fillHistoDataJets::Match("PFCHSv1", "hltAK8PFCHSv1Jets", minAK8JetPt, maxAK8JetDeltaRmatch_GEN));
@@ -257,6 +263,7 @@ void JMETriggerAnalysisDriver::analyze(){
   for(std::string const& jetLabel : {
     "hltAK8CaloJets",
     "hltAK8CaloJetsCorrected",
+    "hltAK8PFClusterJets",
     "hltAK8PFJets",
     "hltAK8PFJetsCorrected",
     "hltAK8PFCHSv1Jets",
@@ -296,6 +303,7 @@ void JMETriggerAnalysisDriver::analyze(){
   // wrt GEN MET Calo
   for(std::string const& metLabel : {
     "hltCaloMET",
+    "hltPFClusterMET",
     "hltPFMETNoMu",
     "hltPuppiV1METNoMu",
     "hltPuppiV2METNoMu",
