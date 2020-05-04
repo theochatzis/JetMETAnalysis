@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ ! -d ${JMEANA_BASE} ]; then
+  return
+fi
+
 export JMEANA_BASE="${PWD}"
 
 export PATH=${PATH}:${JMEANA_BASE}
