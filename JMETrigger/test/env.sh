@@ -1,6 +1,7 @@
 #!/bin/bash
 
-if [ ! -d ${JMEANA_BASE} ]; then
+if [ ! -z ${JMEANA_BASE} ]; then
+  echo "environment already set: JMEANA_BASE=${JMEANA_BASE}"
   return
 fi
 
