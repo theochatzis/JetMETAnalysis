@@ -18,7 +18,7 @@ inpdir=${JMEANA_BASE}/output_hltRun3_trkSingleIterWithPatatrack_v01
 outdir=plots_hltRun3_trkSingleIterWithPatatrack_v01
 
 samples=(
-#  Run3Winter20_QCD_Pt_15to3000_Flat_14TeV
+  Run3Winter20_QCD_Pt_15to3000_Flat_14TeV
   Run3Winter20_DYToLL_M50_14TeV
   Run3Winter20_VBF_HToInvisible_14TeV
 )
@@ -29,7 +29,7 @@ if [ ! -f ${outdirbase}.tar.gz ] && [ ! -d ${outdirbase} ]; then
 
   for sample in "${samples[@]}"; do
 
-    outd_i=${outdir}/run2_vs_singleIterWithPatatrack/${sample}
+    outd_i=${outdir}/${sample}
 
     opts_i=""
     if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m '*Jets*' '*MET_*' '*/offline*MET*_pt' -s '*MET*GEN*'"
@@ -38,46 +38,34 @@ if [ ! -f ${outdirbase}.tar.gz ] && [ ! -d ${outdirbase} ]; then
     elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-m '*MET_*' '*/offlineMETs*_pt'"
     fi
 
-#    dqmPlots_compareFiles.py -o ${outd_i}/dqm -l ${sample} -e pdf root -i \
-#      ${inpdir}/ntuples/HLT/${sample}.root:'Run-2':1:1:20 \
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p00/${sample}.root:'Patatrack+SingleIter [0.00] | ':2:1:24 \
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p01/${sample}.root:'Patatrack+SingleIter [0.01] | ':3:1:25 \
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p10/${sample}.root:'Patatrack+SingleIter [0.10] | ':4:1:26 \
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter [0.30] | ':5:1:27
-#
-#    if [ ${sample} == "Run3Winter20_QCD_Pt_15to3000_Flat_14TeV" ]; then
-#      dqmPlots_compareObjs.py -o ${outdir}/run2/${sample}/dqm_compareObjs -l ${sample} -e pdf root -i \
-#        ${inpdir}/ntuples/HLT/${sample}.root:'':1:1:20
-#
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p00/${sample}.root:'Patatrack+SingleIter [0.00] | ':2:1:24 \
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p01/${sample}.root:'Patatrack+SingleIter [0.01] | ':3:1:25 \
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p10/${sample}.root:'Patatrack+SingleIter [0.10] | ':4:1:26 \
-#      ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter [0.30] | ':5:1:27
-#
-#
-#      dqmPlots_compareFilesAndObjs.py -o ${outd_i}/dqm_compareObjs -l ${sample} -e pdf root -i \
-#        ${inpdir}/ntuples/HLT/${sample}.root:'Run-2':1:1:20 \
-#        ${inpdir}/ntuples/HLT_globalPixelTracks_v01/${sample}.root:'Patatrack PixTrk + Iter-0':2:2:24
-#    fi
-#
-#    jmePlots_compareFiles.py ${opts_i} -o ${outd_i}/jme -l ${sample} -e pdf root -i \
-#      ${inpdir}/harvesting/HLT/${sample}.root:'Run-2':1:1:20 \
-#      ${inpdir}/harvesting/HLT_globalPixelTracks_v01/${sample}.root:'Patatrack PixTrk + Iter-0':2:1:24
-#
-#    jmePlots_compareObjs.py ${opts_i} -o ${outdir}/run2/${sample}/jme_compareObjs -l ${sample} -e pdf root -i \
-#      ${inpdir}/harvesting/HLT/${sample}.root:'':1:1:20
-#
-#    jmePlots_compareFilesAndObjs.py ${opts_i} -o ${outd_i}/jme_compareObjs -l ${sample} -e pdf root -i \
-#      ${inpdir}/harvesting/HLT/${sample}.root:'Run-2':1:1:20 \
-#      ${inpdir}/harvesting/HLT_globalPixelTracks_v01/${sample}.root:'Patatrack PixTrk + Iter-0':2:2:24
+    if [ ${sample} == "Run3Winter20_QCD_Pt_15to3000_Flat_14TeV" ]; then
 
-    jmePlots_compareAll.py -k run3_jme_compareTRK \
-      ${opts_i} -o ${outd_i}/jme_compareObjs -l ${sample} -e pdf root -i \
+      jmePlots.py -k run3_dqm_compareTRK1 \
+        -o ${outd_i}/dqm_compareTRK1 -l ${sample} -e pdf root -i \
+        ${inpdir}/ntuples/HLT/${sample}.root:'Run-2':1:1:20 \
+        ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter':2:2:24
+
+      jmePlots.py -k run3_dqm_compareTRK5 \
+        -o ${outd_i}/dqm_compareTRK5 -l ${sample} -e pdf root -i \
+        ${inpdir}/ntuples/HLT/${sample}.root:'Run-2':921:1:20 \
+        ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p00/${sample}.root:'Patatrack+SingleIter, F=0.00':600:1:24 \
+        ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p01/${sample}.root:'Patatrack+SingleIter, F=0.01':880:1:25 \
+        ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p10/${sample}.root:'Patatrack+SingleIter, F=0.10':801:1:26 \
+        ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter, F=0.30':632:1:27
+    fi
+
+    jmePlots.py -k run3_jme_compareTRK1 ${opts_i} \
+      -o ${outd_i}/jme_compareTRK1 -l ${sample} -e pdf root -i \
       ${inpdir}/harvesting/HLT/${sample}.root:'Run-2':1:1:20 \
-      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p00/${sample}.root:'Patatrack+SingleIter, F=0.00':2:1:24 \
-      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p01/${sample}.root:'Patatrack+SingleIter, F=0.01':3:1:25 \
-      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p10/${sample}.root:'Patatrack+SingleIter, F=0.10':4:1:26 \
-      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter, F=0.30':5:1:27
+      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter':2:2:24
+
+    jmePlots.py -k run3_jme_compareTRK5 ${opts_i} \
+      -o ${outd_i}/jme_compareTRK5 -l ${sample} -e pdf root -i \
+      ${inpdir}/harvesting/HLT/${sample}.root:'Run-2':921:1:20 \
+      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p00/${sample}.root:'Patatrack+SingleIter, F=0.00':600:1:24 \
+      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p01/${sample}.root:'Patatrack+SingleIter, F=0.01':880:1:25 \
+      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p10/${sample}.root:'Patatrack+SingleIter, F=0.10':801:1:26 \
+      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter, F=0.30':632:1:27
 
     unset -v outd_i opts_i
   done
