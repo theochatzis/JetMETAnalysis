@@ -151,6 +151,7 @@ void JMETriggerAnalysisDriver::init(){
     bookHistograms_MET(selLabel, "hltPFMET", {"GEN", "Offline"});
     bookHistograms_MET(selLabel, "hltPFMETNoMu", {"GEN"});
 
+    bookHistograms_MET(selLabel, "hltPFSoftKillerMET", {"GEN"});
     bookHistograms_MET(selLabel, "hltPFCHSv1MET", {"GEN"});
     bookHistograms_MET(selLabel, "hltPFCHSv2MET", {"GEN"});
 
@@ -318,6 +319,7 @@ void JMETriggerAnalysisDriver::analyze(){
 
   // wrt GEN MET
   for(std::string const& metLabel : {
+    "hltPFSoftKillerMET",
     "hltPFCHSv1MET",
     "hltPFCHSv2MET",
     "offlinePFMET_Raw",
@@ -498,6 +500,10 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
   std::vector<float> binEdges_sumEt(121);
   for(uint idx=0; idx<121; ++idx){ binEdges_sumEt.at(idx) = 50.*idx; }
 
+  const std::vector<float> binEdges_offlineNPV(
+    {0, 10, 15, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 65, 70, 80, 100, 120, 140}
+  );
+
   addTH1D(dirPrefix+metType+"_pt", binEdges_pt);
   addTH1D(dirPrefix+metType+"_phi", binEdges_phi);
   addTH1D(dirPrefix+metType+"_sumEt", binEdges_sumEt);
@@ -531,26 +537,32 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
     addTH2D(dirPrefix+metType+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
     addTH2D(dirPrefix+metType+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_phi", binEdges_response, binEdges_phi);
     addTH2D(dirPrefix+metType+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt", binEdges_response, binEdges_sumEt);
+    addTH2D(dirPrefix+metType+"_pt_over"+matchLabel+"__vs__offlineNPV", binEdges_response, binEdges_offlineNPV);
 
     addTH2D(dirPrefix+metType+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_deltaPhi, binEdges_pt);
     addTH2D(dirPrefix+metType+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_phi", binEdges_deltaPhi, binEdges_phi);
     addTH2D(dirPrefix+metType+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_sumEt", binEdges_deltaPhi, binEdges_sumEt);
+    addTH2D(dirPrefix+metType+"_deltaPhi"+matchLabel+"__vs__offlineNPV", binEdges_deltaPhi, binEdges_offlineNPV);
 
     addTH2D(dirPrefix+metType+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_response, binEdges_pt);
     addTH2D(dirPrefix+metType+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_phi", binEdges_response, binEdges_phi);
     addTH2D(dirPrefix+metType+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt", binEdges_response, binEdges_sumEt);
+    addTH2D(dirPrefix+metType+"_sumEt_over"+matchLabel+"__vs__offlineNPV", binEdges_response, binEdges_offlineNPV);
 
     addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_deltaPt, binEdges_pt);
     addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_phi", binEdges_deltaPt, binEdges_phi);
     addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_sumEt", binEdges_deltaPt, binEdges_sumEt);
+    addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"__vs__offlineNPV", binEdges_deltaPt, binEdges_offlineNPV);
 
     addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_deltaPt, binEdges_pt);
     addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_phi", binEdges_deltaPt, binEdges_phi);
     addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_sumEt", binEdges_deltaPt, binEdges_sumEt);
+    addTH2D(dirPrefix+metType+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__offlineNPV", binEdges_deltaPt, binEdges_offlineNPV);
 
     addTH2D(dirPrefix+metType+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_pt", binEdges_deltaPt, binEdges_pt);
     addTH2D(dirPrefix+metType+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_phi", binEdges_deltaPt, binEdges_phi);
     addTH2D(dirPrefix+metType+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_sumEt", binEdges_deltaPt, binEdges_sumEt);
+    addTH2D(dirPrefix+metType+"_pt_perpTo"+matchLabel+"__vs__offlineNPV", binEdges_deltaPt, binEdges_offlineNPV);
   }
 }
 
@@ -783,6 +795,10 @@ void JMETriggerAnalysisDriver::fillHistograms_MET(const std::string& dir, const 
   auto const* v_phi(this->vector_ptr<float>(fhData.metCollection+"_phi"));
   auto const* v_sumEt(this->vector_ptr<float>(fhData.metCollection+"_sumEt"));
 
+  uint offlineNPV(0);
+  auto const* v_offlinePV_z(this->vector_ptr<float>("offlinePrimaryVertices_z"));
+  if(v_offlinePV_z){ offlineNPV = v_offlinePV_z->size(); }
+
   if(not (v_pt and v_phi and v_sumEt)){
     if(verbosity_ >= 0){
       std::cout << "JMETriggerAnalysisDriver::fillHistograms_MET(\"" << dir << "\", const fillHistoDataMET&) -- "
@@ -847,6 +863,7 @@ void JMETriggerAnalysisDriver::fillHistograms_MET(const std::string& dir, const 
       H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metPtRatio, metMatchPt);
       H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metPtRatio, metMatchPhi);
       H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metPtRatio, metMatchSumEt);
+      H2(dirPrefix+fhData.metCollection+"_pt_over"+matchLabel+"__vs__offlineNPV")->Fill(metPtRatio, offlineNPV);
     }
 
     if(metMatchSumEt != 0.){
@@ -856,6 +873,7 @@ void JMETriggerAnalysisDriver::fillHistograms_MET(const std::string& dir, const 
       H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metSumEtRatio, metMatchPt);
       H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metSumEtRatio, metMatchPhi);
       H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metSumEtRatio, metMatchSumEt);
+      H2(dirPrefix+fhData.metCollection+"_sumEt_over"+matchLabel+"__vs__offlineNPV")->Fill(metSumEtRatio, offlineNPV);
     }
 
     auto const metDeltaPhiMatch(utils::deltaPhi(metPhi, metMatchPhi));
@@ -864,23 +882,27 @@ void JMETriggerAnalysisDriver::fillHistograms_MET(const std::string& dir, const 
     H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metDeltaPhiMatch, metMatchPt);
     H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metDeltaPhiMatch, metMatchPhi);
     H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metDeltaPhiMatch, metMatchSumEt);
+    H2(dirPrefix+fhData.metCollection+"_deltaPhi"+matchLabel+"__vs__offlineNPV")->Fill(metDeltaPhiMatch, offlineNPV);
 
     auto const metParaToMatch(metPt*(std::cos(metPhi)*std::cos(metMatchPhi) + std::sin(metPhi)*std::sin(metMatchPhi)));
     H1(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel)->Fill(metParaToMatch);
     H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metParaToMatch, metMatchPt);
     H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metParaToMatch, metMatchPhi);
     H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metParaToMatch, metMatchSumEt);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"__vs__offlineNPV")->Fill(metParaToMatch, offlineNPV);
 
     auto const metParaToMatchMinusMatch(metParaToMatch - metMatchPt);
     H1(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel)->Fill(metParaToMatchMinusMatch);
     H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metParaToMatchMinusMatch, metMatchPt);
     H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metParaToMatchMinusMatch, metMatchPhi);
     H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metParaToMatchMinusMatch, metMatchSumEt);
+    H2(dirPrefix+fhData.metCollection+"_pt_paraTo"+matchLabel+"Minus"+matchLabel+"__vs__offlineNPV")->Fill(metParaToMatchMinusMatch, offlineNPV);
 
     auto const metPerpToMatch(metPt*(std::cos(metPhi)*std::sin(metMatchPhi) - std::sin(metPhi)*std::cos(metMatchPhi)));
     H1(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel)->Fill(metPerpToMatch);
     H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(metPerpToMatch, metMatchPt);
     H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_phi")->Fill(metPerpToMatch, metMatchPhi);
     H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__"+matchLabel+"_sumEt")->Fill(metPerpToMatch, metMatchSumEt);
+    H2(dirPrefix+fhData.metCollection+"_pt_perpTo"+matchLabel+"__vs__offlineNPV")->Fill(metPerpToMatch, offlineNPV);
   }
 }
