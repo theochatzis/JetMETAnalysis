@@ -203,11 +203,11 @@ if __name__ == '__main__':
                   del _htmp
    
               histograms[h_name1] = tmp_h1_xRMS
-   
-              # RMS of X divided by Mean of X, in bins of Y
+
+              # RMS of X divided by Mean Response, in bins of Y
               h_name2 = i_h2_key_dirname+key_varX+'_RMSOverMean_wrt_'+key_varY
               if h_name2 in histograms: KILL('aaa4 '+h_name2)
-   
+
               h_name4 = i_h2_key_dirname+key_varX[:key_varX.rfind('_')]+'_over'+compTag+'_Mean_wrt_'+key_varY
               if h_name4 not in histograms:
                  if opts.verbose:

@@ -40,8 +40,8 @@ if [ ! -f ${outdirbase}.tar.gz ] && [ ! -d ${outdirbase} ]; then
 
     if [ ${sample} == "Run3Winter20_QCD_Pt_15to3000_Flat_14TeV" ]; then
 
-      jmePlots.py -k run3_dqm_compareTRK1 \
-        -o ${outd_i}/dqm_compareTRK1 -l ${sample} -e pdf root -i \
+      jmePlots.py -k run3_dqm_compareTRK2 \
+        -o ${outd_i}/dqm_compareTRK2 -l ${sample} -e pdf root -i \
         ${inpdir}/ntuples/HLT/${sample}.root:'Run-2':1:1:20 \
         ${inpdir}/ntuples/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter':2:2:24
 
@@ -55,7 +55,11 @@ if [ ! -f ${outdirbase}.tar.gz ] && [ ! -d ${outdirbase} ]; then
     fi
 
     jmePlots.py -k run3_jme_compareTRK1 ${opts_i} \
-      -o ${outd_i}/jme_compareTRK1 -l ${sample} -e pdf root -i \
+      -o ${outd_i}/jme_compareTRK1_trkSingleIter -l ${sample} -e pdf root -i \
+      ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter':1:1:20
+
+    jmePlots.py -k run3_jme_compareTRK2 ${opts_i} \
+      -o ${outd_i}/jme_compareTRK2 -l ${sample} -e pdf root -i \
       ${inpdir}/harvesting/HLT/${sample}.root:'Run-2':1:1:20 \
       ${inpdir}/harvesting/HLT_singleTrkIterWithPatatrack_v01_pixVtxFrac0p30/${sample}.root:'Patatrack+SingleIter':2:2:24
 
