@@ -510,11 +510,11 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
     elif '_pt_paraToOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl}) [GeV]'
 
     elif '_pt_paraToGENMinusGEN_Mean_' in key: _titleY = '#LTp_{T}^{#parallel GEN} - p_{T}^{GEN}#GT [GeV]'
-    elif '_pt_paraToGENMinusGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_paraToGENMinusGEN_RMSOverMean_' in key: _titleY = '#sigma(#Deltap_{T}^{#parallel GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
     elif '_pt_paraToGENMinusGEN_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) [GeV]'
 
     elif '_pt_paraToOfflineMinusOffline_Mean_' in key: _titleY = '#LTp_{T}^{#parallel Offl} - p_{T}^{Offl}#GT [GeV]'
-    elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in key: _titleY = '#sigma(#Deltap_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
     elif '_pt_paraToOfflineMinusOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) [GeV]'
 
     elif '_pt_perpToGEN_Mean_' in key: _titleY = '#LTp_{T}^{#perp GEN}#GT [GeV]'
