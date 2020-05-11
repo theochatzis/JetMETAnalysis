@@ -180,10 +180,10 @@ void JMETriggerAnalysisDriver::analyze(){
 
   //// AK4 Jets
   const float minAK4JetPt(30.);
-  const float minAK4JetPt_GEN(25.);
-  const float minAK4JetPt_Offline(25.);
-  const float maxAK4JetDeltaRmatch_GEN(0.1);
-  const float maxAK4JetDeltaRmatch_Offline(0.1);
+  const float minAK4JetPt_GEN(20.);
+  const float minAK4JetPt_Offline(20.);
+  const float maxAK4JetDeltaRmatch_GEN(0.2);
+  const float maxAK4JetDeltaRmatch_Offline(0.2);
 
   // GEN
   fillHistoDataJets fhDataAK4GEN;
@@ -236,10 +236,10 @@ void JMETriggerAnalysisDriver::analyze(){
 
   //// AK8 Jets
   const float minAK8JetPt(90.);
-  const float minAK8JetPt_GEN(75.);
-  const float minAK8JetPt_Offline(75.);
-  const float maxAK8JetDeltaRmatch_GEN(0.1);
-  const float maxAK8JetDeltaRmatch_Offline(0.1);
+  const float minAK8JetPt_GEN(60.);
+  const float minAK8JetPt_Offline(60.);
+  const float maxAK8JetDeltaRmatch_GEN(0.2);
+  const float maxAK8JetDeltaRmatch_Offline(0.2);
 
   // AK8 GEN
   fillHistoDataJets fhDataAK8GEN;
