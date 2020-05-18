@@ -13,8 +13,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-inpdir=${JMEANA_BASE}/output_hltRun3_trkSingleIterWithPatatrack_v01
-outdir=plots_hltRun3_trkSingleIterWithPatatrack_v01
+inpdir=${JMEANA_BASE}/output_hltRun3_trkSingleIterWithPatatrack_v02
+outdir=plots_hltRun3_trkSingleIterWithPatatrack_v02
 
 samples=(
   Run3Winter20_QCD_Pt_15to3000_Flat_14TeV
