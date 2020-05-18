@@ -822,21 +822,21 @@ def getPlotConfig(key, keyword, inputList):
          for idx, inp in enumerate(inputList):
            legTag = ' [ '+inp['Legend']+' ]'
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_offlineParticleFlow'), Legend='Offline PF', Color=ROOT.kPink+1) if idx==0 else None]
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_hltParticleFlow')    , Legend='hltParticleFlow'+legTag)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='hltParticleFlow'+legTag)]
 
        elif '_hltPuppiV1' in key:
          cfg.legXY = [0.55, 0.60, 0.99, 0.99]
          for idx, inp in enumerate(inputList):
            legTag = ' [ '+inp['Legend']+' ]'
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltPuppiV1', '_offlineParticleFlow'), Legend='Offline PF', Color=ROOT.kPink+1) if idx==0 else None]
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltPuppiV1', '_hltPuppiV1')         , Legend='hltPuppiV1'+legTag)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='hltPuppiV1'+legTag)]
 
        elif '_hltPuppiV3' in key:
          cfg.legXY = [0.55, 0.60, 0.99, 0.99]
          for idx, inp in enumerate(inputList):
            legTag = ' [ '+inp['Legend']+' ]'
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltPuppiV3', '_offlineParticleFlow'), Legend='Offline PF', Color=ROOT.kPink+1) if idx==0 else None]
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltPuppiV3', '_hltPuppiV3')         , Legend='hltPuppiV3'+legTag)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='hltPuppiV3'+legTag)]
 
        elif '_hltVerticesPF' in key:
          cfg.legXY = [0.45, 0.70, 0.99, 0.99]
@@ -844,13 +844,13 @@ def getPlotConfig(key, keyword, inputList):
            legTag = ' [ '+inp['Legend']+' ]'
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltVerticesPF', '_offlineSlimmedPrimaryVertices'), Legend='offlinePrimaryVertices', Color=ROOT.kBlack) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltVerticesPF', '_hltPixelVertices'), Legend='hltPixelVertices'+legTag, Color=ROOT.kOrange+2) if idx==0 else None]
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltVerticesPF', '_hltVerticesPF'), Legend='hltVerticesPF'+legTag)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='hltVerticesPF'+legTag)]
 
        elif '_hltMergedTracks' in key:
          cfg.legXY = [0.45, 0.70, 0.99, 0.99]
          for idx, inp in enumerate(inputList):
            legTag = ' [ '+inp['Legend']+' ]'
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltMergedTracks', '_hltMergedTracks'), Legend='hltMergedTracks'+legTag)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='hltMergedTracks'+legTag, Color=ROOT.kBlack) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltMergedTracks', '_hltIter0PFlowTrackSelectionHighPurity'), Legend='hltIter0PFlowTrackSelectionHighPurity'+legTag)]
 
     ##
