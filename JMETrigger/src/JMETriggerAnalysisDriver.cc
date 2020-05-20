@@ -579,6 +579,18 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
 
   auto const* v_numberOfDaughters(this->vector_ptr<uint>(fhData.jetCollection+"_numberOfDaughters"));
 
+  auto const* v_chargedHadronMultiplicity(this->vector_ptr<int>(fhData.jetCollection+"_chargedHadronMultiplicity"));
+  auto const* v_neutralHadronMultiplicity(this->vector_ptr<int>(fhData.jetCollection+"_neutralHadronMultiplicity"));
+  auto const* v_electronMultiplicity(this->vector_ptr<int>(fhData.jetCollection+"_electronMultiplicity"));
+  auto const* v_photonMultiplicity(this->vector_ptr<int>(fhData.jetCollection+"_photonMultiplicity"));
+  auto const* v_muonMultiplicity(this->vector_ptr<int>(fhData.jetCollection+"_muonMultiplicity"));
+
+  auto const* v_chargedHadronEnergyFraction(this->vector_ptr<float>(fhData.jetCollection+"_chargedHadronEnergyFraction"));
+  auto const* v_neutralHadronEnergyFraction(this->vector_ptr<float>(fhData.jetCollection+"_neutralHadronEnergyFraction"));
+  auto const* v_electronEnergyFraction(this->vector_ptr<float>(fhData.jetCollection+"_electronEnergyFraction"));
+  auto const* v_photonEnergyFraction(this->vector_ptr<float>(fhData.jetCollection+"_photonEnergyFraction"));
+  auto const* v_muonEnergyFraction(this->vector_ptr<float>(fhData.jetCollection+"_muonEnergyFraction"));
+
   if(not (v_pt and v_eta and v_phi and v_mass)){
     if(verbosity_ >= 0){
       std::cout << "JMETriggerAnalysisDriver::fillHistograms_Jets(\"" << dir << "\", const fillHistoDataJets&) -- "
@@ -613,9 +625,17 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
       H1(dirPrefix+fhData.jetCollection+catLabel+"_phi")->Fill(v_phi->at(jetIdx));
       H1(dirPrefix+fhData.jetCollection+catLabel+"_mass")->Fill(v_mass->at(jetIdx));
 
-      if(v_numberOfDaughters){
-        H1(dirPrefix+fhData.jetCollection+catLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
-      }
+      if(v_numberOfDaughters          ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_numberOfDaughters"          )->Fill(v_numberOfDaughters          ->at(jetIdx)); }
+      if(v_chargedHadronMultiplicity  ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_chargedHadronMultiplicity"  )->Fill(v_chargedHadronMultiplicity  ->at(jetIdx)); }
+      if(v_neutralHadronMultiplicity  ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_neutralHadronMultiplicity"  )->Fill(v_neutralHadronMultiplicity  ->at(jetIdx)); }
+      if(v_electronMultiplicity       ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_electronMultiplicity"       )->Fill(v_electronMultiplicity       ->at(jetIdx)); }
+      if(v_photonMultiplicity         ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_photonMultiplicity"         )->Fill(v_photonMultiplicity         ->at(jetIdx)); }
+      if(v_muonMultiplicity           ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_muonMultiplicity"           )->Fill(v_muonMultiplicity           ->at(jetIdx)); }
+      if(v_chargedHadronEnergyFraction){ H1(dirPrefix+fhData.jetCollection+catLabel+"_chargedHadronEnergyFraction")->Fill(v_chargedHadronEnergyFraction->at(jetIdx)); }
+      if(v_neutralHadronEnergyFraction){ H1(dirPrefix+fhData.jetCollection+catLabel+"_neutralHadronEnergyFraction")->Fill(v_neutralHadronEnergyFraction->at(jetIdx)); }
+      if(v_electronEnergyFraction     ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_electronEnergyFraction"     )->Fill(v_electronEnergyFraction     ->at(jetIdx)); }
+      if(v_photonEnergyFraction       ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_photonEnergyFraction"       )->Fill(v_photonEnergyFraction       ->at(jetIdx)); }
+      if(v_muonEnergyFraction         ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_muonEnergyFraction"         )->Fill(v_muonEnergyFraction         ->at(jetIdx)); }
     }
 
     H1(dirPrefix+fhData.jetCollection+catLabel+"_njets")->Fill(0.01 + jetIndices.size());
@@ -707,11 +727,20 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
           H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass")->Fill(jetMass);
 
-          if(v_numberOfDaughters){
-            H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
-          }
+          if(v_numberOfDaughters          ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_numberOfDaughters"          )->Fill(v_numberOfDaughters->at(jetIdx)); }
+          if(v_chargedHadronMultiplicity  ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_chargedHadronMultiplicity"  )->Fill(v_chargedHadronMultiplicity->at(jetIdx)); }
+          if(v_neutralHadronMultiplicity  ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_neutralHadronMultiplicity"  )->Fill(v_neutralHadronMultiplicity->at(jetIdx)); }
+          if(v_electronMultiplicity       ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_electronMultiplicity"       )->Fill(v_electronMultiplicity->at(jetIdx)); }
+          if(v_photonMultiplicity         ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_photonMultiplicity"         )->Fill(v_photonMultiplicity->at(jetIdx)); }
+          if(v_muonMultiplicity           ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_muonMultiplicity"           )->Fill(v_muonMultiplicity->at(jetIdx)); }
+          if(v_chargedHadronEnergyFraction){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_chargedHadronEnergyFraction")->Fill(v_chargedHadronEnergyFraction->at(jetIdx)); }
+          if(v_neutralHadronEnergyFraction){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_neutralHadronEnergyFraction")->Fill(v_neutralHadronEnergyFraction->at(jetIdx)); }
+          if(v_electronEnergyFraction     ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_electronEnergyFraction"     )->Fill(v_electronEnergyFraction->at(jetIdx)); }
+          if(v_photonEnergyFraction       ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_photonEnergyFraction"       )->Fill(v_photonEnergyFraction->at(jetIdx)); }
+          if(v_muonEnergyFraction         ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_muonEnergyFraction"         )->Fill(v_muonEnergyFraction->at(jetIdx)); }
 
           auto const jetMatchIdx(mapMatchIndeces.at(jetIdx));
+
           auto const jetMatchPt(v_match_pt->at(jetMatchIdx));
           auto const jetMatchEta(v_match_eta->at(jetMatchIdx));
           auto const jetMatchPhi(v_match_phi->at(jetMatchIdx));
@@ -753,9 +782,17 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
           H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_phi")->Fill(jetPhi);
           H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_mass")->Fill(jetMass);
 
-          if(v_numberOfDaughters){
-            H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters")->Fill(v_numberOfDaughters->at(jetIdx));
-          }
+          if(v_numberOfDaughters          ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_numberOfDaughters"          )->Fill(v_numberOfDaughters          ->at(jetIdx)); }
+          if(v_chargedHadronMultiplicity  ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_chargedHadronMultiplicity"  )->Fill(v_chargedHadronMultiplicity  ->at(jetIdx)); }
+          if(v_neutralHadronMultiplicity  ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_neutralHadronMultiplicity"  )->Fill(v_neutralHadronMultiplicity  ->at(jetIdx)); }
+          if(v_electronMultiplicity       ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_electronMultiplicity"       )->Fill(v_electronMultiplicity       ->at(jetIdx)); }
+          if(v_photonMultiplicity         ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_photonMultiplicity"         )->Fill(v_photonMultiplicity         ->at(jetIdx)); }
+          if(v_muonMultiplicity           ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_muonMultiplicity"           )->Fill(v_muonMultiplicity           ->at(jetIdx)); }
+          if(v_chargedHadronEnergyFraction){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_chargedHadronEnergyFraction")->Fill(v_chargedHadronEnergyFraction->at(jetIdx)); }
+          if(v_neutralHadronEnergyFraction){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_neutralHadronEnergyFraction")->Fill(v_neutralHadronEnergyFraction->at(jetIdx)); }
+          if(v_electronEnergyFraction     ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_electronEnergyFraction"     )->Fill(v_electronEnergyFraction     ->at(jetIdx)); }
+          if(v_photonEnergyFraction       ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_photonEnergyFraction"       )->Fill(v_photonEnergyFraction       ->at(jetIdx)); }
+          if(v_muonEnergyFraction         ){ H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_muonEnergyFraction"         )->Fill(v_muonEnergyFraction         ->at(jetIdx)); }
         }
       }
 
