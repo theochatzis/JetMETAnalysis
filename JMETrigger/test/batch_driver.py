@@ -99,13 +99,13 @@ if __name__ == '__main__':
    which('python')
 
    if 'SCRAM_ARCH' not in os.environ:
-      KILL(log_prc+'environment variable "SCRAM_ARCH" not defined (please set up CMSSW area)')
+      KILL(log_prx+'environment variable "SCRAM_ARCH" not defined (please set up CMSSW area)')
 
    is_slc7_arch = False
    if os.environ['SCRAM_ARCH'].startswith('slc7'): is_slc7_arch = True
    elif os.environ['SCRAM_ARCH'].startswith('slc6'): pass
    else:
-      KILL(log_prc+'could not infer architecture from environment variable "SCRAM_ARCH" (script needs to be updated): '+str(os.environ['SCRAM_ARCH']))
+      KILL(log_prx+'could not infer architecture from environment variable "SCRAM_ARCH" (script needs to be updated): '+str(os.environ['SCRAM_ARCH']))
    ### ----------------
 
    ### output ---------
