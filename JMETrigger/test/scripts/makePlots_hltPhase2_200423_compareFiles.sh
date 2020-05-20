@@ -20,8 +20,8 @@ outdir=plots_hltPhase2_200429_v01
 samples=(
   Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
   Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200
-#  Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU
-#  Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
+  Phase2HLTTDR_VBF_HToInvisible_14TeV_NoPU
+  Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200
 )
 
 recos=(
