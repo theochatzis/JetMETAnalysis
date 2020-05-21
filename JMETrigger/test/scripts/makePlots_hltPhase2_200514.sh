@@ -72,16 +72,16 @@ for sample in "${samples[@]}"; do
   fi
 
   jmePlots.py -k phase2_jme_compareTRK2 ${opts_i} \
-    -o ${outd_i}/jme_compareTRK2 -l ${sample} -e pdf root png -i \
+    -o ${outd_i}/jme_compareTRK2_TICL -l ${sample} -e pdf root png -i \
     ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRK v6 + TICL':1:1:20 \
     ${inpdir}/harvesting/HLT_TRKv06_TICL_skimmedTracks/${sample}.root:'TRK v6 + skimTrk + TICL':1:2:24
 
   jmePlots.py -k phase2_jme_compareTRK5 ${opts_i} \
     -o ${outd_i}/jme_compareTRK5 -l ${sample} -e pdf root png -i \
-    ${inpdir}/harvesting/HLT_TRKv00/${sample}.root:'TRK v0 + TICL':921:1:20 \
-    ${inpdir}/harvesting/HLT_TRKv02/${sample}.root:'TRK v2 + TICL':600:1:24 \
-    ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRK v6 + TICL':880:1:25 \
-    ${inpdir}/harvesting/HLT_TRKv06_skimmedTracks/${sample}.root:'TRK v6 + skimTrk + TICL':801:1:26
+    ${inpdir}/harvesting/HLT_TRKv00/${sample}.root:'TRK v0':921:1:20 \
+    ${inpdir}/harvesting/HLT_TRKv02/${sample}.root:'TRK v2':600:1:24 \
+    ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRK v6':880:1:25 \
+    ${inpdir}/harvesting/HLT_TRKv06_skimmedTracks/${sample}.root:'TRK v6 + skimTrk':801:1:26
 
   jmePlots.py -k phase2_jme_compareTRK5 ${opts_i} \
     -o ${outd_i}/jme_compareTRK5_TICL -l ${sample} -e pdf root png -i \
