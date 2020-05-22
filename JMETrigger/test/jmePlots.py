@@ -3,6 +3,7 @@ from __future__ import print_function
 import argparse
 import os
 import fnmatch
+import math
 import ROOT
 
 from common.utils import *
@@ -173,6 +174,7 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
           h0.GetXaxis().SetLabelSize(xLabelSize)
 
        if xBinLabels:
+          xBinLabels = xBinLabels[int(round(XMIN)):int(round(XMAX))]
           h0.GetXaxis().Set(len(xBinLabels), XMIN, XMAX)
           for tmpIdx, tmpLab in enumerate(xBinLabels):
               h0.GetXaxis().SetBinLabel(tmpIdx+1, tmpLab)
@@ -320,6 +322,7 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
           h21.GetXaxis().SetLabelSize(xLabelSize)
 
        if xBinLabels:
+          xBinLabels = xBinLabels[int(round(XMIN)):int(round(XMAX))]
           h21.GetXaxis().Set(len(xBinLabels), XMIN, XMAX)
           for tmpIdx, tmpLab in enumerate(xBinLabels):
               h21.GetXaxis().SetBinLabel(tmpIdx+1, tmpLab)
