@@ -1246,17 +1246,17 @@ def getPlotConfig(key, keyword, inputList):
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4CaloJets_')     , Legend='Calo'     , Color=ROOT.kGray+1)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PFClusterJets_'), Legend='PFCluster', Color=ROOT.kOrange+2)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PFJets_')       , Legend='PF'       , Color=ROOT.kBlack)]
-         del baseColl, legTag
+         del baseColl
 
        elif 'hltAK4PFJetsCorrected_' in key:
          baseColl = 'hltAK4PFJetsCorrected'
          cfg.objLabel = cfg.objLabel.replace(baseColl, 'AK4JetsCorrected [ '+inputList[0]['Legend']+' ]')
          for idx, inp in enumerate(inputList):
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK4PuppiJetsCorrected_'), Legend='Offline', Color=ROOT.kPink+1)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK4PuppiJetsCorrected_'), Legend='Offline (Puppi)', Color=ROOT.kPink+1)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PFJetsCorrected_')       , Legend='PF'   , Color=ROOT.kBlack)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PFCHSJetsCorrected_')    , Legend='CHS'  , Color=ROOT.kBlue)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PuppiJetsCorrected_')    , Legend='Puppi', Color=ROOT.kRed)]
-         del baseColl, legTag
+         del baseColl
 
        elif 'hltAK8PFJets_' in key:
          baseColl = 'hltAK8PFJets'
@@ -1265,17 +1265,17 @@ def getPlotConfig(key, keyword, inputList):
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8CaloJets_')     , Legend='Calo'     , Color=ROOT.kGray+1)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PFClusterJets_'), Legend='PFCluster', Color=ROOT.kOrange+2)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PFJets_')       , Legend='PF'       , Color=ROOT.kBlack)]
-         del baseColl, legTag
+         del baseColl
 
        elif 'hltAK8PFJetsCorrected_' in key:
          baseColl = 'hltAK8PFJetsCorrected'
          cfg.objLabel = cfg.objLabel.replace(baseColl, 'AK8JetsCorrected [ '+inputList[0]['Legend']+' ]')
          for idx, inp in enumerate(inputList):
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK8PuppiJetsCorrected_'), Legend='Offline', Color=ROOT.kPink+1)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK8PuppiJetsCorrected_'), Legend='Offline (Puppi)', Color=ROOT.kPink+1)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PFJetsCorrected_')       , Legend='PF'   , Color=ROOT.kBlack)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PFCHSJetsCorrected_')    , Legend='CHS'  , Color=ROOT.kBlue)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PuppiJetsCorrected_')    , Legend='Puppi', Color=ROOT.kRed)]
-         del baseColl, legTag
+         del baseColl
 
        elif 'MatchedToPF_' in key:
          baseColl = 'PF'
@@ -1284,17 +1284,17 @@ def getPlotConfig(key, keyword, inputList):
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'Calo_')     , Legend='Calo'     , Color=ROOT.kGray+1)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PFCluster_'), Legend='PFCluster', Color=ROOT.kOrange+2)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PF_')       , Legend='PF'       , Color=ROOT.kBlack)]
-         del baseColl, legTag
+         del baseColl
 
        elif 'MatchedToPFCorr_' in key:
          baseColl = 'PFCorr'
          cfg.objLabel = cfg.objLabel.replace(baseColl, 'Reco(Corr) [ '+inputList[0]['Legend']+' ]')
          for idx, inp in enumerate(inputList):
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'OfflinePuppiCorr_'), Legend='Offline', Color=ROOT.kPink+1)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'OfflinePuppiCorr_'), Legend='Offline (Puppi)', Color=ROOT.kPink+1)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PFCorr_')   , Legend='PF'   , Color=ROOT.kBlack)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PFCHSCorr_'), Legend='CHS'  , Color=ROOT.kBlue)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PuppiCorr_'), Legend='Puppi', Color=ROOT.kRed)]
-         del baseColl, legTag
+         del baseColl
 
     ##
     ## keyword: phase2_jme_compareTRK2
@@ -1322,8 +1322,8 @@ def getPlotConfig(key, keyword, inputList):
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'hltPFClusterMET_')    , Legend='PFCluster'        , Color=ROOT.kOrange+2) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'hltPFMET_')           , Legend='PF'        +legTag, Color=ROOT.kBlack)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'hltPFSoftKillerMET_') , Legend='SoftKiller'+legTag, Color=ROOT.kViolet)]
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'hltPFCHSv1MET_')      , Legend='CHS'       +legTag, Color=ROOT.kBlue)]
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'hltPuppiV4MET_')      , Legend='Puppi'     +legTag, Color=ROOT.kRed)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'hltPFCHSMET_')        , Legend='CHS'       +legTag, Color=ROOT.kBlue)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'hltPuppiMET_')        , Legend='Puppi'     +legTag, Color=ROOT.kRed)]
 
        elif 'hltAK4PFJets_' in key:
          baseColl = 'hltAK4PFJets'
@@ -1340,7 +1340,7 @@ def getPlotConfig(key, keyword, inputList):
          cfg.objLabel = cfg.objLabel.replace(baseColl, 'AK4JetsCorrected')
          for idx, inp in enumerate(inputList):
            legTag = ' [ '+inp['Legend']+' ]'
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK4PuppiJetsCorrected_'), Legend='Offline'     , Color=ROOT.kPink+1) if idx==0 else None]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK4PuppiJetsCorrected_'), Legend='Offline (Puppi)', Color=ROOT.kPink+1) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PFJetsCorrected_')       , Legend='PF'   +legTag, Color=ROOT.kBlack)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PFCHSJetsCorrected_')    , Legend='CHS'  +legTag, Color=ROOT.kBlue)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK4PuppiJetsCorrected_')    , Legend='Puppi'+legTag, Color=ROOT.kRed)]
@@ -1361,7 +1361,7 @@ def getPlotConfig(key, keyword, inputList):
          cfg.objLabel = cfg.objLabel.replace(baseColl, 'AK8JetsCorrected')
          for idx, inp in enumerate(inputList):
            legTag = ' [ '+inp['Legend']+' ]'
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK8PuppiJetsCorrected_'), Legend='Offline'     , Color=ROOT.kPink+1) if idx==0 else None]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK8PuppiJetsCorrected_'), Legend='Offline (Puppi)', Color=ROOT.kPink+1) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PFJetsCorrected_')       , Legend='PF'   +legTag, Color=ROOT.kBlack)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PFCHSJetsCorrected_')    , Legend='CHS'  +legTag, Color=ROOT.kBlue)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'hltAK8PuppiJetsCorrected_')    , Legend='Puppi'+legTag, Color=ROOT.kRed)]
@@ -1382,7 +1382,7 @@ def getPlotConfig(key, keyword, inputList):
          cfg.objLabel = cfg.objLabel.replace(baseColl, 'Reco(Corr)')
          for idx, inp in enumerate(inputList):
            legTag = ' [ '+inp['Legend']+' ]'
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'OfflinePuppiCorr_'), Legend='Offline', Color=ROOT.kPink+1) if idx==0 else None]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'OfflinePuppiCorr_'), Legend='Offline (Puppi)' , Color=ROOT.kPink+1) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PFCorr_')          , Legend='PFCorr'   +legTag, Color=ROOT.kBlack)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PFCHSCorr_')       , Legend='PFCHSCorr'+legTag, Color=ROOT.kBlue)]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'PuppiCorr_')       , Legend='PuppiCorr'+legTag, Color=ROOT.kRed)]
@@ -1423,7 +1423,7 @@ def getPlotConfig(key, keyword, inputList):
 
        elif 'hltPFCHSMET_' in key:
           for idx, inp in enumerate(inputList):
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFCHSv1MET_', 'offlinePuppiMET_Raw_'), Legend='Offline (Puppi)', Color=ROOT.kBlack) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFCHSMET_', 'offlinePuppiMET_Raw_'), Legend='Offline (Puppi)', Color=ROOT.kBlack) if idx==0 else None]
             cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='CHS [ '+inp['Legend']+' ]')]
 
        elif 'hltPuppiMET_' in key:

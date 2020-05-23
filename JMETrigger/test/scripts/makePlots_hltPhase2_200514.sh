@@ -13,8 +13,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-inpdir=${JMEANA_BASE}/output_hltPhase2_200514_v01
-outdir=plots_hltPhase2_200514_v01
+inpdir=${JMEANA_BASE}/output_hltPhase2_200514_v02
+outdir=plots_hltPhase2_200514_v02
 
 samples=(
   Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
@@ -70,6 +70,10 @@ for sample in "${samples[@]}"; do
       ${inpdir}/ntuples/HLT_TRKv06_skimmedTracks/${sample}.root:'TRK v6 + skimTrk':1:1:20 \
       ${inpdir}/ntuples/HLT_TRKv06_TICL_skimmedTracks/${sample}.root:'TRK v6 + skimTrk + TICL':1:2:20
   fi
+
+  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
+    -o ${outd_i}/jme_TRKv6 -l ${sample} -e pdf root png -i \
+    ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRK v6':1:1:20 \
 
   jmePlots.py -k phase2_jme_compareTRK2 ${opts_i} \
     -o ${outd_i}/jme_compareTRK2_TICL -l ${sample} -e pdf root png -i \
