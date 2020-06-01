@@ -83,7 +83,7 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
           if _compressionLevel is None:
              KILL('merge_rootfiles -- logic error: could not determine CompressionLevel parameter from input files')
 
-          _merger = ROOT.TFileMerger(False, False)
+          _merger = ROOT.TFileMerger(False, True)
           _merger.OutputFile(output_file, False, _compressionLevel)
 
           for _tmp in _valid_files:
@@ -96,6 +96,9 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
           _ret = _merger.Merge()
           if not _ret:
              KILL('merge_rootfiles -- runtime error: call to TFileMerger::Merge() failed [output = '+output_file+']')
+
+#         _merger.Reset()
+#         del _merger
 
           print(colored_text('[output = '+output_file+']', ['1', '92']), 'merging completed ({:.2f} MB)'.format(os.path.getsize(output_file)/1024.0/1024.0))
 
