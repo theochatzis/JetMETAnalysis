@@ -45,12 +45,12 @@ for sample in "${samples[@]}"; do
   fi
 
   jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
-    -o ${outd_i}/jme_TRKv6 -l ${sample} -e pdf root png -i \
-    ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRK v6':1:1:20 \
+    -o ${outd_i}/HLT_TRKv06_TICL -l ${sample} -e pdf root png -i \
+    ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRK v6 + TICL':1:1:20 \
 
-  jmePlots.py -k phase2_jme_compareTRK1_L1T ${opts_i} \
-    -o ${outd_i}/jme_TRKv6_L1T -l ${sample} -e pdf root png -i \
-    ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRK v6':1:1:20 \
+  jmePlots.py -k phase2_jme_compareTRK1_withL1T ${opts_i} \
+    -o ${outd_i}/HLT_TRKv06_TICL_withL1T -l ${sample} -e pdf root png -i \
+    ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRK v6 + TICL':1:1:20 \
 
   unset -v outd_i opts_i
 done

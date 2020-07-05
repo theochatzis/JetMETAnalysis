@@ -1297,9 +1297,9 @@ def getPlotConfig(key, keyword, inputList):
          del baseColl
 
     ##
-    ## keyword: phase2_jme_compareTRK1_L1T
+    ## keyword: phase2_jme_compareTRK1_withL1T
     ##
-    elif keyword == 'phase2_jme_compareTRK1_L1T':
+    elif keyword == 'phase2_jme_compareTRK1_withL1T':
 
 #       if ('_wrt_' not in key_basename) and (not key_basename.endswith('_eff')) and \
 #          (not ('MET' in key_basename and key_basename.endswith('_pt'))) and \
