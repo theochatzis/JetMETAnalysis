@@ -209,7 +209,6 @@ void JMETriggerAnalysisDriverPhase2::init(){
 }
 
 void JMETriggerAnalysisDriverPhase2::analyze(){
-
   H1("eventsProcessed")->Fill(0.5, 1.);
 
   //// AK4 Jets

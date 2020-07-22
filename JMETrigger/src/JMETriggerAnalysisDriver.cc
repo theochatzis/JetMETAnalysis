@@ -687,6 +687,23 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
       }
     }
 
+//    if(verbose_ > 0){
+//
+//
+//      for(size_t idx=0; idx<v_pt->size(); ++idx){
+//        if(v_pt->at(idx) <= fhData.jetPtMin){ continue; }
+//
+//        for(auto const& catLabel : jetCategoryLabels_){
+//
+//          if(jetBelongsToCategory(catLabel, v_pt->at(idx), std::abs(v_eta->at(idx))))
+//        }
+//
+//
+//      }
+//
+//
+//    }
+
     for(auto const& catLabel : jetCategoryLabels_){
 
       std::vector<size_t> jetIndices;

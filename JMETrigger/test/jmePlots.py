@@ -1533,6 +1533,16 @@ def getPlotConfig(key, keyword, inputList):
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PuppiCorr_', 'OfflinePuppiCorr_'), Legend='Offline (Puppi)', Color=ROOT.kBlack) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='PuppiCorr [ '+inp['Legend']+' ]')]
 
+    ##
+    ## keyword: jme_compare (compare each distribution across different inputs)
+    ##
+    elif keyword == 'jme_compare':
+       if key.endswith('jet_pt'):
+          cfg.logY = True
+       cfg.legXY = [0.50, 0.70, 0.95, 0.90]
+       for idx, inp in enumerate(inputList):
+         cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key)]
+
     else:
        KILL('getPlotConfig(key="'+key+'", keyword="'+keyword+'") -- invalid keyword: "'+keyword+'"')
 
