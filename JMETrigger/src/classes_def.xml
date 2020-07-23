@@ -3,4 +3,5 @@
   <class name="JMETriggerAnalysisDriver"/>
   <class name="JMETriggerAnalysisDriverRun2"/>
   <class name="JMETriggerAnalysisDriverPhase2"/>
+  <class name="JMETriggerAnalysisDriverJES"/>
 </lcgdict>

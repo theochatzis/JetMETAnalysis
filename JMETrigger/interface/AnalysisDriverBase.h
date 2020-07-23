@@ -13,6 +13,7 @@
 #include <TTreeReaderValue.h>
 #include <TH1D.h>
 #include <TH2D.h>
+#include <TH3D.h>
 
 class AnalysisDriverBase {
 
@@ -52,6 +53,7 @@ class AnalysisDriverBase {
 
   bool hasTH1D(const std::string& key) const { return (mapTH1D_.find(key) != mapTH1D_.end()); }
   bool hasTH2D(const std::string& key) const { return (mapTH2D_.find(key) != mapTH2D_.end()); }
+  bool hasTH3D(const std::string& key) const { return (mapTH3D_.find(key) != mapTH3D_.end()); }
 
  protected:
   std::unique_ptr<TFile> theFile_;
@@ -68,12 +70,15 @@ class AnalysisDriverBase {
 
   TH1D* H1(const std::string&);
   TH2D* H2(const std::string&);
+  TH3D* H3(const std::string&);
 
   void addTH1D(const std::string&, const std::vector<float>&);
   void addTH2D(const std::string&, const std::vector<float>&, const std::vector<float>&);
+  void addTH3D(const std::string&, const std::vector<float>&, const std::vector<float>&, const std::vector<float>&);
 
   std::map<std::string, std::unique_ptr<TH1D>> mapTH1D_;
   std::map<std::string, std::unique_ptr<TH2D>> mapTH2D_;
+  std::map<std::string, std::unique_ptr<TH3D>> mapTH3D_;
 
   std::vector<std::string> outputKeys_;
 };

@@ -176,6 +176,11 @@ void AnalysisDriverBase::write(TFile& outFile){
       mapTH2D_.at(key)->SetTitle(keyTokens.begin()->c_str());
       mapTH2D_.at(key)->Write();
     }
+    else if(hasTH3D(key)){
+      mapTH3D_.at(key)->SetName(keyTokens.begin()->c_str());
+      mapTH3D_.at(key)->SetTitle(keyTokens.begin()->c_str());
+      mapTH3D_.at(key)->Write();
+    }
   }
 }
 
@@ -191,6 +196,12 @@ void AnalysisDriverBase::addTH1D(const std::string& name, const std::vector<floa
     std::ostringstream oss;
     oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
         << "TH2D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH3D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH3D object associated to key \"" << name << "\" already exists";
     throw std::runtime_error(oss.str());
   }
   else if(binEdges.size() < 2){
@@ -221,6 +232,12 @@ void AnalysisDriverBase::addTH2D(const std::string& name, const std::vector<floa
         << "TH2D object associated to key \"" << name << "\" already exists";
     throw std::runtime_error(oss.str());
   }
+  else if(hasTH3D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH2D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH3D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
   else if(binEdgesX.size() < 2){
     std::ostringstream oss;
     oss << "AnalysisDriverBase::addTH2D(\"" << name << "\", const std::vector<float>&) -- "
@@ -237,6 +254,52 @@ void AnalysisDriverBase::addTH2D(const std::string& name, const std::vector<floa
   mapTH2D_.insert(std::make_pair(name, std::unique_ptr<TH2D>(new TH2D(name.c_str(), name.c_str(), binEdgesX.size()-1, &binEdgesX[0], binEdgesY.size()-1, &binEdgesY[0]))));
   mapTH2D_.at(name)->SetDirectory(0);
   mapTH2D_.at(name)->Sumw2();
+
+  outputKeys_.emplace_back(name);
+}
+
+void AnalysisDriverBase::addTH3D(const std::string& name, const std::vector<float>& binEdgesX, const std::vector<float>& binEdgesY, const std::vector<float>& binEdgesZ){
+
+  if(hasTH1D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH3D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH1D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH2D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH3D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH2D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH3D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH3D(\"" << name << "\", const std::vector<float>&, const std::vector<float>&) -- "
+        << "TH3D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdgesX.size() < 2){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH3D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of X-axis bin-edges has invalid size (" << binEdgesX.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdgesY.size() < 2){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH3D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of Y-axis bin-edges has invalid size (" << binEdgesY.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+  else if(binEdgesZ.size() < 2){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH3D(\"" << name << "\", const std::vector<float>&) -- "
+        << "std::vector of Z-axis bin-edges has invalid size (" << binEdgesY.size() << " < 2)";
+    throw std::runtime_error(oss.str());
+  }
+
+  mapTH3D_.insert(std::make_pair(name, std::unique_ptr<TH3D>(new TH3D(name.c_str(), name.c_str(), binEdgesX.size()-1, &binEdgesX[0], binEdgesY.size()-1, &binEdgesY[0], binEdgesZ.size()-1, &binEdgesZ[0]))));
+  mapTH3D_.at(name)->SetDirectory(0);
+  mapTH3D_.at(name)->Sumw2();
 
   outputKeys_.emplace_back(name);
 }
@@ -271,4 +334,20 @@ TH2D* AnalysisDriverBase::H2(const std::string& key){
   }
 
   return mapTH2D_.at(key).get();
+}
+
+TH3D* AnalysisDriverBase::H3(const std::string& key){
+
+  if(not hasTH3D(key)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::H3(\"" << key << "\") -- no TH3D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+  else if(not mapTH3D_.at(key).get()){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::H3(\"" << key << "\") -- null pointer to TH3D associated to key \"" << key << "\"";
+    throw std::runtime_error(oss.str());
+  }
+
+  return mapTH3D_.at(key).get();
 }
