@@ -184,8 +184,8 @@ if __name__ == '__main__':
       time_finish = time.time()
       time_exe = time_finish - time_start
       timereport_str = 'execution time [sec]: {:.2f}'.format(time_exe)
-      if nEvtProcessed > 0:
-         timereport_str += ' ({:.5f} evts/sec)'.format(time_exe/nEvtProcessed)
+      if time_exe > 0:
+         timereport_str += ' ({:.5f} evts/sec)'.format(nEvtProcessed/time_exe)
       print(timereport_str)
 
       print('output:', os.path.relpath(opts.output))
