@@ -14,11 +14,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 inpdir_R=${JMEANA_BASE}/output_hltPhase2_200702_v01
-inpdir_0=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod0_v01
-inpdir_1=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod1_v01
-inpdir_2=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod2_v01
+inpdir_0=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod0_v02
+inpdir_1=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod1_v02
+inpdir_2=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod2_v02
 
-outdir=plots_hltPhase2_200717_v01
+outdir=plots_hltPhase2_200717_v02_comparePuppi
 
 samples=(
 # Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
@@ -28,8 +28,8 @@ samples=(
 )
 
 exts=(
-  pdf
-# png
+# pdf
+  png
 # root
 )
 
@@ -49,15 +49,15 @@ for sample in "${samples[@]}"; do
 
   outd_i=${outdir}/${sample}
 
-  opts_i=""
-  if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*Jets*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt' -s '*MET*GEN*'"
-  elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-m 'NoSel*/*MET_*' 'NoSel*/*/offlineMETs*_pt'"
-  fi
-
-  jmePlots.py -k jme_compare ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06_TICL_compare/11_1_2 -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_R}/harvesting/HLT_TRKv06_TICL/${sample}.root:'11_1_0_pre6':1:1:20 \
-    ${inpdir_0}/harvesting/HLT_TRKv06_TICL/${sample}.root:'11_1_2':2:2:22
+#  opts_i=""
+#  if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*Jets*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt' -s '*MET*GEN*'"
+#  elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-m 'NoSel*/*MET_*' 'NoSel*/*/offlineMETs*_pt'"
+#  fi
+#
+#  jmePlots.py -k jme_compare ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06_TICL_compare/11_1_2 -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_R}/harvesting/HLT_TRKv06_TICL/${sample}.root:'11_1_0_pre6':1:1:20 \
+#    ${inpdir_0}/harvesting/HLT_TRKv06_TICL/${sample}.root:'11_1_2':2:2:22
 
   opts_i=""
   if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*PuppiJetsCorr*' 'NoSel*/*PuppiMET_*' 'NoSel*/*/offlinePuppiMET*_pt' -s '*MET*GEN*'"
@@ -66,34 +66,44 @@ for sample in "${samples[@]}"; do
 
   jmePlots.py -k jme_compare ${opts_i} \
     -o ${outd_i}/HLT_TRKv06_compare/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_0}/harvesting/HLT_TRKv06/${sample}.root:'11_1_2':2:2:22 \
-    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'+ Puppi (B #times 1.45)':4:4:24
+    ${inpdir_0}/harvesting/HLT_TRKv06/${sample}.root:'11_1_2':1:1:20 \
+    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'+ B-Tuned':2:1:22 \
+    ${inpdir_2}/harvesting/HLT_TRKv06/${sample}.root:'+ PU-1or2':4:1:24
 
-  jmePlots.py -k jme_compare ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06_compare/Puppi_PU12 -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'+ Puppi (B #times 1.45)':4:4:24 \
-    ${inpdir_2}/harvesting/HLT_TRKv06/${sample}.root:'+ Puppi PU_1or2':8:8:23
-
-  opts_i=""
-  if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*GenJets*MatchedToGEN*eff' 'NoSel*/*PFJetsCorr*' 'NoSel*/*PFMET_*' 'NoSel*/*/offlineMET*_pt' -s '*MET*GEN*'"
-  elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-m 'NoSel*/*PFMET_*' 'NoSel*/*/offlineMETs*_pt'"
-  fi
-
-  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20 \
-
-  jmePlots.py -k phase2_jme_compareTRK1_withL1T ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06_withL1T/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20 \
-
-  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06_TICL/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_1}/harvesting/HLT_TRKv06_TICL/${sample}.root:'':1:1:20 \
-
-  jmePlots.py -k phase2_jme_compareTRK1_withL1T ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06_TICL_withL1T/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_1}/harvesting/HLT_TRKv06_TICL/${sample}.root:'':1:1:20 \
+#  opts_i=""
+#  if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*GenJets*MatchedTo*eff' 'NoSel*/*JetsCorr*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt' -s '*MET*GEN*'"
+#  elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-m 'NoSel*/*MET_*' 'NoSel*/*/offline*METs*_pt'"
+#  fi
+#
+#  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06/Puppi_Offline -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_0}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20
+#
+#  jmePlots.py -k phase2_jme_compareTRK1_withL1T ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06_withL1T/Puppi_Offline -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_0}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20
+#
+#  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20
+#
+#  jmePlots.py -k phase2_jme_compareTRK1_withL1T ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06_withL1T/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20
+#
+#  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06_TICL/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_1}/harvesting/HLT_TRKv06_TICL/${sample}.root:'':1:1:20 \
+#
+#  jmePlots.py -k phase2_jme_compareTRK1_withL1T ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06_TICL_withL1T/Puppi_BTuned -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_1}/harvesting/HLT_TRKv06_TICL/${sample}.root:'':1:1:20
+#
+#  jmePlots.py -k phase2_jme_comparePuppi ${opts_i} \
+#    -o ${outd_i}/HLT_TRKv06_compare -l ${sample} -e ${exts[*]} -i \
+#    ${inpdir_0}/harvesting/HLT_TRKv06/${sample}.root:'Puppi':4:4:20 \
+#    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'Puppi, B-Tuned':921:921:20 \
+#    ${inpdir_1}/harvesting/HLT_TRKv06_TICL/${sample}.root:'Puppi, B-Tuned & TICL':801:801:20
 
   unset -v outd_i opts_i
 done

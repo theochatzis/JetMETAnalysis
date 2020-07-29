@@ -1534,6 +1534,43 @@ def getPlotConfig(key, keyword, inputList):
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='PuppiCorr [ '+inp['Legend']+' ]')]
 
     ##
+    ## keyword: phase2_jme_comparePuppi
+    ##
+    elif keyword == 'phase2_jme_comparePuppi':
+
+#       if ('_wrt_' not in key_basename) and (not key_basename.endswith('_eff')) and \
+#          (not ('MET' in key_basename and key_basename.endswith('_pt'))) and \
+#          ('pt_over' not in key_basename):
+#          return
+
+       if ('/' in key) and (not key.startswith('NoSelection/')):
+          if ('_pt0' not in key_basename) or key_basename.endswith('pt0_eff') or \
+             key_basename.endswith('pt0') or ('pt0_over' in key_basename):
+             return
+
+       cfg.legXY = [0.55, 0.60, 0.95, 0.90]
+
+       ## MET
+       if 'hltPuppiMET_' in key:
+          for idx, inp in enumerate(inputList):
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPuppiMET_', 'offlinePuppiMET_Raw_'), Legend='Offline (Puppi)',Color=ROOT.kPink+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPuppiMET_', 'l1tPuppiMET_'), Legend='L1T (Puppi)', Color=ROOT.kRed) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
+
+       ## Jets
+       elif 'hltAK4PuppiJetsCorrected_' in key:
+          for idx, inp in enumerate(inputList):
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PuppiJetsCorrected_', 'offlineAK4PuppiJetsCorrected_'), Legend='Offline (Puppi)',Color=ROOT.kPink+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PuppiJetsCorrected_', 'l1tAK4PuppiJetsCorrected_'), Legend='L1T (Puppi)', Color=ROOT.kRed) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
+
+       elif 'MatchedToPuppiCorr_' in key:
+          for idx, inp in enumerate(inputList):
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PuppiCorr_', 'OfflinePuppiCorr_'), Legend='Offline (Puppi)', Color=ROOT.kPink+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PuppiCorr_', 'L1TPuppiCorr_'), Legend='L1T (Puppi)', Color=ROOT.kRed) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
+
+    ##
     ## keyword: jme_compare (compare each distribution across different inputs)
     ##
     elif keyword == 'jme_compare':

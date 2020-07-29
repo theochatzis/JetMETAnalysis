@@ -94,20 +94,22 @@ void JMETriggerAnalysisDriverJES::init(){
     "hltAK4CaloJets",
     "hltAK4PFClusterJets",
     "hltAK4PFJets",
-//    "hltAK4PFCHSv1Jets",
-//    "hltAK4PFCHSv2Jets",
-//    "hltAK4PuppiV1Jets",
-//    "hltAK4PuppiV3Jets",
+    "hltAK4PFJetsCorrected",
+    "hltAK4PFCHSJets",
+    "hltAK4PFCHSJetsCorrected",
+    "hltAK4PuppiJets",
+    "hltAK4PuppiJetsCorrected",
   };
 
   jetCollectionsAK8_ = {
     "hltAK8CaloJets",
     "hltAK8PFClusterJets",
     "hltAK8PFJets",
-//    "hltAK8PFCHSv1Jets",
-//    "hltAK8PFCHSv2Jets",
-//    "hltAK8PuppiV1Jets",
-//    "hltAK8PuppiV3Jets",
+    "hltAK8PFJetsCorrected",
+    "hltAK8PFCHSJets",
+    "hltAK8PFCHSJetsCorrected",
+    "hltAK8PuppiJets",
+    "hltAK8PuppiJetsCorrected",
   };
 
   // histogram: events counter

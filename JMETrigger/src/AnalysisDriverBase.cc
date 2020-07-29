@@ -45,6 +45,12 @@ int AnalysisDriverBase::setInputTTree(const std::string& tfile, const std::strin
     else if(type == "ULong64_t"){
       map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<unsigned long long>>(*theReader_, leaf->GetName())));
     }
+    else if(type == "Float_t"){
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<float>>(*theReader_, leaf->GetName())));
+    }
+    else if(type == "Double_t"){
+      map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<double>>(*theReader_, leaf->GetName())));
+    }
     else if(type == "vector<bool>"){
       map_TTreeReaderValues_.insert(std::make_pair(leaf->GetName(), std::make_unique<TTreeReaderValue<std::vector<bool>>>(*theReader_, leaf->GetName())));
     }

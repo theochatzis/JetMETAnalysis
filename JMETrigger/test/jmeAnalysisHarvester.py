@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """merge outputs of batch jobs"""
-from __future__ import print_function
 import os
 import argparse
 import glob
 import array
 import re
+import ctypes
 import ROOT
 
 from common.utils import *
@@ -37,7 +37,7 @@ def updateDictionary(dictionary, TDirectory, prefix=''):
            dictionary[out_key].SetDirectory(0)
 
            if opts.verbose:
-              print(colored_text('[input]', ['1', '92']), out_key)
+              print colored_text('[input]', ['1', '92']), out_key
 
     return dictionary
 
@@ -278,17 +278,52 @@ if __name__ == '__main__':
               else:
                  histograms[hkey_i_num+'_eff'] = get_efficiency_graph(tmp_hnum, tmp_hden)
           ### -------------------
-   
+
+          ### Histograms for trigger rates
+          for i_h2_key in sorted(histograms.keys()):
+
+              if histograms[i_h2_key].InheritsFrom('TH2'):
+                 continue
+
+              if not (histograms[i_h2_key].InheritsFrom('TH1') and (histograms[i_h2_key].GetEntries() > 0)):
+                 continue
+
+              i_h2_key_basename = os.path.basename(i_h2_key)
+
+              i_h2_key_dirname = os.path.dirname(i_h2_key)
+              if i_h2_key_dirname: i_h2_key_dirname += '/'
+
+              keep_th1 = bool(('Jets' in i_h2_key_basename) and i_h2_key_basename.endswith('_pt0') and ('MatchedTo' not in i_h2_key_basename))
+              keep_th1 += bool(('MET' in i_h2_key_basename) and i_h2_key_basename.endswith('_pt') and ('GEN_' not in i_h2_key_basename) and ('Offline_' not in i_h2_key_basename))
+              if not keep_th1: continue
+
+              tmp_h1 = histograms[i_h2_key].Clone()
+
+              tmp_h1_name = i_h2_key+'_cumul'
+              if tmp_h1_name in histograms: KILL('aaa4 '+tmp_h1_name)
+
+              tmp_h1.SetTitle(tmp_h1.GetName()+'_cumul')
+              tmp_h1.SetName(tmp_h1.GetName()+'_cumul')
+              tmp_h1.SetDirectory(0)
+
+              for _tmp_bin_i in range(1, 1+tmp_h1.GetNbinsX()):
+                  _err = ctypes.c_double(0.)
+                  tmp_h1.SetBinContent(_tmp_bin_i, tmp_h1.IntegralAndError(_tmp_bin_i, -1, _err))
+                  tmp_h1.SetBinError(_tmp_bin_i, _err.value)
+              print tmp_h1_name #!!
+              histograms[tmp_h1_name] = tmp_h1
+          ### -------------------
+
           ### Trigger Efficiencies [HLT_*Jet*]
           for hkey_i in sorted(histograms.keys()):
-   
+
               if histograms[hkey_i].InheritsFrom('TH1') and (histograms[hkey_i].GetEntries() == 0):
                  continue
               elif histograms[hkey_i].InheritsFrom('TGraph') and (histograms[hkey_i].GetN() == 0):
                  continue
-   
+
               hkey_i_basename = os.path.basename(hkey_i)
-   
+
               if '_wrt_' in hkey_i_basename:
                  continue
    
@@ -371,5 +406,5 @@ if __name__ == '__main__':
 
           output_tfile.Close()
 
-       print(colored_text('[output]', ['1','92']), os.path.relpath(output_file))
+       print colored_text('[output]', ['1','92']), os.path.relpath(output_file)
        ### -------------------

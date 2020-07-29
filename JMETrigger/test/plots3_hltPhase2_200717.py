@@ -366,7 +366,7 @@ if __name__ == '__main__':
    ## 1
    INPUT_DIR = '/nfs/dust/cms/user/missirol/test/jmeTrigger/phase2/area_01/CMSSW_11_1_2_PuppiMod2/src/NTupleAnalysis/JMETrigger/test'
 
-   OUT_DIR = 'tmp_plots2_hltPhase2_200717/jets_compare'
+   OUT_DIR = 'tmp_plots3_hltPhase2_200717/jets_compare'
 
    os.makedirs(OUT_DIR)
 
@@ -374,25 +374,19 @@ if __name__ == '__main__':
      'HLT_TRKv06',
    ]:
      for [varName, varTitle] in [
-       ['JetsCorrected_EtaIncl_NotMatchedToGEN_eta_eff', ';Jet #eta;1 - GEN-Match-Eff.'],
-
-       ['JetsCorrected_HB_MatchedToGEN_pt_overGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];<p_{T} / p^{GEN}_{T}>'],
-       ['JetsCorrected_HGCal_MatchedToGEN_pt_overGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];<p_{T} / p^{GEN}_{T}>'],
-       ['JetsCorrected_HF1_MatchedToGEN_pt_overGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];<p_{T} / p^{GEN}_{T}>'],
-       ['JetsCorrected_HF2_MatchedToGEN_pt_overGEN_Mean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];<p_{T} / p^{GEN}_{T}>'],
-
-       ['JetsCorrected_HB_MatchedToGEN_pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T} / p^{GEN}_{T}) / <p_{T} / p^{GEN}_{T}>'],
-       ['JetsCorrected_HGCal_MatchedToGEN_pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T} / p^{GEN}_{T}) / <p_{T} / p^{GEN}_{T}>'],
-       ['JetsCorrected_HF1_MatchedToGEN_pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T} / p^{GEN}_{T}) / <p_{T} / p^{GEN}_{T}>'],
-       ['JetsCorrected_HF2_MatchedToGEN_pt_overGEN_RMSOverMean_wrt_GEN_pt', ';GEN Jet p_{T} [GeV];#sigma(p_{T} / p^{GEN}_{T}) / <p_{T} / p^{GEN}_{T}>'],
+       ['JetsCorrected_EtaIncl_pt0_cumul', ';Jet p_{T} threshold [GeV];Event Counts'],
+       ['JetsCorrected_HB_pt0_cumul'     , ';Jet p_{T} threshold [GeV];Event Counts'],
+       ['JetsCorrected_HGCal_pt0_cumul'  , ';Jet p_{T} threshold [GeV];Event Counts'],
+       ['JetsCorrected_HF1_pt0_cumul'    , ';Jet p_{T} threshold [GeV];Event Counts'],
+       ['JetsCorrected_HF2_pt0_cumul'    , ';Jet p_{T} threshold [GeV];Event Counts'],
      ]:
-       _file0 = ROOT.TFile.Open(INPUT_DIR+'/output_hltPhase2_200717_PuppiMod0_v01/harvesting/'+reco_label+'/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200.root')
+       _file0 = ROOT.TFile.Open(INPUT_DIR+'/output_hltPhase2_200717_PuppiMod0_v02/harvesting/'+reco_label+'/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200.root')
        if not _file0: continue
 
-       _file1 = ROOT.TFile.Open(INPUT_DIR+'/output_hltPhase2_200717_PuppiMod1_v01/harvesting/'+reco_label+'/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200.root')
+       _file1 = ROOT.TFile.Open(INPUT_DIR+'/output_hltPhase2_200717_PuppiMod1_v02/harvesting/'+reco_label+'/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200.root')
        if not _file1: continue
 
-       _file2 = ROOT.TFile.Open(INPUT_DIR+'/output_hltPhase2_200717_PuppiMod1_v01/harvesting/'+reco_label+'_TICL/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200.root')
+       _file2 = ROOT.TFile.Open(INPUT_DIR+'/output_hltPhase2_200717_PuppiMod1_v02/harvesting/'+reco_label+'_TICL/Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200.root')
        if not _file2: continue
 
        for [algoName_i, algoTitle_i] in [
@@ -452,14 +446,20 @@ if __name__ == '__main__':
          h21.Draw(draw_opt2)
          h22.Draw(draw_opt2)
 
+         hmin, hmax = 1e6, 1.
+
+         hmin, hmax = min(hmin, h0 .GetMinimum()), max(hmax, h0 .GetMaximum())
+         hmin, hmax = min(hmin, h1 .GetMinimum()), max(hmax, h1 .GetMaximum())
+         hmin, hmax = min(hmin, h20.GetMinimum()), max(hmax, h20.GetMaximum())
+         hmin, hmax = min(hmin, h21.GetMinimum()), max(hmax, h21.GetMaximum())
+         hmin, hmax = min(hmin, h22.GetMinimum()), max(hmax, h22.GetMaximum())
+         hmin = max(hmin, 0.1)
+
+         print hmin, hmax
+
          h0.SetTitle(varTitle)
-         if '_eta_eff' in h0.GetName():
-            h0.GetXaxis().SetRangeUser(-5, 5)
-            h0.GetYaxis().SetRangeUser(0.001, 1.1)
-         elif '_RMSOverMean' in h0.GetName():
-            h0.GetYaxis().SetRangeUser(0.001, 0.59)
-         elif '_Mean' in h0.GetName():
-            h0.GetYaxis().SetRangeUser(0.001, 3.0)
+         h0.GetXaxis().SetRangeUser(30., 1000.)
+         h0.GetYaxis().SetRangeUser(0.8*hmin, 1.2*hmax)
          h0.GetXaxis().SetTitleSize(0.05)
          h0.GetXaxis().SetTitleOffset(1.2)
          h0.GetYaxis().SetTitleSize(0.05)
@@ -485,6 +485,8 @@ if __name__ == '__main__':
          label2 = get_pavetext(0.1, 0.91, 0.50, 0.99, 0.035, 'QCD Pt-Flat [PU200]')
          label2.SetFillColor(0)
          label2.Draw('same')
+
+         canvas.SetLogx(1)
 
          canvas.SaveAs(OUT_DIR+'/AK4'+algoName_i+varName+'.pdf')
 #        canvas.SetLogy(1)
