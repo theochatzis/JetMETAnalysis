@@ -310,7 +310,7 @@ if __name__ == '__main__':
                   _err = ctypes.c_double(0.)
                   tmp_h1.SetBinContent(_tmp_bin_i, tmp_h1.IntegralAndError(_tmp_bin_i, -1, _err))
                   tmp_h1.SetBinError(_tmp_bin_i, _err.value)
-              print tmp_h1_name #!!
+
               histograms[tmp_h1_name] = tmp_h1
           ### -------------------
 

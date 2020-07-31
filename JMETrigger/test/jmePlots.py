@@ -548,6 +548,7 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
 
     elif ('Jets' in key) and not (isProfile or isEfficiency):
       if   key.endswith('_pt0'): _titleX = 'p_{T}-Leading Jet p_{T} [GeV]'
+      elif key.endswith('_pt0_cumul'): _titleX = 'Jet p_{T} threshold [GeV]'
       elif key.endswith('_pt'): _titleX = 'Jet p_{T} [GeV]'
       elif key.endswith('_eta'): _titleX = 'Jet #eta'
       elif key.endswith('_mass'): _titleX = 'Jet mass [GeV]'
