@@ -779,7 +779,7 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
           if(jetMatchMass != 0.){
             auto const jetMassRatio(jetMass / jetMatchMass);
             H1(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel)->Fill(jetMassRatio);
-            H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetMassRatio, jetMatchMass);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_pt")->Fill(jetMassRatio, jetMatchPt);
             H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_eta")->Fill(jetMassRatio, jetMatchEta);
             H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_mass_over"+matchLabel+"__vs__"+matchLabel+"_mass")->Fill(jetMassRatio, jetMatchMass);
           }
