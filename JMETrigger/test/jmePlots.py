@@ -1572,6 +1572,19 @@ def getPlotConfig(key, keyword, inputList):
             cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
 
     ##
+    ## keyword: phase2_jme_compare
+    ##
+    elif keyword == 'phase2_jme_compare':
+       if ('/' in key) and (not key.startswith('NoSelection/')):
+          if ('_pt0' not in key_basename) or key_basename.endswith('pt0_eff') or \
+             key_basename.endswith('pt0') or ('pt0_over' in key_basename):
+             return
+
+       cfg.legXY = [0.55, 0.60, 0.95, 0.90]
+       for idx, inp in enumerate(inputList):
+         cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key)]
+
+    ##
     ## keyword: jme_compare (compare each distribution across different inputs)
     ##
     elif keyword == 'jme_compare':
@@ -1594,6 +1607,8 @@ def getPlotConfig(key, keyword, inputList):
 
     if not (cfg.IsProfile or cfg.IsEfficiency):
        for cfg_h in cfg.hists:
+          if cfg_h.th1.GetName().endswith('_cumul'):
+             continue
 
           divideByBinWidth = False
           _tmpBW = None
