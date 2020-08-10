@@ -550,6 +550,7 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
       elif key.endswith('_pt0_cumul'): _titleX = 'Jet p_{T} threshold [GeV]'
       elif key.endswith('_pt'): _titleX = 'Jet p_{T} [GeV]'
       elif key.endswith('_eta'): _titleX = 'Jet #eta'
+      elif key.endswith('_phi'): _titleX = 'Jet #phi [rad]'
       elif key.endswith('_mass'): _titleX = 'Jet mass [GeV]'
       elif key.endswith('_dRmatch'): _titleX = '#DeltaR'
       elif key.endswith('_numberOfDaughters'): _titleX = 'Number of jet constituents'
@@ -571,6 +572,7 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
 
     elif ('MET' in key) and not (isProfile or isEfficiency):
       if key.endswith('_pt'): _titleX = 'MET [GeV]'
+      elif key.endswith('_pt_cumul'): _titleX = 'MET threshold [GeV]'
       elif key.endswith('_phi'): _titleX = 'MET #phi'
       elif key.endswith('_sumEt'): _titleX = 'Sum-E_{T} [GeV]'
       elif key.endswith('_sumEt_overGEN'): _titleX = 'Sum-E_{T} / Sum-E_{T}^{GEN}'

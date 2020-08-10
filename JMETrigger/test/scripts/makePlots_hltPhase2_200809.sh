@@ -15,11 +15,11 @@ done
 
 inpdir_R=${JMEANA_BASE}/output_hltPhase2_200702_v01
 inpdir_00=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod0_v02
-inpdir_01=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod1_v02
+inpdir_01=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod1_v03
 inpdir_11=${JMEANA_BASE}/output_hltPhase2_200730_PuppiMod3_v01
 inpdir_12=${JMEANA_BASE}/output_hltPhase2_200730_PuppiMod3_v02
 
-outdir=plots_hltPhase2_200809_v01
+outdir=plots_hltPhase2_200809_v02
 
 samples=(
 # Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
@@ -70,6 +70,12 @@ for sample in "${samples[@]}"; do
     ${inpdir_00}/harvesting/HLT_TRKv06/${sample}.root:'Offline Tune':1:1:20 \
     ${inpdir_01}/harvesting/HLT_TRKv06/${sample}.root:'+ B-retuned':2:1:22 \
     ${inpdir_11}/harvesting/HLT_TRKv06/${sample}.root:'+ A-retuned':4:1:24
+
+  jmePlots.py -k jme_compare ${opts_i} \
+    -o ${outd_i}/HLT_TRKv06_puppiRetuned_TICL -l ${sample} -e ${exts[*]} -i \
+    ${inpdir_00}/harvesting/HLT_TRKv06_TICL/${sample}.root:'Offline Tune':1:1:20 \
+    ${inpdir_01}/harvesting/HLT_TRKv06_TICL/${sample}.root:'+ B-retuned':2:1:22 \
+    ${inpdir_11}/harvesting/HLT_TRKv06_TICL/${sample}.root:'+ A-retuned':4:1:24
 
   opts_i=""
   if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*GenJets*MatchedTo*eff' 'NoSel*/*JetsCorr*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt' -s '*MET*GEN*'"
