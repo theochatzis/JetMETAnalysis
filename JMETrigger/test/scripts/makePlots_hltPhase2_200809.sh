@@ -19,7 +19,7 @@ inpdir_01=${JMEANA_BASE}/output_hltPhase2_200717_PuppiMod1_v03
 inpdir_11=${JMEANA_BASE}/output_hltPhase2_200730_PuppiMod3_v01
 inpdir_12=${JMEANA_BASE}/output_hltPhase2_200730_PuppiMod3_v02
 
-outdir=plots_hltPhase2_200809_v02
+outdir=plots_hltPhase2_200809_v03
 
 samples=(
 # Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_NoPU
@@ -93,6 +93,11 @@ for sample in "${samples[@]}"; do
   jmePlots.py -k phase2_jme_comparePuppi ${opts_i} \
     -o ${outd_i}/HLT_TRKv06_compare -l ${sample} -e ${exts[*]} -i \
     ${inpdir_00}/harvesting/HLT_TRKv06/${sample}.root:'Puppi':4:1:20 \
+    ${inpdir_11}/harvesting/HLT_TRKv06/${sample}.root:'Puppi retuned':921:1:20 \
+    ${inpdir_11}/harvesting/HLT_TRKv06_TICL/${sample}.root:'Puppi retuned + TICL':801:1:20
+
+  jmePlots.py -k phase2_jme_comparePuppi ${opts_i} \
+    -o ${outd_i}/HLT_TRKv06_compare_woOfflTune -l ${sample} -e ${exts[*]} -i \
     ${inpdir_11}/harvesting/HLT_TRKv06/${sample}.root:'Puppi retuned':921:1:20 \
     ${inpdir_11}/harvesting/HLT_TRKv06_TICL/${sample}.root:'Puppi retuned + TICL':801:1:20
 
