@@ -489,6 +489,10 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
     if isEfficiency:
        _titleY = 'Efficiency'
 
+       if keys.endswith('_eff'):
+         if '_NotMatchedTo' in key: _titleY = '1 - Matching Effic.'
+         elif '_MatchedTo' in key: _titleY = 'Matching Effic.'
+
     if   '_pt_overGEN_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
     elif '_pt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
     elif '_pt_overGEN_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
@@ -1576,12 +1580,14 @@ def getPlotConfig(key, keyword, inputList):
     ## keyword: phase2_jme_compare
     ##
     elif keyword == 'phase2_jme_compare':
-       if ('/' in key) and (not key.startswith('NoSelection/')):
-          if ('_pt0' not in key_basename) or key_basename.endswith('pt0_eff') or \
-             key_basename.endswith('pt0') or ('pt0_over' in key_basename):
-             return
+#       if ('/' in key) and (not key.startswith('NoSelection/')):
+#          if ('_pt0' not in key_basename) or key_basename.endswith('pt0_eff') or \
+#             key_basename.endswith('pt0') or ('pt0_over' in key_basename):
+#             return
+       if key.endswith('jet_pt'):
+          cfg.logY = True
+       cfg.legXY = [0.50, 0.70, 0.95, 0.90]
 
-       cfg.legXY = [0.55, 0.60, 0.95, 0.90]
        for idx, inp in enumerate(inputList):
          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key)]
 
