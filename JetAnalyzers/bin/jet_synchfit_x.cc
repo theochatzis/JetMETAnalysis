@@ -390,9 +390,9 @@ bool getInputProfiles(TString inputFilename, TProfile3D *& prof,
       prof    = (TProfile3D*) fin->Get("p_offOverA_etaVsTnpusVsJetPt"); //offOverA(eta, rho, refpt)
       profPt  = (TProfile3D*) fin->Get("p_PtAve_etaVsTnpusVsJetPt"); // pt(eta, rho, refpt)
       profRho = (TProfile3D*) fin->Get("p_RhoAve_etaVsTnpusVsJetPt");// rho(eta, rho, refpt)
-      hist    = (TH3I*)       fin->Get("p_Events_etaVsTnpusVsJetPt");
+     // hist    = (TH3I*)       fin->Get("p_Events_etaVsTnpusVsJetPt");
 
-      if (!prof || !profPt  || !profRho || !hist) {
+      if (!prof || !profPt  || !profRho) { // || !hist) {
         cout<<"ERROR jet_synchfit_xx::getInputProfiles() could not retrieve TProfile3D named "
         <<"either of  p_offOverA_etaVsTnpusVsJetPt, p_PtAve_etaVsTnpusVsJetPt, "
         <<" or p_RhoAve_etaVsTnpusVsJetPt"<<endl;
