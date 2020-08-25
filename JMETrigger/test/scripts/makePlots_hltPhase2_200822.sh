@@ -45,9 +45,9 @@ for sample in "${samples[@]}"; do
   outd_i=${outdir}/${sample}
 
   opts_i=""
-  if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*GenJets*MatchedTo*eff' 'NoSel*/*JetsCorr*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt' -s '*MET*GEN*'"
-  elif [[ ${sample} == *"WJetsToLNu_"* ]]; then opts_i="-m 'NoSel*/*GenJets*MatchedTo*eff' 'NoSel*/*JetsCorr*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt'"
-  elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-m 'NoSel*/*MET_*' 'NoSel*/*/offline*METs*_pt'"
+  if [[ ${sample} == *"WJetsToLNu_"* ]]; then opts_i="-m 'NoSel*/*GenJets*MatchedTo*eff' 'NoSel*/*JetsCorr*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt'"
+  else
+    break
   fi
 
   jmePlots.py -k phase2_jme_compare ${opts_i} \
@@ -55,28 +55,18 @@ for sample in "${samples[@]}"; do
     ${inpdir_0}/harvesting/HLT_TRKv06/${sample}.root:'11_0_X RAW':1:1:20 \
     ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'HLT-TDR ReReco':2:2:22
 
-
-
-  break #!!
-
-
-
   jmePlots.py -k phase2_jme_compare ${opts_i} \
     -o ${outd_i}/HLT_TRKv06_TICL -l ${sample} -e ${exts[*]} -i \
     ${inpdir_0}/harvesting/HLT_TRKv06_TICL/${sample}.root:'11_0_X RAW':1:1:20 \
     ${inpdir_1}/harvesting/HLT_TRKv06_TICL/${sample}.root:'HLT-TDR ReReco':2:2:22
 
-#  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
-#    -o ${outd_i}/HLT_TRKv06/Puppi_tuneHLT1 -l ${sample} -e ${exts[*]} -i \
-#    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'':1:1:20
+  jmePlots.py -k phase2_jme_comparePuppi ${opts_i} \
+    -o ${outd_i}/HLT_TRKv06_comparePuppi_reReco -l ${sample} -e ${exts[*]} -i \
+    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'':4:1:20 \
 
   jmePlots.py -k phase2_jme_comparePuppi ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06_comparePuppi_oldSamples -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_0}/harvesting/HLT_TRKv06/${sample}.root:'Puppi':4:1:20 \
-
-  jmePlots.py -k phase2_jme_comparePuppi ${opts_i} \
-    -o ${outd_i}/HLT_TRKv06_comparePuppi_newSamples -l ${sample} -e ${exts[*]} -i \
-    ${inpdir_1}/harvesting/HLT_TRKv06/${sample}.root:'Puppi':4:1:20 \
+    -o ${outd_i}/HLT_TRKv06_TICL_comparePuppi_reReco -l ${sample} -e ${exts[*]} -i \
+    ${inpdir_1}/harvesting/HLT_TRKv06_TICL/${sample}.root:'':4:1:20 \
 
   unset -v outd_i opts_i
 done
