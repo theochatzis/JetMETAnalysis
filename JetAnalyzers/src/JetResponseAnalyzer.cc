@@ -245,6 +245,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
   if (doBalancing_&&refToJetMap->size()!=1) return;
   JRAEvt_->nref = 0;
   size_t nRef=(nRefMax_==0) ? refs->size() : std::min(nRefMax_,refs->size());
+
   for (size_t iRef=0;iRef<nRef;iRef++) {
      
      reco::CandidateBaseRef ref=refs->refAt(iRef);
@@ -264,11 +265,15 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
         else JRAEvt_->refdrjt->pop_back();
         continue;
      }
-     
-     JRAEvt_->refpdgid->push_back(0);
-     JRAEvt_->refpdgid_algorithmicDef->push_back(0);
-     JRAEvt_->refpdgid_physicsDef->push_back(0);
+
+     if(doFlavor_){
+        JRAEvt_->refpdgid->push_back(0);
+        JRAEvt_->refpdgid_algorithmicDef->push_back(0);
+        JRAEvt_->refpdgid_physicsDef->push_back(0);
+     }
+
      if (getFlavorFromMap_) {
+
         reco::JetMatchedPartonsCollection::const_iterator itPartonMatch;
         itPartonMatch=refToPartonMap->begin();
         for (;itPartonMatch!=refToPartonMap->end();++itPartonMatch) {
@@ -301,6 +306,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
                  }
               }
            }
+
            if (refdrparton_physics<deltaRPartonMax_) {
               JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref)=itPartonMatch->second.physicsDefinitionParton().get()->pdgId();
               int absid = std::abs(JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref));
@@ -315,11 +321,15 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            }
         }
      }
-     else {
+     else if (doFlavor_) {
         JRAEvt_->refpdgid_algorithmicDef->at(JRAEvt_->nref)=0;
         JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref)=0;
      }
-     JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
+
+     if (doFlavor_) {
+        JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
+     }
+
 
      // Beta/Beta Star Calculation
      JRAEvt_->beta = 0.0;
@@ -420,7 +430,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            }
         }
      }
-     
+
      if (doComposition_) {
         
         if (isCaloJet_) {
@@ -441,7 +451,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            JRAEvt_->jthfef->push_back(pfJetRef->HFEMEnergyFraction()         *JRAEvt_->jtjec->at(JRAEvt_->nref));
         } 
      }
-     
+
      JRAEvt_->nref++;
   }
      
@@ -466,6 +476,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
           }
       }
       else {
+
           bool isPF = iEvent.getByToken(srcPFCandidatesAsFwdPtr_, pfCandidatesAsFwdPtr);
           if ( isPF ) {
               for (auto i_pf=pfCandidatesAsFwdPtr->begin(); i_pf != pfCandidatesAsFwdPtr->end(); ++i_pf) {
@@ -484,11 +495,10 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
       }
   }
 
-  
   tree_->Fill();
   
   return;
-  }
+}
 
 //______________________________________________________________________________
 JRAEvent::Flavor JetResponseAnalyzer::getFlavor(reco::PFCandidate::ParticleType id) {
