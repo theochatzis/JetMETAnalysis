@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-import ROOT, math
+import ROOT
+import math
+import ctypes
 
 from th1 import *
 
@@ -14,7 +16,7 @@ def get_efficiency(hP, hT):
         WARNING('get_global_efficiency -- failed efficiency computation: '+hP1.GetName()+' / '+hT1.GetName()+' [N='+str(g.GetN())+']')
         return [0., 0., 0.]
 
-    x, y = ROOT.Double(0.), ROOT.Double(0.)
+    x, y = ctypes.c_double(0.), ctypes.c_double(0.)
     g.GetPoint(0, x, y)
 
     eff = [y, g.GetErrorYhigh(0), g.GetErrorYlow(0)]
@@ -48,11 +50,11 @@ def get_ratio_graph(g_num_, g_den_, verbose=False):
     n = -1
     for i in range(g_den_.GetN()):
 
-        xd, yd = ROOT.Double(0.), ROOT.Double(0.)
+        xd, yd = ctypes.c_double(0.), ctypes.c_double(0.)
         g_den_.GetPoint(i, xd, yd)
 
         for j in range(g_num_.GetN()):
-            xn, yn = ROOT.Double(0.), ROOT.Double(0.)
+            xn, yn = ctypes.c_double(0.), ctypes.c_double(0.)
             g_num_.GetPoint(j, xn, yn)
 
             if xn != xd: continue
