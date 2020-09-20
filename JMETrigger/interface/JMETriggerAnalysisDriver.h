@@ -24,6 +24,7 @@ class JMETriggerAnalysisDriver : public AnalysisDriverBase {
    public:
     std::string jetCollection = "";
     float jetPtMin = -1.;
+    float jetAbsEtaMax = 9999.;
 
     struct Match {
       Match(const std::string& theLabel, const std::string& theJetCollection, const float theJetPtMin, const float theJetDeltaRMin)

@@ -196,16 +196,16 @@ void JMETriggerAnalysisDriverPhase2::init(){
     }
   }
 
-  for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
-    for(std::string const& categ : jetCategoryLabels_){
-      if(algo == "PF"){
-        bookHistograms_Jets("HLT_AK4"+algo+"JetCorrected"+categ+"_100", "hltAK4"+algo+"JetsCorrected", {"GEN"});
-      }
-      else {
-        bookHistograms_Jets("HLT_AK4"+algo+"JetCorrected"+categ+"_100", "hltAK4"+algo+"JetsCorrected", {"GEN", "Offline"});
-      }
-    }
-  }
+//  for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
+//    for(std::string const& categ : jetCategoryLabels_){
+//      if(algo == "PF"){
+//        bookHistograms_Jets("HLT_AK4"+algo+"JetCorrected"+categ+"_100", "hltAK4"+algo+"JetsCorrected", {"GEN"});
+//      }
+//      else {
+//        bookHistograms_Jets("HLT_AK4"+algo+"JetCorrected"+categ+"_100", "hltAK4"+algo+"JetsCorrected", {"GEN", "Offline"});
+//      }
+//    }
+//  }
 }
 
 void JMETriggerAnalysisDriverPhase2::analyze(){
@@ -225,44 +225,46 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     fillHistoDataJets fhDataAK4Jets;
     fhDataAK4Jets.jetCollection = jetLabel.first;
     fhDataAK4Jets.jetPtMin = jetPt1;
+    fhDataAK4Jets.jetAbsEtaMax = 5.0;
     for(auto const& jetLabelRefs : jetLabel.second){
       fhDataAK4Jets.matches.emplace_back(fillHistoDataJets::Match(jetLabelRefs.first, jetLabelRefs.second, jetPt2, maxAK4JetDeltaRmatchRef));
     }
     fillHistograms_Jets("NoSelection", fhDataAK4Jets);
   }
 
-  //// HLT_AK4*JetCorrected*_100
-  for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
-
-    for(std::string const& categ : jetCategoryLabels_){
-
-      auto const selLabel("HLT_AK4"+algo+"JetCorrected"+categ+"_100");
-
-      auto const jetCollection("hltAK4"+algo+"JetsCorrected");
-      auto const& vec_pt(vector<float>(jetCollection+"_pt"));
-      auto const& vec_eta(vector<float>(jetCollection+"_eta"));
-      bool pass(false);
-      for(size_t jetIdx=0; jetIdx<vec_eta.size(); ++jetIdx){
-        if((vec_pt.at(jetIdx) > 100.) and jetBelongsToCategory(categ, vec_pt.at(jetIdx), std::abs(vec_eta.at(jetIdx)))){
-          pass = true;
-          break;
-        }
-      }
-      if(pass){
-        fillHistoDataJets fhData;
-        fhData.jetCollection = jetCollection;
-        fhData.jetPtMin = minAK4JetPt;
-        fhData.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
-        if(algo == "Puppi"){
-          fhData.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PuppiJetsCorrected", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
-        }
-        else if(algo == "PFCHS"){
-          fhData.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PFCHSJetsCorrected", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
-        }
-        fillHistograms_Jets(selLabel, fhData);
-      }
-    }
-  }
+//  //// HLT_AK4*JetCorrected*_100
+//  for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
+//
+//    for(std::string const& categ : jetCategoryLabels_){
+//
+//      auto const selLabel("HLT_AK4"+algo+"JetCorrected"+categ+"_100");
+//
+//      auto const jetCollection("hltAK4"+algo+"JetsCorrected");
+//      auto const& vec_pt(vector<float>(jetCollection+"_pt"));
+//      auto const& vec_eta(vector<float>(jetCollection+"_eta"));
+//      bool pass(false);
+//      for(size_t jetIdx=0; jetIdx<vec_eta.size(); ++jetIdx){
+//        if((vec_pt.at(jetIdx) > 100.) and jetBelongsToCategory(categ, vec_pt.at(jetIdx), std::abs(vec_eta.at(jetIdx)))){
+//          pass = true;
+//          break;
+//        }
+//      }
+//      if(pass){
+//        fillHistoDataJets fhData;
+//        fhData.jetCollection = jetCollection;
+//        fhData.jetPtMin = minAK4JetPt;
+//        fhData.jetAbsEtaMax = 5.0;
+//        fhData.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
+//        if(algo == "Puppi"){
+//          fhData.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PuppiJetsCorrected", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
+//        }
+//        else if(algo == "PFCHS"){
+//          fhData.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PFCHSJetsCorrected", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
+//        }
+//        fillHistograms_Jets(selLabel, fhData);
+//      }
+//    }
+//  }
 
   //// AK8 Jets
   const float minAK8JetPt(90.);
@@ -278,6 +280,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     fillHistoDataJets fhDataAK8Jets;
     fhDataAK8Jets.jetCollection = jetLabel.first;
     fhDataAK8Jets.jetPtMin = jetPt1;
+    fhDataAK8Jets.jetAbsEtaMax = 5.0;
     for(auto const& jetLabelRefs : jetLabel.second){
       fhDataAK8Jets.matches.emplace_back(fillHistoDataJets::Match(jetLabelRefs.first, jetLabelRefs.second, jetPt2, maxAK8JetDeltaRmatchRef));
     }
