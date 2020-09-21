@@ -20,6 +20,8 @@ bool JMETriggerAnalysisDriverPhase2::jetBelongsToCategory(const std::string& cat
   else if(categLabel == "_EtaInclPt3"){ ret = (jetAbsEta < 5.0) and (400. <= jetPt) and (jetPt < 2000.); }
   else if(categLabel == "_EtaInclPt4"){ ret = (jetAbsEta < 5.0) and (2000. <= jetPt); }
 
+  else if(categLabel == "_Eta2p4"){ ret = (jetAbsEta < 2.4); }
+
   else if(categLabel == "_HB"){ ret = (jetAbsEta < 1.5); }
   else if(categLabel == "_HBPt0"){ ret = (jetAbsEta < 1.5) and (30. <= jetPt) and (jetPt < 60.); }
   else if(categLabel == "_HBPt1"){ ret = (jetAbsEta < 1.5) and (60. <= jetPt) and (jetPt < 110.); }
@@ -60,6 +62,8 @@ void JMETriggerAnalysisDriverPhase2::init(){
 //  "_EtaInclPt2",
 //  "_EtaInclPt3",
 //  "_EtaInclPt4",
+
+    "_Eta2p4",
 
     "_HB",
 //  "_HBPt0",
