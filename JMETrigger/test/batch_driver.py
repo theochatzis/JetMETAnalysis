@@ -245,10 +245,14 @@ if __name__ == '__main__':
                  o_shebang = '#!/bin/bash'
                  o_file.write(o_shebang+'\n')
 
-                 # HTCondor getenv=True does not export LD_LIBRARY_PATH
-                 # --> added by hand to the script itself
-                 if 'LD_LIBRARY_PATH' in os.environ:
-                    o_file.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
+#                 # HTCondor getenv=True does not export LD_LIBRARY_PATH
+#                 # --> added by hand to the script itself
+#                 if 'LD_LIBRARY_PATH' in os.environ:
+#                    o_file.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
+
+                 o_file.write('\n'+'cd '+os.environ['CMSSW_BASE']+'/src')
+                 o_file.write('\n'+'eval `scramv1 runtime -sh`')
+                 o_file.write('\n'+'cd -'+'\n')
 
                  EXE_LINE = '\n\n'.join([' \\\n '.join(_cmds) for _cmds in EXECS])
                  o_file.write('\n'+EXE_LINE+'\n')
