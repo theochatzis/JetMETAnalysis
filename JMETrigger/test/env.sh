@@ -5,10 +5,10 @@ if [ ! -z ${JMEANA_BASE} ]; then
   return
 fi
 
-export JMEANA_BASE="${PWD}"
+export JMEANA_BASE=${PWD}
 
-export PATH=${PATH}:${JMEANA_BASE}
+export PATH=${JMEANA_BASE}:${PATH}
 
-export PYTHONPATH="${PYTHONPATH}":"${PWD}"
-export PYTHONPATH="${PYTHONPATH}":"${PWD}"/common
+export PYTHON27PATH=${PWD}:${PYTHON27PATH}
+export PYTHON27PATH=${PWD}/common:${PYTHON27PATH}
 export PYTHONDONTWRITEBYTECODE=1
