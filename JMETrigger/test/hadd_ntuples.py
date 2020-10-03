@@ -34,7 +34,7 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
     for i_dir in input_directories:
 
        _input_files = all_file_paths(i_dir)
-       _input_files = [os.path.abspath(os.path.realpath(_tmp))  for _tmp in _input_files]
+       _input_files = [os.path.abspath(os.path.realpath(_tmp)) for _tmp in _input_files]
 
        _good_files = []
        for _tmp in _input_files:
@@ -158,13 +158,9 @@ if __name__ == '__main__':
 
    # inputs
    INPUT_DIRS = []
-
    for i_inp in opts.inputs:
-
        i_inp_ls = glob.glob(i_inp)
-
        for i_inp_2 in i_inp_ls:
-
            if os.path.isdir(i_inp_2):
               INPUT_DIRS += [os.path.abspath(os.path.realpath(i_inp_2))]
            elif opts.verbosity > 0:
@@ -179,9 +175,7 @@ if __name__ == '__main__':
    sample_inputs_dict = {}
 
    for i_task in INPUT_DIRS:
-
        task_abspath = os.path.abspath(os.path.realpath(i_task))
-
        if not os.path.isdir(task_abspath):
           if opts.verbosity > 0:
              WARNING(log_prx+'skipping task "'+i_task+'", directory not found: '+task_abspath)
