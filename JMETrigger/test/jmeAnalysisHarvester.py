@@ -293,7 +293,7 @@ if __name__ == '__main__':
               i_h2_key_dirname = os.path.dirname(i_h2_key)
               if i_h2_key_dirname: i_h2_key_dirname += '/'
 
-              keep_th1 = bool(('Jets' in i_h2_key_basename) and i_h2_key_basename.endswith('_pt0') and ('MatchedTo' not in i_h2_key_basename))
+              keep_th1 = bool(('Jets' in i_h2_key_basename) and (i_h2_key_basename.endswith('_pt0') or i_h2_key_basename.endswith('_HT') or i_h2_key_basename.endswith('_MHT')) and ('MatchedTo' not in i_h2_key_basename))
               keep_th1 += bool(('MET' in i_h2_key_basename) and i_h2_key_basename.endswith('_pt') and ('GEN_' not in i_h2_key_basename) and ('Offline_' not in i_h2_key_basename))
               if not keep_th1: continue
 
