@@ -2,7 +2,7 @@
 
 set -e
 
-OUTPUT_DIR=output_hltPhase2_200909_MB
+OUTPUT_DIR=output_hltPhase2_200930
 
 #batch_driver.py -l 1 -i ${OUTPUT_DIR}/ntuples/*/* -o ${OUTPUT_DIR}/jobs -n 5000 -p JMETriggerAnalysisDriverPhase2
 #batch_monitor.py -i ${OUTPUT_DIR}/jobs
