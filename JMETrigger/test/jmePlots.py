@@ -424,7 +424,7 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
     elif key.startswith('hltPFSoftKillerMET_'):        _objLabel = 'HLT PF+SoftKiller MET'
 
     if   '_EtaIncl_' in key: pass
-    elif '_HB_'      in key: _objLabel += ', |#eta|<'+('1.5' if keyword.startswith('phase2') else '1.3')
+    elif '_HB_'      in key: _objLabel += ', |#eta|<'+('1.3' if 'run3' in keyword else '1.5')
     elif '_HGCal_'   in key: _objLabel += ', 1.5<|#eta|<3.0'
     elif '_HE_'      in key: _objLabel += ', 1.3<|#eta|<3.0'
     elif '_HE1_'     in key: _objLabel += ', 1.3<|#eta|<2.5'
@@ -489,8 +489,8 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
     if isEfficiency:
        _titleY = 'Efficiency'
        if key.endswith('_eff'):
-         if '_NotMatchedTo' in key: _titleY = '1 - Matching Effic.'
-         elif '_MatchedTo' in key: _titleY = 'Matching Effic.'
+         if '_NotMatchedTo' in key: _titleY = '1 - #varepsilon_{Matching}'
+         elif '_MatchedTo' in key: _titleY = '#varepsilon_{Matching}'
 
     if   '_pt_overGEN_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
     elif '_pt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
@@ -499,6 +499,14 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
     elif '_pt_overOffline_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{Offl}#GT'
     elif '_pt_overOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT'
     elif '_pt_overOffline_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl})'
+
+    if   '_pt0_overGEN_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
+    elif '_pt0_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
+    elif '_pt0_overGEN_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
+
+    elif '_pt0_overOffline_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{Offl}#GT'
+    elif '_pt0_overOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT'
+    elif '_pt0_overOffline_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl})'
 
     elif '_mass_overGEN_Mean_' in key: _titleY = '#LTmass / mass^{GEN}#GT'
     elif '_mass_overGEN_RMSOverMean_' in key: _titleY = '#sigma(m / m^{GEN}) / #LTm / m^{GEN}#GT'
@@ -558,6 +566,10 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
       elif key.endswith('_dRmatch'): _titleX = '#DeltaR'
       elif key.endswith('_numberOfDaughters'): _titleX = 'Number of jet constituents'
       elif key.endswith('_njets'): _titleX = 'Number of jets'
+      elif key.endswith('_HT'): _titleX = 'H_{T} [GeV]'
+      elif key.endswith('_HT_cumul'): _titleX = 'H_{T} threshold [GeV]'
+      elif key.endswith('_MHT'): _titleX = 'MHT [GeV]'
+      elif key.endswith('_MHT_cumul'): _titleX = 'MHT threshold [GeV]'
       elif key.endswith('_chargedHadronEnergyFraction'): _titleX = 'Charged-Hadron Energy Fraction'
       elif key.endswith('_chargedHadronMultiplicity'): _titleX = 'Charged-Hadron Multiplicity'
       elif key.endswith('_neutralHadronEnergyFraction'): _titleX = 'Neutral-Hadron Energy Fraction'
