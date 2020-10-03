@@ -2,7 +2,12 @@
 
 set -e
 
-OUTPUT_DIR=output_hltPhase2_200930
+if [ $# -ne 1 ]; then
+  printf "%s\n" ">>> invalid command-line arguments ($#) -> specify path to input directory"
+  exit 1
+fi
+
+OUTPUT_DIR=${1}
 
 #batch_driver.py -l 1 -i ${OUTPUT_DIR}/ntuples/*/* -o ${OUTPUT_DIR}/jobs -n 5000 -p JMETriggerAnalysisDriverPhase2
 #batch_monitor.py -i ${OUTPUT_DIR}/jobs
