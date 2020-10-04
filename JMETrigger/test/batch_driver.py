@@ -252,7 +252,7 @@ if __name__ == '__main__':
 
                  o_file.write('\n'+'cd '+os.environ['CMSSW_BASE']+'/src')
                  o_file.write('\n'+'eval `scramv1 runtime -sh`')
-                 o_file.write('\n'+'cd -'+'\n')
+                 o_file.write('\n'+'cd - &> /dev/null'+'\n')
 
                  EXE_LINE = '\n\n'.join([' \\\n '.join(_cmds) for _cmds in EXECS])
                  o_file.write('\n'+EXE_LINE+'\n')
