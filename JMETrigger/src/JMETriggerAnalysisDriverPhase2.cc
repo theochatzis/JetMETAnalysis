@@ -202,7 +202,7 @@ void JMETriggerAnalysisDriverPhase2::init(){
   }
 
   l1tSeeds_1Jet_ = {
-    "L1T_AK4PuppiJet130",
+    "L1T_AK4PFPuppiJet130Eta2p4",
     "L1T_PFPuppiHT440",
   };
 
@@ -265,39 +265,6 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
       fillHistograms_Jets(selLabel, fhDataAK4Jets);
     }
   }
-
-//  //// HLT_AK4*JetCorrected*_100
-//  for(std::string const& algo : {"PF", "PFCHS", "Puppi"}){
-//
-//    for(std::string const& categ : jetCategoryLabels_){
-//
-//      auto const selLabel("HLT_AK4"+algo+"JetCorrected"+categ+"_100");
-//
-//      auto const jetCollection("hltAK4"+algo+"JetsCorrected");
-//      auto const& vec_pt(vector<float>(jetCollection+"_pt"));
-//      auto const& vec_eta(vector<float>(jetCollection+"_eta"));
-//      bool pass(false);
-//      for(size_t jetIdx=0; jetIdx<vec_eta.size(); ++jetIdx){
-//        if((vec_pt.at(jetIdx) > 100.) and jetBelongsToCategory(categ, vec_pt.at(jetIdx), std::abs(vec_eta.at(jetIdx)))){
-//          pass = true;
-//          break;
-//        }
-//      }
-//      if(pass){
-//        fillHistoDataJets fhData;
-//        fhData.jetCollection = jetCollection;
-//        fhData.jetPtMin = minAK4JetPt;
-//        fhData.matches.emplace_back(fillHistoDataJets::Match("GEN", "ak4GenJetsNoNu", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
-//        if(algo == "Puppi"){
-//          fhData.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PuppiJetsCorrected", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
-//        }
-//        else if(algo == "PFCHS"){
-//          fhData.matches.emplace_back(fillHistoDataJets::Match("Offline", "offlineAK4PFCHSJetsCorrected", minAK4JetPtRef, maxAK4JetDeltaRmatchRef));
-//        }
-//        fillHistograms_Jets(selLabel, fhData);
-//      }
-//    }
-//  }
 
   //// AK8 Jets
   const float minAK8JetPt(90.);
