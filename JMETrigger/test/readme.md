@@ -13,7 +13,7 @@ source env.sh
 
 * Create output directory with one .root for each crab3 task:
 ```
-hadd_ntuples.py -i [DIRS] -o [OUTDIR] -l 0
+hadd_ntuples.py -i [DIRS] -o [OUTDIR] -l 0 -s DQM
 ```
 
 #### Submit Analysis Jobs to Batch System (HT-Condor)

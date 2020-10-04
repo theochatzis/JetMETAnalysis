@@ -8,7 +8,9 @@ ttree = tfile.Get('JMETriggerNTuple/Events')
 
 h2 = ROOT.TH2D('h2', 'h2', 250, 0, 250, 250, 0, 250)
 
-ttree.Draw("offlinePrimaryVertices_z@.size():fixedGridRhoFastjetAllTmp>>h2","","goff")
+ttree.Draw("fixedGridRhoFastjetAllTmp:offlinePrimaryVertices_z@.size()>>h2","","goff")
+#ttree.Draw("pileupInfo_BX0_numPUInteractions:offlinePrimaryVertices_z@.size()>>h2","","goff")
+#ttree.Draw("pileupInfo_BX0_numPUInteractions:fixedGridRhoFastjetAllTmp>>h2","","goff")
 
 h2_py = h2.ProfileY('h2_py')
 h2_py.Draw()
