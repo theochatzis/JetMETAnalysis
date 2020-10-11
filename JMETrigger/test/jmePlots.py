@@ -1181,10 +1181,10 @@ def getPlotConfig(key, keyword, inputList):
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltPrimaryVertices', '_offlinePrimaryVertices'), Legend='offlinePrimaryVertices', Color=ROOT.kPink+1) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key)]
 
-       elif ('_particleFlowTmp/' in key) or ('_particleFlowTmp_' in key):
-         cfg.objLabel = 'particleFlowTmp'
+       elif ('_hltParticleFlow/' in key) or ('_hltParticleFlow_' in key):
+         cfg.objLabel = 'hltParticleFlow'
          for idx, inp in enumerate(inputList):
-           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_particleFlowTmp', '_offlineParticleFlow'), Legend='Offline PF', Color=ROOT.kPink+1) if idx==0 else None]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_offlineParticleFlow'), Legend='Offline PF', Color=ROOT.kPink+1) if idx==0 else None]
            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key)]
 
        elif ('_simPFProducer/' in key) or ('_simPFProducer_' in key):
@@ -1216,16 +1216,16 @@ def getPlotConfig(key, keyword, inputList):
        if skip_key:
           return
 
-       if ('_particleFlowTmp/' in key) or ('_particleFlowTmp_' in key):
+       if ('_hltParticleFlow/' in key) or ('_hltParticleFlow_' in key):
         cfg.legXY = [0.55, 0.70, 0.99, 0.99]
-        cfg.outputName = key.replace('_particleFlowTmp', '')
+        cfg.outputName = key.replace('_hltParticleFlow', '')
         for idx, inp in enumerate(inputList):
           legTag = '[ '+inp['Legend']+' ] '
-          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_particleFlowTmp', '_offlineParticleFlow'), Legend=       'Offline PF'     , Color=ROOT.kPink+1) if idx==0 else None]
-          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_particleFlowTmp', '_simPFProducer')      , Legend=legTag+'simPFProducer'  , Color=ROOT.kOrange+1)]
-          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_particleFlowTmp', '_pfTICL')             , Legend=legTag+'pfTICL'         , Color=ROOT.kBlue)]
-          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_particleFlowTmp', '_particleFlowTmp')    , Legend=legTag+'particleFlowTmp', Color=ROOT.kBlack)]
-#         cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_particleFlowTmp', '_hltPuppi')           , Legend=legTag+'hltPuppi'       , Color=ROOT.kRed)]
+          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_offlineParticleFlow'), Legend=       'Offline PF'     , Color=ROOT.kPink+1) if idx==0 else None]
+          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_simPFProducer')      , Legend=legTag+'simPFProducer'  , Color=ROOT.kOrange+1)]
+          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_pfTICL')             , Legend=legTag+'pfTICL'         , Color=ROOT.kBlue)]
+          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_hltParticleFlow')    , Legend=legTag+'hltParticleFlow', Color=ROOT.kBlack)]
+#         cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('_hltParticleFlow', '_hltPuppi')           , Legend=legTag+'hltPuppi'       , Color=ROOT.kRed)]
 
     ##
     ## keyword: phase2_jme_compareTRK1
