@@ -214,8 +214,8 @@ void JMETriggerAnalysisDriverPhase2::init(){
   }
 
   l1tSeeds_1Jet_ = {
-    "L1T_AK4PFPuppiJet130Eta2p4",
-    "L1T_PFPuppiHT440",
+    "L1T_SinglePFPuppiJet200off",
+    "L1T_PFPuppiHT450off",
   };
 
   for(auto const& selLabel : l1tSeeds_1Jet_){
@@ -224,6 +224,7 @@ void JMETriggerAnalysisDriverPhase2::init(){
       if((jetLabel.first.find("hlt") != 0) and (jetLabel.first.find("offline") != 0)){
         continue;
       }
+
       bookHistograms_Jets(selLabel, jetLabel.first, utils::mapKeys(jetLabel.second));
     }
 
@@ -235,7 +236,8 @@ void JMETriggerAnalysisDriverPhase2::init(){
   }
 
   l1tSeeds_MET_ = {
-    "L1T_PFPuppiMET100",
+    "L1T_PFPuppiMET200off",
+    "L1T_PFPuppiMET245off",
   };
 
   for(auto const& selLabel : l1tSeeds_MET_){
@@ -244,6 +246,7 @@ void JMETriggerAnalysisDriverPhase2::init(){
       if((metLabel.first.find("hlt") != 0) and (metLabel.first.find("offline") != 0)){
         continue;
       }
+
       bookHistograms_MET(selLabel, metLabel.first, utils::mapKeys(metLabel.second));
     }
 
@@ -344,6 +347,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     for(auto const& metRefs : metLabel.second){
       fhDataMET.matches.emplace_back(fillHistoDataMET::Match(metRefs.first, metRefs.second));
     }
+
     fillHistograms_MET("NoSelection", fhDataMET);
 
     for(auto const& selLabel : l1tSeeds_MET_){
@@ -353,6 +357,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
       if((metLabel.first.find("hlt") != 0) and (metLabel.first.find("offline") != 0)){
         continue;
       }
+
       fillHistograms_MET(selLabel, fhDataMET);
     }
   }
