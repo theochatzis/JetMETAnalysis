@@ -18,6 +18,12 @@ class JMETriggerAnalysisDriverPhase2 : public JMETriggerAnalysisDriver {
  protected:
   bool jetBelongsToCategory(const std::string& categLabel, const float jetPt, const float jetAbsEta) const override;
 
+  void bookHistograms_Jets_2DMaps(const std::string& dir, const std::string& jetType1, const std::string& jetType2);
+  void bookHistograms_MET_2DMaps(const std::string& dir, const std::string& metType1, const std::string& metType2);
+
+  void fillHistograms_Jets_2DMaps(const std::string& dir, const fillHistoDataJets& fhDataJets1, const fillHistoDataJets& fhDataJets2);
+  void fillHistograms_MET_2DMaps(const std::string& dir, const fillHistoDataMET& fhDataMET1, const fillHistoDataMET& fhDataMET2);
+
   std::map<std::string, std::map<std::string, std::string>> labelMap_jetAK4_;
   std::map<std::string, std::map<std::string, std::string>> labelMap_jetAK8_;
   std::map<std::string, std::map<std::string, std::string>> labelMap_MET_;
