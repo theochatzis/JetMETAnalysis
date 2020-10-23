@@ -50,49 +50,70 @@ for sample in "${samples[@]}"; do
 
     jmePlots.py -k phase2_dqm_compareTRK \
       -o ${outd_i}/dqm_compareTRK_withoutTICL -l ${sample} -e ${exts[*]} -i \
-      ${inpdir}/ntuples/HLT_TRKv06/${sample}.root:'TRK-v6':880:1:25 \
-      ${inpdir}/ntuples/HLT_TRKv06p1/${sample}.root:'TRK-v6.1':880:1:20 \
-      ${inpdir}/ntuples/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':801:1:26
+      ${inpdir}/ntuples/HLT_TRKv06/${sample}.root:'TRK-v6':1:1:20 \
+      ${inpdir}/ntuples/HLT_TRKv06p1/${sample}.root:'TRK-v6.1':4:1:22 \
+      ${inpdir}/ntuples/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':2:1:33
 
-#    jmePlots.py -k phase2_dqm_compareTRK -m 'PFCandidateHistograms_*' \
-#      -o ${outd_i}/dqm_compareTRK_withTICL -l ${sample} -e ${exts[*]} -i \
-#      ${inpdir}/ntuples/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':880:1:25 \
-#      ${inpdir}/ntuples/HLT_TRKv07p2_TICL/${sample}.root:'TRK-v7.2 + TICL':801:1:26
-#
-#    jmePlots.py -k phase2_dqm_compareTRK2 \
-#      -o ${outd_i}/dqm_compareTICL_withTRKv06 -l ${sample} -e ${exts[*]} -i \
-#      ${inpdir}/ntuples/HLT_TRKv06/${sample}.root:'TRK-v6':1:1:20 \
-#      ${inpdir}/ntuples/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':1:2:20
-#
-#    jmePlots.py -k phase2_dqm_compareTRK2 \
-#      -o ${outd_i}/dqm_compareTICL_withTRKv07p2 -l ${sample} -e ${exts[*]} -i \
-#      ${inpdir}/ntuples/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':1:1:20 \
-#      ${inpdir}/ntuples/HLT_TRKv07p2_TICL/${sample}.root:'TRK-v7.2 + TICL':1:2:20
+    jmePlots.py -k phase2_dqm_compareTRK -m 'PFCandidateHistograms_*' \
+      -o ${outd_i}/dqm_compareTRK_withTICL -l ${sample} -e ${exts[*]} -i \
+      ${inpdir}/ntuples/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':920:1:24 \
+      ${inpdir}/ntuples/HLT_TRKv06p1_TICL/${sample}.root:'TRK-v6.1 + TICL':879:1:26 \
+      ${inpdir}/ntuples/HLT_TRKv07p2_TICL/${sample}.root:'TRK-v7.2 + TICL':801:1:27
+
+    jmePlots.py -k phase2_dqm_compareTRK2 \
+      -o ${outd_i}/dqm_compareTICL_withTRKv06 -l ${sample} -e ${exts[*]} -i \
+      ${inpdir}/ntuples/HLT_TRKv06/${sample}.root:'TRK-v6':1:1:20 \
+      ${inpdir}/ntuples/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':920:2:24
+
+    jmePlots.py -k phase2_dqm_compareTRK2 \
+      -o ${outd_i}/dqm_compareTICL_withTRKv06p1 -l ${sample} -e ${exts[*]} -i \
+      ${inpdir}/ntuples/HLT_TRKv06p1/${sample}.root:'TRK-v6.1':4:1:22 \
+      ${inpdir}/ntuples/HLT_TRKv06p1_TICL/${sample}.root:'TRK-v6.1 + TICL':879:2:26
+
+    jmePlots.py -k phase2_dqm_compareTRK2 \
+      -o ${outd_i}/dqm_compareTICL_withTRKv07p2 -l ${sample} -e ${exts[*]} -i \
+      ${inpdir}/ntuples/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':2:1:33 \
+      ${inpdir}/ntuples/HLT_TRKv07p2_TICL/${sample}.root:'TRK-v7.2 + TICL':801:2:27
   fi
-
-  continue
 
   opts_i=""
   if   [[ ${sample} == *"QCD_"* ]]; then opts_i="-m 'NoSel*/*JetsCorr*' 'NoSel*/*MET_*' 'NoSel*/*/offline*MET*_pt' -s '*MET*GEN*'"
   elif [[ ${sample} == *"HToInv"* ]]; then opts_i="-m 'NoSel*/*MET_*' 'NoSel*/*/offline*METs*_pt'"
   fi
 
-  jmePlots.py -k jme_compare ${opts_i} \
+  jmePlots.py -k phase2_jme_comparePFPuppi ${opts_i} \
     -o ${outd_i}/compareTRK_withoutTICL -l ${sample} -e ${exts[*]} -i \
     ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRK-v6':1:1:20 \
-    ${inpdir}/harvesting/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':2:1:33 \
+    ${inpdir}/harvesting/HLT_TRKv06p1/${sample}.root:'TRK-v6.1':4:1:22 \
+    ${inpdir}/harvesting/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':2:1:33
 
-  jmePlots.py -k jme_compare ${opts_i} \
+  jmePlots.py -k phase2_jme_comparePFPuppi ${opts_i} \
     -o ${outd_i}/compareTRK_withTICL -l ${sample} -e ${exts[*]} -i \
-    ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':4:1:24 \
+    ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':920:1:24 \
+    ${inpdir}/harvesting/HLT_TRKv06p1_TICL/${sample}.root:'TRK-v6.1 + TICL':879:1:26 \
     ${inpdir}/harvesting/HLT_TRKv07p2_TICL/${sample}.root:'TRK-v7.2 + TICL':801:1:27
 
-  jmePlots.py -k jme_compare ${opts_i} \
-    -o ${outd_i}/compareTRKandTICL -l ${sample} -e ${exts[*]} -i \
+  jmePlots.py -k phase2_jme_comparePFPuppi ${opts_i} \
+    -o ${outd_i}/compareTRKandTICL_v6vs6p1 -l ${sample} -e ${exts[*]} -i \
     ${inpdir}/harvesting/HLT_TRKv06/${sample}.root:'TRK-v6':1:1:20 \
-    ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':4:1:24 \
+    ${inpdir}/harvesting/HLT_TRKv06_TICL/${sample}.root:'TRK-v6 + TICL':920:1:24 \
+    ${inpdir}/harvesting/HLT_TRKv06p1/${sample}.root:'TRK-v6.1':4:1:22 \
+    ${inpdir}/harvesting/HLT_TRKv06p1_TICL/${sample}.root:'TRK-v6.1 + TICL':879:1:26
+
+  jmePlots.py -k phase2_jme_comparePFPuppi ${opts_i} \
+    -o ${outd_i}/compareTRKandTICL_v6p1vs7p2 -l ${sample} -e ${exts[*]} -i \
+    ${inpdir}/harvesting/HLT_TRKv06p1/${sample}.root:'TRK-v6.1':4:1:22 \
+    ${inpdir}/harvesting/HLT_TRKv06p1_TICL/${sample}.root:'TRK-v6.1 + TICL':879:1:26 \
     ${inpdir}/harvesting/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':2:1:33 \
     ${inpdir}/harvesting/HLT_TRKv07p2_TICL/${sample}.root:'TRK-v7.2 + TICL':801:1:27
+
+  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
+    -o ${outd_i}/compareTRK1_TRKv06p1 -l ${sample} -e ${exts[*]} -i \
+    ${inpdir}/harvesting/HLT_TRKv06p1/${sample}.root:'TRK-v6.1':1:1:1
+
+  jmePlots.py -k phase2_jme_compareTRK1 ${opts_i} \
+    -o ${outd_i}/compareTRK1_TRKv07p2 -l ${sample} -e ${exts[*]} -i \
+    ${inpdir}/harvesting/HLT_TRKv07p2/${sample}.root:'TRK-v7.2':1:1:1
 
   unset outd_i opts_i
 done

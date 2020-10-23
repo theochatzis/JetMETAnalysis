@@ -87,3 +87,20 @@ def get_ratio_graph(g_num_, g_den_, verbose=False):
             ratio.SetPointEYlow(n, dw)
 
     return ratio
+
+def getFirstXValueWithYValueAbove(tgraphae, yMin):
+    xyvals = []
+    for p_i in range(effg.GetN()):
+      xd, yd = ctypes.c_double(0.), ctypes.c_double(0.)
+      effg.GetPoint(p_i, xd, yd)
+      xyvals += [[xd-effg.GetErrorXlow(p_i), yd]]
+
+    xyvals = sorted(xyvals, key=lambda x: x[0])
+
+    ret = None
+    for [x0, y0] in xyvals:
+      if y0 > yMin:
+        ret = x0
+        break
+
+    return ret

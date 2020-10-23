@@ -3,11 +3,20 @@ import os, subprocess
 
 def KILL(log):
     raise SystemExit('\n '+'\033[1m'+'@@@ '+'\033[91m'+'FATAL'  +'\033[0m'+' -- '+log+'\n')
-# --
 
 def WARNING(log):
     print '\n '+'\033[1m'+'@@@ '+'\033[93m'+'WARNING'+'\033[0m'+' -- '+log+'\n'
-# --
+
+def MKDIRP(dirpath, verbose=False, dry_run=False):
+    print dirpath, '1'
+    if verbose: print '\033[1m'+'>'+'\033[0m'+' os.mkdirs("'+dirpath+'")'
+    if dry_run: return
+    try:
+      os.makedirs(dirpath)
+    except OSError:
+      if not os.path.isdir(dirpath):
+        raise
+    print dirpath, '2'
 
 def EXE(cmd, suspend=True, verbose=False, dry_run=False):
     if verbose: print '\033[1m'+'>'+'\033[0m'+' '+cmd
@@ -15,10 +24,10 @@ def EXE(cmd, suspend=True, verbose=False, dry_run=False):
 
     _exitcode = os.system(cmd)
 
-    if _exitcode and suspend: raise SystemExit(_exitcode)
+    if _exitcode and suspend:
+       raise RuntimeError(cmd+' exitcode='+str(_exitcode))
 
     return _exitcode
-# --
 
 def get_output(cmd, permissive=False):
     prc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -29,7 +38,6 @@ def get_output(cmd, permissive=False):
        KILL('get_output -- shell command failed (execute command to reproduce the error):\n'+' '*14+'> '+cmd)
 
     return (out, err)
-# --
 
 def command_output_lines(cmd, stdout=True, stderr=False, permissive=False):
 
@@ -45,12 +53,10 @@ def command_output_lines(cmd, stdout=True, stderr=False, permissive=False):
     if stderr: _tmp_out_ls += _tmp_out[1].split('\n')
 
     return _tmp_out_ls
-# --
 
 def rreplace(str__, old__, new__, occurrence__):
     li_ = str__.rsplit(old__, occurrence__)
     return new__.join(li_)
-# --
 
 def which(program, permissive=False, verbose=False):
 
@@ -87,28 +93,21 @@ def which(program, permissive=False, verbose=False):
           WARNING('which -- executable "'+program+'" has multiple matches: \n'+str(_exe_ls))
 
     return _exe_ls[0]
-# --
 
 def is_int(value):
-
     try: int(value)
     except ValueError: return False
 
     return True
-# --
 
 def is_float(value):
-
     try: float(value)
     except ValueError: return False
 
     return True
-# --
 
 def colored_text(txt, keys=[]):
-
     _tmp_out = ''
-
     for _i_tmp in keys:
         _tmp_out += '\033['+_i_tmp+'m'
 
@@ -117,10 +116,8 @@ def colored_text(txt, keys=[]):
     if len(keys) > 0: _tmp_out += '\033[0m'
 
     return _tmp_out
-# --
 
 def HTCondor_jobIDs(username=None):
-
     if not username:
        if 'USER' in os.environ: username = os.environ['USER']
 
@@ -140,7 +137,6 @@ def HTCondor_jobIDs(username=None):
     return _condorq_jobIDs
 
 def HTCondor_jobExecutables(username=None):
-
     if not username:
        if 'USER' in os.environ: username = os.environ['USER']
 
@@ -176,7 +172,6 @@ def HTCondor_jobExecutables(username=None):
     return _condorq_jobExes
 
 def HTCondor_jobExecutables_2(username=None):
-
     if not username:
        if 'USER' in os.environ: username = os.environ['USER']
 
@@ -202,7 +197,6 @@ def HTCondor_jobExecutables_2(username=None):
     return _condorq_jobExes_dict
 
 def HTCondor_executable_from_jobID(jobID):
-
     _condorq_cmd = get_output('condor_q '+jobID+' -long')[0].split('\n')
     _condorq_cmd = [_tmp for _tmp in _condorq_cmd if _tmp.startswith('Cmd = ')]
 
@@ -220,10 +214,8 @@ def HTCondor_executable_from_jobID(jobID):
     _exe_path = os.path.abspath(os.path.realpath(_exe_path))
 
     return _exe_path
-# --
 
 def hadd_rootfiles(output, inputs):
-
     if os.path.exists(output):
        KILL('hadd_rootfiles -- path to target output file already exists: '+output)
 
@@ -260,4 +252,3 @@ def hadd_rootfiles(output, inputs):
     if not _ret: KILL('hadd_rootfiles -- call to TFileMerger::Merge() failed: output='+output)
 
     print colored_text('[output='+output_file+']', ['93']), 'merging completed {0}, {1:.2f} MB'.format(output_file, os.path.getsize(output_file)/1024.0/1024.0)
-# --

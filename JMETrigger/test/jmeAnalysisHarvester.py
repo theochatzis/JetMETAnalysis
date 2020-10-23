@@ -326,7 +326,7 @@ if __name__ == '__main__':
 
               if '_wrt_' in hkey_i_basename:
                  continue
-   
+
               if not (('_MatchedTo' in hkey_i_basename) and ('_pt0' in hkey_i_basename) and (opts.separator_2d in hkey_i_basename)):
                  continue
    
@@ -375,17 +375,14 @@ if __name__ == '__main__':
           KILL(log_prx+'logic error - target output file already exists: '+output_file)
 
        output_dirname = os.path.dirname(os.path.abspath(output_file))
-       if not os.path.isdir(output_dirname):
-          EXE('mkdir -p '+output_dirname, verbose=opts.verbose, dry_run=opts.dry_run)
-       del output_dirname
+       MKDIRP(output_dirname, verbose=opts.verbose, dry_run=opts.dry_run)
 
        if not opts.dry_run:
           output_tfile = ROOT.TFile(output_file, 'create')
           if (not output_tfile) or output_tfile.IsZombie() or output_tfile.TestBit(ROOT.TFile.kRecovered):
-             raise SystemExit(1)
+             raise RuntimeError(output_file)
 
           for i_idx in sorted(histograms.keys()):
-
               if hasattr(histograms[i_idx], 'GetEntries') and (histograms[i_idx].GetEntries() == 0):
                  continue
 

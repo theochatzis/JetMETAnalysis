@@ -15,36 +15,36 @@ for pfAlgo in ['PF', 'PFPuppi']:
  for key in [0, 1, 2]:
 
   if key == 0:
-   inputNtuplesDir = 'output_hltPhase2_201002_v2/ntuples'
+   inputNtuplesDir = 'output_hltPhase2_201007/ntuples'
    ntupleName = 'Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200'
-   outputTag = pfAlgo+'_HLT_TRKv06vs07p2'
-   reco0 = 'HLT_TRKv06'
+   outputTag = pfAlgo+'_HLT_TRKv06p1vs07p2'
+   reco0 = 'HLT_TRKv06p1'
    reco1 = 'HLT_TRKv07p2'
    reco2 = ''
    color0 = 1
    color1 = ROOT.kGray
 
   elif key == 1:
-   inputNtuplesDir = 'output_hltPhase2_201002_v2/ntuples'
+   inputNtuplesDir = 'output_hltPhase2_201007/ntuples'
    ntupleName = 'Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200'
-   outputTag = pfAlgo+'_HLT_TRKv06'
-   reco0 = 'HLT_TRKv06'
-   reco1 = 'HLT_TRKv06_TICL'
-   reco2 = 'HLT_TRKv06_TICL2'
+   outputTag = pfAlgo+'_HLT_TRKv06p1'
+   reco0 = 'HLT_TRKv06p1'
+   reco1 = 'HLT_TRKv06p1_TICL'
+   reco2 = 'HLT_TRKv06p1_TICL2'
    color0 = 1
    color1 = 2
    color2 = 4
 
   elif key == 2:
-   inputNtuplesDir = 'output_hltPhase2_201002_v2/ntuples'
+   inputNtuplesDir = 'output_hltPhase2_201007/ntuples'
    ntupleName = 'Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200'
    outputTag = pfAlgo+'_HLT_TRKv07p2'
    reco0 = 'HLT_TRKv07p2'
    reco1 = 'HLT_TRKv07p2_TICL'
    reco2 = 'HLT_TRKv07p2_TICL2'
-   color0 = ROOT.kGray
-   color1 = ROOT.kOrange+1
-   color2 = ROOT.kViolet-1
+   color0 = 1 #ROOT.kBrown
+   color1 = 2 #ROOT.kOrange+1
+   color2 = 4 #ROOT.kViolet-1
 
   else:
    raise RuntimeError(key)
@@ -63,7 +63,7 @@ for pfAlgo in ['PF', 'PFPuppi']:
     {
       'outputName': outputDir+'/'+ntupleName+'_'+outputTag+'_jpt030.pdf',
       'cut': 'hltAK4'+pfAlgo+'JetsCorrected_pt > 30',
-      'title': ';Jet p_{T} [GeV];Entries',
+      'title': ';Jet #eta;Entries',
       'objLabel': 'hltAK4'+pfAlgo+'Jets, pT > 30 GeV',
       'topLabel': ntupleName,
       'var': 'hltAK4'+pfAlgo+'JetsCorrected_eta',
@@ -75,7 +75,7 @@ for pfAlgo in ['PF', 'PFPuppi']:
     {
       'outputName': outputDir+'/'+ntupleName+'_'+outputTag+'_jpt050.pdf',
       'cut': 'hltAK4'+pfAlgo+'JetsCorrected_pt > 50',
-      'title': ';Jet p_{T} [GeV];Entries',
+      'title': ';Jet #eta;Entries',
       'objLabel': 'hltAK4'+pfAlgo+'Jets, pT > 50 GeV',
       'topLabel': ntupleName,
       'var': 'hltAK4'+pfAlgo+'JetsCorrected_eta',
@@ -87,7 +87,7 @@ for pfAlgo in ['PF', 'PFPuppi']:
     {
       'outputName': outputDir+'/'+ntupleName+'_'+outputTag+'_jpt100.pdf',
       'cut': 'hltAK4'+pfAlgo+'JetsCorrected_pt > 100',
-      'title': ';Jet p_{T} [GeV];Entries',
+      'title': ';Jet #eta;Entries',
       'objLabel': 'hltAK4'+pfAlgo+'Jets, pT > 100 GeV',
       'topLabel': ntupleName,
       'var': 'hltAK4'+pfAlgo+'JetsCorrected_eta',
