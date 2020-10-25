@@ -378,15 +378,14 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   std::vector<float> binEdges_MHT(151);
   for(uint idx=0; idx<151; ++idx){ binEdges_MHT.at(idx) = idx * 10.; }
 
-  const std::vector<float> binEdges_pt(
-    {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000}
-  );
+  std::vector<float> binEdges_pt(101);
+  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = 10.*idx; }
 
   std::vector<float> binEdges_eta(101);
-  for(uint idx=0; idx<101; ++idx){ binEdges_eta.at(idx) = -5.0+0.1*idx; }
+  for(uint idx=0; idx<binEdges_eta.size(); ++idx){ binEdges_eta.at(idx) = -5.0+0.1*idx; }
 
   std::vector<float> binEdges_phi(41);
-  for(uint idx=0; idx<41; ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
+  for(uint idx=0; idx<binEdges_phi.size(); ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
 
   const std::vector<float> binEdges_mass(
     {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600}
@@ -509,15 +508,17 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-  const std::vector<float> binEdges_pt(
-    {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000}
-  );
+  std::vector<float> binEdges_pt(61);
+  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = 10.*idx; }
+//  const std::vector<float> binEdges_pt(
+//    {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000}
+//  );
 
   std::vector<float> binEdges_phi(41);
-  for(uint idx=0; idx<41; ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
+  for(uint idx=0; idx<binEdges_phi.size(); ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
 
   std::vector<float> binEdges_sumEt(121);
-  for(uint idx=0; idx<121; ++idx){ binEdges_sumEt.at(idx) = 50.*idx; }
+  for(uint idx=0; idx<binEdges_sumEt.size(); ++idx){ binEdges_sumEt.at(idx) = 50.*idx; }
 
   const std::vector<float> binEdges_offlineNPV(
     {0, 10, 15, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 65, 70, 80, 100, 120, 140}
