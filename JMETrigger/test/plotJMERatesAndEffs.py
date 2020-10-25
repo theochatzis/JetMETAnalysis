@@ -18,7 +18,11 @@ apply_style(0)
 inputDir = sys.argv[1]
 
 rateGroup = {
-  'MB': ['MinBias_14TeV'],
+
+  'MB': [
+    'MinBias_14TeV',
+  ],
+
   'QCD': [
     'QCD_Pt020to030_14TeV',
     'QCD_Pt030to050_14TeV',
@@ -41,6 +45,11 @@ rateGroup = {
   ],
 }
 
+rateSamples = []
+for _tmp in rateGroup:
+  rateSamples += rateGroup[_tmp]
+rateSamples = sorted(list(set(rateSamples)))
+
 COUNTER = 0
 def tmpName():
   global COUNTER
@@ -48,7 +57,7 @@ def tmpName():
   return 'tmp'+str(COUNTER)
 
 def getRateFactor(processName):
-  if   processName == 'MinBias_14TeV': return 30.903 * 1e6
+  if   processName == 'MinBias_14TeV'             : return 30.903 * 1e6
   elif processName == 'QCD_Pt020to030_14TeV'      : return 0.075 * 436000000.0
   elif processName == 'QCD_Pt030to050_14TeV'      : return 0.075 * 118400000.0
   elif processName == 'QCD_Pt050to080_14TeV'      : return 0.075 *  17650000.0
@@ -74,9 +83,9 @@ def getRateHistogram(h1, rateFac):
    theRateHisto.UseCurrentStyle()
 
    for _tmp_bin_i in range(1, 1+h1.GetNbinsX()):
-      _err = ctypes.c_double(0.)
-      theRateHisto.SetBinContent(_tmp_bin_i, h1.IntegralAndError(_tmp_bin_i, -1, _err))
-      theRateHisto.SetBinError(_tmp_bin_i, _err.value)
+     _err = ctypes.c_double(0.)
+     theRateHisto.SetBinContent(_tmp_bin_i, h1.IntegralAndError(_tmp_bin_i, -1, _err))
+     theRateHisto.SetBinError(_tmp_bin_i, _err.value)
 
    theRateHisto.Scale(rateFac)
 
@@ -168,7 +177,7 @@ def getRates(fpath, processName):
 
     return ret
 
-def getJetEfficiencies(fpath, processName):
+def getJetEfficiencies(fpath, hltThreshold=530.):
     ret = {}
 
     _tfile = ROOT.TFile.Open(fpath)
@@ -181,17 +190,26 @@ def getJetEfficiencies(fpath, processName):
       _tmp_den = _tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
       _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
 
-      ret['1Jet_L1T_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
-      ret['1Jet_L1T_wrt_'+_tmpRef].SetName('1Jet_L1T_wrt_'+_tmpRef)
+      ret['SingleJet_L1T_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+      ret['SingleJet_L1T_wrt_'+_tmpRef].SetName('SingleJet_L1T_wrt_'+_tmpRef)
 
-      _tmp_num = _tfile.Get('L1T_SinglePFPuppiJet200off/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
-      _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, _tmp_num.GetXaxis().FindBin(530.))
+      _tmp_num = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
+      _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold), -1)
 
       _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
       _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
 
-      ret['1Jet_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
-      ret['1Jet_HLT_wrt_'+_tmpRef].SetName('1Jet_HLT_wrt_'+_tmpRef)
+      ret['SingleJet_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+      ret['SingleJet_HLT_wrt_'+_tmpRef].SetName('SingleJet_HLT_wrt_'+_tmpRef)
+
+      _tmp_num = _tfile.Get('L1T_SinglePFPuppiJet200off/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
+      _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold), -1)
+
+      _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
+      _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
+
+      ret['SingleJet_L1TpHLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+      ret['SingleJet_L1TpHLT_wrt_'+_tmpRef].SetName('SingleJet_L1TpHLT_wrt_'+_tmpRef)
 
 #    # HT
 #    for _tmpRef in ['GEN', 'Offline']:
@@ -217,38 +235,44 @@ def getJetEfficiencies(fpath, processName):
 
     return ret
 
-def getMETEfficiencies(fpath, processName):
+def getMETEfficiencies(fpath, hltThreshold=140.):
     ret = {}
 
     _tfile = ROOT.TFile.Open(fpath)
 
     for _tmpRef in ['GEN', 'Offline']:
-#      _tmp_num = _tfile.Get('L1T_SinglePFPuppiJet200off/l1tSlwPFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
-#      _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, -1)
-#
-#      _tmp_den = _tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
-#      _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
-#
-#      ret['1Jet_L1T_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
-#      ret['1Jet_L1T_wrt_'+_tmpRef].SetName('1Jet_L1T_wrt_'+_tmpRef)
-#
-#      _tmp_num = _tfile.Get('L1T_SinglePFPuppiJet200off/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
-#      _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, _tmp_num.GetXaxis().FindBin(530.))
-#
-#      _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
-#      _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
-#
-#      ret['1Jet_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
-#      ret['1Jet_HLT_wrt_'+_tmpRef].SetName('1Jet_HLT_wrt_'+_tmpRef)
+      _tmp_num = _tfile.Get('L1T_PFPuppiMET200off/l1tPFPuppiMET_pt__vs__'+_tmpRef+'_pt')
+      _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, -1)
+
+      _tmp_den = _tfile.Get('NoSelection/l1tPFPuppiMET_pt__vs__'+_tmpRef+'_pt')
+      _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
+
+      ret['MET_L1T_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+      ret['MET_L1T_wrt_'+_tmpRef].SetName('MET_L1T_wrt_'+_tmpRef)
+
+      _tmp_num = _tfile.Get('NoSelection/hltPFPuppiMET_pt__vs__'+_tmpRef+'_pt')
+      _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold), -1)
+
+      _tmp_den = _tfile.Get('NoSelection/hltPFPuppiMET_pt__vs__'+_tmpRef+'_pt')
+      _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
+
+      ret['MET_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+      ret['MET_HLT_wrt_'+_tmpRef].SetName('MET_HLT_wrt_'+_tmpRef)
+
+      _tmp_num = _tfile.Get('L1T_PFPuppiMET200off/hltPFPuppiMET_pt__vs__'+_tmpRef+'_pt')
+      _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold), -1)
+
+      _tmp_den = _tfile.Get('NoSelection/hltPFPuppiMET_pt__vs__'+_tmpRef+'_pt')
+      _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
+
+      ret['MET_L1TpHLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+      ret['MET_L1TpHLT_wrt_'+_tmpRef].SetName('MET_L1TpHLT_wrt_'+_tmpRef)
 
     _tfile.Close()
 
     return ret
 
-_allRateSamples = []
-for _tmp in rateGroup:
-  _allRateSamples += rateGroup[_tmp]
-_allRateSamples = sorted(list(set(_allRateSamples)))
+rates, rateHistos, effys, effysJet, effysMET = {}, {}, {}, {}, {}
 
 for _tmpReco in [
   'HLT_TRKv06p1',
@@ -260,9 +284,9 @@ for _tmpReco in [
   print '='*100
   print '='*100
 
-  histos = {}
-  for _tmp in _allRateSamples:
-    histos[_tmp] = getRates(inputDir+'/'+_tmpReco+'/Phase2HLTTDR_'+_tmp+'_PU200.root', _tmp)
+  rates[_tmpReco] = {}
+  for _tmp in rateSamples:
+    rates[_tmpReco][_tmp] = getRates(inputDir+'/'+_tmpReco+'/Phase2HLTTDR_'+_tmp+'_PU200.root', _tmp)
 
   rateDict = {}
   for _tmpTrg in [
@@ -282,8 +306,8 @@ for _tmpReco in [
     for _tmp1 in rateGroup:
       theRate, theRateErr2 = 0., 0.
       for _tmp2 in rateGroup[_tmp1]:
-        theRate += histos[_tmp2]['v_rates'][_tmpTrg][0]
-        theRateErr2 += math.pow(histos[_tmp2]['v_rates'][_tmpTrg][1], 2)
+        theRate += rates[_tmpReco][_tmp2]['v_rates'][_tmpTrg][0]
+        theRateErr2 += math.pow(rates[_tmpReco][_tmp2]['v_rates'][_tmpTrg][1], 2)
       rateDict[_tmpTrg][_tmp1] = [theRate, math.sqrt(theRateErr2)]
 
   for _tmpTrg in [
@@ -301,7 +325,7 @@ for _tmpReco in [
         rateDict[_tmpTrg[1]][_tmp1][0], rateDict[_tmpTrg[1]][_tmp1][1],
       )
 
-  rateTemplates = {}
+  rateHistos[_tmpReco] = {}
 
   for _tmpVar, _tmpSamples in {
     # L1T
@@ -319,18 +343,34 @@ for _tmpReco in [
     'hltPFPuppiMET'         : ['QCD', 'Wln', 'Zll'],
     'hltPFPuppiMET_2'       : ['QCD', 'Wln', 'Zll'],
   }.items():
-    rateTemplates[_tmpVar] = None
+    rateHistos[_tmpReco][_tmpVar] = None
     for _tmp1 in _tmpSamples:
       for _tmp2 in rateGroup[_tmp1]:
-        h0 = histos[_tmp2]['t_rates'][_tmpVar]
-        if rateTemplates[_tmpVar]: rateTemplates[_tmpVar].Add(h0)
-        else: rateTemplates[_tmpVar] = h0.Clone()
+        h0 = rates[_tmpReco][_tmp2]['t_rates'][_tmpVar]
+        if rateHistos[_tmpReco][_tmpVar]:
+          rateHistos[_tmpReco][_tmpVar].Add(h0)
+        else:
+          rateHistos[_tmpReco][_tmpVar] = h0.Clone()
 
-  effysJet = getJetEfficiencies(inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root')
-  effysMET = getMETEfficiencies(inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200.root')
+  effysJet[_tmpReco] = getJetEfficiencies(inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root')
+  effysMET[_tmpReco] = getMETEfficiencies(inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200.root')
 
 
 
+## Output TFile
+ofile = ROOT.TFile('tmp.root', 'recreate')
+ofile.cd()
+
+for _tmp0 in [effysJet, effysMET]:
+  for _tmp1 in sorted(_tmp0.keys()):
+    _odir = ofile.Get(_tmp1) if ofile.Get(_tmp1) else ofile.mkdir(_tmp1)
+    _odir.cd()
+    for _tmp2 in sorted(_tmp0[_tmp1].keys()):
+      _tmp0[_tmp1][_tmp2].Write()
+
+ofile.Close()
+
+### Plots
 
 #for puTag in ['']:
 #
