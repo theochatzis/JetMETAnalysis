@@ -46,18 +46,15 @@ if __name__ == '__main__':
    if opts.level < 0:
       KILL(log_prx+'negative level of directory depth in output directory (must be >=0) [-l]: '+str(opts.level))
 
-   if os.path.exists(opts.output):
-      KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
+#  if os.path.exists(opts.output):
+#     KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
 
    # inputs
    INPUT_FILES = []
 
    for i_inpf in opts.inputs:
-
        i_inpf_ls = glob.glob(i_inpf)
-
        for i_inpf_2 in i_inpf_ls:
-
            if os.path.isfile(i_inpf_2):
               INPUT_FILES += [os.path.abspath(os.path.realpath(i_inpf_2))]
 
@@ -101,7 +98,8 @@ if __name__ == '__main__':
 
        i_output_path = opts.output+'/'+i_output+'.root'
        if os.path.exists(i_output_path):
-          KILL(log_prx+'logic error - target output file already exists: '+i_output_path)
+          WARNING(log_prx+'target output file already exists (will be skipped): '+i_output_path)
+          continue
 
        if len(outputs_dict[i_output]) == 1:
 

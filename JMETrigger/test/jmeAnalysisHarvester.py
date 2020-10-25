@@ -105,8 +105,8 @@ if __name__ == '__main__':
    if len(INPUT_FILES) == 0:
       KILL(log_prx+'empty list of input files')
 
-   if os.path.exists(opts.output):
-      KILL(log_prx+'target path to output file/directory already exists [-o]: '+opts.output)
+#  if os.path.exists(opts.output):
+#     KILL(log_prx+'target path to output file/directory already exists [-o]: '+opts.output)
    ### -------------------
 
    ROOT.TH1.AddDirectory(False)
@@ -372,7 +372,8 @@ if __name__ == '__main__':
           output_file = opts.output+'/'+('/'.join(input_name_pieces))
 
        if os.path.exists(output_file):
-          KILL(log_prx+'logic error - target output file already exists: '+output_file)
+          WARNING(log_prx+'logic error - target output file already exists (will be skipped): '+output_file)
+          continue
 
        output_dirname = os.path.dirname(os.path.abspath(output_file))
        MKDIRP(output_dirname, verbose=opts.verbose, dry_run=opts.dry_run)
