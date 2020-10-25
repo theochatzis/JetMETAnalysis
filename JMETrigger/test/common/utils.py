@@ -8,7 +8,6 @@ def WARNING(log):
     print '\n '+'\033[1m'+'@@@ '+'\033[93m'+'WARNING'+'\033[0m'+' -- '+log+'\n'
 
 def MKDIRP(dirpath, verbose=False, dry_run=False):
-    print dirpath, '1'
     if verbose: print '\033[1m'+'>'+'\033[0m'+' os.mkdirs("'+dirpath+'")'
     if dry_run: return
     try:
@@ -16,7 +15,6 @@ def MKDIRP(dirpath, verbose=False, dry_run=False):
     except OSError:
       if not os.path.isdir(dirpath):
         raise
-    print dirpath, '2'
 
 def EXE(cmd, suspend=True, verbose=False, dry_run=False):
     if verbose: print '\033[1m'+'>'+'\033[0m'+' '+cmd
