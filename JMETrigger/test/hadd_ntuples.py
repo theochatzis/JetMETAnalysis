@@ -147,8 +147,8 @@ if __name__ == '__main__':
    ROOT.gErrorIgnoreLevel = ROOT.kWarning
 
    ### args validation ---
-   if os.path.exists(opts.output):
-      KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
+#  if os.path.exists(opts.output):
+#     KILL(log_prx+'target path to output directory already exists [-o]: '+opts.output)
 
    if opts.level < 0:
       KILL(log_prx+'negative level of directory depth in output directory (must be >=0) [-l]: '+str(opts.level))
