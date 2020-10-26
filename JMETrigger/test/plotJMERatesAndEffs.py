@@ -11,9 +11,15 @@ from common.efficiency import *
 from common.plot import *
 from common.plot_style import *
 
-ROOT.gROOT.SetBatch()
-ROOT.gStyle.SetOptStat(0)
+ROOT.gROOT.SetBatch() # disable interactive graphics
+ROOT.gErrorIgnoreLevel = ROOT.kError # do not display ROOT warnings
+
 apply_style(0)
+#ROOT.gStyle.SetOptStat(0)
+
+groupQCD = False
+
+minCountsForValidRate = -1.
 
 inputDir = sys.argv[1]
 
@@ -35,6 +41,16 @@ rateGroup = {
     'QCD_Pt600toInf_14TeV',
   ],
 
+  'QCD_020': ['QCD_Pt020to030_14TeV'],
+  'QCD_030': ['QCD_Pt030to050_14TeV'],
+  'QCD_050': ['QCD_Pt050to080_14TeV'],
+  'QCD_080': ['QCD_Pt080to120_14TeV'],
+  'QCD_120': ['QCD_Pt120to170_14TeV'],
+  'QCD_170': ['QCD_Pt170to300_14TeV'],
+  'QCD_300': ['QCD_Pt300to470_14TeV'],
+  'QCD_470': ['QCD_Pt470to600_14TeV'],
+  'QCD_600': ['QCD_Pt600toInf_14TeV'],
+
   'Wln': [
     'WJetsToLNu_14TeV',
   ],
@@ -44,6 +60,20 @@ rateGroup = {
     'DYJetsToLL_M050toInf_14TeV',
   ],
 }
+
+QCDSamples = [
+  'QCD_020',
+  'QCD_030',
+  'QCD_050',
+  'QCD_080',
+  'QCD_120',
+  'QCD_170',
+  'QCD_300',
+  'QCD_470',
+  'QCD_600',
+]
+if groupQCD:
+   QCDSamples = ['QCD']
 
 rateSamples = []
 for _tmp in rateGroup:
@@ -74,22 +104,22 @@ def getRateFactor(processName):
     raise RuntimeError(processName)
 
 def getRateHistogram(h1, rateFac):
-   theRateHisto = h1.Clone()
+  theRateHisto = h1.Clone()
 
-   theRateHisto_name = h1.GetName()+'_rate'
-   theRateHisto.SetTitle(theRateHisto_name)
-   theRateHisto.SetName(theRateHisto_name)
-   theRateHisto.SetDirectory(0)
-   theRateHisto.UseCurrentStyle()
+  theRateHisto_name = h1.GetName()+'_rate'
+  theRateHisto.SetTitle(theRateHisto_name)
+  theRateHisto.SetName(theRateHisto_name)
+  theRateHisto.SetDirectory(0)
+  theRateHisto.UseCurrentStyle()
 
-   for _tmp_bin_i in range(1, 1+h1.GetNbinsX()):
-     _err = ctypes.c_double(0.)
-     theRateHisto.SetBinContent(_tmp_bin_i, h1.IntegralAndError(_tmp_bin_i, -1, _err))
-     theRateHisto.SetBinError(_tmp_bin_i, _err.value)
+  for _tmp_bin_i in range(1, 1+h1.GetNbinsX()):
+    _err = ctypes.c_double(0.)
+    theRateHisto.SetBinContent(_tmp_bin_i, h1.IntegralAndError(_tmp_bin_i, -1, _err))
+    theRateHisto.SetBinError(_tmp_bin_i, _err.value)
 
-   theRateHisto.Scale(rateFac)
+  theRateHisto.Scale(rateFac)
 
-   return theRateHisto
+  return theRateHisto
 
 def getRates(fpath, processName):
     ret = {}
@@ -101,8 +131,9 @@ def getRates(fpath, processName):
 
     rateFactor = getRateFactor(processName) / ret['v_eventsProcessed']
 
-    ret['v_rates'] = {}
     ret['t_rates'] = {}
+    ret['v_rates'] = {}
+    ret['v_counts'] = {}
 
     # SingleJet
     ret['t_rates']['l1tSlwPFPuppiJet'] = getRateHistogram(_tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_pt0'), rateFactor)
@@ -113,12 +144,14 @@ def getRates(fpath, processName):
     _tmp = _tfile.Get('L1T_SinglePFPuppiJet200off/l1tSlwPFPuppiJetsCorrected_EtaIncl_pt0')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(0, -1, _tmp_integErr)
-    ret['v_rates']['L1T_SinglePFPuppiJet200off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['L1T_SinglePFPuppiJet200off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['L1T_SinglePFPuppiJet200off'] = [_tmp_integ, _tmp_integErr.value]
 
     _tmp = _tfile.Get('L1T_SinglePFPuppiJet200off/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(_tmp.GetXaxis().FindBin(530.), -1, _tmp_integErr)
-    ret['v_rates']['HLT_AK4PFPuppiJet530'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['HLT_AK4PFPuppiJet530'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['HLT_AK4PFPuppiJet530'] = [_tmp_integ, _tmp_integErr.value]
 
     # HT
     ret['t_rates']['l1tPFPuppiHT'] = getRateHistogram(_tfile.Get('NoSelection/l1tPFPuppiHT_sumEt'), rateFactor)
@@ -130,12 +163,14 @@ def getRates(fpath, processName):
     _tmp = _tfile.Get('L1T_PFPuppiHT450off/l1tPFPuppiHT_sumEt')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(0, -1, _tmp_integErr)
-    ret['v_rates']['L1T_PFPuppiHT450off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['L1T_PFPuppiHT450off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['L1T_PFPuppiHT450off'] = [_tmp_integ, _tmp_integErr.value]
 
     _tmp = _tfile.Get('L1T_PFPuppiHT450off/hltPFPuppiHT_sumEt')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(_tmp.GetXaxis().FindBin(1060.), -1, _tmp_integErr)
-    ret['v_rates']['HLT_PFPuppiHT1060'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['HLT_PFPuppiHT1060'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['HLT_PFPuppiHT1060'] = [_tmp_integ, _tmp_integErr.value]
 
     # MET
     ret['t_rates']['l1tPFPuppiMET'] = getRateHistogram(_tfile.Get('NoSelection/l1tPFPuppiMET_pt'), rateFactor)
@@ -147,22 +182,26 @@ def getRates(fpath, processName):
     _tmp = _tfile.Get('L1T_PFPuppiMET200off/l1tPFPuppiMET_pt')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(0, -1, _tmp_integErr)
-    ret['v_rates']['L1T_PFPuppiMET200off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['L1T_PFPuppiMET200off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['L1T_PFPuppiMET200off'] = [_tmp_integ, _tmp_integErr.value]
 
     _tmp = _tfile.Get('L1T_PFPuppiMET200off/hltPFPuppiMET_pt')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(_tmp.GetXaxis().FindBin(140.), -1, _tmp_integErr)
-    ret['v_rates']['HLT_PFPuppiMET140'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['HLT_PFPuppiMET140'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['HLT_PFPuppiMET140'] = [_tmp_integ, _tmp_integErr.value]
 
     _tmp = _tfile.Get('L1T_PFPuppiMET245off/l1tPFPuppiMET_pt')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(0, -1, _tmp_integErr)
-    ret['v_rates']['L1T_PFPuppiMET245off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['L1T_PFPuppiMET245off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['L1T_PFPuppiMET245off'] = [_tmp_integ, _tmp_integErr.value]
 
     _tmp = _tfile.Get('L1T_PFPuppiMET245off/hltPFPuppiMET_pt')
     _tmp_integErr = ctypes.c_double(0.)
     _tmp_integ = _tmp.IntegralAndError(_tmp.GetXaxis().FindBin(140.), -1, _tmp_integErr)
-    ret['v_rates']['HLT_PFPuppiMET140_2'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_rates'] ['HLT_PFPuppiMET140_2'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+    ret['v_counts']['HLT_PFPuppiMET140_2'] = [_tmp_integ, _tmp_integErr.value]
 
     ## common
     for _tmp1 in ret:
@@ -272,23 +311,28 @@ def getMETEfficiencies(fpath, hltThreshold=140.):
 
     return ret
 
-rates, rateHistos, effys, effysJet, effysMET = {}, {}, {}, {}, {}
+rates = {}
+rateHistos = {}
+effys = {}
+effysJet = {}
+effysMET = {}
 
 for _tmpReco in [
   'HLT_TRKv06p1',
   'HLT_TRKv07p2',
 ]:
-  print '='*100
-  print '='*100
+  print '='*110
+  print '='*110
   print _tmpReco
-  print '='*100
-  print '='*100
+  print '='*110
+  print '='*110
 
   rates[_tmpReco] = {}
   for _tmp in rateSamples:
     rates[_tmpReco][_tmp] = getRates(inputDir+'/'+_tmpReco+'/Phase2HLTTDR_'+_tmp+'_PU200.root', _tmp)
 
   rateDict = {}
+  countDict = {}
   for _tmpTrg in [
     'L1T_SinglePFPuppiJet200off',
     'HLT_AK4PFPuppiJet530',
@@ -301,28 +345,50 @@ for _tmpReco in [
 
     'L1T_PFPuppiMET245off',
     'HLT_PFPuppiMET140_2',
-   ]:
+  ]:
     rateDict[_tmpTrg] = {}
+    countDict[_tmpTrg] = {}
     for _tmp1 in rateGroup:
       theRate, theRateErr2 = 0., 0.
+      theCount, theCountErr2 = 0., 0.
       for _tmp2 in rateGroup[_tmp1]:
         theRate += rates[_tmpReco][_tmp2]['v_rates'][_tmpTrg][0]
         theRateErr2 += math.pow(rates[_tmpReco][_tmp2]['v_rates'][_tmpTrg][1], 2)
+        theCount += rates[_tmpReco][_tmp2]['v_counts'][_tmpTrg][0]
+        theCountErr2 += math.pow(rates[_tmpReco][_tmp2]['v_counts'][_tmpTrg][1], 2)
       rateDict[_tmpTrg][_tmp1] = [theRate, math.sqrt(theRateErr2)]
+      countDict[_tmpTrg][_tmp1] = [theCount, math.sqrt(theCountErr2)]
 
-  for _tmpTrg in [
+  for _tmpL1T, _tmpHLT in [
     ['L1T_SinglePFPuppiJet200off', 'HLT_AK4PFPuppiJet530'],
     ['L1T_PFPuppiHT450off', 'HLT_PFPuppiHT1060'],
     ['L1T_PFPuppiMET200off', 'HLT_PFPuppiMET140'],
     ['L1T_PFPuppiMET245off', 'HLT_PFPuppiMET140_2'],
   ]:
-    print '-'*68
-    print '{:10} | {:26} | {:26}'.format('Rate [Hz]', _tmpTrg[0], _tmpTrg[1])
-    print '-'*68
-    for _tmp1 in ['MB', 'QCD', 'Wln', 'Zll']:
-      print '{:<10} | {:>11.2f} +/- {:>10.2f} | {:>11.2f} +/- {:>10.2f}'.format(_tmp1,
-        rateDict[_tmpTrg[0]][_tmp1][0], rateDict[_tmpTrg[0]][_tmp1][1],
-        rateDict[_tmpTrg[1]][_tmp1][0], rateDict[_tmpTrg[1]][_tmp1][1],
+    print '-'*110
+    print '\033[1m{:10}\033[0m | \033[1m{:47}\033[0m | \033[1m{:47}\033[0m'.format('Rate [Hz]', '[L1T] '+_tmpL1T, '[L1T+HLT] '+_tmpHLT)
+    print '-'*110
+
+    for _tmp1 in ['MB']+QCDSamples+['Wln', 'Zll']:
+
+      l1tRate    = rateDict[_tmpL1T][_tmp1][0]
+      l1tRateErr = rateDict[_tmpL1T][_tmp1][1]
+
+      hltRate    = rateDict[_tmpHLT][_tmp1][0]
+      hltRateErr = rateDict[_tmpHLT][_tmp1][1]
+
+      l1tCount = countDict[_tmpL1T][_tmp1][0]
+      hltCount = countDict[_tmpHLT][_tmp1][0]
+
+      if l1tCount < minCountsForValidRate:
+        l1tRate, l1tRateErr = -99., -99.
+
+      if hltCount < minCountsForValidRate:
+        hltRate, hltRateErr = -99., -99.
+
+      print '{:<10} | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}] | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}]'.format(_tmp1,
+        l1tRate, l1tRateErr, l1tCount,
+        hltRate, hltRateErr, hltCount
       )
 
   rateHistos[_tmpReco] = {}
@@ -335,13 +401,13 @@ for _tmpReco in [
     'l1tPFPuppiMET'   : ['MB'],
 
     # HLT
-    'hltAK4PFPuppiJet_woL1T': ['QCD', 'Wln', 'Zll'],
-    'hltAK4PFPuppiJet'      : ['QCD', 'Wln', 'Zll'],
-    'hltPFPuppiHT_woL1T'    : ['QCD', 'Wln', 'Zll'],
-    'hltPFPuppiHT'          : ['QCD', 'Wln', 'Zll'],
-    'hltPFPuppiMET_woL1T'   : ['QCD', 'Wln', 'Zll'],
-    'hltPFPuppiMET'         : ['QCD', 'Wln', 'Zll'],
-    'hltPFPuppiMET_2'       : ['QCD', 'Wln', 'Zll'],
+    'hltAK4PFPuppiJet_woL1T': QCDSamples+['Wln', 'Zll'],
+    'hltAK4PFPuppiJet'      : QCDSamples+['Wln', 'Zll'],
+    'hltPFPuppiHT_woL1T'    : QCDSamples+['Wln', 'Zll'],
+    'hltPFPuppiHT'          : QCDSamples+['Wln', 'Zll'],
+    'hltPFPuppiMET_woL1T'   : QCDSamples+['Wln', 'Zll'],
+    'hltPFPuppiMET'         : QCDSamples+['Wln', 'Zll'],
+    'hltPFPuppiMET_2'       : QCDSamples+['Wln', 'Zll'],
   }.items():
     rateHistos[_tmpReco][_tmpVar] = None
     for _tmp1 in _tmpSamples:
