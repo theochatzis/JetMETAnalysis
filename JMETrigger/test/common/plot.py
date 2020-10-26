@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import ROOT
+import ctypes
 
 from utils import *
 
@@ -53,24 +54,25 @@ def get_ymax_from_graphs(gls, error=True):
         if not g: continue
 
         for i in range(0, g.GetN()):
-            x, y = ROOT.Double(0.), ROOT.Double(0.)
+            x, y = ctypes.c_double(0.), ctypes.c_double(0.)
             g.GetPoint(i, x, y)
-            if error: y += g.GetErrorYhigh(i)
+            yval = y.value
+            if error: yval += g.GetErrorYhigh(i)
 
-            if y > ymax: ymax = y
+            if yval > ymax: ymax = yval
 
     return ymax
 
 def get_xyminmax_from_graph(graph, error=True):
     xmin, ymin, xmax, ymax = None, None, None, None
     for idx in range(graph.GetN()):
-        xval, yval = ROOT.Double(0.), ROOT.Double(0.)
+        xval, yval = ctypes.c_double(0.), ctypes.c_double(0.)
         graph.GetPoint(idx, xval, yval)
 
-        x0min = xval - (error * graph.GetErrorXlow(idx))
-        x0max = xval + (error * graph.GetErrorXhigh(idx))
-        y0min = yval - (error * graph.GetErrorYlow(idx))
-        y0max = yval + (error * graph.GetErrorYhigh(idx))
+        x0min = xval.value - (error * graph.GetErrorXlow(idx))
+        x0max = xval.value + (error * graph.GetErrorXhigh(idx))
+        y0min = yval.value - (error * graph.GetErrorYlow(idx))
+        y0max = yval.value + (error * graph.GetErrorYhigh(idx))
 
         if (xmin is None) or (x0min < xmin): xmin = x0min
         if (xmax is None) or (x0max > xmax): xmax = x0max

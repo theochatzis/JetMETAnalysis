@@ -50,12 +50,18 @@ def get_ratio_graph(g_num_, g_den_, verbose=False):
     n = -1
     for i in range(g_den_.GetN()):
 
-        xd, yd = ctypes.c_double(0.), ctypes.c_double(0.)
-        g_den_.GetPoint(i, xd, yd)
+        xdc, ydc = ctypes.c_double(0.), ctypes.c_double(0.)
+        g_den_.GetPoint(i, xdc, ydc)
+
+        xd = xdc.value
+        yd = ydc.value
 
         for j in range(g_num_.GetN()):
-            xn, yn = ctypes.c_double(0.), ctypes.c_double(0.)
-            g_num_.GetPoint(j, xn, yn)
+            xnc, ync = ctypes.c_double(0.), ctypes.c_double(0.)
+            g_num_.GetPoint(j, xnc, ync)
+
+            xn = xnc.value
+            yn = ync.value
 
             if xn != xd: continue
 

@@ -350,7 +350,6 @@ def plot(histograms, outputs, title, labels, legXY=[], ratio=False, ratioPadFrac
 
           h21.GetYaxis().SetRangeUser(h2min, h2max)
 
-#       h21.Draw('e2')
        for _tmp in plot_ratios:
            if _tmp.th1 is not None:
               _tmp.th1.Draw(_tmp.draw)
