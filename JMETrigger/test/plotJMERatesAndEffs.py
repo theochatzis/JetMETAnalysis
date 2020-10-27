@@ -18,6 +18,8 @@ apply_style(0)
 
 groupQCD = False
 
+no_efficiencies = False
+
 minCountsForValidRate = -1.
 
 inputDir = sys.argv[1]
@@ -27,17 +29,17 @@ hltThresholds = {
   'HLT_TRKv06p1': {
 
     'SingleJet': 470,
-    'HT': 1020,
-    'MET': 140,
-    'MET2': 140,
+    'HT': 970,
+    'MET': 120,
+    'MET2': 120,
   },
 
   'HLT_TRKv07p2': {
 
     'SingleJet': 480,
-    'HT': 1050,
-    'MET': 150,
-    'MET2': 150,
+    'HT': 1020,
+    'MET': 120,
+    'MET2': 120,
   },
 
 #  'HLT_TRKv06p1_TICL': {
@@ -87,6 +89,18 @@ rateGroup = {
     'DYJetsToLL_M010to050_14TeV',
     'DYJetsToLL_M050toInf_14TeV',
   ],
+
+    'QCD': [
+#      'QCD_Pt020to030_14TeV',
+#      'QCD_Pt030to050_14TeV',
+      'QCD_Pt050to080_14TeV',
+      'QCD_Pt080to120_14TeV',
+      'QCD_Pt120to170_14TeV',
+      'QCD_Pt170to300_14TeV',
+      'QCD_Pt300to470_14TeV',
+      'QCD_Pt470to600_14TeV',
+      'QCD_Pt600toInf_14TeV',
+    ],
 }
 
 if groupQCD:
@@ -442,6 +456,7 @@ for _tmpReco in sorted(hltThresholds.keys()):
       hltThreshold_SingleJet = hltThresholdSingleJet,
       hltThreshold_HT = hltThresholdHT,
       hltThreshold_MET = hltThresholdMET,
+      hltThreshold_MET2 = hltThresholdMET2,
     )
 
   rateDict[_tmpReco] = {}
@@ -897,193 +912,195 @@ for _tmpReco in sorted(hltThresholds.keys()):
 #file0.Close()
 
 
-outputDir = '.'
+if not no_efficiencies:
 
-print '='*50
-print '='*50
-print '\033[1m'+'Efficiency Plots'+'\033[0m'
-print '='*50
-print '='*50
+  outputDir = '.'
 
-canvasCount = 0
-for _tmpReco in sorted(hltThresholds.keys()):
+  print '='*50
+  print '='*50
+  print '\033[1m'+'Efficiency Plots'+'\033[0m'
+  print '='*50
+  print '='*50
 
-  hltThresholdSingleJet = hltThresholds[_tmpReco]['SingleJet']
-  hltThresholdHT = hltThresholds[_tmpReco]['HT']
-  hltThresholdMET = hltThresholds[_tmpReco]['MET']
-  hltThresholdMET2 = hltThresholds[_tmpReco]['MET2']
+  canvasCount = 0
+  for _tmpReco in sorted(hltThresholds.keys()):
 
-  hltPath_SingleJet = 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet)
-  hltPath_HT = 'HLT_PFPuppiHT'+str(hltThresholdHT)
-  hltPath_MET = 'HLT_PFPuppiMET'+str(hltThresholdMET)
-  hltPath_MET2 = 'HLT_PFPuppiMET'+str(hltThresholdMET2)
+    hltThresholdSingleJet = hltThresholds[_tmpReco]['SingleJet']
+    hltThresholdHT = hltThresholds[_tmpReco]['HT']
+    hltThresholdMET = hltThresholds[_tmpReco]['MET']
+    hltThresholdMET2 = hltThresholds[_tmpReco]['MET2']
 
-  for _tmpRef in ['GEN', 'Offline']:
+    hltPath_SingleJet = 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet)
+    hltPath_HT = 'HLT_PFPuppiHT'+str(hltThresholdHT)
+    hltPath_MET = 'HLT_PFPuppiMET'+str(hltThresholdMET)
+    hltPath_MET2 = 'HLT_PFPuppiMET'+str(hltThresholdMET2)
 
-    for _tmp in [
-      {
-        'l1tPathKey': 'L1T_SinglePFPuppiJet200off',
-        'hltPathKey': hltPath_SingleJet,
-        'outputName': outputDir+'/SingleJet_'+_tmpReco+'.pdf',
-        'title': ';'+_tmpRef+' Jet p_{T} [GeV];Efficiency',
-        'objLabel': _tmpReco,
-        'topLabel': 'QCD_PtFlat_PU200',
-        'xmin': 0,
-        'xmax': 900,
-        'logY': 0,
-        'graphs': [
-          {'graph': effysJet[_tmpReco]['SingleJet_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
-          {'graph': effysJet[_tmpReco]['SingleJet_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['SingleJet'])},
-          {'graph': effysJet[_tmpReco]['SingleJet_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['SingleJet'])},
-        ],
-      },
-#      {
-#        'l1tPathKey': 'L1T_PFPuppiHT450off',
-#        'hltPathKey': hltPath_HT,
-#        'outputName': outputDir+'/HT_'+_tmpReco+'.pdf',
-#        'title': ';'+_tmpRef+' H_{T} [GeV];Efficiency',
-#        'objLabel': _tmpReco,
-#        'topLabel': 'QCD_PtFlat_PU200',
-#        'xmin': 0,
-#        'xmax': 2000,
-#        'logY': 0,
-#        'graphs': [
-#          {'graph': effysJet[_tmpReco]['HT_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
-#          {'graph': effysJet[_tmpReco]['HT_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['HT'])},
-#          {'graph': effysJet[_tmpReco]['HT_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['HT'])},
-#        ],
-#      },
-      {
-        'l1tPathKey': 'L1T_PFPuppiMET200off',
-        'hltPathKey': hltPath_MET,
-        'outputName': outputDir+'/MET_'+_tmpReco+'.pdf',
-        'title': ';'+_tmpRef+' MET [GeV];Efficiency',
-        'objLabel': _tmpReco,
-        'topLabel': 'VBF_HiggsToInvisible_PU200',
-        'xmin': 0,
-        'xmax': 600,
-        'logY': 0,
-        'graphs': [
-          {'graph': effysMET[_tmpReco]['MET_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
-          {'graph': effysMET[_tmpReco]['MET_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['MET'])},
-          {'graph': effysMET[_tmpReco]['MET_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['MET'])},
-        ],
-      },
-      {
-        'l1tPathKey': 'L1T_PFPuppiMET245off',
-        'hltPathKey': hltPath_MET2,
-        'outputName': outputDir+'/MET2_'+_tmpReco+'.pdf',
-        'title': ';'+_tmpRef+' MET [GeV];Efficiency',
-        'objLabel': _tmpReco,
-        'topLabel': 'VBF_HiggsToInvisible_PU200',
-        'xmin': 0,
-        'xmax': 600,
-        'logY': 0,
-        'graphs': [
-          {'graph': effysMET[_tmpReco]['MET2_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
-          {'graph': effysMET[_tmpReco]['MET2_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['MET2'])},
-          {'graph': effysMET[_tmpReco]['MET2_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['MET2'])},
-        ],
-      },
-    ]:
-      canvasCount += 1
-      canvasNamePostfix = '_'+str(canvasCount)
+    for _tmpRef in ['GEN', 'Offline']:
 
-      g0 = _tmp['graphs'][0]['graph']
-      g0.SetMarkerSize(0.5)
-      g0.SetLineWidth(2)
-      g0.SetMarkerColor(_tmp['graphs'][0]['color'])
-      g0.SetLineColor(_tmp['graphs'][0]['color'])
+      for _tmp in [
+        {
+          'l1tPathKey': 'L1T_SinglePFPuppiJet200off',
+          'hltPathKey': hltPath_SingleJet,
+          'outputName': outputDir+'/effy_SingleJet_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
+          'title': ';'+_tmpRef+' Jet p_{T} [GeV];Efficiency',
+          'objLabel': _tmpReco,
+          'topLabel': 'QCD_PtFlat_PU200',
+          'xmin': 0,
+          'xmax': 900,
+          'logY': 0,
+          'graphs': [
+            {'graph': effysJet[_tmpReco]['SingleJet_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
+            {'graph': effysJet[_tmpReco]['SingleJet_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['SingleJet'])},
+            {'graph': effysJet[_tmpReco]['SingleJet_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['SingleJet'])},
+          ],
+        },
+  #      {
+  #        'l1tPathKey': 'L1T_PFPuppiHT450off',
+  #        'hltPathKey': hltPath_HT,
+  #        'outputName': outputDir+'/effy_HT_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
+  #        'title': ';'+_tmpRef+' H_{T} [GeV];Efficiency',
+  #        'objLabel': _tmpReco,
+  #        'topLabel': 'QCD_PtFlat_PU200',
+  #        'xmin': 0,
+  #        'xmax': 2000,
+  #        'logY': 0,
+  #        'graphs': [
+  #          {'graph': effysJet[_tmpReco]['HT_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
+  #          {'graph': effysJet[_tmpReco]['HT_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['HT'])},
+  #          {'graph': effysJet[_tmpReco]['HT_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['HT'])},
+  #        ],
+  #      },
+        {
+          'l1tPathKey': 'L1T_PFPuppiMET200off',
+          'hltPathKey': hltPath_MET,
+          'outputName': outputDir+'/effy_MET_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
+          'title': ';'+_tmpRef+' MET [GeV];Efficiency',
+          'objLabel': _tmpReco,
+          'topLabel': 'VBF_HiggsToInvisible_PU200',
+          'xmin': 0,
+          'xmax': 600,
+          'logY': 0,
+          'graphs': [
+            {'graph': effysMET[_tmpReco]['MET_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
+            {'graph': effysMET[_tmpReco]['MET_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['MET'])},
+            {'graph': effysMET[_tmpReco]['MET_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['MET'])},
+          ],
+        },
+        {
+          'l1tPathKey': 'L1T_PFPuppiMET245off',
+          'hltPathKey': hltPath_MET2,
+          'outputName': outputDir+'/effy_MET2_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
+          'title': ';'+_tmpRef+' MET [GeV];Efficiency',
+          'objLabel': _tmpReco,
+          'topLabel': 'VBF_HiggsToInvisible_PU200',
+          'xmin': 0,
+          'xmax': 600,
+          'logY': 0,
+          'graphs': [
+            {'graph': effysMET[_tmpReco]['MET2_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
+            {'graph': effysMET[_tmpReco]['MET2_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['MET2'])},
+            {'graph': effysMET[_tmpReco]['MET2_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['MET2'])},
+          ],
+        },
+      ]:
+        canvasCount += 1
+        canvasNamePostfix = '_'+str(canvasCount)
 
-      g1 = _tmp['graphs'][1]['graph']
-      g1.SetMarkerSize(0.5)
-      g1.SetLineWidth(2)
-      g1.SetMarkerColor(_tmp['graphs'][1]['color'])
-      g1.SetLineColor(_tmp['graphs'][1]['color'])
+        g0 = _tmp['graphs'][0]['graph']
+        g0.SetMarkerSize(0.5)
+        g0.SetLineWidth(2)
+        g0.SetMarkerColor(_tmp['graphs'][0]['color'])
+        g0.SetLineColor(_tmp['graphs'][0]['color'])
 
-      g2 = _tmp['graphs'][2]['graph']
-      g2.SetMarkerSize(0.5)
-      g2.SetLineWidth(2)
-      g2.SetMarkerColor(_tmp['graphs'][2]['color'])
-      g2.SetLineColor(_tmp['graphs'][2]['color'])
+        g1 = _tmp['graphs'][1]['graph']
+        g1.SetMarkerSize(0.5)
+        g1.SetLineWidth(2)
+        g1.SetMarkerColor(_tmp['graphs'][1]['color'])
+        g1.SetLineColor(_tmp['graphs'][1]['color'])
 
-      canvas = ROOT.TCanvas('c'+canvasNamePostfix, 'c'+canvasNamePostfix)
-      canvas.cd()
+        g2 = _tmp['graphs'][2]['graph']
+        g2.SetMarkerSize(0.5)
+        g2.SetLineWidth(2)
+        g2.SetMarkerColor(_tmp['graphs'][2]['color'])
+        g2.SetLineColor(_tmp['graphs'][2]['color'])
 
-      h0 = canvas.DrawFrame(_tmp['xmin'], 0.0001, _tmp['xmax'], 1.19)
+        canvas = ROOT.TCanvas('c'+canvasNamePostfix, 'c'+canvasNamePostfix)
+        canvas.cd()
 
-      for _tmp2 in [g0, g1, g2]:
-        if _tmp2 is not None:
-          _tmp2.Draw('lepz')
+        h0 = canvas.DrawFrame(_tmp['xmin'], 0.0001, _tmp['xmax'], 1.19)
 
-      topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
-      topLabel.SetFillColor(0)
-#     topLabel.SetFillStyle(3000)
-      topLabel.SetTextColor(ROOT.kBlack)
-      topLabel.SetTextAlign(12)
-      topLabel.SetTextFont(42)
-      topLabel.SetTextSize(0.035)
-      topLabel.SetBorderSize(0)
-      topLabel.AddText(_tmp['topLabel'])
-      topLabel.Draw('same')
+        for _tmp2 in [g0, g1, g2]:
+          if _tmp2 is not None:
+            _tmp2.Draw('lepz')
 
-      objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
-      objLabel.SetFillColor(0)
-#     objLabel.SetFillStyle(3000)
-      objLabel.SetTextColor(ROOT.kBlack)
-      objLabel.SetTextAlign(32)
-      objLabel.SetTextFont(42)
-      objLabel.SetTextSize(0.035)
-      objLabel.SetBorderSize(0)
-      objLabel.AddText(_tmp['objLabel'])
-      objLabel.Draw('same')
+        topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
+        topLabel.SetFillColor(0)
+#       topLabel.SetFillStyle(3000)
+        topLabel.SetTextColor(ROOT.kBlack)
+        topLabel.SetTextAlign(12)
+        topLabel.SetTextFont(42)
+        topLabel.SetTextSize(0.035)
+        topLabel.SetBorderSize(0)
+        topLabel.AddText(_tmp['topLabel'])
+        topLabel.Draw('same')
 
-      l1tRateVal = rateDict[_tmpReco][_tmp['l1tPathKey']]['MB'][0]
-      l1tRateErr = rateDict[_tmpReco][_tmp['l1tPathKey']]['MB'][1]
+        objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+        objLabel.SetFillColor(0)
+#       objLabel.SetFillStyle(3000)
+        objLabel.SetTextColor(ROOT.kBlack)
+        objLabel.SetTextAlign(32)
+        objLabel.SetTextFont(42)
+        objLabel.SetTextSize(0.035)
+        objLabel.SetBorderSize(0)
+        objLabel.AddText(_tmp['objLabel'])
+        objLabel.Draw('same')
 
-      hltRateVal = 0.
-      hltRateErr2 = 0.
-      for _tmpSample in QCDSamples+['Wln', 'Zll']:
-        hltRateVal += rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][0]
-        hltRateErr2 += math.pow(rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][1], 2)
+        l1tRateVal = rateDict[_tmpReco][_tmp['l1tPathKey']]['MB'][0]
+        l1tRateErr = rateDict[_tmpReco][_tmp['l1tPathKey']]['MB'][1]
 
-      l1tRateLabel = ROOT.TPaveText(0.17, 0.85, 0.65, 0.90, 'NDC')
-      l1tRateLabel.SetFillColor(0)
-      l1tRateLabel.SetFillStyle(1001)
-      l1tRateLabel.SetTextColor(ROOT.kBlack)
-      l1tRateLabel.SetTextAlign(12)
-      l1tRateLabel.SetTextFont(42)
-      l1tRateLabel.SetTextSize(0.0325)
-      l1tRateLabel.SetBorderSize(0)
-      l1tRateLabel.AddText('L1T Rate = {:4.1f} +/- {:4.1f} kHz (MB)'.format(l1tRateVal/1000., l1tRateErr/1000.))
-      l1tRateLabel.Draw('f,same')
+        hltRateVal = 0.
+        hltRateErr2 = 0.
+        for _tmpSample in QCDSamples+['Wln', 'Zll']:
+          hltRateVal += rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][0]
+          hltRateErr2 += math.pow(rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][1], 2)
 
-      hltRateLabel = ROOT.TPaveText(0.17, 0.80, 0.65, 0.85, 'NDC')
-      hltRateLabel.SetFillColor(0)
-      hltRateLabel.SetFillStyle(1001)
-      hltRateLabel.SetTextColor(ROOT.kBlack)
-      hltRateLabel.SetTextAlign(12)
-      hltRateLabel.SetTextFont(42)
-      hltRateLabel.SetTextSize(0.0325)
-      hltRateLabel.SetBorderSize(0)
-      hltRateLabel.AddText('L1T+HLT Rate = {:4.1f} +/- {:4.1f} Hz (QCD+Vjets)'.format(hltRateVal, math.sqrt(hltRateErr2)))
-      hltRateLabel.Draw('f,same')
+        l1tRateLabel = ROOT.TPaveText(0.17, 0.85, 0.65, 0.90, 'NDC')
+        l1tRateLabel.SetFillColor(0)
+        l1tRateLabel.SetFillStyle(1001)
+        l1tRateLabel.SetTextColor(ROOT.kBlack)
+        l1tRateLabel.SetTextAlign(12)
+        l1tRateLabel.SetTextFont(42)
+        l1tRateLabel.SetTextSize(0.0325)
+        l1tRateLabel.SetBorderSize(0)
+        l1tRateLabel.AddText('L1T Rate = {:4.1f} +/- {:4.1f} kHz (MB)'.format(l1tRateVal/1000., l1tRateErr/1000.))
+        l1tRateLabel.Draw('f,same')
 
-      leg = ROOT.TLegend(0.65, 0.20, 0.95, 0.40)
-      leg.SetNColumns(1)
-      if g0: leg.AddEntry(g0, _tmp['graphs'][0]['legName'], 'lepx')
-      if g1: leg.AddEntry(g1, _tmp['graphs'][1]['legName'], 'lepx')
-      if g2: leg.AddEntry(g2, _tmp['graphs'][2]['legName'], 'lepx')
-      leg.Draw('same')
+        hltRateLabel = ROOT.TPaveText(0.17, 0.80, 0.65, 0.85, 'NDC')
+        hltRateLabel.SetFillColor(0)
+        hltRateLabel.SetFillStyle(1001)
+        hltRateLabel.SetTextColor(ROOT.kBlack)
+        hltRateLabel.SetTextAlign(12)
+        hltRateLabel.SetTextFont(42)
+        hltRateLabel.SetTextSize(0.0325)
+        hltRateLabel.SetBorderSize(0)
+        hltRateLabel.AddText('L1T+HLT Rate = {:4.1f} +/- {:4.1f} Hz (QCD + V+jets)'.format(hltRateVal, math.sqrt(hltRateErr2)))
+        hltRateLabel.Draw('f,same')
 
-      h0.SetTitle(_tmp['title'])
-      h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+        leg = ROOT.TLegend(0.65, 0.20, 0.95, 0.40)
+        leg.SetNColumns(1)
+        if g0: leg.AddEntry(g0, _tmp['graphs'][0]['legName'], 'lepx')
+        if g1: leg.AddEntry(g1, _tmp['graphs'][1]['legName'], 'lepx')
+        if g2: leg.AddEntry(g2, _tmp['graphs'][2]['legName'], 'lepx')
+        leg.Draw('same')
 
-      canvas.SetLogy(_tmp['logY'])
-      canvas.SetGrid(1, 1)
+        h0.SetTitle(_tmp['title'])
+        h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
 
-      canvas.SaveAs(_tmp['outputName'])
-      canvas.Close()
-      print '\033[1m'+_tmp['outputName']+'\033[0m'
+        canvas.SetLogy(_tmp['logY'])
+        canvas.SetGrid(1, 1)
 
-print '='*50
+        canvas.SaveAs(_tmp['outputName'])
+        canvas.Close()
+        print '\033[1m'+_tmp['outputName']+'\033[0m'
+
+  print '='*50
