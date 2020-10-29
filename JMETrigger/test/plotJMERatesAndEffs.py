@@ -297,8 +297,8 @@ if __name__ == '__main__':
   parser.add_argument('-o', '--output', dest='output', action='store', default='.',
                       help='path to output directory')
 
-  parser.add_argument('--no-efficiencies', dest='no_efficiencies', action='store_true',
-                      help='do not output efficiency plots')
+  parser.add_argument('--no-plots', dest='no_plots', action='store_true',
+                      help='do not create output plots')
 
   parser.add_argument('--minCountsForValidRate', dest='minCountsForValidRate', action='store', type=float, default=-1.0,
                       help='minimum number of counts to consider a sample valid for trigger rate estimates')
@@ -923,10 +923,12 @@ if __name__ == '__main__':
   #
   #file0.Close()
 
-  if not opts.no_efficiencies:
+  if not opts.no_plots:
 
     outputDir = opts.output
     MKDIRP(opts.output, verbose = (opts.verbosity > 0), dry_run = opts.dry_run)
+
+    canvasCount = 0
 
     print '='*50
     print '='*50
@@ -934,7 +936,6 @@ if __name__ == '__main__':
     print '='*50
     print '='*50
 
-    canvasCount = 0
     for _tmpReco in sorted(hltThresholds.keys()):
 
       hltThresholdSingleJet = hltThresholds[_tmpReco]['SingleJet']
@@ -1022,30 +1023,22 @@ if __name__ == '__main__':
           canvasCount += 1
           canvasNamePostfix = '_'+str(canvasCount)
 
-          g0 = _tmp['graphs'][0]['graph']
-          g0.SetMarkerSize(0.5)
-          g0.SetLineWidth(2)
-          g0.SetMarkerColor(_tmp['graphs'][0]['color'])
-          g0.SetLineColor(_tmp['graphs'][0]['color'])
-
-          g1 = _tmp['graphs'][1]['graph']
-          g1.SetMarkerSize(0.5)
-          g1.SetLineWidth(2)
-          g1.SetMarkerColor(_tmp['graphs'][1]['color'])
-          g1.SetLineColor(_tmp['graphs'][1]['color'])
-
-          g2 = _tmp['graphs'][2]['graph']
-          g2.SetMarkerSize(0.5)
-          g2.SetLineWidth(2)
-          g2.SetMarkerColor(_tmp['graphs'][2]['color'])
-          g2.SetLineColor(_tmp['graphs'][2]['color'])
+          theEffys = []
+          for _tmpIdx in range(len(_tmp['graphs'])):
+            g0 = _tmp['graphs'][_tmpIdx]['graph']
+            g0.SetMarkerSize(0.5)
+            g0.SetLineWidth(2)
+            g0.SetMarkerColor(_tmp['graphs'][_tmpIdx]['color'])
+            g0.SetLineColor(_tmp['graphs'][_tmpIdx]['color'])
+            g0.SetName(_tmp['graphs'][_tmpIdx]['legName'])
+            theEffys += [g0]
 
           canvas = ROOT.TCanvas('c'+canvasNamePostfix, 'c'+canvasNamePostfix)
           canvas.cd()
 
           h0 = canvas.DrawFrame(_tmp['xmin'], 0.0001, _tmp['xmax'], 1.19)
 
-          for _tmp2 in [g0, g1, g2]:
+          for _tmp2 in theEffys:
             if _tmp2 is not None:
               _tmp2.Draw('lepz')
 
@@ -1080,7 +1073,7 @@ if __name__ == '__main__':
             hltRateVal += rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][0]
             hltRateErr2 += math.pow(rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][1], 2)
 
-          l1tRateLabel = ROOT.TPaveText(0.17, 0.85, 0.65, 0.90, 'NDC')
+          l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
           l1tRateLabel.SetFillColor(0)
           l1tRateLabel.SetFillStyle(1001)
           l1tRateLabel.SetTextColor(ROOT.kBlack)
@@ -1091,7 +1084,7 @@ if __name__ == '__main__':
           l1tRateLabel.AddText('L1T Rate = {:4.1f} +/- {:4.1f} kHz (MB)'.format(l1tRateVal/1000., l1tRateErr/1000.))
           l1tRateLabel.Draw('same')
 
-          hltRateLabel = ROOT.TPaveText(0.17, 0.80, 0.65, 0.85, 'NDC')
+          hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.65, 0.85, 'NDC')
           hltRateLabel.SetFillColor(0)
           hltRateLabel.SetFillStyle(1001)
           hltRateLabel.SetTextColor(ROOT.kBlack)
@@ -1104,9 +1097,8 @@ if __name__ == '__main__':
 
           leg = ROOT.TLegend(0.65, 0.20, 0.95, 0.40)
           leg.SetNColumns(1)
-          if g0: leg.AddEntry(g0, _tmp['graphs'][0]['legName'], 'lepx')
-          if g1: leg.AddEntry(g1, _tmp['graphs'][1]['legName'], 'lepx')
-          if g2: leg.AddEntry(g2, _tmp['graphs'][2]['legName'], 'lepx')
+          for _tmpGr in theEffys:
+            leg.AddEntry(_tmpGr, _tmpGr.GetName(), 'lepx')
           leg.Draw('same')
 
           h0.SetTitle(_tmp['title'])
@@ -1121,5 +1113,204 @@ if __name__ == '__main__':
           canvas.Close()
 
           print '\033[1m'+_tmp['outputName']+'\033[0m'
+
+    print '='*50
+    print '='*50
+    print '\033[1m'+'Rate Plots'+'\033[0m'
+    print '='*50
+    print '='*50
+
+    for _tmp in [
+      {
+        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_SinglePFPuppiJet200off']['MB'],
+        'hltTargetRateHz': 75,
+        'outputName': outputDir+'/rate_SingleJet',
+        'outputExts': EXTS,
+        'title': ';HLT PF+Puppi Jet p_{T} [GeV];Rate [Hz]',
+        'objLabel': '',
+        'topLabel': 'MC: QCD + V+jets',
+        'xmin': 0,
+        'xmax': 1000,
+        'logY': 1,
+        'histos': [
+          {'histo': rateHistos['HLT_TRKv06p1']       ['hltAK4PFPuppiJet'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltAK4PFPuppiJet'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltAK4PFPuppiJet'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltAK4PFPuppiJet'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltAK4PFPuppiJet'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltAK4PFPuppiJet'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+        ],
+      },
+      {
+        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_PFPuppiHT450off']['MB'],
+        'hltTargetRateHz': 75,
+        'outputName': outputDir+'/rate_HT',
+        'outputExts': EXTS,
+        'title': ';HLT PF+Puppi H_{T} [GeV];Rate [Hz]',
+        'objLabel': '',
+        'topLabel': 'MC: QCD + V+jets',
+        'xmin': 0,
+        'xmax': 2000,
+        'logY': 1,
+        'histos': [
+          {'histo': rateHistos['HLT_TRKv06p1']       ['hltAK4PFPuppiHT'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltAK4PFPuppiHT'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltAK4PFPuppiHT'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltAK4PFPuppiHT'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltAK4PFPuppiHT'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltAK4PFPuppiHT'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+        ],
+      },
+      {
+        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_PFPuppiMET200off']['MB'],
+        'hltTargetRateHz': 225,
+        'outputName': outputDir+'/rate_MET',
+        'outputExts': EXTS,
+        'title': ';HLT PF+Puppi MET [GeV];Rate [Hz]',
+        'objLabel': '',
+        'topLabel': 'MC: QCD + V+jets',
+        'xmin': 0,
+        'xmax': 600,
+        'logY': 1,
+        'histos': [
+          {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiMET'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiMET'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiMET'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+        ],
+      },
+      {
+        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_PFPuppiMET245off']['MB'],
+        'hltTargetRateHz': 225,
+        'outputName': outputDir+'/rate_MET2',
+        'outputExts': EXTS,
+        'title': ';HLT PF+Puppi MET [GeV];Rate [Hz]',
+        'objLabel': '',
+        'topLabel': 'MC: QCD + V+jets',
+        'xmin': 0,
+        'xmax': 600,
+        'logY': 1,
+        'histos': [
+          {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiMET2'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiMET2'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiMET2'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET2'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET2'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET2'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+        ],
+      },
+    ]:
+      canvasCount += 1
+      canvasNamePostfix = '_'+str(canvasCount)
+
+      theRates = []
+      for _tmpIdx in range(len(_tmp['histos'])):
+        h0 = _tmp['histos'][_tmpIdx]['histo']
+        h0.SetMarkerSize(0.5)
+        h0.SetLineWidth(2)
+        h0.SetMarkerColor(_tmp['histos'][_tmpIdx]['color'])
+        h0.SetLineColor(_tmp['histos'][_tmpIdx]['color'])
+        h0.SetLineStyle(_tmp['histos'][_tmpIdx]['lineStyle'])
+        h0.SetName(_tmp['histos'][_tmpIdx]['legName'])
+        theRates += [h0]
+
+      canvas = ROOT.TCanvas('c'+canvasNamePostfix, 'c'+canvasNamePostfix)
+      canvas.cd()
+
+      h0 = canvas.DrawFrame(_tmp['xmin'], 0.0001, _tmp['xmax'], 1.19)
+
+      addSame = False
+      for _tmp2 in theRates:
+        if _tmp2 is not None:
+          if addSame:
+            _tmp2.Draw('hist,e,same')
+          else:
+            _tmp2.Draw('hist,e')
+            addSame = True
+      del addSame
+
+      topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
+      topLabel.SetFillColor(0)
+      topLabel.SetFillStyle(1001)
+      topLabel.SetTextColor(ROOT.kBlack)
+      topLabel.SetTextAlign(12)
+      topLabel.SetTextFont(42)
+      topLabel.SetTextSize(0.035)
+      topLabel.SetBorderSize(0)
+      topLabel.AddText(_tmp['topLabel'])
+      topLabel.Draw('same')
+
+      objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+      objLabel.SetFillColor(0)
+      objLabel.SetFillStyle(1001)
+      objLabel.SetTextColor(ROOT.kBlack)
+      objLabel.SetTextAlign(32)
+      objLabel.SetTextFont(42)
+      objLabel.SetTextSize(0.035)
+      objLabel.SetBorderSize(0)
+      objLabel.AddText(_tmp['objLabel'])
+      objLabel.Draw('same')
+
+      l1tRateVal = _tmp['l1tRateTuple'][0]
+      l1tRateErr = _tmp['l1tRateTuple'][1]
+
+      l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
+      l1tRateLabel.SetFillColor(0)
+      l1tRateLabel.SetFillStyle(1001)
+      l1tRateLabel.SetTextColor(ROOT.kBlack)
+      l1tRateLabel.SetTextAlign(12)
+      l1tRateLabel.SetTextFont(42)
+      l1tRateLabel.SetTextSize(0.0325)
+      l1tRateLabel.SetBorderSize(0)
+      l1tRateLabel.AddText('L1T Rate = {:4.1f} +/- {:4.1f} kHz (MB)'.format(l1tRateVal/1000., l1tRateErr/1000.))
+      l1tRateLabel.Draw('same')
+
+#      hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.65, 0.85, 'NDC')
+#      hltRateLabel.SetFillColor(0)
+#      hltRateLabel.SetFillStyle(1001)
+#      hltRateLabel.SetTextColor(ROOT.kBlack)
+#      hltRateLabel.SetTextAlign(12)
+#      hltRateLabel.SetTextFont(42)
+#      hltRateLabel.SetTextSize(0.0325)
+#      hltRateLabel.SetBorderSize(0)
+#      hltRateLabel.AddText('L1T+HLT Rate = {:4.1f} +/- {:4.1f} Hz (QCD + V+jets)'.format(hltRateVal, math.sqrt(hltRateErr2)))
+#      hltRateLabel.Draw('same')
+
+      hltTargetRateLine = ROOT.TLine(_tmp['xmin'], _tmp['hltTargetRateHz'], _tmp['xmax'], _tmp['hltTargetRateHz'])
+      hltTargetRateLine.SetLineWidth(2)
+      hltTargetRateLine.SetLineStyle(2)
+      hltTargetRateLine.SetLineColor(ROOT.kPurple-1)
+      hltTargetRateLine.Draw('same')
+
+      hltTargetRateLabel = ROOT.TPaveText(0.60, 0.92, 0.96, 0.98, 'NDC')
+      hltTargetRateLabel.SetTextSize(0.035)
+      hltTargetRateLabel.SetFillColor(0)
+      hltTargetRateLabel.SetFillStyle(3000)
+      hltTargetRateLabel.SetTextColor(ROOT.kPurple-1)
+      hltTargetRateLabel.SetTextFont(42)
+      hltTargetRateLabel.SetTextAlign(32)
+      hltTargetRateLabel.AddText('Target HLT Rate: '+str(_tmp['hltTargetRateHz'])+' Hz')
+      hltTargetRateLabel.Draw('same')
+
+      leg = ROOT.TLegend(0.65, 0.20, 0.95, 0.40)
+      leg.SetNColumns(1)
+      for _tmpRate in theRates:
+        leg.AddEntry(_tmpRate, _tmpRate.GetName(), 'le')
+      leg.Draw('same')
+
+      h0.SetTitle(_tmp['title'])
+      h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+      canvas.SetLogy(_tmp['logY'])
+      canvas.SetGrid(1, 1)
+
+      for _tmpExt in _tmp['outputExts']:
+        canvas.SaveAs(_tmp['outputName']+'.'+_tmpExt)
+
+      canvas.Close()
+
+      print '\033[1m'+_tmp['outputName']+'\033[0m'
 
     print '='*50
