@@ -1129,16 +1129,18 @@ if __name__ == '__main__':
         'title': ';HLT PF+Puppi Jet p_{T} [GeV];Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
-        'xmin': 0,
-        'xmax': 1000,
+        'xmin':  400,
+        'xmax':  550,
+        'ymin':   11,
+        'ymax':  299,
         'logY': 1,
         'histos': [
           {'histo': rateHistos['HLT_TRKv06p1']       ['hltAK4PFPuppiJet'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
           {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltAK4PFPuppiJet'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
           {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltAK4PFPuppiJet'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltAK4PFPuppiJet'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltAK4PFPuppiJet'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltAK4PFPuppiJet'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltAK4PFPuppiJet'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltAK4PFPuppiJet'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltAK4PFPuppiJet'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
         ],
       },
       {
@@ -1149,16 +1151,18 @@ if __name__ == '__main__':
         'title': ';HLT PF+Puppi H_{T} [GeV];Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
-        'xmin': 0,
-        'xmax': 2000,
+        'xmin':  900,
+        'xmax': 1400,
+        'ymin':    2,
+        'ymax':  299,
         'logY': 1,
         'histos': [
-          {'histo': rateHistos['HLT_TRKv06p1']       ['hltAK4PFPuppiHT'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltAK4PFPuppiHT'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltAK4PFPuppiHT'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltAK4PFPuppiHT'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltAK4PFPuppiHT'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltAK4PFPuppiHT'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiHT'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiHT'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiHT'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiHT'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiHT'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiHT'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
         ],
       },
       {
@@ -1169,16 +1173,18 @@ if __name__ == '__main__':
         'title': ';HLT PF+Puppi MET [GeV];Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
-        'xmin': 0,
-        'xmax': 600,
+        'xmin':    0,
+        'xmax':  260,
+        'ymin':    2,
+        'ymax': 2999,
         'logY': 1,
         'histos': [
           {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiMET'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
           {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiMET'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
           {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiMET'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
         ],
       },
       {
@@ -1189,16 +1195,18 @@ if __name__ == '__main__':
         'title': ';HLT PF+Puppi MET [GeV];Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
-        'xmin': 0,
-        'xmax': 600,
+        'xmin':    0,
+        'xmax':  260,
+        'ymin':    2,
+        'ymax': 2999,
         'logY': 1,
         'histos': [
           {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiMET2'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
           {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiMET2'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
           {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiMET2'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET2'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET2'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET2'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v7.2 + TICLnew'},
+          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET2'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
+          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET2'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
+          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET2'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
         ],
       },
     ]:
@@ -1219,17 +1227,11 @@ if __name__ == '__main__':
       canvas = ROOT.TCanvas('c'+canvasNamePostfix, 'c'+canvasNamePostfix)
       canvas.cd()
 
-      h0 = canvas.DrawFrame(_tmp['xmin'], 0.0001, _tmp['xmax'], 1.19)
+      h0 = canvas.DrawFrame(_tmp['xmin'], _tmp['ymin'], _tmp['xmax'], _tmp['ymax'])
 
-      addSame = False
       for _tmp2 in theRates:
         if _tmp2 is not None:
-          if addSame:
-            _tmp2.Draw('hist,e,same')
-          else:
-            _tmp2.Draw('hist,e')
-            addSame = True
-      del addSame
+          _tmp2.Draw('hist,e,same')
 
       topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
       topLabel.SetFillColor(0)
@@ -1256,7 +1258,7 @@ if __name__ == '__main__':
       l1tRateVal = _tmp['l1tRateTuple'][0]
       l1tRateErr = _tmp['l1tRateTuple'][1]
 
-      l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
+      l1tRateLabel = ROOT.TPaveText(0.50, 0.85, 0.94, 0.90, 'NDC')
       l1tRateLabel.SetFillColor(0)
       l1tRateLabel.SetFillStyle(1001)
       l1tRateLabel.SetTextColor(ROOT.kBlack)
@@ -1267,34 +1269,24 @@ if __name__ == '__main__':
       l1tRateLabel.AddText('L1T Rate = {:4.1f} +/- {:4.1f} kHz (MB)'.format(l1tRateVal/1000., l1tRateErr/1000.))
       l1tRateLabel.Draw('same')
 
-#      hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.65, 0.85, 'NDC')
-#      hltRateLabel.SetFillColor(0)
-#      hltRateLabel.SetFillStyle(1001)
-#      hltRateLabel.SetTextColor(ROOT.kBlack)
-#      hltRateLabel.SetTextAlign(12)
-#      hltRateLabel.SetTextFont(42)
-#      hltRateLabel.SetTextSize(0.0325)
-#      hltRateLabel.SetBorderSize(0)
-#      hltRateLabel.AddText('L1T+HLT Rate = {:4.1f} +/- {:4.1f} Hz (QCD + V+jets)'.format(hltRateVal, math.sqrt(hltRateErr2)))
-#      hltRateLabel.Draw('same')
-
       hltTargetRateLine = ROOT.TLine(_tmp['xmin'], _tmp['hltTargetRateHz'], _tmp['xmax'], _tmp['hltTargetRateHz'])
       hltTargetRateLine.SetLineWidth(2)
       hltTargetRateLine.SetLineStyle(2)
-      hltTargetRateLine.SetLineColor(ROOT.kPurple-1)
+      hltTargetRateLine.SetLineColor(ROOT.kViolet-1)
       hltTargetRateLine.Draw('same')
 
-      hltTargetRateLabel = ROOT.TPaveText(0.60, 0.92, 0.96, 0.98, 'NDC')
-      hltTargetRateLabel.SetTextSize(0.035)
+      hltTargetRateLabel = ROOT.TPaveText(0.50, 0.80, 0.94, 0.85, 'NDC')
       hltTargetRateLabel.SetFillColor(0)
-      hltTargetRateLabel.SetFillStyle(3000)
-      hltTargetRateLabel.SetTextColor(ROOT.kPurple-1)
-      hltTargetRateLabel.SetTextFont(42)
+      hltTargetRateLabel.SetFillStyle(1001)
+      hltTargetRateLabel.SetTextColor(ROOT.kViolet-1)
       hltTargetRateLabel.SetTextAlign(32)
+      hltTargetRateLabel.SetTextFont(42)
+      hltTargetRateLabel.SetTextSize(0.0325)
+      l1tRateLabel.SetBorderSize(0)
       hltTargetRateLabel.AddText('Target HLT Rate: '+str(_tmp['hltTargetRateHz'])+' Hz')
       hltTargetRateLabel.Draw('same')
 
-      leg = ROOT.TLegend(0.65, 0.20, 0.95, 0.40)
+      leg = ROOT.TLegend(0.165, 0.17, 0.50, 0.55)
       leg.SetNColumns(1)
       for _tmpRate in theRates:
         leg.AddEntry(_tmpRate, _tmpRate.GetName(), 'le')
