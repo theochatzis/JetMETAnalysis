@@ -184,35 +184,35 @@ def getJetEfficiencies(fpath, hltThreshold_SingleJet, hltThreshold_HT):
     ret['SingleJet_L1TpHLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
     ret['SingleJet_L1TpHLT_wrt_'+_tmpRef].SetName('SingleJet_L1TpHLT_wrt_'+_tmpRef)
 
-#  # HT
-#  for _tmpRef in ['GEN', 'Offline']:
-#
-#    _tmp_num = _tfile.Get('L1T_PFPuppiHT450off/l1tSlwPFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
-#    _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, -1)
-#
-#    _tmp_den = _tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
-#    _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
-#
-#    ret['HT_L1T_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
-#    ret['HT_L1T_wrt_'+_tmpRef].SetName('HT_L1T_wrt_'+_tmpRef)
-#
-#    _tmp_num = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
-#    _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold_HT), -1)
-#
-#    _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
-#    _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
-#
-#    ret['HT_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
-#    ret['HT_HLT_wrt_'+_tmpRef].SetName('HT_HLT_wrt_'+_tmpRef)
-#
-#    _tmp_num = _tfile.Get('L1T_PFPuppiHT450off/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
-#    _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold_HT), -1)
-#
-#    _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
-#    _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
-#
-#    ret['HT_L1TpHLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
-#    ret['HT_L1TpHLT_wrt_'+_tmpRef].SetName('HT_L1TpHLT_wrt_'+_tmpRef)
+  # HT
+  for _tmpRef in ['GEN', 'Offline']:
+
+    _tmp_num = _tfile.Get('L1T_PFPuppiHT450off/l1tSlwPFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, -1)
+
+    _tmp_den = _tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
+
+    ret['HT_L1T_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+    ret['HT_L1T_wrt_'+_tmpRef].SetName('HT_L1T_wrt_'+_tmpRef)
+
+    _tmp_num = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold_HT), -1)
+
+    _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
+
+    ret['HT_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+    ret['HT_HLT_wrt_'+_tmpRef].SetName('HT_HLT_wrt_'+_tmpRef)
+
+    _tmp_num = _tfile.Get('L1T_PFPuppiHT450off/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold_HT), -1)
+
+    _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_den = _tmp_den.ProjectionY(tmpName(), 0, -1)
+
+    ret['HT_L1TpHLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
+    ret['HT_L1TpHLT_wrt_'+_tmpRef].SetName('HT_L1TpHLT_wrt_'+_tmpRef)
 
   _tfile.Close()
 
@@ -286,9 +286,6 @@ def getMETEfficiencies(fpath, hltThreshold_MET, hltThreshold_MET2):
 
   return ret
 
-
-
-
 #### main
 if __name__ == '__main__':
   ### args ---------------
@@ -343,38 +340,38 @@ if __name__ == '__main__':
       'MET': 120,
       'MET2': 120,
     },
-  
-  #  'HLT_TRKv06p1_TICL': {
-  #
-  #    'SingleJet': 530,
-  #    'HT': 1060,
-  #    'MET': 140,
-  #    'MET2': 140,
-  #  },
-  #
-  #  'HLT_TRKv07p2_TICL': {
-  #
-  #    'SingleJet': 530,
-  #    'HT': 1060,
-  #    'MET': 140,
-  #    'MET2': 140,
-  #  },
-  #
-  #  'HLT_TRKv06p1_TICLv2': {
-  #
-  #    'SingleJet': 530,
-  #    'HT': 1060,
-  #    'MET': 140,
-  #    'MET2': 140,
-  #  },
-  #
-  #  'HLT_TRKv07p2_TICLv2': {
-  #
-  #    'SingleJet': 530,
-  #    'HT': 1060,
-  #    'MET': 140,
-  #    'MET2': 140,
-  #  },
+
+    'HLT_TRKv06p1_TICL': {
+
+      'SingleJet': 530,
+      'HT': 1060,
+      'MET': 140,
+      'MET2': 140,
+    },
+
+    'HLT_TRKv07p2_TICL': {
+
+      'SingleJet': 530,
+      'HT': 1060,
+      'MET': 140,
+      'MET2': 140,
+    },
+
+    'HLT_TRKv06p1_TICLv2': {
+
+      'SingleJet': 530,
+      'HT': 1060,
+      'MET': 140,
+      'MET2': 140,
+    },
+
+    'HLT_TRKv07p2_TICLv2': {
+
+      'SingleJet': 530,
+      'HT': 1060,
+      'MET': 140,
+      'MET2': 140,
+    },
   }
 
   rateGroup = {
