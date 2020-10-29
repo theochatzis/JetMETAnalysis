@@ -444,7 +444,7 @@ void JMETriggerAnalysisDriverPhase2::bookHistograms_Jets_2DMaps(const std::strin
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-  std::vector<float> binEdges_HT(151);
+  std::vector<float> binEdges_HT(221);
   for(uint idx=0; idx<binEdges_HT.size(); ++idx){ binEdges_HT.at(idx) = idx * 10.; }
 
   addTH2D(dirPrefix+jetType1+"_HT__vs__"+jetType2+"_HT", binEdges_HT, binEdges_HT);
@@ -456,14 +456,14 @@ void JMETriggerAnalysisDriverPhase2::bookHistograms_MET_2DMaps(const std::string
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-  std::vector<float> binEdges_pt(61);
+  std::vector<float> binEdges_pt(81);
   for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = idx * 10.; }
 
   std::vector<float> binEdges_phi(41);
   for(uint idx=0; idx<binEdges_phi.size(); ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
 
-  std::vector<float> binEdges_sumEt(151);
-  for(uint idx=0; idx<binEdges_sumEt.size(); ++idx){ binEdges_sumEt.at(idx) = 10.*idx; }
+  std::vector<float> binEdges_sumEt(221);
+  for(uint idx=0; idx<binEdges_sumEt.size(); ++idx){ binEdges_sumEt.at(idx) = idx * 10.; }
 
   if(book1D){
     addTH1D(dirPrefix+metType1+"_pt", binEdges_pt);

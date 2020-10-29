@@ -370,16 +370,16 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
   std::vector<float> binEdges_njets(121);
-  for(uint idx=0; idx<121; ++idx){ binEdges_njets.at(idx) = idx; }
+  for(uint idx=0; idx<binEdges_njets.size(); ++idx){ binEdges_njets.at(idx) = idx; }
 
-  std::vector<float> binEdges_HT(151);
-  for(uint idx=0; idx<151; ++idx){ binEdges_HT.at(idx) = idx * 10.; }
+  std::vector<float> binEdges_HT(221);
+  for(uint idx=0; idx<binEdges_HT.size(); ++idx){ binEdges_HT.at(idx) = idx * 10.; }
 
-  std::vector<float> binEdges_MHT(151);
-  for(uint idx=0; idx<151; ++idx){ binEdges_MHT.at(idx) = idx * 10.; }
+  std::vector<float> binEdges_MHT(221);
+  for(uint idx=0; idx<binEdges_njets.size(); ++idx){ binEdges_MHT.at(idx) = idx * 10.; }
 
   std::vector<float> binEdges_pt(101);
-  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = 10.*idx; }
+  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = idx * 10.; }
 
   std::vector<float> binEdges_eta(101);
   for(uint idx=0; idx<binEdges_eta.size(); ++idx){ binEdges_eta.at(idx) = -5.0+0.1*idx; }
@@ -387,27 +387,27 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   std::vector<float> binEdges_phi(41);
   for(uint idx=0; idx<binEdges_phi.size(); ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
 
-  const std::vector<float> binEdges_mass(
+  std::vector<float> const binEdges_mass(
     {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600}
   );
 
   std::vector<float> binEdges_numberOfDaughters(121);
-  for(uint idx=0; idx<121; ++idx){ binEdges_numberOfDaughters.at(idx) = 2.*idx; }
+  for(uint idx=0; idx<binEdges_numberOfDaughters.size(); ++idx){ binEdges_numberOfDaughters.at(idx) = 2.*idx; }
 
   std::vector<float> binEdges_energyFrac(21);
-  for(uint idx=0; idx<21; ++idx){ binEdges_energyFrac.at(idx) = 0.05*idx; }
+  for(uint idx=0; idx<binEdges_energyFrac.size(); ++idx){ binEdges_energyFrac.at(idx) = 0.05*idx; }
 
   std::vector<float> binEdges_dauMult1(61);
-  for(uint idx=0; idx<61; ++idx){ binEdges_dauMult1.at(idx) = idx; }
+  for(uint idx=0; idx<binEdges_dauMult1.size(); ++idx){ binEdges_dauMult1.at(idx) = idx; }
 
   std::vector<float> binEdges_dauMult2(13);
-  for(uint idx=0; idx<13; ++idx){ binEdges_dauMult2.at(idx) = idx; }
+  for(uint idx=0; idx<binEdges_dauMult2.size(); ++idx){ binEdges_dauMult2.at(idx) = idx; }
 
   std::vector<float> binEdges_dRmatch(26);
-  for(uint idx=0; idx<26; ++idx){ binEdges_dRmatch.at(idx) = 0.2*idx; }
+  for(uint idx=0; idx<binEdges_dRmatch.size(); ++idx){ binEdges_dRmatch.at(idx) = 0.2*idx; }
 
   std::vector<float> binEdges_response(51);
-  for(uint idx=0; idx<51; ++idx){ binEdges_response.at(idx) = 0.1*idx; }
+  for(uint idx=0; idx<binEdges_response.size(); ++idx){ binEdges_response.at(idx) = 0.1*idx; }
 
   for(auto const& catLabel : jetCategoryLabels_){
 
@@ -508,17 +508,14 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-  std::vector<float> binEdges_pt(61);
-  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = 10.*idx; }
-//  const std::vector<float> binEdges_pt(
-//    {0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 400, 500, 600, 700, 800, 1000}
-//  );
+  std::vector<float> binEdges_pt(81);
+  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = idx * 10.; }
 
   std::vector<float> binEdges_phi(41);
   for(uint idx=0; idx<binEdges_phi.size(); ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
 
   std::vector<float> binEdges_sumEt(121);
-  for(uint idx=0; idx<binEdges_sumEt.size(); ++idx){ binEdges_sumEt.at(idx) = 50.*idx; }
+  for(uint idx=0; idx<binEdges_sumEt.size(); ++idx){ binEdges_sumEt.at(idx) = idx * 50.; }
 
   const std::vector<float> binEdges_offlineNPV(
     {0, 10, 15, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 65, 70, 80, 100, 120, 140}
