@@ -46,6 +46,8 @@ def monitor(options, log='', local=False):
     if options.job_maxtime is not None:
        if BATCH_HTC: ADD_OPTIONS += ['-append "+RequestRuntime = '+str(options.job_maxtime)+'"']
 
+#    ADD_OPTIONS += ['-append \'+JobFlavour = "longlunch"\'']
+
     if len(ADD_OPTIONS) > 0:
        print ' > additional options to "'+BATCH_RESUB_EXE+'":', str(ADD_OPTIONS)
 
