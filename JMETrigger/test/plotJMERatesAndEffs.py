@@ -303,6 +303,9 @@ if __name__ == '__main__':
   parser.add_argument('--minCountsForValidRate', dest='minCountsForValidRate', action='store', type=float, default=-1.0,
                       help='minimum number of counts to consider a sample valid for trigger rate estimates')
 
+  parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['pdf', 'png'],
+                      help='list of extension(s) for output file(s)')
+
   parser.add_argument('-v', '--verbosity', dest='verbosity', nargs='?', const=1, type=int, default=0,
                       help='verbosity level')
 
@@ -318,6 +321,8 @@ if __name__ == '__main__':
   ROOT.gErrorIgnoreLevel = ROOT.kError # do not display ROOT warnings
 
   apply_style(0)
+
+  EXTS = list(set(opts.exts))
 
   ### args validation ---
 
@@ -343,34 +348,34 @@ if __name__ == '__main__':
 
     'HLT_TRKv06p1_TICL': {
 
-      'SingleJet': 530,
-      'HT': 1060,
-      'MET': 140,
-      'MET2': 140,
+      'SingleJet': 470,
+      'HT': 1000,
+      'MET': 150,
+      'MET2': 150,
     },
 
     'HLT_TRKv07p2_TICL': {
 
-      'SingleJet': 530,
-      'HT': 1060,
-      'MET': 140,
-      'MET2': 140,
+      'SingleJet': 490,
+      'HT': 1370,
+      'MET': 230,
+      'MET2': 230,
     },
 
     'HLT_TRKv06p1_TICLv2': {
 
-      'SingleJet': 530,
-      'HT': 1060,
-      'MET': 140,
-      'MET2': 140,
+      'SingleJet': 470,
+      'HT': 980,
+      'MET': 120,
+      'MET2': 120,
     },
 
     'HLT_TRKv07p2_TICLv2': {
 
-      'SingleJet': 530,
-      'HT': 1060,
-      'MET': 140,
-      'MET2': 140,
+      'SingleJet': 480,
+      'HT': 1030,
+      'MET': 150,
+      'MET2': 150,
     },
   }
 
@@ -921,7 +926,7 @@ if __name__ == '__main__':
   if not opts.no_efficiencies:
 
     outputDir = opts.output
-    MKDIRP(opts.output, verbosity = (opts.verbosity > 0), dry_run = opts.dry_run)
+    MKDIRP(opts.output, verbose = (opts.verbosity > 0), dry_run = opts.dry_run)
 
     print '='*50
     print '='*50
@@ -948,12 +953,13 @@ if __name__ == '__main__':
           {
             'l1tPathKey': 'L1T_SinglePFPuppiJet200off',
             'hltPathKey': hltPath_SingleJet,
-            'outputName': outputDir+'/effy_SingleJet_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
+            'outputName': outputDir+'/effy_SingleJet_wrt'+_tmpRef+'_'+_tmpReco,
+            'outputExts': EXTS,
             'title': ';'+_tmpRef+' Jet p_{T} [GeV];Efficiency',
             'objLabel': _tmpReco,
             'topLabel': 'QCD_PtFlat_PU200',
             'xmin': 0,
-            'xmax': 900,
+            'xmax': 1000,
             'logY': 0,
             'graphs': [
               {'graph': effysJet[_tmpReco]['SingleJet_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
@@ -961,26 +967,28 @@ if __name__ == '__main__':
               {'graph': effysJet[_tmpReco]['SingleJet_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['SingleJet'])},
             ],
           },
-    #      {
-    #        'l1tPathKey': 'L1T_PFPuppiHT450off',
-    #        'hltPathKey': hltPath_HT,
-    #        'outputName': outputDir+'/effy_HT_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
-    #        'title': ';'+_tmpRef+' H_{T} [GeV];Efficiency',
-    #        'objLabel': _tmpReco,
-    #        'topLabel': 'QCD_PtFlat_PU200',
-    #        'xmin': 0,
-    #        'xmax': 2000,
-    #        'logY': 0,
-    #        'graphs': [
-    #          {'graph': effysJet[_tmpReco]['HT_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
-    #          {'graph': effysJet[_tmpReco]['HT_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['HT'])},
-    #          {'graph': effysJet[_tmpReco]['HT_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['HT'])},
-    #        ],
-    #      },
+          {
+            'l1tPathKey': 'L1T_PFPuppiHT450off',
+            'hltPathKey': hltPath_HT,
+            'outputName': outputDir+'/effy_HT_wrt'+_tmpRef+'_'+_tmpReco,
+            'outputExts': EXTS,
+            'title': ';'+_tmpRef+' H_{T} [GeV];Efficiency',
+            'objLabel': _tmpReco,
+            'topLabel': 'QCD_PtFlat_PU200',
+            'xmin': 0,
+            'xmax': 2000,
+            'logY': 0,
+            'graphs': [
+              {'graph': effysJet[_tmpReco]['HT_L1T_wrt_'+_tmpRef], 'color': 2, 'legName': 'L1T'},
+              {'graph': effysJet[_tmpReco]['HT_HLT_wrt_'+_tmpRef], 'color': 1, 'legName': 'HLT'+str(hltThresholds[_tmpReco]['HT'])},
+              {'graph': effysJet[_tmpReco]['HT_L1TpHLT_wrt_'+_tmpRef], 'color': 4, 'legName': 'L1T + HLT'+str(hltThresholds[_tmpReco]['HT'])},
+            ],
+          },
           {
             'l1tPathKey': 'L1T_PFPuppiMET200off',
             'hltPathKey': hltPath_MET,
-            'outputName': outputDir+'/effy_MET_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
+            'outputName': outputDir+'/effy_MET_wrt'+_tmpRef+'_'+_tmpReco,
+            'outputExts': EXTS,
             'title': ';'+_tmpRef+' MET [GeV];Efficiency',
             'objLabel': _tmpReco,
             'topLabel': 'VBF_HiggsToInvisible_PU200',
@@ -996,7 +1004,8 @@ if __name__ == '__main__':
           {
             'l1tPathKey': 'L1T_PFPuppiMET245off',
             'hltPathKey': hltPath_MET2,
-            'outputName': outputDir+'/effy_MET2_wrt'+_tmpRef+'_'+_tmpReco+'.pdf',
+            'outputName': outputDir+'/effy_MET2_wrt'+_tmpRef+'_'+_tmpReco,
+            'outputExts': EXTS,
             'title': ';'+_tmpRef+' MET [GeV];Efficiency',
             'objLabel': _tmpReco,
             'topLabel': 'VBF_HiggsToInvisible_PU200',
@@ -1106,8 +1115,11 @@ if __name__ == '__main__':
           canvas.SetLogy(_tmp['logY'])
           canvas.SetGrid(1, 1)
 
-          canvas.SaveAs(_tmp['outputName'])
+          for _tmpExt in _tmp['outputExts']:
+            canvas.SaveAs(_tmp['outputName']+'.'+_tmpExt)
+
           canvas.Close()
+
           print '\033[1m'+_tmp['outputName']+'\033[0m'
 
     print '='*50
