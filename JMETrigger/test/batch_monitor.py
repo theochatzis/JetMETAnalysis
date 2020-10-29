@@ -46,7 +46,8 @@ def monitor(options, log='', local=False):
     if options.job_maxtime is not None:
        if BATCH_HTC: ADD_OPTIONS += ['-append "+RequestRuntime = '+str(options.job_maxtime)+'"']
 
-#    ADD_OPTIONS += ['-append \'+JobFlavour = "longlunch"\'']
+    if options.jobflavour is not None:
+       ADD_OPTIONS += ['-append \'+JobFlavour = "'+str(options.jobflavour)+'"\'']
 
     if len(ADD_OPTIONS) > 0:
        print ' > additional options to "'+BATCH_RESUB_EXE+'":', str(ADD_OPTIONS)
@@ -320,6 +321,9 @@ if __name__ == '__main__':
 
    parser.add_argument('-r', '--resubmit', dest='resubmit', action='store_true', default=False,
                        help='enable resubmission of batch jobs')
+
+   parser.add_argument('--jobflavour', dest='jobflavour', action='store', type=str, default=None, required=False,
+                       help='argument of HTCondor parameter "+JobFlavour"')
 
    parser.add_argument('-t', '--job-maxtime', dest='job_maxtime', action='store', default=None,
                        help='max-time assigned to batch job in seconds (only applies when running with --resubmit; only works for HTCondor)')
