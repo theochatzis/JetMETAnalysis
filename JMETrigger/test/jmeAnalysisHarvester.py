@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-"""merge outputs of batch jobs"""
+"""add harvesting products (e.g. profiles, efficiencies)"""
 import os
 import argparse
 import glob
-import array
-import re
 import ctypes
 import ROOT
 
@@ -34,24 +32,18 @@ def updateDictionary(dictionary, TDirectory, prefix=''):
               KILL(log_prx+'input error -> found duplicate of template ["'+out_key+'"] in input file: '+TDirectory.GetName())
 
            dictionary[out_key] = j_obj.Clone()
-           dictionary[out_key].SetDirectory(0)
+#           dictionary[out_key].SetDirectory(0)
 
            if opts.verbose:
               print colored_text('[input]', ['1', '92']), out_key
 
     return dictionary
 
-def getTH1sFromTFile(path):
+def getTH1sFromTFile(tfile):
 
     input_histos_dict = {}
 
-    i_inptfile = ROOT.TFile.Open(path)
-    if (not i_inptfile) or i_inptfile.IsZombie() or i_inptfile.TestBit(ROOT.TFile.kRecovered):
-       return input_histos_dict
-
-    updateDictionary(input_histos_dict, i_inptfile, prefix='')
-
-    i_inptfile.Close()
+    updateDictionary(input_histos_dict, tfile, prefix='')
 
     return input_histos_dict
 
@@ -114,7 +106,11 @@ if __name__ == '__main__':
    for inpf in INPUT_FILES:
 
        ### Input Histograms
-       histograms = getTH1sFromTFile(inpf)
+       i_inptfile = ROOT.TFile.Open(inpf)
+       if (not i_inptfile) or i_inptfile.IsZombie() or i_inptfile.TestBit(ROOT.TFile.kRecovered):
+          continue
+
+       histograms = getTH1sFromTFile(i_inptfile)
 
        if not opts.copy_only:
           ### Histograms for profile of Mean
@@ -147,12 +143,12 @@ if __name__ == '__main__':
               if h_name0 in histograms: KILL('aaa1 '+h_name0)
    
               tmp_h1_xMean = tmp_h2.ProjectionY(h_name0)
-              tmp_h1_xMean.SetDirectory(0)
+#              tmp_h1_xMean.SetDirectory(0)
               tmp_h1_xMean.Reset()
    
               for _idx in range(1, 1+tmp_h2.GetNbinsY()):
                   _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-                  _htmp.SetDirectory(0)
+#                  _htmp.SetDirectory(0)
                   tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
                   tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
                   del _htmp
@@ -192,12 +188,12 @@ if __name__ == '__main__':
               if h_name1 in histograms: KILL('aaa3 '+h_name1)
    
               tmp_h1_xRMS = tmp_h2.ProjectionY(h_name1)
-              tmp_h1_xRMS.SetDirectory(0)
+#              tmp_h1_xRMS.SetDirectory(0)
               tmp_h1_xRMS.Reset()
    
               for _idx in range(1, 1+tmp_h2.GetNbinsY()):
                   _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
-                  _htmp.SetDirectory(0)
+#                  _htmp.SetDirectory(0)
                   tmp_h1_xRMS.SetBinContent(_idx, _htmp.GetRMS())
                   tmp_h1_xRMS.SetBinError(_idx, _htmp.GetRMSError())
                   del _htmp
@@ -219,10 +215,11 @@ if __name__ == '__main__':
    
                  tmp_h1_xRMSScaled = tmp_h1_xRMS.Clone()
                  tmp_h1_xRMSScaled.SetName(h_name2)
-                 tmp_h1_xRMSScaled.SetDirectory(0)
+#                 tmp_h1_xRMSScaled.SetDirectory(0)
                  tmp_h1_xRMSScaled.Divide(tmp_h1_ratioMeanNoErr)
-   
+
                  histograms[h_name2] = tmp_h1_xRMSScaled
+                 del tmp_h1_ratioMeanNoErr
           ### -------------------
    
           ### Matching Efficiencies
@@ -304,7 +301,7 @@ if __name__ == '__main__':
 
               tmp_h1.SetTitle(tmp_h1.GetName()+'_cumul')
               tmp_h1.SetName(tmp_h1.GetName()+'_cumul')
-              tmp_h1.SetDirectory(0)
+#              tmp_h1.SetDirectory(0)
 
               for _tmp_bin_i in range(1, 1+tmp_h1.GetNbinsX()):
                   _err = ctypes.c_double(0.)
@@ -350,12 +347,15 @@ if __name__ == '__main__':
    
               tmp_hnum0 = tmp_hnum.ProjectionY('tmp_hnum0')
               tmp_hden0 = tmp_hden.ProjectionY('tmp_hden0')
-   
+
               tmp_effname = hkey_i_num.replace(opts.separator_2d, '_')+'_eff'
    
               if tmp_effname in histograms: KILL(log_prx+'CCC2 '+tmp_effname)
    
               histograms[tmp_effname] = get_efficiency_graph(tmp_hnum0, tmp_hden0)
+
+              del tmp_hnum0
+              del tmp_hden0
           ### -------------------
 
        ### output file -------
@@ -403,6 +403,11 @@ if __name__ == '__main__':
               histograms[i_idx].Write()
 
           output_tfile.Close()
+
+       i_inptfile.Close()
+
+       for _tmp in histograms.keys():
+         del histograms[_tmp]
 
        print colored_text('[output]', ['1','92']), os.path.relpath(output_file)
        ### -------------------
