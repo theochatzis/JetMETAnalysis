@@ -360,7 +360,7 @@ if __name__ == '__main__':
 
        ### output file -------
        output_file = None
-       if len(INPUT_FILES) == 1:
+       if (len(INPUT_FILES) == -1) and (opts.level == 0):
           output_file = opts.output
        else:
           input_name_pieces = [os.path.basename(inpf)]
