@@ -21,10 +21,10 @@ corrJetsDict = {}
 
 jetColl = {
   'ak4pfHLT': 'hltAK4PFJets',
-  'ak4puppiHLT': 'hltAK4PuppiJets',
+  'ak4puppiHLT': 'hltAK4PFPuppiJets',
 
   'ak8pfHLT': 'hltAK8PFJets',
-  'ak8puppiHLT': 'hltAK8PuppiJets',
+  'ak8puppiHLT': 'hltAK8PFPuppiJets',
 }
 
 for ca in stdClusteringAlgorithms:
