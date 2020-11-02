@@ -24,6 +24,7 @@ L2Creator::L2Creator() {
     histogramMetric = HistUtil::getHistogramMetricType(histMet);
     delphes = false;
     maxFitIter = 30;
+    ptclipfit=false;
 }
 
 //______________________________________________________________________________
@@ -45,6 +46,10 @@ L2Creator::L2Creator(CommandLine& cl) {
     maxFitIter = cl.getValue<int>     ("maxFitIter",        30);
     histMet    = cl.getValue<string>  ("histMet",       "mu_h");
     histogramMetric = HistUtil::getHistogramMetricType(histMet);
+
+    ptclip     = cl.getValue<float>   ("ptclip",            0.);
+    statTh     = cl.getValue<int>     ("statTh",             4);
+    ptclipfit = cl.getValue<bool> ("ptclipfit", false);
 
     if (!cl.partialCheck()) return;
     cl.print();
@@ -211,6 +216,11 @@ void L2Creator::loopOverEtaBins() {
     TH1F* hrsp(0);
     hl_rsp.begin_loop();
 
+    //print fit results for all eta bins in a txt file
+    TString txtFitResultsFilename = outputDir + "Fit_Results.txt";
+    ofstream FitResults(txtFitResultsFilename);
+    FitResults.setf(ios::right);
+
     while ((hrsp=hl_rsp.next_object(indices))) {
 
         unsigned int ieta=indices[0];
@@ -232,7 +242,7 @@ void L2Creator::loopOverEtaBins() {
         // only add points to the graphs if the current histo is not empty
         // the current setting might be a little high
         //
-        if (hrsp->GetEntries() > 4) {//hrsp->Integral()!=0) {
+        if (hrsp->GetEntries() > 30) {//hrsp->Integral()!=0) {//EDW 4
 
             //TF1*  frsp    = (TF1*)hrsp->GetListOfFunctions()->Last();
             //std::cout << "hrspName = " << hrsp->GetName() << ": frsp = " << frsp << std::endl;
@@ -277,19 +287,23 @@ void L2Creator::loopOverEtaBins() {
             double eabsrsp = epeak;
             double abscor = 0.0;
             double eabscor = 0.0;
-
-            if (absrsp > 0) {
+//cout << "EDW 1 " << "eta" << vabscor_eta.back()->GetName() << "absrsp " << absrsp << " and eabsrsp " << eabsrsp << " and abscor " << abscor << " and eabscor " << eabscor << endl;
+            if (absrsp > 0 ) {//edw test
                 abscor  =1.0/absrsp;
                 eabscor = abscor*abscor*epeak;
+
+
+//cout << "EDW 2 " << "eta" << vabscor_eta.back()->GetName() << endl;
             }
-            if ((abscor>0) && (absrsp>0) && (eabscor>1e-5) && (eabscor/abscor<0.5) && (eabsrsp>1e-4) && (eabsrsp/absrsp<0.5)) {
+            if ((abscor>0)  && (absrsp>0) && (eabscor>1e-5) && (eabscor/abscor<0.5) && (eabsrsp>1e-4) && (eabsrsp/absrsp<0.5)) {
                 int n = vabsrsp_eta.back()->GetN();
                 vabsrsp_eta.back()->SetPoint     (n,refpt, absrsp);
                 vabsrsp_eta.back()->SetPointError(n,erefpt,eabsrsp);
                 vabscor_eta.back()->SetPoint     (n,jetpt, abscor);
                 vabscor_eta.back()->SetPointError(n,ejetpt,eabscor);
+            //    cout << "EDW 3" << "eta" << vabscor_eta.back()->GetName() << "refpt" << refpt << "jetpt" << jetpt << "absrsp " << absrsp << " and eabsrsp " << eabsrsp << " and abscor " << abscor << " and eabscor " << eabscor << endl;
             }
-            else cout << "absrsp " << absrsp << " and eabsrsp " << eabsrsp << " and abscor " << abscor << " and eabscor " << eabscor << endl;
+            //else cout << "EDW 4" << "absrsp " << absrsp << " and eabsrsp " << eabsrsp << " and abscor " << abscor << " and eabscor " << eabscor << endl;
         }
 
         //
@@ -376,6 +390,17 @@ void L2Creator::loopOverEtaBins() {
                         fabscor=new TF1("fit",fcn.Data(),xmin,xmax);
                         setOfflinePFParameters(gabscor, fabscor,xmin,xmax);
 
+			std::cout<<"ieta = "<<ieta<<std::endl;
+//			if(ieta==14 || ieta==67) std::cout<<"eta bin = "<<vabscor_eta.back()->GetName()<<std::endl;
+
+/*			if(ieta<=14 || ieta>=67) //EDW Mikko's fit function, fix parameters 3,4,5 to 0 for |eta|>=2.5
+			{ 
+//				fabscor->SetRange(12.,3500.);	//for mixed fit range
+				fabscor->FixParameter(3,0.);
+				fabscor->FixParameter(4,0.);
+				fabscor->FixParameter(5,0.);
+			}
+*/
                         if(l2pffit.Contains("spline",TString::kIgnoreCase)) {
                             vabscor_eta_spline.back()->setPartialFunction(fabscor);
                         }
@@ -537,6 +562,42 @@ void L2Creator::loopOverEtaBins() {
                 }
             }
 
+
+	    //edw ptclipfit 
+	    if (ptclipfit) 
+	    {    
+                if (xmin > 0.0001) 
+		{
+                    int nPar = fabscor->GetNpar();
+                    int clipPar = nPar;
+
+                    TString clip = TString::Format("((x<10)*([%d]))+((x>=10)*("+(TString)fabscor->GetTitle()+"))", clipPar);
+                    TF1 * fabscornew = new TF1(fabscor->GetName(), clip, 0.001, 6500);
+                    for (int ip=0; ip<nPar; ip++) 
+		    {
+                        fabscornew->SetParameter(ip, fabscor->GetParameter(ip));
+                    }
+                    
+                    fabscornew->SetParameter(clipPar, fabscor->Eval(xmin));
+
+		    fabscornew->SetChisquare(fabscor->GetChisquare());
+		    fabscornew->SetNDF(fabscor->GetNDF());
+
+                    fabscor = fabscornew;
+                    gabscor->GetListOfFunctions()->Clear();
+                    gabscor->GetListOfFunctions()->AddLast(fabscor);
+		}
+	    }
+
+	    //EDW print chi2 and prob for each fit in every eta bin
+	    std::cout<<"Chi2/NDF = "<<fabscor->GetChisquare()/fabscor->GetNDF()<<std::endl;
+	    std::cout<<"Prob = "<<fabscor->GetProb()<<std::endl;
+	
+	    FitResults<<ieta<<"\n";
+	    FitResults<<"Eta bin : "<<vabscor_eta.back()->GetName()<<"\n";
+	    FitResults<<"Chi2/NDF = "<<fabscor->GetChisquare()<<"/"<<fabscor->GetNDF()<<" = "<<fabscor->GetChisquare()/fabscor->GetNDF()<<"\n";
+	    FitResults<<"Prob = "<<fabscor->GetProb()<<"\n\n\n";
+
             //
             // format the graphs
             //
@@ -553,6 +614,9 @@ void L2Creator::loopOverEtaBins() {
             vabscor_eta_spline.push_back(nullptr);
         }
     }
+
+    FitResults.close();
+
 }
 
 //______________________________________________________________________________
@@ -804,7 +868,7 @@ void L2Creator::makeCanvas(string makeCanvasVariable) {
                 spline_func->SetRange(bounds.first,bounds.second);
                 spline_func->SetLineColor(igraph%nperpad+1);
                 spline_func->SetLineStyle(kDotted);
-                spline_func->Draw("same");
+//              spline_func->Draw("same");
             }
         }
 
@@ -874,7 +938,8 @@ TString L2Creator::getOfflinePFFunction() {
         return "[0]+([1]/(pow(log10(x),2)+[2]))+([3]*exp(-[4]*(log10(x)-[5])*(log10(x)-[5])))";
     }
     else if(l2pffit.EqualTo("standard+Gaussian",TString::kIgnoreCase)) {
-        return "[0]+([1]/(pow(log10(x),2)+[2]))+([3]*exp(-([4]*((log10(x)-[5])*(log10(x)-[5])))))+([6]*exp(-([7]*((log10(x)-[8])*(log10(x)-[8])))))";
+          return "[0]+([1]/(pow(log10(x),2)+[2]))+([3]*exp(-([4]*((log10(x)-[5])*(log10(x)-[5])))))+([6]*exp(-([7]*((log10(x)-[8])*(log10(x)-[8])))))";
+//	  return "[0]+[1]*pow(x,[2])+[3]*exp(-[4]*max(0.,(log10(x)-[5]))*(log10(x)-[5]))"; //Modification of 0,1,2 with powerlaw first term + single-sided log-gaus by Mikko	
     }
     else if(l2pffit.EqualTo("LogNormal+Gaussian+fixed",TString::kIgnoreCase)) {
         return "([0]+TMath::LogNormal(TMath::Log10(x),[1],[2],[3]))+([4]+[5]/(pow(log10(x),2)+[6])+[7]*exp(-[8]*(log10(x)-[9])*(log10(x)-[9])))";
@@ -954,6 +1019,15 @@ void L2Creator::setOfflinePFParameters(TGraphErrors* gabscor, TF1* fabscor, doub
         fabscor->SetParLimits(4,0,500);
         fabscor->SetParLimits(0,-2,25);
         fabscor->SetParLimits(1,0,250);
+
+/*	fabscor->SetRange(8.,3500.);
+	fabscor->SetParameter(0,1.09892);	//Modification of 0,1,2 with powerlaw first term + single-sided log-gaus by Mikko
+	fabscor->SetParameter(1,-0.46266);
+	fabscor->SetParameter(2,-0.152203);
+	fabscor->SetParameter(3,0.0951505);
+	fabscor->SetParameter(4,1.16479);
+	fabscor->SetParameter(5,1.53048);
+*/
     }
     else if(l2pffit.EqualTo("LogNormal+Gaussian+fixed",TString::kIgnoreCase)) {
         fabscor->SetRange(3,2000);
@@ -1313,6 +1387,7 @@ void L2Creator::writeTextFileForCurrentAlgorithm_spline() {
 
     //For eta-dependent spline clipping
     int pt_limit = 70;
+    float pt_clip = ptclip;
 
     unsigned int vector_size = 0;
     vector_size = vabscor_eta.size();
@@ -1345,6 +1420,7 @@ void L2Creator::writeTextFileForCurrentAlgorithm_spline() {
 
             bool abovePtLimit = false;
             bool lastLine = false;
+            bool firstline = true;
 
             for(int isection=0; isection<spline->getNSections(); isection++) {
                 if(lastLine) continue;
@@ -1364,7 +1440,7 @@ void L2Creator::writeTextFileForCurrentAlgorithm_spline() {
                 //if(isection==spline->getNSections()-1) {
                 //    bounds.second = 6500;
                 //}
-
+                if(bounds.second < pt_clip) continue;
                 if(isection==spline->getNSections()-1) lastLine = true;
                 if(bounds.second >= pt_limit) {
                     abovePtLimit = true;
@@ -1373,16 +1449,17 @@ void L2Creator::writeTextFileForCurrentAlgorithm_spline() {
 
                 //For expediency of Summer16_25nsV5_MC do eta-dependent clipping
                 fout<<setw(8) <<etamin<<setw(8)<<etamax
-                    <<setw(10)<<setprecision(6)<<(isection ? bounds.first : 0.001)
+                    <<setw(10)<<setprecision(6)<<(firstline ? 0.001 : bounds.first)
                     <<setw(10)<<setprecision(6)<<(lastLine ? 6500 : bounds.second)
                     <<setw(6)<<(int)(spline->getNpar()+2) //Number of parameters + 2
-                    <<setw(12)<<setprecision(8)<<bounds.first
+                    <<setw(12)<<setprecision(8)<<(firstline ? pt_clip : bounds.first)
                     <<setw(12)<<setprecision(8)<<(abovePtLimit ? pt_limit : bounds.second);
                 TF1* spline_func = spline->setParameters(isection);
                 for(int p=0; p<spline->getNpar(); p++) {
                    fout<<setw(17)<<setprecision(10)<<spline_func->GetParameter(p);
                 }
                 fout<<endl;
+                firstline = false;
             }
         }
     }
@@ -1399,3 +1476,4 @@ void L2Creator::closeFiles() {
     delete ifile;
     cout<<"DONE"<<endl;
 }
+
