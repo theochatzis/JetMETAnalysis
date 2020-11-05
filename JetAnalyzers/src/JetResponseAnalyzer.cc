@@ -290,6 +290,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
   if (doBalancing_&&refToJetMap->size()!=1) return;
   JRAEvt_->nref = 0;
   size_t nRef=(nRefMax_==0) ? refs->size() : std::min(nRefMax_,refs->size());
+
   for (size_t iRef=0;iRef<nRef;iRef++) {
      
      reco::CandidateBaseRef ref=refs->refAt(iRef);
@@ -309,11 +310,16 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
         else JRAEvt_->refdrjt->pop_back();
         continue;
      }
-     JRAEvt_->refpdgid->push_back(0);
 
-     if (getFlavorFromMap_) {
+     // SPS Adelina's branch takes JRAEvt_->refpdgid->push_back(0);
+     //     out of this if statement, necessary? 
+     if(doFlavor_){
+        JRAEvt_->refpdgid->push_back(0);
         JRAEvt_->refpdgid_algorithmicDef->push_back(0);
         JRAEvt_->refpdgid_physicsDef->push_back(0);
+     }
+
+     if (getFlavorFromMap_) {
 
         reco::JetMatchedPartonsCollection::const_iterator itPartonMatch;
         itPartonMatch=refToPartonMap->begin();
@@ -347,6 +353,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
                  }
               }
            }
+
            if (refdrparton_physics<deltaRPartonMax_) {
               JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref)=itPartonMatch->second.physicsDefinitionParton().get()->pdgId();
               int absid = std::abs(JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref));
@@ -361,7 +368,15 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            }
         }
      }
-     JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
+     // SPS Adelina's branch doesn't have this else if and if statements, necessary?  
+     else if (doFlavor_) {
+        JRAEvt_->refpdgid_algorithmicDef->at(JRAEvt_->nref)=0;
+        JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref)=0;
+     }
+
+     if (doFlavor_) {
+        JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
+     }
 
      // Beta/Beta Star Calculation
      JRAEvt_->beta = 0.0;
@@ -462,7 +477,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            }
         }
      }
-     
+
      if (doComposition_) {
         
         if (isCaloJet_) {
@@ -517,6 +532,7 @@ int chMult=0, nMult=0;
           }
       }
       else {
+
           bool isPF = iEvent.getByToken(srcPFCandidatesAsFwdPtr_, pfCandidatesAsFwdPtr);
           if ( isPF ) {
               for (auto i_pf=pfCandidatesAsFwdPtr->begin(); i_pf != pfCandidatesAsFwdPtr->end(); ++i_pf) {
@@ -537,7 +553,7 @@ int chMult=0, nMult=0;
   tree_->Fill();
 
   return;
-  }
+}
 
 //______________________________________________________________________________
 JRAEvent::Flavor JetResponseAnalyzer::getFlavor(reco::PFCandidate::ParticleType id) {
