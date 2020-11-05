@@ -339,9 +339,9 @@ if __name__ == '__main__':
     },
   
     'HLT_TRKv07p2': {
-  
+
       'SingleJet': 480,
-      'HT': 1020,
+      'HT': 1030,
       'MET': 120,
       'MET2': 120,
     },
@@ -366,14 +366,14 @@ if __name__ == '__main__':
 
       'SingleJet': 470,
       'HT': 980,
-      'MET': 120,
-      'MET2': 120,
+      'MET': 130,
+      'MET2': 130,
     },
 
     'HLT_TRKv07p2_TICLv2': {
 
       'SingleJet': 480,
-      'HT': 1030,
+      'HT': 1050,
       'MET': 150,
       'MET2': 150,
     },
@@ -508,38 +508,38 @@ if __name__ == '__main__':
       print '-'*110
       print '\033[1m{:10}\033[0m | \033[1m{:47}\033[0m | \033[1m{:47}\033[0m'.format('Rate [Hz]', '[L1T] '+_tmpL1T, '[L1T+HLT] '+_tmpHLT)
       print '-'*110
-  
+
       for _tmp1 in sorted(rateGroup.keys()):
-  
+
         l1tRate    = rateDict[_tmpReco][_tmpL1T][_tmp1][0]
         l1tRateErr = rateDict[_tmpReco][_tmpL1T][_tmp1][1]
-  
+
         hltRate    = rateDict[_tmpReco][_tmpHLT][_tmp1][0]
         hltRateErr = rateDict[_tmpReco][_tmpHLT][_tmp1][1]
-  
+
         l1tCount = countDict[_tmpReco][_tmpL1T][_tmp1][0]
         hltCount = countDict[_tmpReco][_tmpHLT][_tmp1][0]
 
         if l1tCount < opts.minCountsForValidRate:
           l1tRate, l1tRateErr = -99., -99.
-  
+
         if hltCount < opts.minCountsForValidRate:
           hltRate, hltRateErr = -99., -99.
-  
+
         print '{:<10} | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}] | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}]'.format(_tmp1,
           l1tRate, l1tRateErr, l1tCount,
           hltRate, hltRateErr, hltCount
         )
-  
+
     rateHistos[_tmpReco] = {}
-  
+
     for _tmpVar, _tmpSamples in {
       # L1T
       'l1tSlwPFPuppiJet': ['MB'],
       'l1tPFPuppiHT'    : ['MB'],
       'l1tPFPuppiHT_2'  : ['MB'],
       'l1tPFPuppiMET'   : ['MB'],
-  
+
       # HLT
       'hltAK4PFPuppiJet_woL1T': QCDSamples+['Wln', 'Zll'],
       'hltAK4PFPuppiJet'      : QCDSamples+['Wln', 'Zll'],
@@ -557,372 +557,20 @@ if __name__ == '__main__':
             rateHistos[_tmpReco][_tmpVar].Add(h0)
           else:
             rateHistos[_tmpReco][_tmpVar] = h0.Clone()
-  
+
     effysJet[_tmpReco] = getJetEfficiencies(
       fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',
       hltThreshold_SingleJet = hltThresholdSingleJet,
       hltThreshold_HT = hltThresholdHT,
     )
-  
+
     effysMET[_tmpReco] = getMETEfficiencies(
       fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200.root',
       hltThreshold_MET = hltThresholdMET,
       hltThreshold_MET2 = hltThresholdMET2,
     )
-  
-  ### ## Output TFile
-  ### ofile = ROOT.TFile('tmp.root', 'recreate')
-  ### ofile.cd()
-  ### 
-  ### for _tmp0 in [effysJet, effysMET]:
-  ###   for _tmp1 in sorted(_tmp0.keys()):
-  ###     _odir = ofile.Get(_tmp1) if ofile.Get(_tmp1) else ofile.mkdir(_tmp1)
-  ###     _odir.cd()
-  ###     for _tmp2 in sorted(_tmp0[_tmp1].keys()):
-  ###       _tmp0[_tmp1][_tmp2].Write()
-  ### 
-  ### ofile.Close()
-  
-  ### Plots
-  
-  #for puTag in ['']:
-  #
-  #    for regTag in ['']:
-  #
-  #        h0 = file0.Get('l1tPFMET_pt')
-  #        h1 = file0.Get('l1tPFMET_pt')
-  #        h2 = file0.Get('l1tPFPuppiMET_pt')
-  #
-  #        h00 = getRateHistogram(h0)
-  #        h01 = getRateHistogram(h1)
-  #        h02 = getRateHistogram(h2)
-  #
-  #        h00.SetLineColor(1)
-  #        h01.SetLineColor(2)
-  #        h02.SetLineColor(4)
-  #
-  #        h00.SetLineStyle(1)
-  #        h01.SetLineStyle(1)
-  #        h02.SetLineStyle(1)
-  #    
-  #        h00.SetLineWidth(2)
-  #        h01.SetLineWidth(2)
-  #        h02.SetLineWidth(2)
-  #
-  #        h00.SetMarkerSize(0)
-  #        h01.SetMarkerSize(0)
-  #        h02.SetMarkerSize(0)
-  #
-  #        canv = ROOT.TCanvas()
-  #
-  ##       canv.SetRightMargin(0.05)
-  ##       canv.SetLeftMargin(0.12)
-  #
-  #        canv.cd()
-  #        canv.SetLogy()
-  #
-  #        h00.Draw('hist,e0')
-  ##       h01.Draw('hist,e0,same')
-  #        h02.Draw('hist,e0,same')
-  #
-  #        h00.SetTitle(';L1T MET Threshold [GeV];Rate [kHz]')
-  #        h00.GetYaxis().SetRangeUser(0.01, 1e5)
-  #
-  #        leg = ROOT.TLegend(0.65, 0.70, 0.95, 0.90)
-  #        leg.SetNColumns(1)
-  #        leg.AddEntry(h00, 'L1T MET PF', 'le')
-  ##       leg.AddEntry(h01, 'L1T MET PF', 'le')
-  #        leg.AddEntry(h02, 'L1T MET PF+Puppi', 'le')
-  #        leg.Draw('same')
-  #
-  #        l1tPFPuppiMET_tdrRate = ROOT.TLine(0, 18, 500, 18)
-  #        l1tPFPuppiMET_tdrRate.SetLineWidth(2)
-  #        l1tPFPuppiMET_tdrRate.SetLineStyle(2)
-  #        l1tPFPuppiMET_tdrRate.SetLineColor(ROOT.kBlue-1)
-  #        l1tPFPuppiMET_tdrRate.Draw('same')
-  #
-  #        l1tPFPuppiMET_tdrRateTxt = ROOT.TPaveText(0.175, 0.42, 0.325, 0.52, 'NDC')
-  #        l1tPFPuppiMET_tdrRateTxt.SetTextSize(0.035)
-  #        l1tPFPuppiMET_tdrRateTxt.SetFillColor(0)
-  #        l1tPFPuppiMET_tdrRateTxt.SetFillStyle(3000)
-  #        l1tPFPuppiMET_tdrRateTxt.SetTextColor(ROOT.kBlue-1)
-  #        l1tPFPuppiMET_tdrRateTxt.SetTextFont(42)
-  #        l1tPFPuppiMET_tdrRateTxt.AddText('[18 kHz]')
-  #        l1tPFPuppiMET_tdrRateTxt.Draw('same')
-  #
-  #        l1tPFPuppiMET_thresh = ROOT.TLine(136, 0.01, 136, 18)
-  #        l1tPFPuppiMET_thresh.SetLineWidth(2)
-  #        l1tPFPuppiMET_thresh.SetLineStyle(2)
-  #        l1tPFPuppiMET_thresh.SetLineColor(ROOT.kBlue-1)
-  #        l1tPFPuppiMET_thresh.Draw('same')
-  #
-  #        mcSampleTxt = ROOT.TPaveText(0.10, 0.92, 0.65, 0.99, 'NDC')
-  #        mcSampleTxt.SetTextSize(0.035)
-  #        mcSampleTxt.SetFillColor(0)
-  #        mcSampleTxt.SetFillStyle(3000)
-  #        mcSampleTxt.SetTextColor(ROOT.kBlack)
-  #        mcSampleTxt.SetTextFont(42)
-  #        mcSampleTxt.AddText('MinBias PU200 [11_1_X]')
-  #        mcSampleTxt.Draw('same')
-  #
-  #        canv.SaveAs('tmp.pdf')
-  #        canv.Close()
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #        h0 = file0.Get('hltPFMET_pt')
-  #        h1 = file0.Get('hltPFPuppiMET_pt')
-  #        h2 = file0.Get('offlinePFMET_Raw_pt')
-  #        h3 = file0.Get('offlinePFPuppiMET_Raw_pt')
-  #        h4 = file0.Get('offlinePFPuppiMET_Type1_pt')
-  #
-  #        h00 = getRateHistogram(h0)
-  #        h01 = getRateHistogram(h1)
-  #        h02 = getRateHistogram(h2)
-  #        h03 = getRateHistogram(h3)
-  #        h04 = getRateHistogram(h4)
-  #
-  #        h00.SetLineColor(1)
-  #        h01.SetLineColor(4)
-  #        h02.SetLineColor(2)
-  #        h03.SetLineColor(ROOT.kViolet)
-  #        h04.SetLineColor(ROOT.kOrange)
-  #
-  #        h00.SetLineStyle(1)
-  #        h01.SetLineStyle(1)
-  #        h02.SetLineStyle(1)
-  #        h03.SetLineStyle(1)
-  #        h04.SetLineStyle(1)
-  #
-  #        h00.SetLineWidth(2)
-  #        h01.SetLineWidth(2)
-  #        h02.SetLineWidth(2)
-  #        h03.SetLineWidth(2)
-  #        h04.SetLineWidth(2)
-  #
-  #        h00.SetMarkerSize(0)
-  #        h01.SetMarkerSize(0)
-  #        h02.SetMarkerSize(0)
-  #        h03.SetMarkerSize(0)
-  #        h04.SetMarkerSize(0)
-  #
-  #        canv = ROOT.TCanvas()
-  #
-  ##       canv.SetRightMargin(0.05)
-  ##       canv.SetLeftMargin(0.12)
-  #
-  #        canv.cd()
-  #        canv.SetLogy()
-  #
-  #        h00.Draw('hist,e0')
-  #        h01.Draw('hist,e0,same')
-  #        h02.Draw('hist,e0,same')
-  #        h03.Draw('hist,e0,same')
-  #        h04.Draw('hist,e0,same')
-  #
-  #        h00.SetTitle(';HLT/Offline MET Threshold [GeV];Rate [kHz]')
-  #        h00.GetYaxis().SetRangeUser(0.01, 1e5)
-  #
-  #        leg = ROOT.TLegend(0.65, 0.55, 0.95, 0.90)
-  #        leg.SetNColumns(1)
-  #        leg.AddEntry(h00, 'HLT MET PF', 'le')
-  #        leg.AddEntry(h01, 'HLT MET PF+Puppi', 'le')
-  #        leg.AddEntry(h02, 'Offl MET PF', 'le')
-  #        leg.AddEntry(h03, 'Offl MET PF+Puppi', 'le')
-  #        leg.AddEntry(h04, 'Offl MET PF+Puppi (Type-1)', 'le')
-  #        leg.Draw('same')
-  #
-  ##        l1tPFPuppiMET_tdrRate = ROOT.TLine(0, 18, 500, 18)
-  ##        l1tPFPuppiMET_tdrRate.SetLineWidth(2)
-  ##        l1tPFPuppiMET_tdrRate.SetLineStyle(2)
-  ##        l1tPFPuppiMET_tdrRate.SetLineColor(ROOT.kBlue-1)
-  ##        l1tPFPuppiMET_tdrRate.Draw('same')
-  ##
-  ##        l1tPFPuppiMET_tdrRateTxt = ROOT.TPaveText(0.175, 0.42, 0.325, 0.52, 'NDC')
-  ##        l1tPFPuppiMET_tdrRateTxt.SetTextSize(0.035)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetFillColor(0)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetFillStyle(3000)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetTextColor(ROOT.kBlue-1)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetTextFont(42)
-  ##        l1tPFPuppiMET_tdrRateTxt.AddText('[18 kHz]')
-  ##        l1tPFPuppiMET_tdrRateTxt.Draw('same')
-  ##
-  ##        l1tPFPuppiMET_thresh = ROOT.TLine(136, 0.01, 136, 18)
-  ##        l1tPFPuppiMET_thresh.SetLineWidth(2)
-  ##        l1tPFPuppiMET_thresh.SetLineStyle(2)
-  ##        l1tPFPuppiMET_thresh.SetLineColor(ROOT.kBlue-1)
-  ##        l1tPFPuppiMET_thresh.Draw('same')
-  #
-  #        mcSampleTxt = ROOT.TPaveText(0.10, 0.92, 0.65, 0.99, 'NDC')
-  #        mcSampleTxt.SetTextSize(0.035)
-  #        mcSampleTxt.SetFillColor(0)
-  #        mcSampleTxt.SetFillStyle(3000)
-  #        mcSampleTxt.SetTextColor(ROOT.kBlack)
-  #        mcSampleTxt.SetTextFont(42)
-  #        mcSampleTxt.AddText('MinBias PU200 [11_1_X]')
-  #        mcSampleTxt.Draw('same')
-  #
-  #        canv.SaveAs('tmp2.pdf')
-  #        canv.Close()
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  #
-  ##        h0 = file0.Get('l1tPFPuppiMET_pt__hltPFPuppiMET_pt')
-  ##
-  ##        eff_den = h0.ProjectionY('den', 0, -1)
-  ##        eff_num = h0.ProjectionY('num', h0.GetXaxis().FindBin(136.1), -1)
-  ##
-  ##        met_binning = [0, 30, 60, 90, 100, 110, 120, 130, 140,150,160,170,180,200,220,240,260,280,300,340,380,440,500]
-  ##
-  ##        eff_den2 = get_rebinned_histo(eff_den, met_binning)
-  ##        eff_num2 = get_rebinned_histo(eff_num, met_binning)
-  ##
-  ##        geff = get_efficiency_graph(eff_num2, eff_den2)
-  ##
-  ##        geff.SetLineColor(4)
-  ##        geff.SetLineStyle(1)
-  ##        geff.SetLineWidth(2)
-  ##        geff.SetMarkerSize(0.5)
-  ##
-  ##        canv = ROOT.TCanvas()
-  ##
-  ###       canv.SetRightMargin(0.05)
-  ###       canv.SetLeftMargin(0.12)
-  ##
-  ##        canv.cd()
-  ##
-  ##        geff.Draw('alp')
-  ##
-  ##        geff.SetTitle(';Offline PF+Puppi MET (Raw) [GeV];Efficiency')
-  ###        geff.GetYaxis().SetRangeUser(0.01, 1e5)
-  ##
-  ###        leg = ROOT.TLegend(0.65, 0.70, 0.95, 0.90)
-  ###        leg.SetNColumns(1)
-  ###        leg.AddEntry(h00, 'L1T MET PF', 'le')
-  ####       leg.AddEntry(h01, 'L1T MET PF', 'le')
-  ###        leg.AddEntry(h02, 'L1T MET PF+Puppi', 'le')
-  ###        leg.Draw('same')
-  ###
-  ###        l1tPFPuppiMET_tdrRate = ROOT.TLine(0, 18, 500, 18)
-  ###        l1tPFPuppiMET_tdrRate.SetLineWidth(2)
-  ###        l1tPFPuppiMET_tdrRate.SetLineStyle(2)
-  ###        l1tPFPuppiMET_tdrRate.SetLineColor(ROOT.kBlue-1)
-  ###        l1tPFPuppiMET_tdrRate.Draw('same')
-  ###
-  ###        l1tPFPuppiMET_tdrRateTxt = ROOT.TPaveText(0.175, 0.42, 0.325, 0.52, 'NDC')
-  ###        l1tPFPuppiMET_tdrRateTxt.SetTextSize(0.035)
-  ###        l1tPFPuppiMET_tdrRateTxt.SetFillColor(0)
-  ###        l1tPFPuppiMET_tdrRateTxt.SetFillStyle(3000)
-  ###        l1tPFPuppiMET_tdrRateTxt.SetTextColor(ROOT.kBlue-1)
-  ###        l1tPFPuppiMET_tdrRateTxt.SetTextFont(42)
-  ###        l1tPFPuppiMET_tdrRateTxt.AddText('[18 kHz]')
-  ###        l1tPFPuppiMET_tdrRateTxt.Draw('same')
-  ###
-  ###        l1tPFPuppiMET_thresh = ROOT.TLine(136, 0.01, 136, 18)
-  ###        l1tPFPuppiMET_thresh.SetLineWidth(2)
-  ###        l1tPFPuppiMET_thresh.SetLineStyle(2)
-  ###        l1tPFPuppiMET_thresh.SetLineColor(ROOT.kBlue-1)
-  ###        l1tPFPuppiMET_thresh.Draw('same')
-  ##
-  ##        canv.SaveAs('tmp2.pdf')
-  ##        canv.Close()
-  #
-  #        h0 = file1.Get('NoSelection/l1tAK4PFJetsCorrected_Eta2p4_HT')
-  #        h2 = file1.Get('NoSelection/l1tAK4PFPuppiJetsCorrected_Eta2p4_HT')
-  #
-  #        h00 = getRateHistogram(h0)
-  #        h02 = getRateHistogram(h2)
-  #
-  #        h00.SetLineColor(1)
-  #        h02.SetLineColor(4)
-  #
-  #        h00.SetLineStyle(1)
-  #        h02.SetLineStyle(1)
-  #    
-  #        h00.SetLineWidth(2)
-  #        h02.SetLineWidth(2)
-  #
-  #        h00.SetMarkerSize(0)
-  #        h02.SetMarkerSize(0)
-  #
-  #        canv = ROOT.TCanvas()
-  #
-  ##       canv.SetRightMargin(0.05)
-  ##       canv.SetLeftMargin(0.12)
-  #
-  #        canv.cd()
-  #        canv.SetLogy()
-  #
-  #        h00.Draw('hist,e0')
-  #        h02.Draw('hist,e0,same')
-  #
-  #        h00.SetTitle(';L1T H_{T} Threshold [GeV];Rate [kHz]')
-  #        h00.GetYaxis().SetRangeUser(0.01, 1e5)
-  #
-  #        leg = ROOT.TLegend(0.65, 0.70, 0.95, 0.90)
-  #        leg.SetNColumns(1)
-  #        leg.AddEntry(h00, 'L1T H_{T}(Jets) PF', 'le')
-  #        leg.AddEntry(h02, 'L1T H_{T}(Jets) PF+Puppi', 'le')
-  #        leg.Draw('same')
-  #
-  ##        l1tPFPuppiMET_tdrRate = ROOT.TLine(0, 18, 500, 18)
-  ##        l1tPFPuppiMET_tdrRate.SetLineWidth(2)
-  ##        l1tPFPuppiMET_tdrRate.SetLineStyle(2)
-  ##        l1tPFPuppiMET_tdrRate.SetLineColor(ROOT.kBlue-1)
-  ##        l1tPFPuppiMET_tdrRate.Draw('same')
-  ##
-  ##        l1tPFPuppiMET_tdrRateTxt = ROOT.TPaveText(0.175, 0.42, 0.325, 0.52, 'NDC')
-  ##        l1tPFPuppiMET_tdrRateTxt.SetTextSize(0.035)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetFillColor(0)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetFillStyle(3000)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetTextColor(ROOT.kBlue-1)
-  ##        l1tPFPuppiMET_tdrRateTxt.SetTextFont(42)
-  ##        l1tPFPuppiMET_tdrRateTxt.AddText('[18 kHz]')
-  ##        l1tPFPuppiMET_tdrRateTxt.Draw('same')
-  ##
-  ##        l1tPFPuppiMET_thresh = ROOT.TLine(136, 0.01, 136, 18)
-  ##        l1tPFPuppiMET_thresh.SetLineWidth(2)
-  ##        l1tPFPuppiMET_thresh.SetLineStyle(2)
-  ##        l1tPFPuppiMET_thresh.SetLineColor(ROOT.kBlue-1)
-  ##        l1tPFPuppiMET_thresh.Draw('same')
-  #
-  #        mcSampleTxt = ROOT.TPaveText(0.10, 0.92, 0.65, 0.99, 'NDC')
-  #        mcSampleTxt.SetTextSize(0.035)
-  #        mcSampleTxt.SetFillColor(0)
-  #        mcSampleTxt.SetFillStyle(3000)
-  #        mcSampleTxt.SetTextColor(ROOT.kBlack)
-  #        mcSampleTxt.SetTextFont(42)
-  #        mcSampleTxt.AddText('MinBias PU200 [11_1_X]')
-  #        mcSampleTxt.Draw('same')
-  #
-  #        canv.SaveAs('tmp3.pdf')
-  #        canv.Close()
-  #
-  #
-  #
-  #
-  #file0.Close()
 
+  ### Plots
   if not opts.no_plots:
 
     outputDir = opts.output
@@ -1126,7 +774,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 75,
         'outputName': outputDir+'/rate_SingleJet',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi Jet p_{T} [GeV];Rate [Hz]',
+        'title': ';HLT PF+Puppi Jet p_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':  400,
@@ -1148,7 +796,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 75,
         'outputName': outputDir+'/rate_HT',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi H_{T} [GeV];Rate [Hz]',
+        'title': ';HLT PF+Puppi H_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':  900,
@@ -1170,7 +818,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 225,
         'outputName': outputDir+'/rate_MET',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi MET [GeV];Rate [Hz]',
+        'title': ';HLT PF+Puppi MET Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':    0,
@@ -1192,7 +840,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 225,
         'outputName': outputDir+'/rate_MET2',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi MET [GeV];Rate [Hz]',
+        'title': ';HLT PF+Puppi MET Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':    0,
@@ -1306,3 +954,26 @@ if __name__ == '__main__':
       print '\033[1m'+_tmp['outputName']+'\033[0m'
 
     print '='*50
+
+
+
+for _tmp1 in sorted(rateDict.keys()):
+  for _tmp2 in sorted(rateDict[_tmp1].keys()):
+    aRate, aRateErr2 = 0., 0.
+    for _tmp3 in QCDSamples+['Wln', 'Zll']:
+      aRate += rateDict[_tmp1][_tmp2][_tmp3][0]
+      aRateErr2 += math.pow(rateDict[_tmp1][_tmp2][_tmp3][1], 2)
+    print _tmp1, '  ', _tmp2, aRate, math.sqrt(aRateErr2)
+
+## ## Output TFile
+## ofile = ROOT.TFile('tmp.root', 'recreate')
+## ofile.cd()
+## 
+## for _tmp0 in [effysJet, effysMET]:
+##   for _tmp1 in sorted(_tmp0.keys()):
+##     _odir = ofile.Get(_tmp1) if ofile.Get(_tmp1) else ofile.mkdir(_tmp1)
+##     _odir.cd()
+##     for _tmp2 in sorted(_tmp0[_tmp1].keys()):
+##       _tmp0[_tmp1][_tmp2].Write()
+## 
+## ofile.Close()

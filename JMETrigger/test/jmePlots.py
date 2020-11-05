@@ -491,68 +491,68 @@ def getPlotLabels(key, isProfile, isEfficiency, keyword):
          if '_NotMatchedTo' in key: _titleY = '1 - #varepsilon_{Matching}'
          elif '_MatchedTo' in key: _titleY = '#varepsilon_{Matching}'
 
-    if   '_pt_overGEN_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
-    elif '_pt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
+    if   '_pt_overGEN_Mean_' in key: _titleY = '<p_{T} / p_{T}^{GEN}>'
+    elif '_pt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / <p_{T} / p_{T}^{GEN}>'
     elif '_pt_overGEN_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
 
-    elif '_pt_overOffline_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{Offl}#GT'
-    elif '_pt_overOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT'
+    elif '_pt_overOffline_Mean_' in key: _titleY = '<p_{T} / p_{T}^{Offl}>'
+    elif '_pt_overOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / <p_{T} / p_{T}^{Offl}>'
     elif '_pt_overOffline_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl})'
 
-    if   '_pt0_overGEN_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{GEN}#GT'
-    elif '_pt0_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / #LTp_{T} / p_{T}^{GEN}#GT'
+    if   '_pt0_overGEN_Mean_' in key: _titleY = '<p_{T} / p_{T}^{GEN}>'
+    elif '_pt0_overGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN}) / <p_{T} / p_{T}^{GEN}>'
     elif '_pt0_overGEN_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{GEN})'
 
-    elif '_pt0_overOffline_Mean_' in key: _titleY = '#LTp_{T} / p_{T}^{Offl}#GT'
-    elif '_pt0_overOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / #LTp_{T} / p_{T}^{Offl}#GT'
+    elif '_pt0_overOffline_Mean_' in key: _titleY = '<p_{T} / p_{T}^{Offl}>'
+    elif '_pt0_overOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl}) / <p_{T} / p_{T}^{Offl}>'
     elif '_pt0_overOffline_RMS_' in key: _titleY = '#sigma(p_{T} / p_{T}^{Offl})'
 
-    elif '_mass_overGEN_Mean_' in key: _titleY = '#LTmass / mass^{GEN}#GT'
-    elif '_mass_overGEN_RMSOverMean_' in key: _titleY = '#sigma(m / m^{GEN}) / #LTm / m^{GEN}#GT'
+    elif '_mass_overGEN_Mean_' in key: _titleY = '<mass / mass^{GEN}>'
+    elif '_mass_overGEN_RMSOverMean_' in key: _titleY = '#sigma(m / m^{GEN}) / <m / m^{GEN}>'
     elif '_mass_overGEN_RMS_' in key: _titleY = '#sigma(mass / mass^{GEN})'
 
-    elif '_mass_overOffline_Mean_' in key: _titleY = '#LTmass / mass^{Offl}#GT'
-    elif '_mass_overOffline_RMSOverMean_' in key: _titleY = '#sigma(m / m^{Offl}) / #LTm / m^{Offl}#GT'
+    elif '_mass_overOffline_Mean_' in key: _titleY = '<mass / mass^{Offl}>'
+    elif '_mass_overOffline_RMSOverMean_' in key: _titleY = '#sigma(m / m^{Offl}) / <m / m^{Offl}>'
     elif '_mass_overOffline_RMS_' in key: _titleY = '#sigma(mass / mass^{Offl})'
 
-    elif '_sumEt_overGEN_Mean_' in key: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
-    elif '_sumEt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN}) / #LTSum-E_{T} / Sum-E_{T}^{GEN}#GT'
+    elif '_sumEt_overGEN_Mean_' in key: _titleY = '<Sum-E_{T} / Sum-E_{T}^{GEN}>'
+    elif '_sumEt_overGEN_RMSOverMean_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN}) / <Sum-E_{T} / Sum-E_{T}^{GEN}>'
     elif '_sumEt_overGEN_RMS_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{GEN})'
 
-    elif '_sumEt_overOffline_Mean_' in key: _titleY = '#LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
-    elif '_sumEt_overOffline_RMSOverMean_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl}) / #LTSum-E_{T} / Sum-E_{T}^{Offl}#GT'
+    elif '_sumEt_overOffline_Mean_' in key: _titleY = '<Sum-E_{T} / Sum-E_{T}^{Offl}>'
+    elif '_sumEt_overOffline_RMSOverMean_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl}) / <Sum-E_{T} / Sum-E_{T}^{Offl}>'
     elif '_sumEt_overOffline_RMS_' in key: _titleY = '#sigma(Sum-E_{T} / Sum-E_{T}^{Offl})'
 
-    elif '_deltaPhiGEN_Mean_' in key: _titleY = '#LT#Delta#phi^{GEN}#GT'
-#   elif '_deltaPhiGEN_RMSOverMean_' in key: _titleY = '#sigma(#Delta#phi^{GEN}) / #LT#Delta#phi^{GEN}#GT'
+    elif '_deltaPhiGEN_Mean_' in key: _titleY = '<#Delta#phi^{GEN}>'
+#   elif '_deltaPhiGEN_RMSOverMean_' in key: _titleY = '#sigma(#Delta#phi^{GEN}) / <#Delta#phi^{GEN}>'
     elif '_deltaPhiGEN_RMS_' in key: _titleY = '#sigma(#Delta#phi^{GEN})'
 
-    elif '_deltaPhiOffline_Mean_' in key: _titleY = '#LT#Delta#phi^{Offl}#GT'
-#   elif '_deltaPhiOffline_RMSOverMean_' in key: _titleY = '#sigma(#Delta#phi^{Offl}) / #LT#Delta#phi^{Offl}#GT'
+    elif '_deltaPhiOffline_Mean_' in key: _titleY = '<#Delta#phi^{Offl}>'
+#   elif '_deltaPhiOffline_RMSOverMean_' in key: _titleY = '#sigma(#Delta#phi^{Offl}) / <#Delta#phi^{Offl}>'
     elif '_deltaPhiOffline_RMS_' in key: _titleY = '#sigma(#Delta#phi^{Offl})'
 
-    elif '_pt_paraToGEN_Mean_' in key: _titleY = '#LTp_{T}^{#parallel GEN}#GT [GeV]'
-    elif '_pt_paraToGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_paraToGEN_Mean_' in key: _titleY = '<p_{T}^{#parallel GEN}> [GeV]'
+    elif '_pt_paraToGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN}) / <p_{T} / p_{T}^{GEN}> [GeV]'
     elif '_pt_paraToGEN_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN}) [GeV]'
 
-    elif '_pt_paraToOffline_Mean_' in key: _titleY = '#LTp_{T}^{#parallel Offl}#GT [GeV]'
-    elif '_pt_paraToOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_paraToOffline_Mean_' in key: _titleY = '<p_{T}^{#parallel Offl}> [GeV]'
+    elif '_pt_paraToOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl}) / <p_{T} / p_{T}^{Offl}> [GeV]'
     elif '_pt_paraToOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl}) [GeV]'
 
-    elif '_pt_paraToGENMinusGEN_Mean_' in key: _titleY = '#LTp_{T}^{#parallel GEN} - p_{T}^{GEN}#GT [GeV]'
-    elif '_pt_paraToGENMinusGEN_RMSOverMean_' in key: _titleY = '#sigma(#Deltap_{T}^{#parallel GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_paraToGENMinusGEN_Mean_' in key: _titleY = '<p_{T}^{#parallel GEN} - p_{T}^{GEN}> [GeV]'
+    elif '_pt_paraToGENMinusGEN_RMSOverMean_' in key: _titleY = '#sigma(#Deltap_{T}^{#parallel GEN}) / <p_{T} / p_{T}^{GEN}> [GeV]'
     elif '_pt_paraToGENMinusGEN_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel GEN} - p_{T}^{GEN}) [GeV]'
 
-    elif '_pt_paraToOfflineMinusOffline_Mean_' in key: _titleY = '#LTp_{T}^{#parallel Offl} - p_{T}^{Offl}#GT [GeV]'
-    elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in key: _titleY = '#sigma(#Deltap_{T}^{#parallel Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_paraToOfflineMinusOffline_Mean_' in key: _titleY = '<p_{T}^{#parallel Offl} - p_{T}^{Offl}> [GeV]'
+    elif '_pt_paraToOfflineMinusOffline_RMSOverMean_' in key: _titleY = '#sigma(#Deltap_{T}^{#parallel Offl}) / <p_{T} / p_{T}^{Offl}> [GeV]'
     elif '_pt_paraToOfflineMinusOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#parallel Offl} - p_{T}^{Offl}) [GeV]'
 
-    elif '_pt_perpToGEN_Mean_' in key: _titleY = '#LTp_{T}^{#perp GEN}#GT [GeV]'
-    elif '_pt_perpToGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#perp GEN}) / #LTp_{T} / p_{T}^{GEN}#GT [GeV]'
+    elif '_pt_perpToGEN_Mean_' in key: _titleY = '<p_{T}^{#perp GEN}> [GeV]'
+    elif '_pt_perpToGEN_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#perp GEN}) / <p_{T} / p_{T}^{GEN}> [GeV]'
     elif '_pt_perpToGEN_RMS_' in key: _titleY = '#sigma(p_{T}^{#perp GEN}) [GeV]'
 
-    elif '_pt_perpToOffline_Mean_' in key: _titleY = '#LTp_{T}^{#perp Offl}#GT [GeV]'
-    elif '_pt_perpToOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#perp Offl}) / #LTp_{T} / p_{T}^{Offl}#GT [GeV]'
+    elif '_pt_perpToOffline_Mean_' in key: _titleY = '<p_{T}^{#perp Offl}> [GeV]'
+    elif '_pt_perpToOffline_RMSOverMean_' in key: _titleY = '#sigma(p_{T}^{#perp Offl}) / <p_{T} / p_{T}^{Offl}> [GeV]'
     elif '_pt_perpToOffline_RMS_' in key: _titleY = '#sigma(p_{T}^{#perp Offl}) [GeV]'
 
     elif ('Jets' in key) and not (isProfile or isEfficiency):
@@ -616,6 +616,8 @@ class PlotConfig:
 #        self.divideByBinWidth = False
 #        self.normalizedToUnity = False
         self.legXY = [0.75, 0.60, 0.95, 0.90]
+        self.xMin = None
+        self.xMax = None
         self.ratio = True
         self.autoRangeX = True
         self.xLabelSize = None
@@ -1322,11 +1324,6 @@ def getPlotConfig(key, keyword, inputList):
     ##
     elif keyword == 'phase2_jme_compareTRK1_withL1T':
 
-#       if ('_wrt_' not in key_basename) and (not key_basename.endswith('_eff')) and \
-#          (not ('MET' in key_basename and key_basename.endswith('_pt'))) and \
-#          ('pt_over' not in key_basename):
-#          return
-
        if ('/' in key) and (not key.startswith('NoSelection/')):
           if ('_pt0' not in key_basename) or key_basename.endswith('pt0_eff') or \
              key_basename.endswith('pt0') or ('pt0_over' in key_basename):
@@ -1559,57 +1556,88 @@ def getPlotConfig(key, keyword, inputList):
     ##
     elif keyword == 'phase2_jme_comparePFPuppi':
 
-#       if ('_wrt_' not in key_basename) and (not key_basename.endswith('_eff')) and \
-#          (not ('MET' in key_basename and key_basename.endswith('_pt'))) and \
-#          ('pt_over' not in key_basename):
-#          return
-
        if ('/' in key) and (not key.startswith('NoSelection/')):
           if ('_pt0' not in key_basename) or key_basename.endswith('pt0_eff') or \
              key_basename.endswith('pt0') or ('pt0_over' in key_basename):
              return
+
+       if key.endswith('_pt_eff'):
+          cfg.xMin, cfg.xMax = 0., 300.
 
        cfg.legXY = [0.55, 0.60, 0.95, 0.90]
 
        ## MET
        if 'hltPFPuppiMET_' in key:
           for idx, inp in enumerate(inputList):
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFPuppiMET_', 'offlinePFPuppiMET_Raw_'), Legend='Offline (PFPuppi)',Color=ROOT.kPink+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFPuppiMET_', 'l1tPFPuppiMET_'), Legend='L1T (PFPuppi)', Color=ROOT.kGreen+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT (PFPuppi'+inp['Legend']+')')]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFPuppiMET_', 'offlinePFPuppiMET_Raw_'), Legend='Offline',Color=ROOT.kPink+1) if idx==0 else None]
+#           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFPuppiMET_', 'l1tPFPuppiMET_'), Legend='L1T', Color=ROOT.kGreen+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
 
        ## Jets
        elif 'hltAK4PFPuppiJetsCorrected_' in key:
           for idx, inp in enumerate(inputList):
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFPuppiJetsCorrected_', 'offlineAK4PFPuppiJetsCorrected_'), Legend='Offline (PFPuppi)',Color=ROOT.kPink+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFPuppiJetsCorrected_', 'l1tAK4PFPuppiJetsCorrected_'), Legend='L1T (PFPuppi)', Color=ROOT.kGreen+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT (PFPuppi'+inp['Legend']+')')]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFPuppiJetsCorrected_', 'offlineAK4PFPuppiJetsCorrected_'), Legend='Offline',Color=ROOT.kPink+1) if idx==0 else None]
+#           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFPuppiJetsCorrected_', 'l1tAK4PFPuppiJetsCorrected_'), Legend='L1T', Color=ROOT.kGreen+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
 
        elif 'MatchedToPFPuppiCorr_' in key:
           for idx, inp in enumerate(inputList):
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFPuppiCorr_', 'OfflinePFPuppiCorr_'), Legend='Offline (PFPuppi)', Color=ROOT.kPink+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFPuppiCorr_', 'L1TPFPuppiCorr_'), Legend='L1T (PFPuppi)', Color=ROOT.kGreen+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT (PFPuppi'+inp['Legend']+')')]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFPuppiCorr_', 'OfflinePFPuppiCorr_'), Legend='Offline', Color=ROOT.kPink+1) if idx==0 else None]
+#           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFPuppiCorr_', 'L1TPFPuppiCorr_'), Legend='L1T', Color=ROOT.kGreen+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
 
        ## MET
        elif 'hltPFMET_' in key:
           for idx, inp in enumerate(inputList):
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'offlinePFMET_Raw_'), Legend='Offline (PF)',Color=ROOT.kPink+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'l1tPFMET_'), Legend='L1T (PF)', Color=ROOT.kGreen+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT (PF'+inp['Legend']+')')]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'offlinePFMET_Raw_'), Legend='Offline',Color=ROOT.kPink+1) if idx==0 else None]
+#           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltPFMET_', 'l1tPFMET_'), Legend='L1T', Color=ROOT.kGreen+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
 
        ## Jets
        elif 'hltAK4PFJetsCorrected_' in key:
           for idx, inp in enumerate(inputList):
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFJetsCorrected_', 'offlineAK4PFJetsCorrected_'), Legend='Offline (PF)',Color=ROOT.kPink+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFJetsCorrected_', 'l1tAK4PFJetsCorrected_'), Legend='L1T (PF)', Color=ROOT.kGreen+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT (PF'+inp['Legend']+')')]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFJetsCorrected_', 'offlineAK4PFJetsCorrected_'), Legend='Offline',Color=ROOT.kPink+1) if idx==0 else None]
+#           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('hltAK4PFJetsCorrected_', 'l1tAK4PFJetsCorrected_'), Legend='L1T', Color=ROOT.kGreen+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
 
        elif 'MatchedToPFCorr_' in key:
           for idx, inp in enumerate(inputList):
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFCorr_', 'OfflinePFCorr_'), Legend='Offline (PF)', Color=ROOT.kPink+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFCorr_', 'L1TPFCorr_'), Legend='L1T (PF)', Color=ROOT.kGreen+1) if idx==0 else None]
-            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT (PF'+inp['Legend']+')')]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFCorr_', 'OfflinePFCorr_'), Legend='Offline', Color=ROOT.kPink+1) if idx==0 else None]
+#           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace('PFCorr_', 'L1TPFCorr_'), Legend='L1T', Color=ROOT.kGreen+1) if idx==0 else None]
+            cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key, Legend='HLT ('+inp['Legend']+')')]
+
+    ##
+    ## keyword: phase2_jme_compareL1T
+    ##
+    elif keyword == 'phase2_jme_compareL1T':
+
+       if ('/' in key) and (not key.startswith('NoSelection/')):
+          if ('_pt0' not in key_basename) or key_basename.endswith('pt0_eff') or \
+             key_basename.endswith('pt0') or ('pt0_over' in key_basename):
+             return
+
+       if 'MHT' in key:
+          return
+
+       cfg.legXY = [0.25, 0.70, 0.75, 0.95]
+
+       if 'l1tAK4PFPuppiJetsCorrected_' in key:
+         baseColl = 'l1tAK4PFPuppiJetsCorrected'
+         cfg.objLabel = ''
+         for idx, inp in enumerate(inputList):
+#          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'offlineAK4PFPuppiJetsCorrected_'), Legend='Offline (PFPuppi)', Color=ROOT.kPink+1)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'l1tAK4PFPuppiJetsCorrected_')  , Legend='L1T PFPuppi (AK4)'  , Color=ROOT.kRed)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'l1tSlwPFPuppiJetsCorrected_')  , Legend='L1T PFPuppi (7x7h)' , Color=ROOT.kBlue)]
+         del baseColl
+
+       elif 'MatchedToL1TPFPuppiCorr2_' in key:
+         baseColl = 'PFPuppiCorr2'
+         cfg.objLabel = ''
+         for idx, inp in enumerate(inputList):
+#          cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'OfflinePFPuppiCorr_'), Legend='Offline (PFPuppi)' , Color=ROOT.kPink+1)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'L1TPFPuppiCorr2_')   , Legend='L1T PFPuppi (AK4)' , Color=ROOT.kRed)]
+           cfg.hists += [getHistogram(plotCfg=cfg, inputDict=inp, key=key.replace(baseColl+'_', 'L1TPFPuppiCorr_')    , Legend='L1T PFPuppi (7x7h)', Color=ROOT.kBlue)]
+         del baseColl
 
     ##
     ## keyword: phase2_jme_compare
@@ -1792,6 +1820,8 @@ if __name__ == '__main__':
              'outputs': [OUTDIR+'/'+_plotConfig.outputName+'.'+_tmp for _tmp in EXTS],
              'ratio': _plotConfig.ratio,
              'logY': _plotConfig.logY,
+             'xMin': _plotConfig.xMin,
+             'xMax': _plotConfig.xMax,
              'autoRangeX': _plotConfig.autoRangeX,
              'xLabelSize': _plotConfig.xLabelSize,
              'xBinLabels': _plotConfig.xBinLabels,
