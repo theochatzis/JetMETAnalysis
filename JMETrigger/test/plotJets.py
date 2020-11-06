@@ -12,17 +12,34 @@ apply_style(0)
 
 for pfAlgo in ['PF', 'PFPuppi']:
 
- for key in [0, 1, 2]:
+ for key in [
+   -1,
+#   0,
+#   1,
+#   2,
+ ]:
+  if key == -1:
+   inputNtuplesDir0 = '/eos/cms/store/group/dpg_trigger/comm_trigger/TriggerStudiesGroup/Upgrade/JetMET_PhaseII/JMETriggerAnalysis_phase2/ntuples/output_hltPhase2_201022/HLT_TRKv06p1_TICLv2'
+   inputNtuplesDir1 = 'output_hltPhase2_201105_TICLv3/ntuples/HLT_TRKv06p1_TICL'
+   inputNtuplesDir2 = 'output_hltPhase2_201105_TICLv3m1/ntuples/HLT_TRKv06p1_TICL'
+   ntupleName = 'Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200'
+   outputTag = pfAlgo+'_HLT_TICLv3Val_TRKv06p1'
+   reco0 = 'v2'
+   reco1 = 'v3'
+   reco2 = 'v3 -1'
+   color0 = 1
+   color1 = 2
+   color2 = 4
 
-  if key == 0:
-   inputNtuplesDir = 'output_hltPhase2_201007/ntuples'
+  elif key == 0:
+   inputNtuplesDir0 = 'output_hltPhase2_201007/ntuples/HLT_TRKv06p1'
+   inputNtuplesDir1 = 'output_hltPhase2_201007/ntuples/HLT_TRKv07p2'
+   inputNtuplesDir2 = ''
    ntupleName = 'Phase2HLTTDR_QCD_Pt_15to3000_Flat_14TeV_PU200'
    outputTag = pfAlgo+'_HLT_TRKv06p1vs07p2'
-   reco0 = 'HLT_TRKv06p1'
-   reco1 = 'HLT_TRKv07p2'
-   reco2 = ''
    color0 = 1
    color1 = ROOT.kGray
+   color2 = 4
 
   elif key == 1:
    inputNtuplesDir = 'output_hltPhase2_201007/ntuples'
@@ -49,9 +66,9 @@ for pfAlgo in ['PF', 'PFPuppi']:
   else:
    raise RuntimeError(key)
 
-  f0 = ROOT.TFile.Open(inputNtuplesDir+'/'+reco0+'/'+ntupleName+'.root')
-  f1 = ROOT.TFile.Open(inputNtuplesDir+'/'+reco1+'/'+ntupleName+'.root')
-  f2 = ROOT.TFile.Open(inputNtuplesDir+'/'+reco2+'/'+ntupleName+'.root')
+  f0 = ROOT.TFile.Open(inputNtuplesDir0+'/'+ntupleName+'.root')
+  f1 = ROOT.TFile.Open(inputNtuplesDir1+'/'+ntupleName+'.root')
+  f2 = ROOT.TFile.Open(inputNtuplesDir2+'/'+ntupleName+'.root')
 
   t0 = f0.Get("JMETriggerNTuple/Events") if f0 else None
   t1 = f1.Get("JMETriggerNTuple/Events") if f1 else None
