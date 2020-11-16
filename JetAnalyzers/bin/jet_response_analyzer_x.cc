@@ -305,6 +305,7 @@ int main(int argc,char**argv)
     //
     float weight(1.0);
     float flavorWeight(1.0);
+    // SPS changed to 81 - doFlavor = false
     JRAEvent* JRAEvt = new JRAEvent(tree,85);
     tree->SetBranchStatus("*",0);
     vector<string> branch_names = {"nref","weight","rho","refpdgid","refpt",
@@ -1440,7 +1441,8 @@ int main(int argc,char**argv)
     // fill histograms
     //
     TEventList* el = new TEventList("el","el");
-    stringstream selection; selection<<"1";
+    // SPS changed "1" to "1==1" since TTree::Draw wasn't interpeting 1 as true (?)
+    stringstream selection; selection<<"1==1";
     for (unsigned icut=0;icut<presel.size();icut++) selection<<"&&("<<presel[icut]<<")";
     if (presel.size()>0) cout<<"Selection: "<<selection.str()<<endl;
     tree->Draw(">>el",selection.str().c_str());
