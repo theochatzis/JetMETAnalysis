@@ -257,7 +257,12 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
         jra.srcRho = 'fixedGridRhoFastjetAll'
         jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
     elif type == 'PuppiHLT':
-        jra.srcRho = 'fixedGridRhoFastjetAll'
+        # SPS why is rho getting filled with zeros?
+        # adding print message and 'cms.InputTag' below
+        # print("******* setting cms.InputTag('fixedGridRhoFastjetAll') ******")
+        # jra.srcRho =    cms.InputTag('fixedGridRhoFastjetAll')
+        # jra.srcRhoHLT = cms.InputTag('fixedGridRhoFastjetAll')
+        jra.srcRho =    'fixedGridRhoFastjetAll'
         jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
     elif type == 'PFchsHLT':
         jra.srcRho = ak4PFchsL1Fastjet.srcRho #added 02/15/2012
