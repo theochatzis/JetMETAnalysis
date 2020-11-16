@@ -311,15 +311,13 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
         continue;
      }
 
-     // SPS Adelina's branch takes JRAEvt_->refpdgid->push_back(0);
-     //     out of this if statement, necessary? 
-     if(doFlavor_){
-        JRAEvt_->refpdgid->push_back(0);
-        JRAEvt_->refpdgid_algorithmicDef->push_back(0);
-        JRAEvt_->refpdgid_physicsDef->push_back(0);
-     }
+     // SPS flipping back to adelina's version
+     if (doFlavor_) JRAEvt_->refpdgid->push_back(0);
 
      if (getFlavorFromMap_) {
+        JRAEvt_->refpdgid_algorithmicDef->push_back(0);
+        JRAEvt_->refpdgid_physicsDef->push_back(0);
+
 
         reco::JetMatchedPartonsCollection::const_iterator itPartonMatch;
         itPartonMatch=refToPartonMap->begin();
@@ -367,7 +365,10 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
               }
            }
         }
-     }
+     }  
+     //JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
+
+     // SPS flipping back to adelina's version
      // SPS Adelina's branch doesn't have this else if and if statements, necessary?  
      else if (doFlavor_) {
         JRAEvt_->refpdgid_algorithmicDef->at(JRAEvt_->nref)=0;
@@ -496,17 +497,21 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            JRAEvt_->jtmuf ->push_back(pfJetRef->muonEnergyFraction()         *JRAEvt_->jtjec->at(JRAEvt_->nref));
            JRAEvt_->jthfhf->push_back(pfJetRef->HFHadronEnergyFraction()     *JRAEvt_->jtjec->at(JRAEvt_->nref));
            JRAEvt_->jthfef->push_back(pfJetRef->HFEMEnergyFraction()         *JRAEvt_->jtjec->at(JRAEvt_->nref));
-int chMult=0, nMult=0;
-           getMult( ref.castTo<reco::GenJetRef>()->getJetConstituents(), &nMult, &chMult );
-           JRAEvt_->refnMult ->push_back( nMult );
-           JRAEvt_->refchMult->push_back( chMult );
+           // SPS do we need these: jtnMult, jtchMult, refnMult, refchMult? 
+           //     these branches aren't declared in JetUtilites/src/JRAEvent.cc
+           //     and cause the program to crash... 
+           //
+           //int chMult=0, nMult=0;
+           //getMult( ref.castTo<reco::GenJetRef>()->getJetConstituents(), &nMult, &chMult );
+           //JRAEvt_->refnMult ->push_back( nMult );
+           //JRAEvt_->refchMult->push_back( chMult );
 
-           //this method exists for pfjets (neutralMultiplicity()), but not for genjets
-           //original i thought since genjet didn't have it i should make this method
-           chMult=0; nMult=0;
-           getMult( jet.castTo<reco::PFJetRef>()->getJetConstituents(), &nMult, &chMult );
-           JRAEvt_->jtnMult ->push_back( nMult );
-           JRAEvt_->jtchMult->push_back( chMult );
+           ////this method exists for pfjets (neutralMultiplicity()), but not for genjets
+           ////original i thought since genjet didn't have it i should make this method
+           //chMult=0; nMult=0;
+           //getMult( jet.castTo<reco::PFJetRef>()->getJetConstituents(), &nMult, &chMult );
+           //JRAEvt_->jtnMult ->push_back( nMult );
+           //JRAEvt_->jtchMult->push_back( chMult );
         } 
      }
      JRAEvt_->nref++;
