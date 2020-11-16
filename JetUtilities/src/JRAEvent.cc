@@ -84,6 +84,8 @@ void JRAEvent::MakeTree(TTree* tree)
    fChain->Branch("evt", &evt, "evt/L");
    fChain->Branch("nref", &nref, "nref/b");
    fChain->Branch("refrank", "vector<UChar_t>", &refrank);
+   // SPS refpdgid needs to be defined even if doFlavor==false
+   // fChain->Branch("refpdgid", "vector<Int_t>", &refpdgid);
    if(!flags.test(0) || (flags.test(0) && flags.test(2))) {
       fChain->Branch("refpdgid", "vector<Int_t>", &refpdgid);
       fChain->Branch("refpdgid_algorithmicDef", "vector<Int_t>", &refpdgid_algorithmicDef);
@@ -184,6 +186,8 @@ void JRAEvent::Init(TTree *tree)
    fChain->SetBranchAddress("evt", &evt, &b_evt);
    fChain->SetBranchAddress("nref", &nref, &b_nref);
    fChain->SetBranchAddress("refrank", &refrank, &b_refrank);
+   // SPS refpdgid needs to be defined even if doFlavor==false
+   // fChain->SetBranchAddress("refpdgid", &refpdgid, &b_refpdgid);
    if(!flags.test(0) || (flags.test(0) && flags.test(2))) {
       fChain->SetBranchAddress("refpdgid", &refpdgid, &b_refpdgid);
       fChain->SetBranchAddress("refpdgid_algorithmicDef", &refpdgid_algorithmicDef, &b_refpdgid_algorithmicDef);
@@ -274,6 +278,8 @@ void JRAEvent::MakeVectors()
    ntrks_highpt            = new vector<int>;
    rhos                    = new vector<float>;
    refrank                 = new vector<UChar_t>;
+   // SPS refpdgid needs to be defined even if doFlavor==false
+   //refpdgid                = new vector<int>;
    if(!flags.test(0) || (flags.test(0) && flags.test(2))) {
       refpdgid                = new vector<int>;
       refpdgid_algorithmicDef = new vector<int>;
@@ -336,6 +342,8 @@ void JRAEvent::clear()
    ntrks_highpt->clear();
    rhos->clear();
    refrank->clear();
+   // SPS refpdgid needs to be defined even if doFlavor==false
+   // refpdgid->clear();
    if(!flags.test(0) || (flags.test(0) && flags.test(2))) {
       refpdgid->clear();
       refpdgid_algorithmicDef->clear();
