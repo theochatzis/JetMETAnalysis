@@ -64,7 +64,9 @@ int main(int argc,char**argv)
   //
   l2c->openInputFile();
   l2c->openL3File();
+  std::cout<<"***********OK before loopOverDirectories *******************"<<endl;
   l2c->loopOverDirectories();
+  std::cout<<"***********OK before loopOverAlgorithms *******************"<<endl;
   l2c->loopOverAlgorithms(makeCanvasVariable);
   
   //
