@@ -174,6 +174,7 @@ void L2Creator::loopOverAlgorithms(string makeCanvasVariable) {
         // Needed for both L2 only corrections and L2L3 corrections
         //
         loopOverEtaBins();
+        std::cout<<"***********OK after loopOverEtaBins *******************"<<endl;
 
         if(!l2l3) {
             //
@@ -196,11 +197,14 @@ void L2Creator::loopOverAlgorithms(string makeCanvasVariable) {
         // Check that the FormulaEvaluator returns the same value as the TF1 used to create the fit
         // This is necessary because several times in the past the FormulaEvaluator has returned strange values
         //
+        //
+        std::cout<<"***********OK before checkFormulaEvaluator *******************"<<endl;
         assert(checkFormulaEvaluator());
 
         //
         // Draw several canvases of the graphs and associated fits
         //
+        std::cout<<"***********OK before makeCanvas *******************"<<endl;
         if(!makeCanvasVariable.empty()) {
             makeCanvas(makeCanvasVariable);
         }
@@ -242,7 +246,8 @@ void L2Creator::loopOverEtaBins() {
         // only add points to the graphs if the current histo is not empty
         // the current setting might be a little high
         //
-        if (hrsp->GetEntries() > 30) {//hrsp->Integral()!=0) {//EDW 4
+        // SPS changed to 2 to for very small test file
+        if (hrsp->GetEntries() > 1) {//hrsp->Integral()!=0) {//EDW 4
 
             //TF1*  frsp    = (TF1*)hrsp->GetListOfFunctions()->Last();
             //std::cout << "hrspName = " << hrsp->GetName() << ": frsp = " << frsp << std::endl;
@@ -805,6 +810,7 @@ void L2Creator::makeCanvas(string makeCanvasVariable) {
     frame->GetYaxis()->SetRangeUser(0.8,2.2);
     frame->GetYaxis()->SetTitle(makeCanvasVariable.substr(0,makeCanvasVariable.find("Vs")).c_str());
 
+    std::cout<<"***********OK before loop over graphs *******************"<<endl;
     for(unsigned int igraph=0; igraph<graphs.size(); igraph++) {
 
         int icnv = igraph/nperpad;
