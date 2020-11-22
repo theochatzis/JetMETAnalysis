@@ -6,31 +6,30 @@ tfile = ROOT.TFile(sys.argv[1])
 
 ttree = tfile.Get('JMETriggerNTuple/Events')
 
-h2 = ROOT.TH2D('h2', 'h2', 250, 0, 250, 250, 0, 250)
-#ttree.Draw("offlineFixedGridRhoFastjetAll:offlinePrimaryVertices_z@.size()>>h2","","goff")
-#ttree.Draw("fixedGridRhoFastjetAllTmp:offlinePrimaryVertices_z@.size()>>h2","","goff")
-#ttree.Draw("hltPixelVertices_z@.size():offlinePrimaryVertices_z@.size()>>h2","","goff")
-ttree.Draw("hltPrimaryVertices_z@.size():offlinePrimaryVertices_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVertices_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPrimaryVertices_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:offlinePrimaryVertices_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:fixedGridRhoFastjetAllTmp>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:offlineFixedGridRhoFastjetAll>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:n_hltPixelTracks>>h2","","goff")
+# pileupInfo_BX0_numPUInteractions
+# hltPixelClustersMultiplicity
+# hltOuterTrackerClustersMultiplicity
+# hltPixelTracksMultiplicity
+# hltPixelTracksCleanerMultiplicity
+# hltPixelTracksMergerMultiplicity
+# hltPixelVerticesMultiplicity
+# hltTracksMultiplicity
+# hltPrimaryVerticesMultiplicity
+# offlinePrimaryVerticesMultiplicity
+# offlineFixedGridRhoFastjetAll
 
-#h2 = ROOT.TH2D('h2', 'h2', 250, 0, 250, 250, 0, 250)
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVertices_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVerticesForPuppi1_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVerticesForPuppi2_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVerticesForPuppi3_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVerticesForPuppi4_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVerticesForPuppi5_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVerticesForPuppi6_z@.size()>>h2","","goff")
-#ttree.Draw("pileupInfo_BX0_numPUInteractions:hltPixelVerticesForPuppi7_z@.size()>>h2","","goff")
+th2_binning = sys.argv[2].split(':')
+th2_xnbins = int(th2_binning[0])
+th2_xmin = float(th2_binning[1])
+th2_xmax = float(th2_binning[2])
+th2_ynbins = int(th2_binning[3])
+th2_ymin = float(th2_binning[4])
+th2_ymax = float(th2_binning[5])
 
-#h2 = ROOT.TH2D('h2', 'h2', 250, 0, 250, 300, 0, 3000)
-#ttree.Draw("n_hltPixelTracks:offlinePrimaryVertices_z@.size()>>h2","","goff")
-#ttree.Draw("n_hltPixelTracks:pileupInfo_BX0_numPUInteractions>>h2","","goff")
+h2 = ROOT.TH2D('h2', 'h2', th2_xnbins, th2_xmin, th2_xmax, th2_ynbins, th2_ymin, th2_ymax)
+ttree.Draw(sys.argv[4]+':'+sys.argv[3]+'>>h2','','goff')
+
+print 'correlation factor =', h2.GetCorrelationFactor()
 
 h2_py = h2.ProfileY('h2_py')
 h2_py.Draw()
