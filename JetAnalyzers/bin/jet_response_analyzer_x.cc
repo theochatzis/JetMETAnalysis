@@ -305,7 +305,9 @@ int main(int argc,char**argv)
     //
     float weight(1.0);
     float flavorWeight(1.0);
-    // SPS changed to 81 - doFlavor = false
+    // SPS why is 85 hardcoded here? shouldn't this 
+    //     change accoring to the bitset explained in JRAEvent.h ?
+    // 
     JRAEvent* JRAEvt = new JRAEvent(tree,85);
     tree->SetBranchStatus("*",0);
     vector<string> branch_names = {"nref","weight","rho","refpdgid","refpt",

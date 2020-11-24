@@ -311,7 +311,8 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
         continue;
      }
 
-     // SPS flipping back to adelina's version
+     // SPS when do we need to save refpdgid?
+     //     does it matter?
      if (doFlavor_) JRAEvt_->refpdgid->push_back(0);
 
      if (getFlavorFromMap_) {
@@ -368,8 +369,8 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
      }  
      //JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
 
-     // SPS flipping back to adelina's version
-     // SPS Adelina's branch doesn't have this else if and if statements, necessary?  
+     // SPS when do we need to save refpdgid_*?
+     //     does it matter?
      else if (doFlavor_) {
         JRAEvt_->refpdgid_algorithmicDef->at(JRAEvt_->nref)=0;
         JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref)=0;
@@ -498,7 +499,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            JRAEvt_->jthfhf->push_back(pfJetRef->HFHadronEnergyFraction()     *JRAEvt_->jtjec->at(JRAEvt_->nref));
            JRAEvt_->jthfef->push_back(pfJetRef->HFEMEnergyFraction()         *JRAEvt_->jtjec->at(JRAEvt_->nref));
            // SPS do we need these: jtnMult, jtchMult, refnMult, refchMult? 
-           //     these branches aren't declared in JetUtilites/src/JRAEvent.cc
+           //     these branches aren't declared in JetUtilites/src/JRAEvent.cc !
            //     and cause the program to crash... 
            //
            //int chMult=0, nMult=0;

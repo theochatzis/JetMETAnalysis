@@ -246,8 +246,9 @@ void L2Creator::loopOverEtaBins() {
         // only add points to the graphs if the current histo is not empty
         // the current setting might be a little high
         //
-        // SPS changed to 2 to for very small test file
-        if (hrsp->GetEntries() > 1) {//hrsp->Integral()!=0) {//EDW 4
+        // SPS what's the optimal value here?  
+        // 
+        if (hrsp->GetEntries() > 30) {//hrsp->Integral()!=0) {//EDW 4
 
             //TF1*  frsp    = (TF1*)hrsp->GetListOfFunctions()->Last();
             //std::cout << "hrspName = " << hrsp->GetName() << ": frsp = " << frsp << std::endl;
