@@ -461,7 +461,10 @@ void MatchEventsAndJets::DeclareHistograms(bool reduceHistograms) {
    //
    if(!reduceHistograms) {
       histograms["m_refpt_diff"]     = new TH1D("m_refpt_diff","refpt_diff;p_{T, j1}- p_{T, j2}; Number of events",300,-150,150);
-      histograms["m_refpdgid_diff"]  = new TH1D("m_refpdgid_diff","m_refpdgid_diff;pdgid_{j1}- pdgid_{j2}; Number of events",100,-50,50);
+         //
+         // SPS commenting pdgid stuff to match l1 corr branch
+         //
+      //histograms["m_refpdgid_diff"]  = new TH1D("m_refpdgid_diff","m_refpdgid_diff;pdgid_{j1}- pdgid_{j2}; Number of events",100,-50,50);
       histograms["m_deltaPthat"]     = new TProfile("m_deltaPthat","m_deltaPthat;pthat_{pu}(GeV);pthat_{pu}-pthat_{nopu}(GeV)",300,0,3000);
 
       // To show the excees of jets at low-pt for the sample with pu.
@@ -772,10 +775,13 @@ void MatchEventsAndJets::DeclareHistograms(bool reduceHistograms) {
     }//pt
 
     //0, 1-3, 4, 5, 21, all, quarks
-    for (int ipdgid=0;ipdgid<NPDGIDcat;ipdgid++) {
-         hname = Form("p_offresVsrefpt_%s_pdgid_%s",detectorAbbreviation.Data(),pdgidstr[ipdgid].Data());
-         histograms[hname] = new TH2D(hname,hname+";p^{GEN}_{T}; p_{T}/p_{T}^{nopu};",NPtBins, vpt,1000,-300,300);
-    }//pdgid
+         //
+         // SPS commenting pdgid stuff to match l1 corr branch
+         //
+    //for (int ipdgid=0;ipdgid<NPDGIDcat;ipdgid++) {
+    //     hname = Form("p_offresVsrefpt_%s_pdgid_%s",detectorAbbreviation.Data(),pdgidstr[ipdgid].Data());
+    //     histograms[hname] = new TH2D(hname,hname+";p^{GEN}_{T}; p_{T}/p_{T}^{nopu};",NPtBins, vpt,1000,-300,300);
+    //}//pdgid
   }
 
   //=========================================================
@@ -799,15 +805,20 @@ void MatchEventsAndJets::LoopOverEvents(bool verbose, bool reduceHistograms, str
 
    cout << endl << "Looping over the mapped events:" << endl << "\tprogress:" << endl;
    ull nentries = mapTreePU.size();
+   cout << endl << "after mapTreePU.size" << endl;
    int jetMapIndex = -1;
+   cout << endl << "before for loop" << endl;
    for (IT::const_iterator it = mapTreePU.begin(); it != mapTreePU.end(); ++it) {
 
+      cout << endl << "before iftest" << endl;
       if (iftest && nevs >= maxEvts) return;
 
       //if (nevs%10000==0) cout << "\t"<<nevs << endl;
+      cout << endl << "before loadbar" << endl;
       loadbar2(nevs+1,nentries,50,"\t\t");
 
       // if this entry does not exist on the second ntuple just skip this event
+      cout << endl << "before mapTreeNoPU.find(it->first)" << endl;
       if (mapTreeNoPU.find(it->first) == mapTreeNoPU.end()) {
          if(verbose) {
             cout << "\tWARNING::mapTreeNoPU.find(it->first) == mapTreeNoPU.end() failed" << endl
@@ -820,29 +831,42 @@ void MatchEventsAndJets::LoopOverEvents(bool verbose, bool reduceHistograms, str
       }
 
       // Load the entries at the proper place.
+      cout << endl << "before getentry pu" << endl;
       tpu->GetEntry(mapTreePU[it->first].second);
+      cout << endl << "before getentry nopu" << endl;
       tnopu->GetEntry(mapTreeNoPU[it->first].second);
 
       //Skip events without any primary vertex as these make no sense
+      cout << endl << "before npv check" << endl;
       if (tpu->npv == 0 || tnopu->npv == 0) continue;
 
       // Set the in-time pileup index after the first event only
+      cout << endl << "before nevs==0" << endl;
       if(nevs==0) iIT = tpu->itIndex();
 
       // Create the mapping of matched jets.
       // key is PU, value is for NoPU
       //if(!readJetMap) FillJetMap();
+      cout << endl << "before readjetmap" << endl;
       if(readJetMap.empty() || !jetMapTreeFound) {
          FillRecToRecThroughGenMap();
       }
       else {
+         cout << endl << "inside else bit" << endl;
          jetMapIndex++;
          ReadJetMap(jetMapIndex,readJetMap);
       }  
 
+      cout << endl << "before fillhistograms" << endl;
+      cout << endl << "values are "<<reduceHistograms << endl;
+      cout << endl << "values are "<<FillHistograms(reduceHistograms) << endl;
       if(FillHistograms(reduceHistograms)) nevs++;
+      cout << endl << "after fillhistograms" << endl;
+      cout << endl << "values are"<<reduceHistograms << endl<< FillHistograms(reduceHistograms) << endl;
 
    }//for
+
+   cout << endl << "finished for loop" << endl;
 }
 
 //______________________________________________________________________________
@@ -996,6 +1020,7 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
    //
    // retrieve the correct weight and fill some histograms to keep track of them
    //
+   cout << endl << "Filling Histograms!" << endl;
    weight = 1.0;
    if(useweight) {
       weight *= tpu->weight;
@@ -1203,7 +1228,10 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
    TString detectorAbbreviation;
    double offset = 0, offset_raw = 0, offsetOA = 0, offsetOrefpt = 0, areaDiff = 0, resp = 0,
           respTonopu = 0, respNopu = 0, PUEff = 0, GenSumPtOA = 0;
-   int diff_pdgid = 0;
+         //
+         // SPS commenting pdgid stuff to match l1 corr branch
+         //
+   //int diff_pdgid = 0;
    vector<double> offset_PFcat;
    for (map<Int_t, Int_t>::const_iterator itj = jetMap.begin(); itj != jetMap.end(); itj++) {
 
@@ -1214,9 +1242,12 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
       idet = JetInfo::getDetIndex(tpu->jteta->at(jpu));
       detectorAbbreviation = JetInfo::get_detector_abbreviation(detector_names[idet]);
       detectorAbbreviation.ToLower();
-      vector<int> pdgid_indecies = JetInfo::getPDGIDIndecies(tpu->refpdgid->at(jpu));
+         //
+         // SPS commenting pdgid stuff to match l1 corr branch
+         //
+      //vector<int> pdgid_indecies = JetInfo::getPDGIDIndecies(tpu->refpdgid->at(jpu));
 
-      diff_pdgid    = tpu->refpdgid->at(jpu) - tnopu->refpdgid->at(jnopu);
+      //diff_pdgid    = tpu->refpdgid->at(jpu) - tnopu->refpdgid->at(jnopu);
       offset        = tpu->jtpt->at(jpu) - tnopu->jtpt->at(jnopu);
       offset_raw    = (tpu_jtpt_raw.size()>0) ? tpu_jtpt_raw[jpu] - tnopu->jtpt->at(jnopu) : -1.0;
       offsetOA      = offset / tpu->jtarea->at(jpu);
@@ -1281,7 +1312,10 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
 
          dynamic_cast<TProfile*>(histograms["p_drVsrefpt"])->Fill(tpu->refpt->at(jpu),tpu->refdrjt->at(jpu),weight);
          dynamic_cast<TH1D*>(histograms["m_refpt_diff"])   ->Fill(tpu->refpt->at(jpu) - tnopu->refpt->at(jnopu),weight);
-         dynamic_cast<TH1D*>(histograms["m_refpdgid_diff"])->Fill(diff_pdgid,weight);
+         //
+         // SPS commenting pdgid stuff to match l1 corr branch
+         //
+         //dynamic_cast<TH1D*>(histograms["m_refpdgid_diff"])->Fill(diff_pdgid,weight);
 
          if (idet == 0) {
             dynamic_cast<TH3F*>(histograms["p_rho_npv_refpt_BB"])               ->Fill(tpu->rho,tpu->npv,tpu->refpt->at(jpu),weight);
@@ -1387,10 +1421,13 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
          if(tpu->refpt->at(jpu)>10.0) {
             dynamic_cast<TH2D*>(histograms[hname])->Fill(tpu->npus->at(iIT),resp,weight);
          }
-         for (unsigned int ipdgid=0; ipdgid<pdgid_indecies.size(); ipdgid++) {
-            hname = Form("p_offresVsrefpt_%s_pdgid_%s",detectorAbbreviation.Data(),pdgidstr[ipdgid].Data());
-            dynamic_cast<TH2D*>(histograms[hname])->Fill(tpu->refpt->at(jpu),offset,weight);
-         }
+         //
+         // SPS commenting pdgid stuff to match l1 corr branch
+         //
+         //for (unsigned int ipdgid=0; ipdgid<pdgid_indecies.size(); ipdgid++) {
+         //   hname = Form("p_offresVsrefpt_%s_pdgid_%s",detectorAbbreviation.Data(),pdgidstr[ipdgid].Data());
+         //   dynamic_cast<TH2D*>(histograms[hname])->Fill(tpu->refpt->at(jpu),offset,weight);
+         //}
       }
 
       avg_offset +=  offset;
@@ -1474,7 +1511,7 @@ int main(int argc,char**argv)
    if (!cl.parse(argc,argv)) return 0;
    string       samplePU          = cl.getValue<string>  ("samplePU");
    string       sampleNoPU        = cl.getValue<string>  ("sampleNoPU");
-   string       basepath          = cl.getValue<string>  ("basepath", "/fdata/hepx/store/user/aperloff/");
+   string       basepath          = cl.getValue<string>  ("basepath", "/afs/cern.ch/work/s/saparede/private/jet_stuff/hlt_phase2_jec/v2/CMSSW_11_1_4/src/");
    string       algo1             = cl.getValue<string>  ("algo1",                               "ak5pf");
    string       algo2             = cl.getValue<string>  ("algo2",                               "ak5pf");
    bool         iftest            = cl.getValue<bool>    ("iftest",                                false);
@@ -1534,22 +1571,36 @@ int main(int argc,char**argv)
    mej->SetupLumiWeights((DataPUReWeighting.empty())? "" : basepath+DataPUReWeighting,
                          (MCPUReWeighting.empty()) ? "" : basepath+MCPUReWeighting,
                          DataPUHistoName,MCPUHistoName);
+   cout << endl << "*****oppening input files******" << endl;
    mej->OpenInputFiles(basepath+samplePU,basepath+sampleNoPU);
+   cout << endl << "*****gettingntuples******" << endl;
    mej->GetNtuples(treeName);
-   if(readEvtMaps.empty())
+   cout << endl << "*****checking readevtmaps******" << endl;
+   if(readEvtMaps.empty()){
+      cout << endl << "*****readevtmaps was empty******" << endl;
       mej->MakeMatchedEventsMaps(treeName,outputPath);
-   else
+      }
+   else{
+      cout << endl << "*****readevtmaps was not empty******" << endl;
       mej->ReadMatchedEventsMaps(readEvtMaps);
+      }
+   cout << endl << "*****oppening output file******" << endl;
    mej->OpenOutputFile(outputPath);
+   cout << endl << "*****checking if for applyJEC******" << endl;
    if (ApplyJEC) {
       cout << "jet_synchtest_x::Setting the JEC parameter file to " << JECpar << " ... ";
       mej->SetJEC(JECpar);
       cout << "DONE" << endl;
    }
+   cout << endl << "*****setting npvrhonpu******" << endl;
    mej->SetNpvRhoNpuValues(NBinsNpvRhoNpu,npvRhoNpuBinWidth);
+   cout << endl << "*****setting vpt bins******" << endl;
    mej->SetVptBins(vptBins);
+   cout << endl << "*****declaring histograms******" << endl;
    mej->DeclareHistograms(reduceHistograms);
+   cout << endl << "*****looping over events******" << endl;
    mej->LoopOverEvents(verbose,reduceHistograms,readEvtMaps);
+   cout << endl << "*****wiritng ouptput******" << endl;
    mej->WriteOutput(outputPath,readEvtMaps.empty()||!mej->JetMapTreeFound());
    mej->Report();
 
