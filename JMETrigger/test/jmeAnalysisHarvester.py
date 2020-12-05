@@ -149,8 +149,19 @@ if __name__ == '__main__':
               for _idx in range(1, 1+tmp_h2.GetNbinsY()):
                   _htmp = tmp_h2.ProjectionX('_htmp'+str(_idx), _idx, _idx, 'e')
 #                  _htmp.SetDirectory(0)
-                  tmp_h1_xMean.SetBinContent(_idx, _htmp.GetMean())
-                  tmp_h1_xMean.SetBinError(_idx, _htmp.GetMeanError())
+
+                  _val = _htmp.GetMean()
+                  _err = _htmp.GetMeanError()
+#                  _med, _medQ = ctypes.c_double(0.), ctypes.c_double(0.5)
+#                  _htmp.ComputeIntegral()
+#                  _htmp.GetQuantiles(1, _med, _medQ)
+#                  _val = _med.value
+#                  _err = 1.253 * _htmp.GetMeanError()
+
+                  tmp_h1_xMean.SetBinContent(_idx, _val)
+                  tmp_h1_xMean.SetBinError(_idx, _err)
+
+#                  histograms[h_name0+'_'+str(_idx)] = _htmp.Clone()
                   del _htmp
    
               histograms[h_name0] = tmp_h1_xMean
