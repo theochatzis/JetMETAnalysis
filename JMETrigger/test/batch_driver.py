@@ -35,6 +35,12 @@ if __name__ == '__main__':
    parser.add_argument('--time', '--RequestRuntime', dest='RequestRuntime', action='store', default='10800',
                        help='HTCondor: value of parameter "RequestRuntime"')
 
+   parser.add_argument('--JobFlavour', dest='JobFlavour', action='store', default=None,
+                       help='argument of HTCondor parameter "+JobFlavour" (by default, the parameter is not specified)')
+
+   parser.add_argument('--AccountingGroup', dest='AccountingGroup', action='store', default=None,
+                       help='argument of HTCondor parameter "+AccountingGroup" (by default, the parameter is not specified)')
+
    parser.add_argument('--batch', dest='batch', action='store', choices=['htc', 'sge'], default='htc',
                        help='type of batch system for job submission [default: HTCondor]')
 
@@ -235,9 +241,29 @@ if __name__ == '__main__':
 
                 ' RequestMemory  =  2000',
                 '+RequestRuntime = '+str(opts.RequestRuntime),
-
-                'queue',
               ]
+
+              if opts.JobFlavour is not None:
+                 JobFlavour = opts.JobFlavour
+                 while JobFlavour.startswith("'") or JobFlavour.startswith('"'):
+                   JobFlavour = JobFlavour[1:]
+                 while JobFlavour.endswith("'") or JobFlavour.endswith('"'):
+                   JobFlavour = JobFlavour[:-1]
+                 OPTS += [
+                   '+JobFlavour = "{:}"'.format(JobFlavour)
+                 ]
+
+              if opts.AccountingGroup is not None:
+                 AccountingGroup = opts.AccountingGroup
+                 while AccountingGroup.startswith("'") or AccountingGroup.startswith('"'):
+                   AccountingGroup = AccountingGroup[1:]
+                 while AccountingGroup.endswith("'") or AccountingGroup.endswith('"'):
+                   AccountingGroup = AccountingGroup[:-1]
+                 OPTS += [
+                   '+AccountingGroup = "{:}"'.format(AccountingGroup)
+                 ]
+
+              OPTS += ['queue']
 
               if not opts.dry_run:
                  o_file = open(OUTEXE_ABSPATH, 'w')
