@@ -53,14 +53,15 @@ if __name__ == '__main__':
   for _key in sorted(dirNameDict.keys()):
     _inpTree = infile.Get(dirNameDict[_key]+'/t')
     if not _inpTree:
-      print '** TTree named "'+dirNameDict[_key]+'/t" not found in input file (will be skipped): '+opts.inputf
+      if opts.verbosity > -10:
+        print '** TTree named "'+dirNameDict[_key]+'/t" not found in input file (will be skipped): '+opts.inputf
       continue
     outfile.cd()
     _tmpDir = outfile.mkdir(_key)
     _tmpDir.cd()
     _outTree = _inpTree.CloneTree()
     _outTree.Write()
-    if opts.verbosity > 0:
+    if opts.verbosity > 1:
       print '>> cloned TTree "'+dirNameDict[_key]+'/t" (input) to TTree "'+_key+'/'+_outTree.GetName()+'" (output)'
 
   # close input and output files
