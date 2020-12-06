@@ -24,6 +24,9 @@ class JMETriggerAnalysisDriverPhase2 : public JMETriggerAnalysisDriver {
   void fillHistograms_Jets_2DMaps(const std::string& dir, const fillHistoDataJets& fhDataJets1, const fillHistoDataJets& fhDataJets2);
   void fillHistograms_MET_2DMaps(const std::string& dir, const fillHistoDataMET& fhDataMET1, const fillHistoDataMET& fhDataMET2, bool const fill1D=false);
 
+  bool l1tSingleJetSeed(std::string const& key) const;
+  bool l1tHTSeed(std::string const& key) const;
+
   std::map<std::string, std::map<std::string, std::string>> labelMap_jetAK4_;
   std::map<std::string, std::map<std::string, std::string>> labelMap_jetAK8_;
   std::map<std::string, std::map<std::string, std::string>> labelMap_MET_;

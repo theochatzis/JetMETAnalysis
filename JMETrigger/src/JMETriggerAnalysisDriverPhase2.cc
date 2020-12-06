@@ -136,25 +136,25 @@ void JMETriggerAnalysisDriverPhase2::init(){
       {"hltPFCHSCorr"   , "hltAK4PFCHSJetsCorrected"},
       {"hltPFPuppi"     , "hltAK4PFPuppiJets"},
       {"hltPFPuppiCorr" , "hltAK4PFPuppiJetsCorrected"},
-      {"offlPFPuppiCorr", "offlineAK4PFPuppiJetsCorrected"},
+//      {"offlPFPuppiCorr", "offlineAK4PFPuppiJetsCorrected"},
     }},
 
     {"l1tAK4CaloJetsCorrected"   , {{"GEN", "ak4GenJetsNoNu"}}},
     {"l1tAK4PFJetsCorrected"     , {{"GEN", "ak4GenJetsNoNu"}}},
-    {"l1tAK4PFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
-    {"l1tSlwPFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
+//    {"l1tAK4PFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
+//    {"l1tSlwPFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
 
 //  {"hltAK4CaloJets"            , {{"GEN", "ak4GenJetsNoNu"}}},
 //  {"hltAK4PFClusterJets"       , {{"GEN", "ak4GenJetsNoNu"}}},
 //  {"hltAK4PFJets"              , {{"GEN", "ak4GenJetsNoNu"}}},
     {"hltAK4PFJetsCorrected"     , {{"GEN", "ak4GenJetsNoNu"}}},
 //  {"hltAK4PFCHSJets"           , {{"GEN", "ak4GenJetsNoNu"}}},
-    {"hltAK4PFCHSJetsCorrected"  , {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFCHSJetsCorrected"}}},
+    {"hltAK4PFCHSJetsCorrected"  , {{"GEN", "ak4GenJetsNoNu"}}},//, {"Offline", "offlineAK4PFCHSJetsCorrected"}}},
 //  {"hltAK4PFPuppiJets"         , {{"GEN", "ak4GenJetsNoNu"}}},
-    {"hltAK4PFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
+    {"hltAK4PFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}}},//, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
 
-    {"offlineAK4PFCHSJetsCorrected"  , {{"GEN", "ak4GenJetsNoNu"}}},
-    {"offlineAK4PFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}}},
+//    {"offlineAK4PFCHSJetsCorrected"  , {{"GEN", "ak4GenJetsNoNu"}}},
+//    {"offlineAK4PFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}}},
   };
 
   labelMap_jetAK8_.clear();
@@ -168,7 +168,7 @@ void JMETriggerAnalysisDriverPhase2::init(){
       {"hltPFCHSCorr"   , "hltAK8PFCHSJetsCorrected"},
 //    {"hltPFPuppi"     , "hltAK8PFPuppiJets"},
       {"hltPFPuppiCorr" , "hltAK8PFPuppiJetsCorrected"},
-      {"offlPFPuppiCorr", "offlineAK8PFPuppiJetsCorrected"},
+//      {"offlPFPuppiCorr", "offlineAK8PFPuppiJetsCorrected"},
     }},
 
 //  {"hltAK8CaloJets"            , {{"GEN", "ak8GenJetsNoNu"}}},
@@ -176,12 +176,12 @@ void JMETriggerAnalysisDriverPhase2::init(){
 //  {"hltAK8PFJets"              , {{"GEN", "ak8GenJetsNoNu"}}},
     {"hltAK8PFJetsCorrected"     , {{"GEN", "ak8GenJetsNoNu"}}},
 //  {"hltAK8PFCHSJets"           , {{"GEN", "ak8GenJetsNoNu"}}},
-    {"hltAK8PFCHSJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}, {"Offline", "offlineAK8PFCHSJetsCorrected"}}},
+    {"hltAK8PFCHSJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}}}, //, {"Offline", "offlineAK8PFCHSJetsCorrected"}}},
 //  {"hltAK8PFPuppiJets"         , {{"GEN", "ak8GenJetsNoNu"}}},
-    {"hltAK8PFPuppiJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}, {"Offline", "offlineAK8PFPuppiJetsCorrected"}}},
+    {"hltAK8PFPuppiJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}}}, //, {"Offline", "offlineAK8PFPuppiJetsCorrected"}}},
 
-    {"offlineAK8PFCHSJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}}},
-    {"offlineAK8PFPuppiJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}}},
+//    {"offlineAK8PFCHSJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}}},
+//    {"offlineAK8PFPuppiJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}}},
   };
 
   labelMap_MET_.clear();
@@ -190,22 +190,22 @@ void JMETriggerAnalysisDriverPhase2::init(){
     {"genMETTrue", {}},
 
     {"l1tCaloMET"   , {{"GEN", "genMETCalo"}}},
-    {"l1tPFMET"     , {{"GEN", "genMETTrue"}, {"Offline", "offlinePFMET_Raw"}}},
-    {"l1tPFPuppiMET", {{"GEN", "genMETTrue"}, {"Offline", "offlinePFPuppiMET_Raw"}}},
+    {"l1tPFMET"     , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFMET_Raw"}}},
+    {"l1tPFPuppiMET", {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFPuppiMET_Raw"}}},
 
 //  {"hltPFClusterMET"   , {{"GEN", "genMETCalo"}}},
 //  {"hltPFMETNoMu"      , {{"GEN", "genMETCalo"}}},
-    {"hltPFMET"          , {{"GEN", "genMETTrue"}, {"Offline", "offlinePFMET_Raw"}}},
+    {"hltPFMET"          , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFMET_Raw"}}},
     {"hltPFCHSMET"       , {{"GEN", "genMETTrue"}}},
     {"hltPFSoftKillerMET", {{"GEN", "genMETTrue"}}},
 //  {"hltPFPuppiMETNoMu" , {{"GEN", "genMETCalo"}}},
-    {"hltPFPuppiMET"     , {{"GEN", "genMETTrue"}, {"Offline", "offlinePFPuppiMET_Raw"}}},
-    {"hltPFPuppiMETv0"   , {{"GEN", "genMETTrue"}, {"Offline", "offlinePuppiMET_Raw"}}},
+    {"hltPFPuppiMET"     , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFPuppiMET_Raw"}}},
+    {"hltPFPuppiMETv0"   , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePuppiMET_Raw"}}},
 
-    {"offlinePFMET_Raw"       , {{"GEN", "genMETTrue"}}},
-    {"offlinePFMET_Type1"     , {{"GEN", "genMETTrue"}}},
-    {"offlinePFPuppiMET_Raw"  , {{"GEN", "genMETTrue"}}},
-    {"offlinePFPuppiMET_Type1", {{"GEN", "genMETTrue"}}},
+//    {"offlinePFMET_Raw"       , {{"GEN", "genMETTrue"}}},
+//    {"offlinePFMET_Type1"     , {{"GEN", "genMETTrue"}}},
+//    {"offlinePFPuppiMET_Raw"  , {{"GEN", "genMETTrue"}}},
+//    {"offlinePFPuppiMET_Type1", {{"GEN", "genMETTrue"}}},
   };
 
   for(auto const& selLabel : {
@@ -217,10 +217,10 @@ void JMETriggerAnalysisDriverPhase2::init(){
     }
 
     bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFJetsCorrected", "l1tSlwPFJetsCorrected");
-    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFJetsCorrected", "offlineAK4PFJetsCorrected");
+//    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFJetsCorrected", "offlineAK4PFJetsCorrected");
 
     bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFPuppiJetsCorrected", "l1tSlwPFPuppiJetsCorrected");
-    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFPuppiJetsCorrected", "offlineAK4PFPuppiJetsCorrected");
+//    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFPuppiJetsCorrected", "offlineAK4PFPuppiJetsCorrected");
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiHT", "l1tPFPuppiHT", true);
 
@@ -235,14 +235,22 @@ void JMETriggerAnalysisDriverPhase2::init(){
     }
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFMET", "l1tPFMET");
-    bookHistograms_MET_2DMaps(selLabel, "hltPFMET", "offlinePFMET_Raw");
+//    bookHistograms_MET_2DMaps(selLabel, "hltPFMET", "offlinePFMET_Raw");
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "l1tPFPuppiMET");
-    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "offlinePFPuppiMET_Raw");
+//    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "offlinePFPuppiMET_Raw");
   }
 
   l1tSeeds_1Jet_ = {
     "L1T_SinglePFPuppiJet200off",
+    "L1T_SinglePFPuppiJet200off2",
+    "L1T_SinglePFPuppiJet230off2",
+    "L1T_SinglePFPuppiJet280off2",
+    "L1T_SinglePFPuppiJet320off2",
+    "L1T_SinglePFPuppiJet350off2",
+    "L1T_SinglePFPuppiJet380off2",
+    "L1T_SinglePFPuppiJet400off2",
+    "L1T_SinglePFPuppiJet420off2",
   };
 
   for(auto const& selLabel : l1tSeeds_1Jet_){
@@ -254,6 +262,14 @@ void JMETriggerAnalysisDriverPhase2::init(){
 
   l1tSeeds_HT_ = {
     "L1T_PFPuppiHT450off",
+    "L1T_PFPuppiHT450off2",
+    "L1T_PFPuppiHT500off2",
+    "L1T_PFPuppiHT550off2",
+    "L1T_PFPuppiHT600off2",
+    "L1T_PFPuppiHT650off2",
+    "L1T_PFPuppiHT700off2",
+    "L1T_PFPuppiHT750off2",
+    "L1T_PFPuppiHT800off2",
   };
 
   for(auto const& selLabel : l1tSeeds_HT_){
@@ -263,10 +279,10 @@ void JMETriggerAnalysisDriverPhase2::init(){
     }
 
     bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFJetsCorrected", "l1tSlwPFJetsCorrected");
-    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFJetsCorrected", "offlineAK4PFJetsCorrected");
+//    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFJetsCorrected", "offlineAK4PFJetsCorrected");
 
     bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFPuppiJetsCorrected", "l1tSlwPFPuppiJetsCorrected");
-    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFPuppiJetsCorrected", "offlineAK4PFPuppiJetsCorrected");
+//    bookHistograms_Jets_2DMaps(selLabel, "hltAK4PFPuppiJetsCorrected", "offlineAK4PFPuppiJetsCorrected");
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiHT", "l1tPFPuppiHT", true);
   }
@@ -283,10 +299,10 @@ void JMETriggerAnalysisDriverPhase2::init(){
     }
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFMET", "l1tPFMET");
-    bookHistograms_MET_2DMaps(selLabel, "hltPFMET", "offlinePFMET_Raw");
+//    bookHistograms_MET_2DMaps(selLabel, "hltPFMET", "offlinePFMET_Raw");
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "l1tPFPuppiMET");
-    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "offlinePFPuppiMET_Raw");
+//    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "offlinePFPuppiMET_Raw");
   }
 }
 
@@ -316,7 +332,8 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     fillHistograms_Jets("NoSelection", fhDataAK4Jets);
 
     for(auto const& selLabel : l1tSeeds_1Jet_){
-      if(not value<bool>(selLabel)){
+      auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tSingleJetSeed(selLabel);
+      if(not l1tSeed){
         continue;
       }
 
@@ -324,7 +341,8 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     }
 
     for(auto const& selLabel : l1tSeeds_HT_){
-      if(not value<bool>(selLabel)){
+      auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tHTSeed(selLabel);
+      if(not l1tSeed){
         continue;
       }
 
@@ -337,21 +355,21 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
 
     fillHistoDataJets fhDataL1TSLWJets;
     fhDataL1TSLWJets.jetCollection = "l1tSlw"+jetType+"JetsCorrected";
-    fhDataL1TSLWJets.jetPtMin = 30.0;
+    fhDataL1TSLWJets.jetPtMin = minAK4JetPt;
     fhDataL1TSLWJets.jetAbsEtaMax = 2.4;
 
     fillHistoDataJets fhDataHLTAK4Jets;
     fhDataHLTAK4Jets.jetCollection = "hltAK4"+jetType+"JetsCorrected";
-    fhDataHLTAK4Jets.jetPtMin = 30.0;
+    fhDataHLTAK4Jets.jetPtMin = minAK4JetPt;
     fhDataHLTAK4Jets.jetAbsEtaMax = 5.0;
 
-    fillHistoDataJets fhDataOffAK4Jets;
-    fhDataOffAK4Jets.jetCollection = "offlineAK4"+jetType+"JetsCorrected";
-    fhDataOffAK4Jets.jetPtMin = 30.0;
-    fhDataOffAK4Jets.jetAbsEtaMax = 5.0;
+//    fillHistoDataJets fhDataOffAK4Jets;
+//    fhDataOffAK4Jets.jetCollection = "offlineAK4"+jetType+"JetsCorrected";
+//    fhDataOffAK4Jets.jetPtMin = minAK4JetPt;
+//    fhDataOffAK4Jets.jetAbsEtaMax = 5.0;
 
     fillHistograms_Jets_2DMaps("NoSelection", fhDataHLTAK4Jets, fhDataL1TSLWJets);
-    fillHistograms_Jets_2DMaps("NoSelection", fhDataHLTAK4Jets, fhDataOffAK4Jets);
+//    fillHistograms_Jets_2DMaps("NoSelection", fhDataHLTAK4Jets, fhDataOffAK4Jets);
 
     fillHistoDataMET fhDataHLTHT;
     fhDataHLTHT.metCollection = "hlt"+jetType+"HT";
@@ -362,12 +380,13 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     fillHistograms_MET_2DMaps("NoSelection", fhDataHLTHT, fhDataL1THT, true);
 
     for(auto const& selLabel : l1tSeeds_HT_){
-      if(not value<bool>(selLabel)){
+      auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tHTSeed(selLabel);
+      if(not l1tSeed){
         continue;
       }
 
       fillHistograms_Jets_2DMaps(selLabel, fhDataHLTAK4Jets, fhDataL1TSLWJets);
-      fillHistograms_Jets_2DMaps(selLabel, fhDataHLTAK4Jets, fhDataOffAK4Jets);
+//      fillHistograms_Jets_2DMaps(selLabel, fhDataHLTAK4Jets, fhDataOffAK4Jets);
 
       if(jetType == "PFPuppi"){
         fillHistograms_MET_2DMaps(selLabel, fhDataHLTHT, fhDataL1THT, true);
@@ -425,15 +444,15 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     fillHistoDataMET fhDataHLTMET;
     fhDataHLTMET.metCollection = "hlt"+metType+"MET";
 
-    fillHistoDataMET fhDataOffMET;
-    fhDataOffMET.metCollection = "offline"+metType+"MET_Raw";
+//    fillHistoDataMET fhDataOffMET;
+//    fhDataOffMET.metCollection = "offline"+metType+"MET_Raw";
 
     fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataL1TMET);
-    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataOffMET);
+//    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataOffMET);
 
     for(auto const& selLabel : l1tSeeds_MET_){
       fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataL1TMET);
-      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataOffMET);
+//      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataOffMET);
     }
   }
 }
@@ -591,4 +610,86 @@ void JMETriggerAnalysisDriverPhase2::fillHistograms_MET_2DMaps(const std::string
   H2(dirPrefix+fhData1.metCollection+"_pt__vs__"+fhData2.metCollection+"_pt")->Fill(met1_pt, met2_pt);
   H2(dirPrefix+fhData1.metCollection+"_phi__vs__"+fhData2.metCollection+"_phi")->Fill(met1_phi, met2_phi);
   H2(dirPrefix+fhData1.metCollection+"_sumEt__vs__"+fhData2.metCollection+"_sumEt")->Fill(met1_sumEt, met2_sumEt);
+}
+
+bool JMETriggerAnalysisDriverPhase2::l1tSingleJetSeed(std::string const& key) const {
+
+  auto const* v_pt = vector_ptr<float>("l1tSlwPFPuppiJetsCorrected_pt");
+  auto const* v_eta = vector_ptr<float>("l1tSlwPFPuppiJetsCorrected_eta");
+
+  if(not (v_pt and v_eta)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriverPhase2::l1tSingleJetSeed(\"" << key << "\") -- "
+        << "branches not available (histograms will not be filled): "
+        << "l1tSlwPFPuppiJetsCorrected_{pt,eta}";
+    throw std::runtime_error(oss.str());
+  }
+
+  int jetIndex(-1);
+  float max_pt(-1.);
+  for(uint idx=0; idx<v_pt->size(); ++idx){
+    if(std::abs(v_eta->at(idx)) >= 5.) continue;
+    if(v_pt->at(idx) > max_pt){
+      max_pt = v_pt->at(idx);
+      jetIndex = idx;
+    }
+  }
+
+  if(jetIndex < 0) return false;
+
+  auto const pt = v_pt->at(jetIndex);
+  auto const eta = v_eta->at(jetIndex);
+
+  float offlinePt(0.f);
+  if(std::abs(eta) < 1.5) offlinePt = 1.40627 * pt + 11.1254;
+  else if(std::abs(eta) < 2.4) offlinePt = 1.4152 * pt + 24.8375;
+  else offlinePt = 1.33052 * pt + 42.4039;
+
+  if     (key == "L1T_SinglePFPuppiJet200off2") return offlinePt > 200.;
+  else if(key == "L1T_SinglePFPuppiJet230off2") return offlinePt > 230.;
+  else if(key == "L1T_SinglePFPuppiJet280off2") return offlinePt > 280.;
+  else if(key == "L1T_SinglePFPuppiJet320off2") return offlinePt > 320.;
+  else if(key == "L1T_SinglePFPuppiJet350off2") return offlinePt > 350.;
+  else if(key == "L1T_SinglePFPuppiJet380off2") return offlinePt > 380.;
+  else if(key == "L1T_SinglePFPuppiJet400off2") return offlinePt > 400.;
+  else if(key == "L1T_SinglePFPuppiJet420off2") return offlinePt > 420.;
+  else
+    throw std::runtime_error("JMETriggerAnalysisDriverPhase2::l1tSingleJetSeed(\""+key+"\") -- invalid key");
+
+  return false;
+}
+
+bool JMETriggerAnalysisDriverPhase2::l1tHTSeed(std::string const& key) const {
+
+  auto const* v_pt = vector_ptr<float>("l1tSlwPFPuppiJetsCorrected_pt");
+  auto const* v_eta = vector_ptr<float>("l1tSlwPFPuppiJetsCorrected_eta");
+
+  if(not (v_pt and v_eta)){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriverPhase2::l1tHTSeed(\"" << key << "\") -- "
+        << "branches not available (histograms will not be filled): "
+        << "l1tSlwPFPuppiJetsCorrected_{pt,eta}";
+    throw std::runtime_error(oss.str());
+  }
+
+  float l1tHT(0.);
+  for(uint idx=0; idx<v_pt->size(); ++idx){
+    if(v_pt->at(idx) > 30. and std::abs(v_eta->at(idx)) < 2.4)
+      l1tHT += v_pt->at(idx);
+  }
+
+  auto const offlineHT = l1tHT * 1.0961 + 50.0182;
+
+  if     (key == "L1T_PFPuppiHT450off2") return offlineHT > 450.;
+  else if(key == "L1T_PFPuppiHT500off2") return offlineHT > 500.;
+  else if(key == "L1T_PFPuppiHT550off2") return offlineHT > 550.;
+  else if(key == "L1T_PFPuppiHT600off2") return offlineHT > 600.;
+  else if(key == "L1T_PFPuppiHT650off2") return offlineHT > 650.;
+  else if(key == "L1T_PFPuppiHT700off2") return offlineHT > 700.;
+  else if(key == "L1T_PFPuppiHT750off2") return offlineHT > 750.;
+  else if(key == "L1T_PFPuppiHT800off2") return offlineHT > 800.;
+  else
+    throw std::runtime_error("JMETriggerAnalysisDriverPhase2::l1tHTSeed(\""+key+"\") -- invalid key");
+
+  return false;
 }
