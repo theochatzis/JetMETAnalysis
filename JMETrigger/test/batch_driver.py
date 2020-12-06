@@ -23,13 +23,13 @@ if __name__ == '__main__':
    parser.add_argument('-t', '--tree-name', dest='tree_name', action='store', default='JMETriggerNTuple/Events',
                        help='TTree key in input file(s)')
 
-   parser.add_argument('-p', '--plugin', dest='plugin', action='store', default=None, required=True,
+   parser.add_argument('-p', '--plugin', dest='plugin', action='store', default='JMETriggerAnalysisDriverPhase2', #default=None, required=True,
                        help='name of analysis plugin')
 
    parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                        help='path to output directory')
 
-   parser.add_argument('-n', '--nperjob', dest='nperjob', type=long, action='store', default=None, required=True,
+   parser.add_argument('-n', '--nperjob', dest='nperjob', type=long, action='store', default=5000, #default=None, required=True,
                        help='number of events per job')
 
    parser.add_argument('--time', '--RequestRuntime', dest='RequestRuntime', action='store', default='10800',
@@ -237,7 +237,6 @@ if __name__ == '__main__':
                 'when_to_transfer_output = ON_EXIT',
 
                 'requirements = (OpSysAndVer == "'+('CentOS7' if is_slc7_arch else 'SL6')+'")',
-                '#requirements = (OpSysAndVer == "SL6" || OpSysAndVer == "CentOS7")',
 
                 ' RequestMemory  =  2000',
                 '+RequestRuntime = '+str(opts.RequestRuntime),
