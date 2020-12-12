@@ -11,6 +11,9 @@ from common.efficiency import *
 from common.plot import *
 from common.plot_style import *
 
+L1T_SingleJet = 'L1T_SinglePFPuppiJet200off'
+L1T_HT = 'L1T_PFPuppiHT450off'
+
 COUNTER = 0
 def tmpName():
   global COUNTER
@@ -53,6 +56,8 @@ def getRateHistogram(h1, rateFac):
   return theRateHisto
 
 def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThreshold_MET, hltThreshold_MET2):
+  global L1T_SingleJet, L1T_HT
+
   ret = {}
 
   _tfile = ROOT.TFile.Open(fpath)
@@ -72,15 +77,15 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
   ret['t_rates']['l1tSlwPFPuppiJet'] = getRateHistogram(_tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_pt0'), rateFactor)
 
   ret['t_rates']['hltAK4PFPuppiJet_woL1T'] = getRateHistogram(_tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0'), rateFactor)
-  ret['t_rates']['hltAK4PFPuppiJet'] = getRateHistogram(_tfile.Get('L1T_SinglePFPuppiJet200off/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0'), rateFactor)
+  ret['t_rates']['hltAK4PFPuppiJet'] = getRateHistogram(_tfile.Get(L1T_SingleJet+'/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0'), rateFactor)
 
-  _tmp = _tfile.Get('L1T_SinglePFPuppiJet200off/l1tSlwPFPuppiJetsCorrected_EtaIncl_pt0')
+  _tmp = _tfile.Get(L1T_SingleJet+'/l1tSlwPFPuppiJetsCorrected_EtaIncl_pt0')
   _tmp_integErr = ctypes.c_double(0.)
   _tmp_integ = _tmp.IntegralAndError(0, -1, _tmp_integErr)
-  ret['v_rates'] ['L1T_SinglePFPuppiJet200off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
-  ret['v_counts']['L1T_SinglePFPuppiJet200off'] = [_tmp_integ, _tmp_integErr.value]
+  ret['v_rates'] [L1T_SingleJet] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+  ret['v_counts'][L1T_SingleJet] = [_tmp_integ, _tmp_integErr.value]
 
-  _tmp = _tfile.Get('L1T_SinglePFPuppiJet200off/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0')
+  _tmp = _tfile.Get(L1T_SingleJet+'/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0')
   _tmp_integErr = ctypes.c_double(0.)
   _tmp_integ = _tmp.IntegralAndError(_tmp.GetXaxis().FindBin(float(hltThreshold_SingleJet)), -1, _tmp_integErr)
   ret['v_rates'] ['HLT_AK4PFPuppiJet'+str(hltThreshold_SingleJet)] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
@@ -91,15 +96,15 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
   ret['t_rates']['l1tPFPuppiHT_2'] = getRateHistogram(_tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_Eta2p4_HT'), rateFactor)
 
   ret['t_rates']['hltPFPuppiHT_woL1T'] = getRateHistogram(_tfile.Get('NoSelection/hltPFPuppiHT_sumEt'), rateFactor)
-  ret['t_rates']['hltPFPuppiHT'] = getRateHistogram(_tfile.Get('L1T_PFPuppiHT450off/hltPFPuppiHT_sumEt'), rateFactor)
+  ret['t_rates']['hltPFPuppiHT'] = getRateHistogram(_tfile.Get(L1T_HT+'/hltPFPuppiHT_sumEt'), rateFactor)
 
-  _tmp = _tfile.Get('L1T_PFPuppiHT450off/l1tPFPuppiHT_sumEt')
+  _tmp = _tfile.Get(L1T_HT+'/l1tPFPuppiHT_sumEt')
   _tmp_integErr = ctypes.c_double(0.)
   _tmp_integ = _tmp.IntegralAndError(0, -1, _tmp_integErr)
-  ret['v_rates'] ['L1T_PFPuppiHT450off'] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
-  ret['v_counts']['L1T_PFPuppiHT450off'] = [_tmp_integ, _tmp_integErr.value]
+  ret['v_rates'] [L1T_HT] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
+  ret['v_counts'][L1T_HT] = [_tmp_integ, _tmp_integErr.value]
 
-  _tmp = _tfile.Get('L1T_PFPuppiHT450off/hltPFPuppiHT_sumEt')
+  _tmp = _tfile.Get(L1T_HT+'/hltPFPuppiHT_sumEt')
   _tmp_integErr = ctypes.c_double(0.)
   _tmp_integ = _tmp.IntegralAndError(_tmp.GetXaxis().FindBin(float(hltThreshold_HT)), -1, _tmp_integErr)
   ret['v_rates'] ['HLT_PFPuppiHT'+str(hltThreshold_HT)] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
@@ -151,13 +156,15 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
   return ret
 
 def getJetEfficiencies(fpath, hltThreshold_SingleJet, hltThreshold_HT):
+  global L1T_SingleJet, L1T_HT
+
   ret = {}
 
   _tfile = ROOT.TFile.Open(fpath)
 
   # SingleJet
   for _tmpRef in ['GEN', 'Offline']:
-    _tmp_num = _tfile.Get('L1T_SinglePFPuppiJet200off/l1tSlwPFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
+    _tmp_num = _tfile.Get(L1T_SingleJet+'/l1tSlwPFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
     _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, -1)
 
     _tmp_den = _tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
@@ -175,7 +182,7 @@ def getJetEfficiencies(fpath, hltThreshold_SingleJet, hltThreshold_HT):
     ret['SingleJet_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
     ret['SingleJet_HLT_wrt_'+_tmpRef].SetName('SingleJet_HLT_wrt_'+_tmpRef)
 
-    _tmp_num = _tfile.Get('L1T_SinglePFPuppiJet200off/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
+    _tmp_num = _tfile.Get(L1T_SingleJet+'/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
     _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold_SingleJet), -1)
 
     _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_MatchedTo'+_tmpRef+'_pt0__vs__'+_tmpRef+'_pt')
@@ -187,7 +194,7 @@ def getJetEfficiencies(fpath, hltThreshold_SingleJet, hltThreshold_HT):
   # HT
   for _tmpRef in ['GEN', 'Offline']:
 
-    _tmp_num = _tfile.Get('L1T_PFPuppiHT450off/l1tSlwPFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_num = _tfile.Get(L1T_HT+'/l1tSlwPFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
     _tmp_num = _tmp_num.ProjectionY(tmpName(), 0, -1)
 
     _tmp_den = _tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
@@ -205,7 +212,7 @@ def getJetEfficiencies(fpath, hltThreshold_SingleJet, hltThreshold_HT):
     ret['HT_HLT_wrt_'+_tmpRef] = get_efficiency_graph(_tmp_num, _tmp_den)
     ret['HT_HLT_wrt_'+_tmpRef].SetName('HT_HLT_wrt_'+_tmpRef)
 
-    _tmp_num = _tfile.Get('L1T_PFPuppiHT450off/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
+    _tmp_num = _tfile.Get(L1T_HT+'/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
     _tmp_num = _tmp_num.ProjectionY(tmpName(), _tmp_num.GetXaxis().FindBin(hltThreshold_HT), -1)
 
     _tmp_den = _tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_HT__vs__'+_tmpRef+'_HT')
@@ -474,10 +481,10 @@ if __name__ == '__main__':
     rateDict[_tmpReco] = {}
     countDict[_tmpReco] = {}
     for _tmpTrg in [
-      'L1T_SinglePFPuppiJet200off',
+      L1T_SingleJet,
       hltPath_SingleJet,
   
-      'L1T_PFPuppiHT450off',
+      L1T_HT,
       hltPath_HT,
   
       'L1T_PFPuppiMET200off',
@@ -500,8 +507,8 @@ if __name__ == '__main__':
         countDict[_tmpReco][_tmpTrg][_tmp1] = [theCount, math.sqrt(theCountErr2)]
   
     for _tmpL1T, _tmpHLT in [
-      ['L1T_SinglePFPuppiJet200off', hltPath_SingleJet],
-      ['L1T_PFPuppiHT450off', hltPath_HT],
+      [L1T_SingleJet, hltPath_SingleJet],
+      [L1T_HT, hltPath_HT],
       ['L1T_PFPuppiMET200off', hltPath_MET],
       ['L1T_PFPuppiMET245off', hltPath_MET2],
     ]:
@@ -600,7 +607,7 @@ if __name__ == '__main__':
 
         for _tmp in [
           {
-            'l1tPathKey': 'L1T_SinglePFPuppiJet200off',
+            'l1tPathKey': L1T_SingleJet,
             'hltPathKey': hltPath_SingleJet,
             'outputName': outputDir+'/effy_SingleJet_wrt'+_tmpRef+'_'+_tmpReco,
             'outputExts': EXTS,
@@ -617,7 +624,7 @@ if __name__ == '__main__':
             ],
           },
           {
-            'l1tPathKey': 'L1T_PFPuppiHT450off',
+            'l1tPathKey': L1T_HT,
             'hltPathKey': hltPath_HT,
             'outputName': outputDir+'/effy_HT_wrt'+_tmpRef+'_'+_tmpReco,
             'outputExts': EXTS,
@@ -770,7 +777,7 @@ if __name__ == '__main__':
 
     for _tmp in [
       {
-        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_SinglePFPuppiJet200off']['MB'],
+        'l1tRateTuple': rateDict['HLT_TRKv06p1'][L1T_SingleJet]['MB'],
         'hltTargetRateHz': 75,
         'outputName': outputDir+'/rate_SingleJet',
         'outputExts': EXTS,
@@ -792,7 +799,7 @@ if __name__ == '__main__':
         ],
       },
       {
-        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_PFPuppiHT450off']['MB'],
+        'l1tRateTuple': rateDict['HLT_TRKv06p1'][L1T_HT]['MB'],
         'hltTargetRateHz': 75,
         'outputName': outputDir+'/rate_HT',
         'outputExts': EXTS,
