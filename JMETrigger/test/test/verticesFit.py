@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+"""
+python -i test/verticesFit.py [TFILE] 180:0:1800000:60:60:240 offlinePrimaryVerticesMultiplicity hltOuterTrackerClustersMultiplicity
+"""
 import sys
 import ROOT
 

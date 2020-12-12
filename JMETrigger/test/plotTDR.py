@@ -379,55 +379,55 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
    canvas = ROOT.TCanvas(tmpName(), tmpName())
    canvas.cd()
 
-   h0 = canvas.DrawFrame(0.001, 0.0001, 2.59, 0.47 if _etaTag in ['EtaIncl', 'HB'] else 0.34)
+   h0 = canvas.DrawFrame(0.001, 0.0001, 2.39, 0.27 if _etaTag in ['EtaIncl', 'HB'] else 0.17)
 
    histos['PU140']['pt030to100'].SetMarkerStyle(20)
-   histos['PU140']['pt030to100'].SetMarkerSize(1.0)
+   histos['PU140']['pt030to100'].SetMarkerSize(.0)
    histos['PU140']['pt030to100'].SetLineWidth(2)
    histos['PU140']['pt030to100'].SetLineStyle(2)
    histos['PU140']['pt030to100'].SetLineColor(1)
    histos['PU140']['pt030to100'].SetMarkerColor(1)
 
    histos['PU140']['pt100to300'].SetMarkerStyle(20)
-   histos['PU140']['pt100to300'].SetMarkerSize(1.0)
+   histos['PU140']['pt100to300'].SetMarkerSize(.0)
    histos['PU140']['pt100to300'].SetLineWidth(2)
    histos['PU140']['pt100to300'].SetLineStyle(2)
    histos['PU140']['pt100to300'].SetLineColor(2)
    histos['PU140']['pt100to300'].SetMarkerColor(2)
  
    histos['PU140']['pt300to600'].SetMarkerStyle(20)
-   histos['PU140']['pt300to600'].SetMarkerSize(1.0)
+   histos['PU140']['pt300to600'].SetMarkerSize(.0)
    histos['PU140']['pt300to600'].SetLineWidth(2)
    histos['PU140']['pt300to600'].SetLineStyle(2)
    histos['PU140']['pt300to600'].SetLineColor(4)
    histos['PU140']['pt300to600'].SetMarkerColor(4)
 
    histos['PU200']['pt030to100'].SetMarkerStyle(20)
-   histos['PU200']['pt030to100'].SetMarkerSize(1.0)
+   histos['PU200']['pt030to100'].SetMarkerSize(.0)
    histos['PU200']['pt030to100'].SetLineWidth(2)
    histos['PU200']['pt030to100'].SetLineColor(1)
    histos['PU200']['pt030to100'].SetMarkerColor(1)
 
    histos['PU200']['pt100to300'].SetMarkerStyle(20)
-   histos['PU200']['pt100to300'].SetMarkerSize(1.0)
+   histos['PU200']['pt100to300'].SetMarkerSize(.0)
    histos['PU200']['pt100to300'].SetLineWidth(2)
    histos['PU200']['pt100to300'].SetLineColor(2)
    histos['PU200']['pt100to300'].SetMarkerColor(2)
- 
+
    histos['PU200']['pt300to600'].SetMarkerStyle(20)
-   histos['PU200']['pt300to600'].SetMarkerSize(1.0)
+   histos['PU200']['pt300to600'].SetMarkerSize(.0)
    histos['PU200']['pt300to600'].SetLineWidth(2)
    histos['PU200']['pt300to600'].SetLineColor(4)
    histos['PU200']['pt300to600'].SetMarkerColor(4)
 
-   histos['PU140']['pt030to100'].Draw('hist,e0,same')  
-   histos['PU200']['pt030to100'].Draw('hist,e0,same')  
+   histos['PU140']['pt030to100'].Draw('hist,e0,same')
+   histos['PU200']['pt030to100'].Draw('hist,e0,same')
 
-   histos['PU140']['pt100to300'].Draw('hist,e0,same')  
-   histos['PU200']['pt100to300'].Draw('hist,e0,same')  
+   histos['PU140']['pt100to300'].Draw('hist,e0,same')
+   histos['PU200']['pt100to300'].Draw('hist,e0,same')
 
-   histos['PU140']['pt300to600'].Draw('hist,e0,same')  
-   histos['PU200']['pt300to600'].Draw('hist,e0,same')  
+   histos['PU140']['pt300to600'].Draw('hist,e0,same')
+   histos['PU200']['pt300to600'].Draw('hist,e0,same')
 
    topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
    topLabel.SetFillColor(0)
@@ -451,7 +451,7 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
    objLabel.AddText('PU 140-200 (14 TeV)')
    objLabel.Draw('same')
 
-   l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
+   l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.50, 0.90, 'NDC')
    l1tRateLabel.SetFillColor(0)
    l1tRateLabel.SetFillStyle(1001)
    l1tRateLabel.SetTextColor(ROOT.kBlack)
@@ -459,10 +459,10 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
    l1tRateLabel.SetTextFont(42)
    l1tRateLabel.SetTextSize(0.035)
    l1tRateLabel.SetBorderSize(0)
-   l1tRateLabel.AddText('AK4 PF+Puppi Jets')
+   l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
    l1tRateLabel.Draw('same')
 
-   hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.65, 0.85, 'NDC')
+   hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
    hltRateLabel.SetFillColor(0)
    hltRateLabel.SetFillStyle(1001)
    hltRateLabel.SetTextColor(ROOT.kBlack)
@@ -473,23 +473,23 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
    hltRateLabel.AddText(_etaLabel)
    hltRateLabel.Draw('same')
 
-   aaahltRateLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
-   aaahltRateLabel.SetFillColor(0)
-   aaahltRateLabel.SetFillStyle(1001)
-   aaahltRateLabel.SetTextColor(ROOT.kBlack)
-   aaahltRateLabel.SetTextAlign(22)
-   aaahltRateLabel.SetTextFont(42)
-   aaahltRateLabel.SetTextSize(0.035)
-   aaahltRateLabel.SetBorderSize(0)
-   aaahltRateLabel.AddText('GEN Jet p_{T} range')
-   aaahltRateLabel.Draw('same')
+   genJetPtLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
+   genJetPtLabel.SetFillColor(0)
+   genJetPtLabel.SetFillStyle(1001)
+   genJetPtLabel.SetTextColor(ROOT.kBlack)
+   genJetPtLabel.SetTextAlign(22)
+   genJetPtLabel.SetTextFont(42)
+   genJetPtLabel.SetTextSize(0.035)
+   genJetPtLabel.SetBorderSize(0)
+   genJetPtLabel.AddText('GEN Jet p_{T} range')
+   genJetPtLabel.Draw('same')
 
-   leg1 = ROOT.TLegend(0.65, 0.60, 0.94, 0.80)
+   leg1 = ROOT.TLegend(0.65, 0.60, 0.94, 0.81)
    leg1.SetNColumns(1)
    leg1.SetTextFont(42)
-   leg1.AddEntry(histos['PU200']['pt030to100'],  '30-100 GeV', 'lepx')
-   leg1.AddEntry(histos['PU200']['pt100to300'], '100-300 GeV', 'lepx')
-   leg1.AddEntry(histos['PU200']['pt300to600'], '300-600 GeV', 'lepx')
+   leg1.AddEntry(histos['PU200']['pt030to100'],  '30-100 GeV', 'lex')
+   leg1.AddEntry(histos['PU200']['pt100to300'], '100-300 GeV', 'lex')
+   leg1.AddEntry(histos['PU200']['pt300to600'], '300-600 GeV', 'lex')
    leg1.Draw('same')
 
    _htmpPU140 = histos['PU140']['pt030to100'].Clone()
@@ -526,704 +526,1158 @@ def plotJetResolution(fpath_PU140, fpath_PU200, outputName, exts):
   fpaths['PU200'] = ROOT.TFile.Open(fpath_PU200)
 
   histos = {
-    'PU140': {'HB': None, 'HGCal': None, 'HF': None},
-    'PU200': {'HB': None, 'HGCal': None, 'HF': None},
+    'PU140': {
+      'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HF': [30, 40, 50, 60, 80, 120, 240, 600],
+    },
+    'PU200': {
+      'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HF': [30, 40, 50, 60, 80, 120, 240, 600],
+    },
   }
 
-  pTbins = {
-    'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
-    'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
-    'HF': [30, 40, 50, 60, 80, 120, 240, 600],
-  }
+  for _puTag in fpaths:
+    _tmpTFile = fpaths[_puTag]
+    if not _tmpTFile:
+      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      continue
 
-  for (_puTag, _puLabel) in {
-    'PU140': 'PU=140',
-    'PU200': 'PU=200',
-  }.items():
-   _tmpTFile = fpaths[_puTag]
-   if not _tmpTFile:
-     WARNING('failed to open target TFile: '+fpaths[_puTag])
-     continue
+    for _etaTag in histos[_puTag]:
+      h1vals = []
+      _h2tmp = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_MatchedToGEN_pt_overGEN__vs__GEN_pt')
+      binEdges = array.array('d', histos[_puTag][_etaTag])
+      for pTbinEdge_idx in range(len(binEdges)-1):
+        _h1tmp = _h2tmp.ProjectionX(tmpName(), _h2tmp.GetYaxis().FindBin(1.0001*binEdges[pTbinEdge_idx]), _h2tmp.GetYaxis().FindBin(0.9999*binEdges[pTbinEdge_idx+1]))
+        _h1tmp_val = _h1tmp.GetRMS() / _h1tmp.GetMean() if _h1tmp.GetMean() != 0. else None
+        _h1tmp_err = _h1tmp.GetRMSError() / _h1tmp.GetMean() if _h1tmp.GetMean() != 0. else None
+        h1vals.append([_h1tmp_val, _h1tmp_err])
 
-   for _etaTag in pTbins:
-     h1vals = []
-     _h2tmp = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_MatchedToGEN_pt_overGEN__vs__GEN_pt')
-     for pTbinEdge_idx in range(len(pTbins[_etaTag])-1):
-       _h1tmp = _h2tmp.ProjectionX(tmpName(), _h2tmp.GetYaxis().FindBin(1.0001*pTbins[_etaTag][pTbinEdge_idx]), _h2tmp.GetYaxis().FindBin(0.9999*pTbins[_etaTag][pTbinEdge_idx+1]))
-       _h1tmp_val = _h1tmp.GetRMS() / _h1tmp.GetMean() if _h1tmp.GetMean() != 0. else None
-       _h1tmp_err = _h1tmp.GetRMSError() / _h1tmp.GetMean() if _h1tmp.GetMean() != 0. else None
-       h1vals.append([_h1tmp_val, _h1tmp_err])
+      histos[_puTag][_etaTag] = ROOT.TH1D(tmpName(), tmpName(False), len(binEdges)-1, binEdges)
+      histos[_puTag][_etaTag].SetDirectory(0)
+      histos[_puTag][_etaTag].UseCurrentStyle()
+      for _binIdx in range(histos[_puTag][_etaTag].GetNbinsX()):
+        if h1vals[_binIdx] != [None, None]:
+          histos[_puTag][_etaTag].SetBinContent(_binIdx+1, h1vals[_binIdx][0])
+          histos[_puTag][_etaTag].SetBinError(_binIdx+1, h1vals[_binIdx][1])
 
-     binEdges = array.array('d', pTbins[_etaTag])
-     histos[_puTag][_etaTag] = ROOT.TH1D(tmpName(), tmpName(), len(binEdges)-1, binEdges)
-     histos[_puTag][_etaTag].UseCurrentStyle()
-     for _binIdx in range(histos[_puTag][_etaTag].GetNbinsX()):
-       if h1vals[_binIdx] != [None, None]:
-         histos[_puTag][_etaTag].SetBinContent(_binIdx+1, h1vals[_binIdx][0])
-         histos[_puTag][_etaTag].SetBinError(_binIdx+1, h1vals[_binIdx][1])
+  canvas = ROOT.TCanvas(tmpName(), tmpName())
+  canvas.cd()
 
-   for _tmp2 in histos[_puTag]:
-     if histos[_puTag][_tmp2] is None: continue
-     histos[_puTag][_tmp2].SetDirectory(0)
-     histos[_puTag][_tmp2].UseCurrentStyle()
+  h0 = canvas.DrawFrame(30., 0.0001, 600., 0.57)
 
-   canvas = ROOT.TCanvas(tmpName(), tmpName())
-   canvas.cd()
+  histos['PU140']['HB'].SetMarkerStyle(24)
+  histos['PU140']['HB'].SetMarkerSize(1)
+  histos['PU140']['HB'].SetLineWidth(2)
+  histos['PU140']['HB'].SetLineStyle(2)
+  histos['PU140']['HB'].SetLineColor(1)
+  histos['PU140']['HB'].SetMarkerColor(1)
 
-   h0 = canvas.DrawFrame(30., 0.0001, 600., 0.57)
+  histos['PU140']['HGCal'].SetMarkerStyle(25)
+  histos['PU140']['HGCal'].SetMarkerSize(1)
+  histos['PU140']['HGCal'].SetLineWidth(2)
+  histos['PU140']['HGCal'].SetLineStyle(2)
+  histos['PU140']['HGCal'].SetLineColor(2)
+  histos['PU140']['HGCal'].SetMarkerColor(2)
 
-   histos[_puTag]['HB'].SetMarkerStyle(20)
-   histos[_puTag]['HB'].SetMarkerSize(1.0)
-   histos[_puTag]['HB'].SetLineWidth(2)
-   histos[_puTag]['HB'].SetLineColor(1)
-   histos[_puTag]['HB'].SetMarkerColor(1)
+  histos['PU140']['HF'].SetMarkerStyle(27)
+  histos['PU140']['HF'].SetMarkerSize(1.5)
+  histos['PU140']['HF'].SetLineWidth(2)
+  histos['PU140']['HF'].SetLineStyle(2)
+  histos['PU140']['HF'].SetLineColor(4)
+  histos['PU140']['HF'].SetMarkerColor(4)
 
-   histos[_puTag]['HGCal'].SetMarkerStyle(20)
-   histos[_puTag]['HGCal'].SetMarkerSize(1.0)
-   histos[_puTag]['HGCal'].SetLineWidth(2)
-   histos[_puTag]['HGCal'].SetLineColor(2)
-   histos[_puTag]['HGCal'].SetMarkerColor(2)
+  histos['PU200']['HB'].SetMarkerStyle(20)
+  histos['PU200']['HB'].SetMarkerSize(1)
+  histos['PU200']['HB'].SetLineWidth(2)
+  histos['PU200']['HB'].SetLineStyle(1)
+  histos['PU200']['HB'].SetLineColor(1)
+  histos['PU200']['HB'].SetMarkerColor(1)
 
-   histos[_puTag]['HF'].SetMarkerStyle(20)
-   histos[_puTag]['HF'].SetMarkerSize(1.0)
-   histos[_puTag]['HF'].SetLineWidth(2)
-   histos[_puTag]['HF'].SetLineColor(4)
-   histos[_puTag]['HF'].SetMarkerColor(4)
+  histos['PU200']['HGCal'].SetMarkerStyle(21)
+  histos['PU200']['HGCal'].SetMarkerSize(1)
+  histos['PU200']['HGCal'].SetLineWidth(2)
+  histos['PU200']['HGCal'].SetLineStyle(1)
+  histos['PU200']['HGCal'].SetLineColor(2)
+  histos['PU200']['HGCal'].SetMarkerColor(2)
 
-   histos[_puTag]['HB'].Draw('hist,e0,same')  
-   histos[_puTag]['HGCal'].Draw('hist,e0,same')  
-   histos[_puTag]['HF'].Draw('hist,e0,same')  
+  histos['PU200']['HF'].SetMarkerStyle(33)
+  histos['PU200']['HF'].SetMarkerSize(1.5)
+  histos['PU200']['HF'].SetLineWidth(2)
+  histos['PU200']['HF'].SetLineStyle(1)
+  histos['PU200']['HF'].SetLineColor(4)
+  histos['PU200']['HF'].SetMarkerColor(4)
 
-   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
-   topLabel.SetFillColor(0)
-   topLabel.SetFillStyle(1001)
-   topLabel.SetTextColor(ROOT.kBlack)
-   topLabel.SetTextAlign(12)
-   topLabel.SetTextFont(42)
-   topLabel.SetTextSize(0.035)
-   topLabel.SetBorderSize(0)
-   topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
-   topLabel.Draw('same')
+  histos['PU140']['HF'].Draw('hist,e0,same')
+  histos['PU140']['HGCal'].Draw('hist,e0,same')
+  histos['PU140']['HB'].Draw('hist,e0,same')
+  histos['PU200']['HF'].Draw('hist,e0,same')
+  histos['PU200']['HGCal'].Draw('hist,e0,same')
+  histos['PU200']['HB'].Draw('hist,e0,same')
 
-   objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
-   objLabel.SetFillColor(0)
-   objLabel.SetFillStyle(1001)
-   objLabel.SetTextColor(ROOT.kBlack)
-   objLabel.SetTextAlign(32)
-   objLabel.SetTextFont(42)
-   objLabel.SetTextSize(0.035)
-   objLabel.SetBorderSize(0)
-   objLabel.AddText(_puLabel+' (14 TeV)')
-   objLabel.Draw('same')
+  topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
+  topLabel.SetFillColor(0)
+  topLabel.SetFillStyle(1001)
+  topLabel.SetTextColor(ROOT.kBlack)
+  topLabel.SetTextAlign(12)
+  topLabel.SetTextFont(42)
+  topLabel.SetTextSize(0.035)
+  topLabel.SetBorderSize(0)
+  topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+  topLabel.Draw('same')
 
-   l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
-   l1tRateLabel.SetFillColor(0)
-   l1tRateLabel.SetFillStyle(1001)
-   l1tRateLabel.SetTextColor(ROOT.kBlack)
-   l1tRateLabel.SetTextAlign(12)
-   l1tRateLabel.SetTextFont(42)
-   l1tRateLabel.SetTextSize(0.035)
-   l1tRateLabel.SetBorderSize(0)
-   l1tRateLabel.AddText('AK4 PF+Puppi Jets')
-   l1tRateLabel.Draw('same')
+  objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+  objLabel.SetFillColor(0)
+  objLabel.SetFillStyle(1001)
+  objLabel.SetTextColor(ROOT.kBlack)
+  objLabel.SetTextAlign(32)
+  objLabel.SetTextFont(42)
+  objLabel.SetTextSize(0.035)
+  objLabel.SetBorderSize(0)
+  objLabel.AddText('PU 140-200 (14 TeV)')
+  objLabel.Draw('same')
 
-   hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.65, 0.85, 'NDC')
-   hltRateLabel.SetFillColor(0)
-   hltRateLabel.SetFillStyle(1001)
-   hltRateLabel.SetTextColor(ROOT.kBlack)
-   hltRateLabel.SetTextAlign(12)
-   hltRateLabel.SetTextFont(42)
-   hltRateLabel.SetTextSize(0.035)
-   hltRateLabel.SetBorderSize(0)
-#   hltRateLabel.AddText(_etaLabel)
-#   hltRateLabel.Draw('same')
+  l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.50, 0.90, 'NDC')
+  l1tRateLabel.SetFillColor(0)
+  l1tRateLabel.SetFillStyle(1001)
+  l1tRateLabel.SetTextColor(ROOT.kBlack)
+  l1tRateLabel.SetTextAlign(12)
+  l1tRateLabel.SetTextFont(42)
+  l1tRateLabel.SetTextSize(0.035)
+  l1tRateLabel.SetBorderSize(0)
+  l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
+  l1tRateLabel.Draw('same')
 
-   aaahltRateLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
-   aaahltRateLabel.SetFillColor(0)
-   aaahltRateLabel.SetFillStyle(1001)
-   aaahltRateLabel.SetTextColor(ROOT.kBlack)
-   aaahltRateLabel.SetTextAlign(22)
-   aaahltRateLabel.SetTextFont(42)
-   aaahltRateLabel.SetTextSize(0.035)
-   aaahltRateLabel.SetBorderSize(0)
-   aaahltRateLabel.AddText(_puLabel)
-#   aaahltRateLabel.Draw('same')
+  hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.37, 0.85, 'NDC')
+  hltRateLabel.SetFillColor(0)
+  hltRateLabel.SetFillStyle(1001)
+  hltRateLabel.SetTextColor(ROOT.kBlack)
+  hltRateLabel.SetTextAlign(12)
+  hltRateLabel.SetTextFont(42)
+  hltRateLabel.SetTextSize(0.035)
+  hltRateLabel.SetBorderSize(0)
+  hltRateLabel.AddText('p_{T}^{HLT} > 30 GeV')
+  hltRateLabel.Draw('same')
 
-   leg1 = ROOT.TLegend(0.65, 0.70, 0.94, 0.90)
-   leg1.SetNColumns(1)
-   leg1.SetTextFont(42)
-   leg1.AddEntry(histos[_puTag]['HB']   ,     '|#eta|<1.5', 'lepx')
-   leg1.AddEntry(histos[_puTag]['HGCal'], '1.5<|#eta|<3.0', 'lepx')
-   leg1.AddEntry(histos[_puTag]['HF']   , '3.0<|#eta|<5.0', 'lepx')
-   leg1.Draw('same')
+  leg1 = ROOT.TLegend(0.65, 0.70, 0.94, 0.90)
+  leg1.SetNColumns(1)
+  leg1.SetTextFont(42)
+  leg1.AddEntry(histos['PU200']['HB']   ,     '|#eta|<1.5', 'lepx')
+  leg1.AddEntry(histos['PU200']['HGCal'], '1.5<|#eta|<3.0', 'lepx')
+  leg1.AddEntry(histos['PU200']['HF']   , '3.0<|#eta|<5.0', 'lepx')
+  leg1.Draw('same')
 
-   h0.SetTitle(';GEN Jet p_{T} [GeV];#sigma(p^{HLT}_{T} / p^{GEN}_{T}) / #LTp^{HLT}_{T} / p^{GEN}_{T}#GT')
-   h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+  _htmpPU140 = histos['PU140']['HB'].Clone()
+  _htmpPU140.SetLineColor(1)
+  _htmpPU140.SetLineStyle(2)
 
-   canvas.SetLogy(0)
-   canvas.SetGrid(1, 1)
+  _htmpPU200 = histos['PU200']['HB'].Clone()
+  _htmpPU200.SetLineColor(1)
+  _htmpPU200.SetLineStyle(1)
 
-   for _tmpExt in exts:
-     canvas.SaveAs(outputName+'_'+_puTag+'.'+_tmpExt)
+  leg2 = ROOT.TLegend(0.45, 0.70, 0.65, 0.82)
+  leg2.SetNColumns(1)
+  leg2.SetTextFont(42)
+  leg2.AddEntry(_htmpPU140, 'PU=140', 'l')
+  leg2.AddEntry(_htmpPU200, 'PU=200', 'l')
+  leg2.Draw('same')
 
-   canvas.Close()
+  h0.SetTitle(';GEN Jet p_{T} [GeV];#sigma(p^{HLT}_{T} / p^{GEN}_{T}) / #LTp^{HLT}_{T} / p^{GEN}_{T}#GT')
+  h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
 
-   print '\033[1m'+outputName+'_'+_puTag+'\033[0m'
+  canvas.SetLogy(0)
+  canvas.SetGrid(1, 1)
+
+  for _tmpExt in exts:
+    canvas.SaveAs(outputName+'.'+_tmpExt)
+
+  canvas.Close()
+
+  print '\033[1m'+outputName+'\033[0m'
 
 def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
   fpaths = {}
   fpaths['PU140'] = ROOT.TFile.Open(fpath_PU140)
   fpaths['PU200'] = ROOT.TFile.Open(fpath_PU200)
 
+  # HLT - MatchedToGEN
   graphs = {
-    'PU140': {'HB': None, 'HGCal': None, 'HF': None},
-    'PU200': {'HB': None, 'HGCal': None, 'HF': None},
+    'PU140': {
+      'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HF': [30, 40, 50, 60, 80, 120, 240, 600],
+    },
+    'PU200': {
+      'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HF': [30, 40, 50, 60, 80, 120, 240, 600],
+    },
   }
 
-  for (_puTag, _puLabel) in {
-    'PU140': 'PU=140',
-    'PU200': 'PU=200',
-  }.items():
-   _tmpTFile = fpaths[_puTag]
-   if not _tmpTFile:
-     WARNING('failed to open target TFile: '+fpaths[_puTag])
-     continue
-
-   # HLT - MatchedToGEN
-   pTbins = {
-     'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
-     'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
-     'HF': [30, 40, 50, 60, 80, 120, 240, 600],
-   }
-
-   for _etaTag in pTbins:
-     _htmpNum = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_MatchedToGEN_pt')
-     _htmpDen = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_pt')
-
-     _binEdges = array.array('d', pTbins[_etaTag])
-     _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-     _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-
-     graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
-
-   for _tmp2 in graphs[_puTag]:
-     if graphs[_puTag][_tmp2] is None: continue
-     graphs[_puTag][_tmp2].UseCurrentStyle()
-
-   canvas = ROOT.TCanvas(tmpName(), tmpName())
-   canvas.cd()
-
-   h0 = canvas.DrawFrame(30., 0.0001, 600., 1.2)
-
-   graphs[_puTag]['HB'].SetMarkerStyle(20)
-   graphs[_puTag]['HB'].SetMarkerSize(1)
-   graphs[_puTag]['HB'].SetLineWidth(2)
-   graphs[_puTag]['HB'].SetLineColor(1)
-   graphs[_puTag]['HB'].SetMarkerColor(1)
-
-   graphs[_puTag]['HGCal'].SetMarkerStyle(21)
-   graphs[_puTag]['HGCal'].SetMarkerSize(1)
-   graphs[_puTag]['HGCal'].SetLineWidth(2)
-   graphs[_puTag]['HGCal'].SetLineColor(2)
-   graphs[_puTag]['HGCal'].SetMarkerColor(2)
-
-   graphs[_puTag]['HF'].SetMarkerStyle(33)
-   graphs[_puTag]['HF'].SetMarkerSize(1.5)
-   graphs[_puTag]['HF'].SetLineWidth(2)
-   graphs[_puTag]['HF'].SetLineColor(4)
-   graphs[_puTag]['HF'].SetMarkerColor(4)
-
-   graphs[_puTag]['HB'].Draw('lepz')
-   graphs[_puTag]['HGCal'].Draw('lepz')
-   graphs[_puTag]['HF'].Draw('lepz')
-
-   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
-   topLabel.SetFillColor(0)
-   topLabel.SetFillStyle(1001)
-   topLabel.SetTextColor(ROOT.kBlack)
-   topLabel.SetTextAlign(12)
-   topLabel.SetTextFont(42)
-   topLabel.SetTextSize(0.035)
-   topLabel.SetBorderSize(0)
-   topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
-   topLabel.Draw('same')
-
-   objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
-   objLabel.SetFillColor(0)
-   objLabel.SetFillStyle(1001)
-   objLabel.SetTextColor(ROOT.kBlack)
-   objLabel.SetTextAlign(32)
-   objLabel.SetTextFont(42)
-   objLabel.SetTextSize(0.035)
-   objLabel.SetBorderSize(0)
-   objLabel.AddText(_puLabel+' (14 TeV)')
-   objLabel.Draw('same')
-
-   l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
-   l1tRateLabel.SetFillColor(0)
-   l1tRateLabel.SetFillStyle(1001)
-   l1tRateLabel.SetTextColor(ROOT.kBlack)
-   l1tRateLabel.SetTextAlign(12)
-   l1tRateLabel.SetTextFont(42)
-   l1tRateLabel.SetTextSize(0.035)
-   l1tRateLabel.SetBorderSize(0)
-   l1tRateLabel.AddText('AK4 PF+Puppi Jets')
-   l1tRateLabel.Draw('same')
-
-   hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
-   hltRateLabel.SetFillColor(0)
-   hltRateLabel.SetFillStyle(1001)
-   hltRateLabel.SetTextColor(ROOT.kBlack)
-   hltRateLabel.SetTextAlign(12)
-   hltRateLabel.SetTextFont(42)
-   hltRateLabel.SetTextSize(0.035)
-   hltRateLabel.SetBorderSize(0)
-   hltRateLabel.AddText('p_{T}^{HLT} > 15 GeV')
-   hltRateLabel.Draw('same')
-
-   aaahltRateLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
-   aaahltRateLabel.SetFillColor(0)
-   aaahltRateLabel.SetFillStyle(1001)
-   aaahltRateLabel.SetTextColor(ROOT.kBlack)
-   aaahltRateLabel.SetTextAlign(22)
-   aaahltRateLabel.SetTextFont(42)
-   aaahltRateLabel.SetTextSize(0.035)
-   aaahltRateLabel.SetBorderSize(0)
-   aaahltRateLabel.AddText(_puLabel)
-#   aaahltRateLabel.Draw('same')
-
-   leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
-   leg1.SetNColumns(1)
-   leg1.SetTextFont(42)
-   leg1.AddEntry(graphs[_puTag]['HB']   ,     '|#eta|<1.5', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HGCal'], '1.5<|#eta|<3.0', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HF']   , '3.0<|#eta|<5.0', 'lepz')
-   leg1.Draw('same')
-
-   hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
-   hltTargetRateLine.SetLineWidth(2)
-   hltTargetRateLine.SetLineStyle(2)
-   hltTargetRateLine.SetLineColor(ROOT.kGray)
-   hltTargetRateLine.Draw('same')
-
-   h0.SetTitle(';HLT Jet p_{T} [GeV];GEN-Matching Efficiency')
-   h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
-
-   canvas.SetLogx(1)
-   canvas.SetLogy(0)
-   canvas.SetGrid(1, 1)
-
-   h0.GetXaxis().SetNoExponent()
-   h0.GetXaxis().SetMoreLogLabels()
-
-   for _tmpExt in exts:
-     canvas.SaveAs(outputName+'_hltMatchEff_'+_puTag+'.'+_tmpExt)
-
-   canvas.Close()
-
-   print '\033[1m'+outputName+'_hltMatchEff_'+_puTag+'\033[0m'
-
-   # HLT - NotMatchedToGEN
-   pTbins = {
-     'HB': [30, 40, 50, 60, 100, 140, 200, 600],
-     'HGCal': [30, 40, 50, 60, 100, 140, 200, 600],
-     'HF': [30, 40, 50, 60, 100, 200, 600],
-   }
-
-   for _etaTag in pTbins:
-     _htmpNum = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_NotMatchedToGEN_pt')
-     _htmpDen = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_pt')
-
-     _binEdges = array.array('d', pTbins[_etaTag])
-     _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-     _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-
-     graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
-
-   for _tmp2 in graphs[_puTag]:
-     if graphs[_puTag][_tmp2] is None: continue
-     graphs[_puTag][_tmp2].UseCurrentStyle()
-
-   canvas = ROOT.TCanvas(tmpName(), tmpName())
-   canvas.cd()
-
-   h0 = canvas.DrawFrame(30., 0.001, 600., 2.4)
-
-   graphs[_puTag]['HB'].SetMarkerStyle(20)
-   graphs[_puTag]['HB'].SetMarkerSize(1)
-   graphs[_puTag]['HB'].SetLineWidth(2)
-   graphs[_puTag]['HB'].SetLineColor(1)
-   graphs[_puTag]['HB'].SetMarkerColor(1)
-
-   graphs[_puTag]['HGCal'].SetMarkerStyle(21)
-   graphs[_puTag]['HGCal'].SetMarkerSize(1)
-   graphs[_puTag]['HGCal'].SetLineWidth(2)
-   graphs[_puTag]['HGCal'].SetLineColor(2)
-   graphs[_puTag]['HGCal'].SetMarkerColor(2)
-
-   graphs[_puTag]['HF'].SetMarkerStyle(33)
-   graphs[_puTag]['HF'].SetMarkerSize(1.5)
-   graphs[_puTag]['HF'].SetLineWidth(2)
-   graphs[_puTag]['HF'].SetLineColor(4)
-   graphs[_puTag]['HF'].SetMarkerColor(4)
-
-   graphs[_puTag]['HB'].Draw('lepz')
-   graphs[_puTag]['HGCal'].Draw('lepz')
-   graphs[_puTag]['HF'].Draw('lepz')
-
-   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
-   topLabel.SetFillColor(0)
-   topLabel.SetFillStyle(1001)
-   topLabel.SetTextColor(ROOT.kBlack)
-   topLabel.SetTextAlign(12)
-   topLabel.SetTextFont(42)
-   topLabel.SetTextSize(0.035)
-   topLabel.SetBorderSize(0)
-   topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
-   topLabel.Draw('same')
-
-   objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
-   objLabel.SetFillColor(0)
-   objLabel.SetFillStyle(1001)
-   objLabel.SetTextColor(ROOT.kBlack)
-   objLabel.SetTextAlign(32)
-   objLabel.SetTextFont(42)
-   objLabel.SetTextSize(0.035)
-   objLabel.SetBorderSize(0)
-   objLabel.AddText(_puLabel+' (14 TeV)')
-   objLabel.Draw('same')
-
-   l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
-   l1tRateLabel.SetFillColor(0)
-   l1tRateLabel.SetFillStyle(1001)
-   l1tRateLabel.SetTextColor(ROOT.kBlack)
-   l1tRateLabel.SetTextAlign(12)
-   l1tRateLabel.SetTextFont(42)
-   l1tRateLabel.SetTextSize(0.035)
-   l1tRateLabel.SetBorderSize(0)
-   l1tRateLabel.AddText('AK4 PF+Puppi Jets')
-   l1tRateLabel.Draw('same')
-
-   hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
-   hltRateLabel.SetFillColor(0)
-   hltRateLabel.SetFillStyle(1001)
-   hltRateLabel.SetTextColor(ROOT.kBlack)
-   hltRateLabel.SetTextAlign(12)
-   hltRateLabel.SetTextFont(42)
-   hltRateLabel.SetTextSize(0.035)
-   hltRateLabel.SetBorderSize(0)
-   hltRateLabel.AddText('p_{T}^{GEN} > 20 GeV')
-   hltRateLabel.Draw('same')
-
-   aaahltRateLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
-   aaahltRateLabel.SetFillColor(0)
-   aaahltRateLabel.SetFillStyle(1001)
-   aaahltRateLabel.SetTextColor(ROOT.kBlack)
-   aaahltRateLabel.SetTextAlign(22)
-   aaahltRateLabel.SetTextFont(42)
-   aaahltRateLabel.SetTextSize(0.035)
-   aaahltRateLabel.SetBorderSize(0)
-#   aaahltRateLabel.AddText(_puLabel)
-#   aaahltRateLabel.Draw('same')
-
-   leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
-   leg1.SetNColumns(1)
-   leg1.SetTextFont(42)
-   leg1.AddEntry(graphs[_puTag]['HB']   ,     '|#eta|<1.5', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HGCal'], '1.5<|#eta|<3.0', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HF']   , '3.0<|#eta|<5.0', 'lepz')
-   leg1.Draw('same')
-
-   hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
-   hltTargetRateLine.SetLineWidth(2)
-   hltTargetRateLine.SetLineStyle(2)
-#   hltTargetRateLine.SetLineColor(ROOT.kGray)
-#   hltTargetRateLine.Draw('same')
-
-   h0.SetTitle(';HLT Jet p_{T} [GeV];Jet Mistag Rate')
-   h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
-
-   canvas.SetLogx(1)
-   canvas.SetLogy(1)
-   canvas.SetGrid(1, 1)
-
-   h0.GetXaxis().SetNoExponent()
-   h0.GetXaxis().SetMoreLogLabels()
-
-   for _tmpExt in exts:
-     canvas.SaveAs(outputName+'_hltMistagRate_'+_puTag+'.'+_tmpExt)
-
-   canvas.Close()
-
-   print '\033[1m'+outputName+'_hltMistagRate_'+_puTag+'\033[0m'
-
-   # GEN - MatchedToGEN
-   pTbins = {
-     'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
-     'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
-     'HF': [30, 40, 50, 60, 80, 120, 240, 600],
-   }
-
-   for _etaTag in pTbins:
-     _htmpNum = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_MatchedTohltPFPuppiCorr_pt')
-     _htmpDen = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_pt')
-
-     _binEdges = array.array('d', pTbins[_etaTag])
-     _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-     _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-
-     graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
-
-   for _tmp2 in graphs[_puTag]:
-     if graphs[_puTag][_tmp2] is None: continue
-     graphs[_puTag][_tmp2].UseCurrentStyle()
-
-   canvas = ROOT.TCanvas(tmpName(), tmpName())
-   canvas.cd()
-
-   h0 = canvas.DrawFrame(30., 0.0001, 600., 1.2)
-
-   graphs[_puTag]['HB'].SetMarkerStyle(20)
-   graphs[_puTag]['HB'].SetMarkerSize(1)
-   graphs[_puTag]['HB'].SetLineWidth(2)
-   graphs[_puTag]['HB'].SetLineColor(1)
-   graphs[_puTag]['HB'].SetMarkerColor(1)
-
-   graphs[_puTag]['HGCal'].SetMarkerStyle(21)
-   graphs[_puTag]['HGCal'].SetMarkerSize(1)
-   graphs[_puTag]['HGCal'].SetLineWidth(2)
-   graphs[_puTag]['HGCal'].SetLineColor(2)
-   graphs[_puTag]['HGCal'].SetMarkerColor(2)
-
-   graphs[_puTag]['HF'].SetMarkerStyle(33)
-   graphs[_puTag]['HF'].SetMarkerSize(1.5)
-   graphs[_puTag]['HF'].SetLineWidth(2)
-   graphs[_puTag]['HF'].SetLineColor(4)
-   graphs[_puTag]['HF'].SetMarkerColor(4)
-
-   graphs[_puTag]['HB'].Draw('lepz')
-   graphs[_puTag]['HGCal'].Draw('lepz')
-   graphs[_puTag]['HF'].Draw('lepz')
-
-   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
-   topLabel.SetFillColor(0)
-   topLabel.SetFillStyle(1001)
-   topLabel.SetTextColor(ROOT.kBlack)
-   topLabel.SetTextAlign(12)
-   topLabel.SetTextFont(42)
-   topLabel.SetTextSize(0.035)
-   topLabel.SetBorderSize(0)
-   topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
-   topLabel.Draw('same')
-
-   objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
-   objLabel.SetFillColor(0)
-   objLabel.SetFillStyle(1001)
-   objLabel.SetTextColor(ROOT.kBlack)
-   objLabel.SetTextAlign(32)
-   objLabel.SetTextFont(42)
-   objLabel.SetTextSize(0.035)
-   objLabel.SetBorderSize(0)
-   objLabel.AddText(_puLabel+' (14 TeV)')
-   objLabel.Draw('same')
-
-   l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
-   l1tRateLabel.SetFillColor(0)
-   l1tRateLabel.SetFillStyle(1001)
-   l1tRateLabel.SetTextColor(ROOT.kBlack)
-   l1tRateLabel.SetTextAlign(12)
-   l1tRateLabel.SetTextFont(42)
-   l1tRateLabel.SetTextSize(0.035)
-   l1tRateLabel.SetBorderSize(0)
-   l1tRateLabel.AddText('AK4 PF+Puppi Jets')
-   l1tRateLabel.Draw('same')
-
-   hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
-   hltRateLabel.SetFillColor(0)
-   hltRateLabel.SetFillStyle(1001)
-   hltRateLabel.SetTextColor(ROOT.kBlack)
-   hltRateLabel.SetTextAlign(12)
-   hltRateLabel.SetTextFont(42)
-   hltRateLabel.SetTextSize(0.035)
-   hltRateLabel.SetBorderSize(0)
-   hltRateLabel.AddText('p_{T}^{HLT} > 15 GeV')
-   hltRateLabel.Draw('same')
-
-   aaahltRateLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
-   aaahltRateLabel.SetFillColor(0)
-   aaahltRateLabel.SetFillStyle(1001)
-   aaahltRateLabel.SetTextColor(ROOT.kBlack)
-   aaahltRateLabel.SetTextAlign(22)
-   aaahltRateLabel.SetTextFont(42)
-   aaahltRateLabel.SetTextSize(0.035)
-   aaahltRateLabel.SetBorderSize(0)
-   aaahltRateLabel.AddText(_puLabel)
-#   aaahltRateLabel.Draw('same')
-
-   leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
-   leg1.SetNColumns(1)
-   leg1.SetTextFont(42)
-   leg1.AddEntry(graphs[_puTag]['HB']   ,     '|#eta|<1.5', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HGCal'], '1.5<|#eta|<3.0', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HF']   , '3.0<|#eta|<5.0', 'lepz')
-   leg1.Draw('same')
-
-   hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
-   hltTargetRateLine.SetLineWidth(2)
-   hltTargetRateLine.SetLineStyle(2)
-   hltTargetRateLine.SetLineColor(ROOT.kGray)
-   hltTargetRateLine.Draw('same')
-
-   h0.SetTitle(';GEN Jet p_{T} [GeV];Jet-Finding Efficiency')
-   h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
-
-   canvas.SetLogx(1)
-   canvas.SetLogy(0)
-   canvas.SetGrid(1, 1)
-
-   h0.GetXaxis().SetNoExponent()
-   h0.GetXaxis().SetMoreLogLabels()
-
-   for _tmpExt in exts:
-     canvas.SaveAs(outputName+'_genMatchEff_'+_puTag+'.'+_tmpExt)
-
-   canvas.Close()
-
-   print '\033[1m'+outputName+'_genMatchEff_'+_puTag+'\033[0m'
-
-   # GEN - NotMatchedToPFPuppiCorr
-   pTbins = {
-     'HB': [30, 40, 50, 60, 100, 140, 200, 300, 600],
-     'HGCal': [30, 40, 50, 60, 100, 140, 200, 300, 600],
-     'HF': [30, 40, 50, 60, 80, 180, 600],
-   }
-
-   for _etaTag in pTbins:
-     _htmpNum = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_NotMatchedTohltPFPuppiCorr_pt')
-     _htmpDen = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_pt')
-
-     _binEdges = array.array('d', pTbins[_etaTag])
-     _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-     _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
-
-     graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
-
-   for _tmp2 in graphs[_puTag]:
-     if graphs[_puTag][_tmp2] is None: continue
-     graphs[_puTag][_tmp2].UseCurrentStyle()
-
-   canvas = ROOT.TCanvas(tmpName(), tmpName())
-   canvas.cd()
-
-   h0 = canvas.DrawFrame(30., 0.001, 600., 1.9)
-
-   graphs[_puTag]['HB'].SetMarkerStyle(20)
-   graphs[_puTag]['HB'].SetMarkerSize(1)
-   graphs[_puTag]['HB'].SetLineWidth(2)
-   graphs[_puTag]['HB'].SetLineColor(1)
-   graphs[_puTag]['HB'].SetMarkerColor(1)
-
-   graphs[_puTag]['HGCal'].SetMarkerStyle(21)
-   graphs[_puTag]['HGCal'].SetMarkerSize(1)
-   graphs[_puTag]['HGCal'].SetLineWidth(2)
-   graphs[_puTag]['HGCal'].SetLineColor(2)
-   graphs[_puTag]['HGCal'].SetMarkerColor(2)
-
-   graphs[_puTag]['HF'].SetMarkerStyle(33)
-   graphs[_puTag]['HF'].SetMarkerSize(1.5)
-   graphs[_puTag]['HF'].SetLineWidth(2)
-   graphs[_puTag]['HF'].SetLineColor(4)
-   graphs[_puTag]['HF'].SetMarkerColor(4)
-
-   graphs[_puTag]['HB'].Draw('lepz')
-   graphs[_puTag]['HGCal'].Draw('lepz')
-   graphs[_puTag]['HF'].Draw('lepz')
-
-   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
-   topLabel.SetFillColor(0)
-   topLabel.SetFillStyle(1001)
-   topLabel.SetTextColor(ROOT.kBlack)
-   topLabel.SetTextAlign(12)
-   topLabel.SetTextFont(42)
-   topLabel.SetTextSize(0.035)
-   topLabel.SetBorderSize(0)
-   topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
-   topLabel.Draw('same')
-
-   objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
-   objLabel.SetFillColor(0)
-   objLabel.SetFillStyle(1001)
-   objLabel.SetTextColor(ROOT.kBlack)
-   objLabel.SetTextAlign(32)
-   objLabel.SetTextFont(42)
-   objLabel.SetTextSize(0.035)
-   objLabel.SetBorderSize(0)
-   objLabel.AddText(_puLabel+' (14 TeV)')
-   objLabel.Draw('same')
-
-   l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
-   l1tRateLabel.SetFillColor(0)
-   l1tRateLabel.SetFillStyle(1001)
-   l1tRateLabel.SetTextColor(ROOT.kBlack)
-   l1tRateLabel.SetTextAlign(12)
-   l1tRateLabel.SetTextFont(42)
-   l1tRateLabel.SetTextSize(0.035)
-   l1tRateLabel.SetBorderSize(0)
-   l1tRateLabel.AddText('AK4 PF+Puppi Jets')
-   l1tRateLabel.Draw('same')
-
-   hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
-   hltRateLabel.SetFillColor(0)
-   hltRateLabel.SetFillStyle(1001)
-   hltRateLabel.SetTextColor(ROOT.kBlack)
-   hltRateLabel.SetTextAlign(12)
-   hltRateLabel.SetTextFont(42)
-   hltRateLabel.SetTextSize(0.035)
-   hltRateLabel.SetBorderSize(0)
-   hltRateLabel.AddText('p_{T}^{HLT} > 15 GeV')
-   hltRateLabel.Draw('same')
-
-   aaahltRateLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
-   aaahltRateLabel.SetFillColor(0)
-   aaahltRateLabel.SetFillStyle(1001)
-   aaahltRateLabel.SetTextColor(ROOT.kBlack)
-   aaahltRateLabel.SetTextAlign(22)
-   aaahltRateLabel.SetTextFont(42)
-   aaahltRateLabel.SetTextSize(0.035)
-   aaahltRateLabel.SetBorderSize(0)
-#   aaahltRateLabel.AddText(_puLabel)
-#   aaahltRateLabel.Draw('same')
-
-   leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
-   leg1.SetNColumns(1)
-   leg1.SetTextFont(42)
-   leg1.AddEntry(graphs[_puTag]['HB']   ,     '|#eta|<1.5', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HGCal'], '1.5<|#eta|<3.0', 'lepz')
-   leg1.AddEntry(graphs[_puTag]['HF']   , '3.0<|#eta|<5.0', 'lepz')
-   leg1.Draw('same')
-
-   hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
-   hltTargetRateLine.SetLineWidth(2)
-   hltTargetRateLine.SetLineStyle(2)
-   hltTargetRateLine.SetLineColor(ROOT.kGray)
-#   hltTargetRateLine.Draw('same')
-
-   h0.SetTitle(';GEN Jet p_{T} [GeV];% of Unreconstructed GEN Jets')
-   h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
-
-   canvas.SetLogx(1)
-   canvas.SetLogy(1)
-   canvas.SetGrid(1, 1)
-
-   h0.GetXaxis().SetNoExponent()
-   h0.GetXaxis().SetMoreLogLabels()
-
-   for _tmpExt in exts:
-     canvas.SaveAs(outputName+'_genMistagRate_'+_puTag+'.'+_tmpExt)
-
-   canvas.Close()
-
-   print '\033[1m'+outputName+'_genMistagRate_'+_puTag+'\033[0m'
+  for _puTag in fpaths:
+    _tmpTFile = fpaths[_puTag]
+    if not _tmpTFile:
+      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      continue
+
+    for _etaTag in graphs[_puTag]:
+      _binEdges = array.array('d', graphs[_puTag][_etaTag])
+
+      _htmpNum = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_MatchedToGEN_pt')
+      _htmpDen = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_pt')
+      _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+      _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+
+      graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
+      graphs[_puTag][_etaTag].UseCurrentStyle()
+      for _tmpn in range(graphs[_puTag][_etaTag].GetN()):
+        graphs[_puTag][_etaTag].SetPointEXhigh(_tmpn, 0.)
+        graphs[_puTag][_etaTag].SetPointEXlow(_tmpn, 0.)
+
+  canvas = ROOT.TCanvas(tmpName(), tmpName())
+  canvas.cd()
+
+  h0 = canvas.DrawFrame(30., 0.0001, 600., 1.2)
+
+  graphs['PU140']['HB'].SetMarkerStyle(24)
+  graphs['PU140']['HB'].SetMarkerSize(1)
+  graphs['PU140']['HB'].SetLineWidth(2)
+  graphs['PU140']['HB'].SetLineStyle(2)
+  graphs['PU140']['HB'].SetLineColor(1)
+  graphs['PU140']['HB'].SetMarkerColor(1)
+
+  graphs['PU140']['HGCal'].SetMarkerStyle(25)
+  graphs['PU140']['HGCal'].SetMarkerSize(1)
+  graphs['PU140']['HGCal'].SetLineWidth(2)
+  graphs['PU140']['HGCal'].SetLineStyle(2)
+  graphs['PU140']['HGCal'].SetLineColor(2)
+  graphs['PU140']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU140']['HF'].SetMarkerStyle(27)
+  graphs['PU140']['HF'].SetMarkerSize(1.5)
+  graphs['PU140']['HF'].SetLineWidth(2)
+  graphs['PU140']['HF'].SetLineStyle(2)
+  graphs['PU140']['HF'].SetLineColor(4)
+  graphs['PU140']['HF'].SetMarkerColor(4)
+
+  graphs['PU200']['HB'].SetMarkerStyle(20)
+  graphs['PU200']['HB'].SetMarkerSize(1)
+  graphs['PU200']['HB'].SetLineWidth(2)
+  graphs['PU200']['HB'].SetLineStyle(1)
+  graphs['PU200']['HB'].SetLineColor(1)
+  graphs['PU200']['HB'].SetMarkerColor(1)
+
+  graphs['PU200']['HGCal'].SetMarkerStyle(21)
+  graphs['PU200']['HGCal'].SetMarkerSize(1)
+  graphs['PU200']['HGCal'].SetLineWidth(2)
+  graphs['PU200']['HGCal'].SetLineStyle(1)
+  graphs['PU200']['HGCal'].SetLineColor(2)
+  graphs['PU200']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU200']['HF'].SetMarkerStyle(33)
+  graphs['PU200']['HF'].SetMarkerSize(1.5)
+  graphs['PU200']['HF'].SetLineWidth(2)
+  graphs['PU200']['HF'].SetLineStyle(1)
+  graphs['PU200']['HF'].SetLineColor(4)
+  graphs['PU200']['HF'].SetMarkerColor(4)
+
+  graphs['PU140']['HF'].Draw('lepz')
+  graphs['PU140']['HGCal'].Draw('lepz')
+  graphs['PU140']['HB'].Draw('lepz')
+  graphs['PU200']['HF'].Draw('lepz')
+  graphs['PU200']['HGCal'].Draw('lepz')
+  graphs['PU200']['HB'].Draw('lepz')
+
+  topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
+  topLabel.SetFillColor(0)
+  topLabel.SetFillStyle(1001)
+  topLabel.SetTextColor(ROOT.kBlack)
+  topLabel.SetTextAlign(12)
+  topLabel.SetTextFont(42)
+  topLabel.SetTextSize(0.035)
+  topLabel.SetBorderSize(0)
+  topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+  topLabel.Draw('same')
+
+  objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+  objLabel.SetFillColor(0)
+  objLabel.SetFillStyle(1001)
+  objLabel.SetTextColor(ROOT.kBlack)
+  objLabel.SetTextAlign(32)
+  objLabel.SetTextFont(42)
+  objLabel.SetTextSize(0.035)
+  objLabel.SetBorderSize(0)
+  objLabel.AddText('PU 140-200 (14 TeV)')
+  objLabel.Draw('same')
+
+  l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.50, 0.90, 'NDC')
+  l1tRateLabel.SetFillColor(0)
+  l1tRateLabel.SetFillStyle(1001)
+  l1tRateLabel.SetTextColor(ROOT.kBlack)
+  l1tRateLabel.SetTextAlign(12)
+  l1tRateLabel.SetTextFont(42)
+  l1tRateLabel.SetTextSize(0.035)
+  l1tRateLabel.SetBorderSize(0)
+  l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
+  l1tRateLabel.Draw('same')
+
+  hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
+  hltRateLabel.SetFillColor(0)
+  hltRateLabel.SetFillStyle(1001)
+  hltRateLabel.SetTextColor(ROOT.kBlack)
+  hltRateLabel.SetTextAlign(12)
+  hltRateLabel.SetTextFont(42)
+  hltRateLabel.SetTextSize(0.035)
+  hltRateLabel.SetBorderSize(0)
+  hltRateLabel.AddText('p_{T}^{GEN} > 20 GeV')
+  hltRateLabel.Draw('same')
+
+  hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
+  hltTargetRateLine.SetLineWidth(2)
+  hltTargetRateLine.SetLineStyle(2)
+  hltTargetRateLine.SetLineColor(ROOT.kGray)
+  hltTargetRateLine.Draw('same')
+
+  _htmpHB = ROOT.TH1D()
+  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+
+  _htmpHGCal = ROOT.TH1D()
+  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+
+  _htmpHF = ROOT.TH1D()
+  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+
+  leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
+  leg1.SetNColumns(1)
+  leg1.SetTextFont(42)
+  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
+  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
+  leg1.Draw('same')
+
+  _htmpPU140 = graphs['PU140']['HB'].Clone()
+  _htmpPU140.SetLineColor(1)
+  _htmpPU140.SetLineStyle(2)
+
+  _htmpPU200 = graphs['PU200']['HB'].Clone()
+  _htmpPU200.SetLineColor(1)
+  _htmpPU200.SetLineStyle(1)
+
+  leg2 = ROOT.TLegend(0.75, 0.45, 0.94, 0.60)
+  leg2.SetNColumns(1)
+  leg2.SetTextFont(42)
+  leg2.AddEntry(_htmpPU140, 'PU=140', 'l')
+  leg2.AddEntry(_htmpPU200, 'PU=200', 'l')
+  leg2.Draw('same')
+
+  h0.SetTitle(';HLT Jet p_{T} [GeV];GEN-Matching Efficiency')
+  h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+  canvas.SetLogx(1)
+  canvas.SetLogy(0)
+  canvas.SetGrid(1, 1)
+
+  h0.GetXaxis().SetNoExponent()
+  h0.GetXaxis().SetMoreLogLabels()
+
+  for _tmpExt in exts:
+    canvas.SaveAs(outputName+'_hltMatchEff.'+_tmpExt)
+
+  canvas.Close()
+
+  print '\033[1m'+outputName+'_hltMatchEff'+'\033[0m'
+
+  # HLT - NotMatchedToGEN
+  graphs = {
+    'PU140': {
+      'HB': [30, 40, 50, 60, 100, 140, 200, 600],
+      'HGCal': [30, 40, 50, 60, 100, 140, 200, 600],
+      'HF': [30, 40, 50, 60, 100, 200, 600],
+    },
+    'PU200': {
+      'HB': [30, 40, 50, 60, 100, 140, 200, 600],
+      'HGCal': [30, 40, 50, 60, 100, 140, 200, 600],
+      'HF': [30, 40, 50, 60, 100, 200, 600],
+    },
+  }
+
+  for _puTag in fpaths:
+    _tmpTFile = fpaths[_puTag]
+    if not _tmpTFile:
+      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      continue
+
+    for _etaTag in graphs[_puTag]:
+      _binEdges = array.array('d', graphs[_puTag][_etaTag])
+
+      _htmpNum = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_NotMatchedToGEN_pt')
+      _htmpDen = getHistogram(_tmpTFile, 'NoSelection/hltAK4PFPuppiJetsCorrected_'+_etaTag+'_pt')
+      _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+      _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+
+      graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
+      graphs[_puTag][_etaTag].UseCurrentStyle()
+      for _tmpn in range(graphs[_puTag][_etaTag].GetN()):
+        graphs[_puTag][_etaTag].SetPointEXhigh(_tmpn, 0.)
+        graphs[_puTag][_etaTag].SetPointEXlow(_tmpn, 0.)
+
+  canvas = ROOT.TCanvas(tmpName(), tmpName())
+  canvas.cd()
+
+  h0 = canvas.DrawFrame(30., 0.001, 500., 4.9)
+
+  graphs['PU140']['HB'].SetMarkerStyle(20)
+  graphs['PU140']['HB'].SetMarkerSize(1)
+  graphs['PU140']['HB'].SetLineWidth(2)
+  graphs['PU140']['HB'].SetLineStyle(2)
+  graphs['PU140']['HB'].SetLineColor(1)
+  graphs['PU140']['HB'].SetMarkerColor(1)
+
+  graphs['PU140']['HGCal'].SetMarkerStyle(21)
+  graphs['PU140']['HGCal'].SetMarkerSize(1)
+  graphs['PU140']['HGCal'].SetLineWidth(2)
+  graphs['PU140']['HGCal'].SetLineStyle(2)
+  graphs['PU140']['HGCal'].SetLineColor(2)
+  graphs['PU140']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU140']['HF'].SetMarkerStyle(33)
+  graphs['PU140']['HF'].SetMarkerSize(1.5)
+  graphs['PU140']['HF'].SetLineWidth(2)
+  graphs['PU140']['HF'].SetLineStyle(2)
+  graphs['PU140']['HF'].SetLineColor(4)
+  graphs['PU140']['HF'].SetMarkerColor(4)
+
+  graphs['PU200']['HB'].SetMarkerStyle(20)
+  graphs['PU200']['HB'].SetMarkerSize(1)
+  graphs['PU200']['HB'].SetLineWidth(2)
+  graphs['PU200']['HB'].SetLineStyle(1)
+  graphs['PU200']['HB'].SetLineColor(1)
+  graphs['PU200']['HB'].SetMarkerColor(1)
+
+  graphs['PU200']['HGCal'].SetMarkerStyle(21)
+  graphs['PU200']['HGCal'].SetMarkerSize(1)
+  graphs['PU200']['HGCal'].SetLineWidth(2)
+  graphs['PU200']['HGCal'].SetLineStyle(1)
+  graphs['PU200']['HGCal'].SetLineColor(2)
+  graphs['PU200']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU200']['HF'].SetMarkerStyle(33)
+  graphs['PU200']['HF'].SetMarkerSize(1.5)
+  graphs['PU200']['HF'].SetLineWidth(2)
+  graphs['PU200']['HF'].SetLineStyle(1)
+  graphs['PU200']['HF'].SetLineColor(4)
+  graphs['PU200']['HF'].SetMarkerColor(4)
+
+  graphs['PU140']['HF'].Draw('lepz')
+  graphs['PU140']['HGCal'].Draw('lepz')
+  graphs['PU140']['HB'].Draw('lepz')
+  graphs['PU200']['HF'].Draw('lepz')
+  graphs['PU200']['HGCal'].Draw('lepz')
+  graphs['PU200']['HB'].Draw('lepz')
+
+  topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
+  topLabel.SetFillColor(0)
+  topLabel.SetFillStyle(1001)
+  topLabel.SetTextColor(ROOT.kBlack)
+  topLabel.SetTextAlign(12)
+  topLabel.SetTextFont(42)
+  topLabel.SetTextSize(0.035)
+  topLabel.SetBorderSize(0)
+  topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+  topLabel.Draw('same')
+
+  objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+  objLabel.SetFillColor(0)
+  objLabel.SetFillStyle(1001)
+  objLabel.SetTextColor(ROOT.kBlack)
+  objLabel.SetTextAlign(32)
+  objLabel.SetTextFont(42)
+  objLabel.SetTextSize(0.035)
+  objLabel.SetBorderSize(0)
+  objLabel.AddText('PU 140-200 (14 TeV)')
+  objLabel.Draw('same')
+
+  l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.50, 0.90, 'NDC')
+  l1tRateLabel.SetFillColor(0)
+  l1tRateLabel.SetFillStyle(1001)
+  l1tRateLabel.SetTextColor(ROOT.kBlack)
+  l1tRateLabel.SetTextAlign(12)
+  l1tRateLabel.SetTextFont(42)
+  l1tRateLabel.SetTextSize(0.035)
+  l1tRateLabel.SetBorderSize(0)
+  l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
+  l1tRateLabel.Draw('same')
+
+  hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
+  hltRateLabel.SetFillColor(0)
+  hltRateLabel.SetFillStyle(1001)
+  hltRateLabel.SetTextColor(ROOT.kBlack)
+  hltRateLabel.SetTextAlign(12)
+  hltRateLabel.SetTextFont(42)
+  hltRateLabel.SetTextSize(0.035)
+  hltRateLabel.SetBorderSize(0)
+  hltRateLabel.AddText('p_{T}^{GEN} > 20 GeV')
+  hltRateLabel.Draw('same')
+
+  hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
+  hltTargetRateLine.SetLineWidth(2)
+  hltTargetRateLine.SetLineStyle(2)
+  hltTargetRateLine.SetLineColor(ROOT.kGray)
+  hltTargetRateLine.Draw('same')
+
+  _htmpHB = ROOT.TH1D()
+  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+
+  _htmpHGCal = ROOT.TH1D()
+  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+
+  _htmpHF = ROOT.TH1D()
+  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+
+  leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
+  leg1.SetNColumns(1)
+  leg1.SetTextFont(42)
+  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
+  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
+  leg1.Draw('same')
+
+  _htmpPU140 = graphs['PU140']['HB'].Clone()
+  _htmpPU140.SetLineColor(1)
+  _htmpPU140.SetLineStyle(2)
+
+  _htmpPU200 = graphs['PU200']['HB'].Clone()
+  _htmpPU200.SetLineColor(1)
+  _htmpPU200.SetLineStyle(1)
+
+  leg2 = ROOT.TLegend(0.75, 0.50, 0.94, 0.65)
+  leg2.SetNColumns(1)
+  leg2.SetTextFont(42)
+  leg2.AddEntry(_htmpPU140, 'PU=140', 'l')
+  leg2.AddEntry(_htmpPU200, 'PU=200', 'l')
+  leg2.Draw('same')
+
+  h0.SetTitle(';HLT Jet p_{T} [GeV];Jet Mistag Rate')
+  h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+  canvas.SetLogx(1)
+  canvas.SetLogy(1)
+  canvas.SetGrid(1, 1)
+
+  h0.GetXaxis().SetNoExponent()
+  h0.GetXaxis().SetMoreLogLabels()
+
+  for _tmpExt in exts:
+    canvas.SaveAs(outputName+'_hltMistagRate.'+_tmpExt)
+
+  canvas.Close()
+
+  print '\033[1m'+outputName+'_hltMistagRate'+'\033[0m'
+
+  # GEN - MatchedToGEN
+  graphs = {
+    'PU140': {
+      'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HF': [30, 40, 50, 60, 80, 120, 240, 600],
+    },
+    'PU200': {
+      'HB': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HGCal': [30, 40, 50, 60, 80, 100, 120, 140, 160, 200, 250, 300, 350, 400, 500, 600],
+      'HF': [30, 40, 50, 60, 80, 120, 240, 600],
+    },
+  }
+
+  for _puTag in fpaths:
+    _tmpTFile = fpaths[_puTag]
+    if not _tmpTFile:
+      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      continue
+
+    for _etaTag in graphs[_puTag]:
+      _binEdges = array.array('d', graphs[_puTag][_etaTag])
+
+      _htmpNum = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_MatchedTohltPFPuppiCorr_pt')
+      _htmpDen = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_pt')
+      _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+      _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+
+      graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
+      graphs[_puTag][_etaTag].UseCurrentStyle()
+      for _tmpn in range(graphs[_puTag][_etaTag].GetN()):
+        graphs[_puTag][_etaTag].SetPointEXhigh(_tmpn, 0.)
+        graphs[_puTag][_etaTag].SetPointEXlow(_tmpn, 0.)
+
+  canvas = ROOT.TCanvas(tmpName(), tmpName())
+  canvas.cd()
+
+  h0 = canvas.DrawFrame(30., 0.0001, 600., 1.2)
+
+  graphs['PU140']['HB'].SetMarkerStyle(20)
+  graphs['PU140']['HB'].SetMarkerSize(1)
+  graphs['PU140']['HB'].SetLineWidth(2)
+  graphs['PU140']['HB'].SetLineStyle(2)
+  graphs['PU140']['HB'].SetLineColor(1)
+  graphs['PU140']['HB'].SetMarkerColor(1)
+
+  graphs['PU140']['HGCal'].SetMarkerStyle(21)
+  graphs['PU140']['HGCal'].SetMarkerSize(1)
+  graphs['PU140']['HGCal'].SetLineWidth(2)
+  graphs['PU140']['HGCal'].SetLineStyle(2)
+  graphs['PU140']['HGCal'].SetLineColor(2)
+  graphs['PU140']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU140']['HF'].SetMarkerStyle(33)
+  graphs['PU140']['HF'].SetMarkerSize(1.5)
+  graphs['PU140']['HF'].SetLineWidth(2)
+  graphs['PU140']['HF'].SetLineStyle(2)
+  graphs['PU140']['HF'].SetLineColor(4)
+  graphs['PU140']['HF'].SetMarkerColor(4)
+
+  graphs['PU200']['HB'].SetMarkerStyle(20)
+  graphs['PU200']['HB'].SetMarkerSize(1)
+  graphs['PU200']['HB'].SetLineWidth(2)
+  graphs['PU200']['HB'].SetLineStyle(1)
+  graphs['PU200']['HB'].SetLineColor(1)
+  graphs['PU200']['HB'].SetMarkerColor(1)
+
+  graphs['PU200']['HGCal'].SetMarkerStyle(21)
+  graphs['PU200']['HGCal'].SetMarkerSize(1)
+  graphs['PU200']['HGCal'].SetLineWidth(2)
+  graphs['PU200']['HGCal'].SetLineStyle(1)
+  graphs['PU200']['HGCal'].SetLineColor(2)
+  graphs['PU200']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU200']['HF'].SetMarkerStyle(33)
+  graphs['PU200']['HF'].SetMarkerSize(1.5)
+  graphs['PU200']['HF'].SetLineWidth(2)
+  graphs['PU200']['HF'].SetLineStyle(1)
+  graphs['PU200']['HF'].SetLineColor(4)
+  graphs['PU200']['HF'].SetMarkerColor(4)
+
+  graphs['PU140']['HF'].Draw('lepz')
+  graphs['PU140']['HGCal'].Draw('lepz')
+  graphs['PU140']['HB'].Draw('lepz')
+  graphs['PU200']['HF'].Draw('lepz')
+  graphs['PU200']['HGCal'].Draw('lepz')
+  graphs['PU200']['HB'].Draw('lepz')
+
+  topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
+  topLabel.SetFillColor(0)
+  topLabel.SetFillStyle(1001)
+  topLabel.SetTextColor(ROOT.kBlack)
+  topLabel.SetTextAlign(12)
+  topLabel.SetTextFont(42)
+  topLabel.SetTextSize(0.035)
+  topLabel.SetBorderSize(0)
+  topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+  topLabel.Draw('same')
+
+  objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+  objLabel.SetFillColor(0)
+  objLabel.SetFillStyle(1001)
+  objLabel.SetTextColor(ROOT.kBlack)
+  objLabel.SetTextAlign(32)
+  objLabel.SetTextFont(42)
+  objLabel.SetTextSize(0.035)
+  objLabel.SetBorderSize(0)
+  objLabel.AddText('PU 140-200 (14 TeV)')
+  objLabel.Draw('same')
+
+  l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.50, 0.90, 'NDC')
+  l1tRateLabel.SetFillColor(0)
+  l1tRateLabel.SetFillStyle(1001)
+  l1tRateLabel.SetTextColor(ROOT.kBlack)
+  l1tRateLabel.SetTextAlign(12)
+  l1tRateLabel.SetTextFont(42)
+  l1tRateLabel.SetTextSize(0.035)
+  l1tRateLabel.SetBorderSize(0)
+  l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
+  l1tRateLabel.Draw('same')
+
+  hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
+  hltRateLabel.SetFillColor(0)
+  hltRateLabel.SetFillStyle(1001)
+  hltRateLabel.SetTextColor(ROOT.kBlack)
+  hltRateLabel.SetTextAlign(12)
+  hltRateLabel.SetTextFont(42)
+  hltRateLabel.SetTextSize(0.035)
+  hltRateLabel.SetBorderSize(0)
+  hltRateLabel.AddText('p_{T}^{HLT} > 15 GeV')
+  hltRateLabel.Draw('same')
+
+  hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
+  hltTargetRateLine.SetLineWidth(2)
+  hltTargetRateLine.SetLineStyle(2)
+  hltTargetRateLine.SetLineColor(ROOT.kGray)
+  hltTargetRateLine.Draw('same')
+
+  _htmpHB = ROOT.TH1D()
+  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+
+  _htmpHGCal = ROOT.TH1D()
+  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+
+  _htmpHF = ROOT.TH1D()
+  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+
+  leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
+  leg1.SetNColumns(1)
+  leg1.SetTextFont(42)
+  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
+  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
+  leg1.Draw('same')
+
+  _htmpPU140 = graphs['PU140']['HB'].Clone()
+  _htmpPU140.SetLineColor(1)
+  _htmpPU140.SetLineStyle(2)
+
+  _htmpPU200 = graphs['PU200']['HB'].Clone()
+  _htmpPU200.SetLineColor(1)
+  _htmpPU200.SetLineStyle(1)
+
+  leg2 = ROOT.TLegend(0.75, 0.45, 0.94, 0.60)
+  leg2.SetNColumns(1)
+  leg2.SetTextFont(42)
+  leg2.AddEntry(_htmpPU140, 'PU=140', 'l')
+  leg2.AddEntry(_htmpPU200, 'PU=200', 'l')
+  leg2.Draw('same')
+
+  h0.SetTitle(';GEN Jet p_{T} [GeV];Jet-Finding Efficiency')
+  h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+  canvas.SetLogx(1)
+  canvas.SetLogy(0)
+  canvas.SetGrid(1, 1)
+
+  h0.GetXaxis().SetNoExponent()
+  h0.GetXaxis().SetMoreLogLabels()
+
+  for _tmpExt in exts:
+    canvas.SaveAs(outputName+'_genMatchEff.'+_tmpExt)
+
+  canvas.Close()
+
+  print '\033[1m'+outputName+'_genMatchEff'+'\033[0m'
+
+  # GEN - NotMatchedToPFPuppiCorr
+  graphs = {
+    'PU140': {
+      'HB': [30, 40, 50, 60, 100, 140, 200, 300, 600],
+      'HGCal': [30, 40, 50, 60, 100, 140, 200, 300, 600],
+      'HF': [30, 40, 50, 60, 80, 180, 600],
+    },
+    'PU200': {
+      'HB': [30, 40, 50, 60, 100, 140, 200, 300, 600],
+      'HGCal': [30, 40, 50, 60, 100, 140, 200, 300, 600],
+      'HF': [30, 40, 50, 60, 80, 180, 600],
+    },
+  }
+
+  for _puTag in fpaths:
+    _tmpTFile = fpaths[_puTag]
+    if not _tmpTFile:
+      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      continue
+
+    for _etaTag in graphs[_puTag]:
+      _binEdges = array.array('d', graphs[_puTag][_etaTag])
+
+      _htmpNum = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_NotMatchedTohltPFPuppiCorr_pt')
+      _htmpDen = getHistogram(_tmpTFile, 'NoSelection/ak4GenJetsNoNu_'+_etaTag+'_pt')
+      _htmpNum = _htmpNum.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+      _htmpDen = _htmpDen.Rebin(len(_binEdges)-1, tmpName(), _binEdges)
+
+      graphs[_puTag][_etaTag] = get_efficiency_graph(_htmpNum, _htmpDen)
+      graphs[_puTag][_etaTag].UseCurrentStyle()
+      for _tmpn in range(graphs[_puTag][_etaTag].GetN()):
+        graphs[_puTag][_etaTag].SetPointEXhigh(_tmpn, 0.)
+        graphs[_puTag][_etaTag].SetPointEXlow(_tmpn, 0.)
+
+  canvas = ROOT.TCanvas(tmpName(), tmpName())
+  canvas.cd()
+
+  h0 = canvas.DrawFrame(30., 0.001, 500., 4.9)
+
+  graphs['PU140']['HB'].SetMarkerStyle(20)
+  graphs['PU140']['HB'].SetMarkerSize(1)
+  graphs['PU140']['HB'].SetLineWidth(2)
+  graphs['PU140']['HB'].SetLineStyle(2)
+  graphs['PU140']['HB'].SetLineColor(1)
+  graphs['PU140']['HB'].SetMarkerColor(1)
+
+  graphs['PU140']['HGCal'].SetMarkerStyle(21)
+  graphs['PU140']['HGCal'].SetMarkerSize(1)
+  graphs['PU140']['HGCal'].SetLineWidth(2)
+  graphs['PU140']['HGCal'].SetLineStyle(2)
+  graphs['PU140']['HGCal'].SetLineColor(2)
+  graphs['PU140']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU140']['HF'].SetMarkerStyle(33)
+  graphs['PU140']['HF'].SetMarkerSize(1.5)
+  graphs['PU140']['HF'].SetLineWidth(2)
+  graphs['PU140']['HF'].SetLineStyle(2)
+  graphs['PU140']['HF'].SetLineColor(4)
+  graphs['PU140']['HF'].SetMarkerColor(4)
+
+  graphs['PU200']['HB'].SetMarkerStyle(20)
+  graphs['PU200']['HB'].SetMarkerSize(1)
+  graphs['PU200']['HB'].SetLineWidth(2)
+  graphs['PU200']['HB'].SetLineStyle(1)
+  graphs['PU200']['HB'].SetLineColor(1)
+  graphs['PU200']['HB'].SetMarkerColor(1)
+
+  graphs['PU200']['HGCal'].SetMarkerStyle(21)
+  graphs['PU200']['HGCal'].SetMarkerSize(1)
+  graphs['PU200']['HGCal'].SetLineWidth(2)
+  graphs['PU200']['HGCal'].SetLineStyle(1)
+  graphs['PU200']['HGCal'].SetLineColor(2)
+  graphs['PU200']['HGCal'].SetMarkerColor(2)
+
+  graphs['PU200']['HF'].SetMarkerStyle(33)
+  graphs['PU200']['HF'].SetMarkerSize(1.5)
+  graphs['PU200']['HF'].SetLineWidth(2)
+  graphs['PU200']['HF'].SetLineStyle(1)
+  graphs['PU200']['HF'].SetLineColor(4)
+  graphs['PU200']['HF'].SetMarkerColor(4)
+
+  graphs['PU140']['HF'].Draw('lepz')
+  graphs['PU140']['HGCal'].Draw('lepz')
+  graphs['PU140']['HB'].Draw('lepz')
+  graphs['PU200']['HF'].Draw('lepz')
+  graphs['PU200']['HGCal'].Draw('lepz')
+  graphs['PU200']['HB'].Draw('lepz')
+
+  topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
+  topLabel.SetFillColor(0)
+  topLabel.SetFillStyle(1001)
+  topLabel.SetTextColor(ROOT.kBlack)
+  topLabel.SetTextAlign(12)
+  topLabel.SetTextFont(42)
+  topLabel.SetTextSize(0.035)
+  topLabel.SetBorderSize(0)
+  topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+  topLabel.Draw('same')
+
+  objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+  objLabel.SetFillColor(0)
+  objLabel.SetFillStyle(1001)
+  objLabel.SetTextColor(ROOT.kBlack)
+  objLabel.SetTextAlign(32)
+  objLabel.SetTextFont(42)
+  objLabel.SetTextSize(0.035)
+  objLabel.SetBorderSize(0)
+  objLabel.AddText('PU 140-200 (14 TeV)')
+  objLabel.Draw('same')
+
+  l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.50, 0.90, 'NDC')
+  l1tRateLabel.SetFillColor(0)
+  l1tRateLabel.SetFillStyle(1001)
+  l1tRateLabel.SetTextColor(ROOT.kBlack)
+  l1tRateLabel.SetTextAlign(12)
+  l1tRateLabel.SetTextFont(42)
+  l1tRateLabel.SetTextSize(0.035)
+  l1tRateLabel.SetBorderSize(0)
+  l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
+  l1tRateLabel.Draw('same')
+
+  hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.35, 0.85, 'NDC')
+  hltRateLabel.SetFillColor(0)
+  hltRateLabel.SetFillStyle(1001)
+  hltRateLabel.SetTextColor(ROOT.kBlack)
+  hltRateLabel.SetTextAlign(12)
+  hltRateLabel.SetTextFont(42)
+  hltRateLabel.SetTextSize(0.035)
+  hltRateLabel.SetBorderSize(0)
+  hltRateLabel.AddText('p_{T}^{HLT} > 15 GeV')
+  hltRateLabel.Draw('same')
+
+  hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
+  hltTargetRateLine.SetLineWidth(2)
+  hltTargetRateLine.SetLineStyle(2)
+  hltTargetRateLine.SetLineColor(ROOT.kGray)
+  hltTargetRateLine.Draw('same')
+
+  _htmpHB = ROOT.TH1D()
+  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+
+  _htmpHGCal = ROOT.TH1D()
+  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+
+  _htmpHF = ROOT.TH1D()
+  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+
+  leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
+  leg1.SetNColumns(1)
+  leg1.SetTextFont(42)
+  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
+  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
+  leg1.Draw('same')
+
+  _htmpPU140 = graphs['PU140']['HB'].Clone()
+  _htmpPU140.SetLineColor(1)
+  _htmpPU140.SetLineStyle(2)
+
+  _htmpPU200 = graphs['PU200']['HB'].Clone()
+  _htmpPU200.SetLineColor(1)
+  _htmpPU200.SetLineStyle(1)
+
+  leg2 = ROOT.TLegend(0.75, 0.50, 0.94, 0.65)
+  leg2.SetNColumns(1)
+  leg2.SetTextFont(42)
+  leg2.AddEntry(_htmpPU140, 'PU=140', 'l')
+  leg2.AddEntry(_htmpPU200, 'PU=200', 'l')
+  leg2.Draw('same')
+
+  h0.SetTitle(';GEN Jet p_{T} [GeV];% of Unreconstructed GEN Jets')
+  h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+  canvas.SetLogx(1)
+  canvas.SetLogy(1)
+  canvas.SetGrid(1, 1)
+
+  h0.GetXaxis().SetNoExponent()
+  h0.GetXaxis().SetMoreLogLabels()
+
+  for _tmpExt in exts:
+    canvas.SaveAs(outputName+'_genMistagRate.'+_tmpExt)
+
+  canvas.Close()
+
+  print '\033[1m'+outputName+'_genMistagRate'+'\033[0m'
+
+def plotMETResponse(fpath_PU140, fpath_PU200, outputName, exts):
+  fpaths = {}
+  fpaths['PU140'] = ROOT.TFile.Open(fpath_PU140)
+  fpaths['PU200'] = ROOT.TFile.Open(fpath_PU200)
+
+  histos = {
+    'PU140': {'PFRaw': None, 'PFPuppiRaw': None, 'PFPuppiType1': None},
+    'PU200': {'PFRaw': None, 'PFPuppiRaw': None, 'PFPuppiType1': None},
+  }
+
+  for _tmp in fpaths:
+    _tmpTFile = fpaths[_tmp]
+    if not _tmpTFile:
+      WARNING('failed to open target TFile: '+fpaths[_tmp])
+      continue
+
+    histos[_tmp]['PFRaw'] = getHistogram(_tmpTFile, 'NoSelection/hltPFMET_pt_overGEN_Mean_wrt_GEN_pt')
+    histos[_tmp]['PFPuppiRaw'] = getHistogram(_tmpTFile, 'NoSelection/hltPFPuppiMET_pt_overGEN_Mean_wrt_GEN_pt')
+    histos[_tmp]['PFPuppiType1'] = getHistogram(_tmpTFile, 'NoSelection/hltPFPuppiMETTypeOne_pt_overGEN_Mean_wrt_GEN_pt')
+
+  for _tmp1 in histos:
+    for _tmp2 in histos[_tmp1]:
+      if histos[_tmp1][_tmp2] is None: continue
+      histos[_tmp1][_tmp2].SetDirectory(0)
+      histos[_tmp1][_tmp2].UseCurrentStyle()
+
+  canvas = ROOT.TCanvas(tmpName(), tmpName())
+  canvas.cd()
+
+  h0 = canvas.DrawFrame(0.001, 0.3, 2.59, 4.5)
+
+  histos['PU140']['PFRaw'].SetMarkerStyle(20)
+  histos['PU140']['PFRaw'].SetMarkerSize(1.0)
+  histos['PU140']['PFRaw'].SetLineWidth(2)
+  histos['PU140']['PFRaw'].SetLineStyle(2)
+  histos['PU140']['PFRaw'].SetLineColor(1)
+  histos['PU140']['PFRaw'].SetMarkerColor(1)
+
+  histos['PU140']['PFPuppiRaw'].SetMarkerStyle(20)
+  histos['PU140']['PFPuppiRaw'].SetMarkerSize(1.0)
+  histos['PU140']['PFPuppiRaw'].SetLineWidth(2)
+  histos['PU140']['PFPuppiRaw'].SetLineStyle(2)
+  histos['PU140']['PFPuppiRaw'].SetLineColor(2)
+  histos['PU140']['PFPuppiRaw'].SetMarkerColor(2)
+
+  histos['PU140']['PFPuppiType1'].SetMarkerStyle(20)
+  histos['PU140']['PFPuppiType1'].SetMarkerSize(1.0)
+  histos['PU140']['PFPuppiType1'].SetLineWidth(2)
+  histos['PU140']['PFPuppiType1'].SetLineStyle(2)
+  histos['PU140']['PFPuppiType1'].SetLineColor(4)
+  histos['PU140']['PFPuppiType1'].SetMarkerColor(4)
+
+  histos['PU200']['PFRaw'].SetMarkerStyle(20)
+  histos['PU200']['PFRaw'].SetMarkerSize(1.0)
+  histos['PU200']['PFRaw'].SetLineWidth(2)
+  histos['PU200']['PFRaw'].SetLineColor(1)
+  histos['PU200']['PFRaw'].SetMarkerColor(1)
+
+  histos['PU200']['PFPuppiRaw'].SetMarkerStyle(20)
+  histos['PU200']['PFPuppiRaw'].SetMarkerSize(1.0)
+  histos['PU200']['PFPuppiRaw'].SetLineWidth(2)
+  histos['PU200']['PFPuppiRaw'].SetLineColor(2)
+  histos['PU200']['PFPuppiRaw'].SetMarkerColor(2)
+
+  histos['PU200']['PFPuppiType1'].SetMarkerStyle(20)
+  histos['PU200']['PFPuppiType1'].SetMarkerSize(1.0)
+  histos['PU200']['PFPuppiType1'].SetLineWidth(2)
+  histos['PU200']['PFPuppiType1'].SetLineColor(4)
+  histos['PU200']['PFPuppiType1'].SetMarkerColor(4)
+
+  histos['PU140']['PFRaw'].Draw('hist,e0,same')
+  histos['PU200']['PFRaw'].Draw('hist,e0,same')
+
+  histos['PU140']['PFPuppiRaw'].Draw('hist,e0,same')
+  histos['PU200']['PFPuppiRaw'].Draw('hist,e0,same')
+
+  histos['PU140']['PFPuppiType1'].Draw('hist,e0,same')
+  histos['PU200']['PFPuppiType1'].Draw('hist,e0,same')
+
+  topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
+  topLabel.SetFillColor(0)
+  topLabel.SetFillStyle(1001)
+  topLabel.SetTextColor(ROOT.kBlack)
+  topLabel.SetTextAlign(12)
+  topLabel.SetTextFont(42)
+  topLabel.SetTextSize(0.035)
+  topLabel.SetBorderSize(0)
+  topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+  topLabel.Draw('same')
+
+  objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+  objLabel.SetFillColor(0)
+  objLabel.SetFillStyle(1001)
+  objLabel.SetTextColor(ROOT.kBlack)
+  objLabel.SetTextAlign(32)
+  objLabel.SetTextFont(42)
+  objLabel.SetTextSize(0.035)
+  objLabel.SetBorderSize(0)
+  objLabel.AddText('PU 140-200 (14 TeV)')
+  objLabel.Draw('same')
+
+  l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
+  l1tRateLabel.SetFillColor(0)
+  l1tRateLabel.SetFillStyle(1001)
+  l1tRateLabel.SetTextColor(ROOT.kBlack)
+  l1tRateLabel.SetTextAlign(12)
+  l1tRateLabel.SetTextFont(42)
+  l1tRateLabel.SetTextSize(0.035)
+  l1tRateLabel.SetBorderSize(0)
+#  l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
+#  l1tRateLabel.Draw('same')
+
+  hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.65, 0.85, 'NDC')
+  hltRateLabel.SetFillColor(0)
+  hltRateLabel.SetFillStyle(1001)
+  hltRateLabel.SetTextColor(ROOT.kBlack)
+  hltRateLabel.SetTextAlign(12)
+  hltRateLabel.SetTextFont(42)
+  hltRateLabel.SetTextSize(0.035)
+  hltRateLabel.SetBorderSize(0)
+#  hltRateLabel.AddText(_etaLabel)
+#  hltRateLabel.Draw('same')
+
+  aaahltRateLabel = ROOT.TPaveText(0.65, 0.80, 0.94, 0.90, 'NDC')
+  aaahltRateLabel.SetFillColor(0)
+  aaahltRateLabel.SetFillStyle(1001)
+  aaahltRateLabel.SetTextColor(ROOT.kBlack)
+  aaahltRateLabel.SetTextAlign(22)
+  aaahltRateLabel.SetTextFont(42)
+  aaahltRateLabel.SetTextSize(0.035)
+  aaahltRateLabel.SetBorderSize(0)
+#  aaahltRateLabel.AddText('GEN Jet p_{T} range')
+#  aaahltRateLabel.Draw('same')
+
+  leg1 = ROOT.TLegend(0.65, 0.60, 0.94, 0.90)
+  leg1.SetNColumns(1)
+  leg1.SetTextFont(42)
+  leg1.AddEntry(histos['PU200']['PFRaw'], 'PF MET (Raw)', 'lepx')
+  leg1.AddEntry(histos['PU200']['PFPuppiRaw'], 'PF+PUPPI MET (Raw)', 'lepx')
+  leg1.AddEntry(histos['PU200']['PFPuppiType1'], 'PF+PUPPI MET (Type-1)', 'lepx')
+  leg1.Draw('same')
+
+  _htmpPU140 = histos['PU140']['PFRaw'].Clone()
+  _htmpPU140.SetLineColor(1)
+  _htmpPU140.SetLineStyle(2)
+
+  _htmpPU200 = histos['PU200']['PFRaw'].Clone()
+  _htmpPU200.SetLineColor(1)
+  _htmpPU200.SetLineStyle(1)
+
+  leg2 = ROOT.TLegend(0.75, 0.45, 0.94, 0.60)
+  leg2.SetNColumns(1)
+  leg2.SetTextFont(42)
+  leg2.AddEntry(_htmpPU140, 'PU=140', 'l')
+  leg2.AddEntry(_htmpPU200, 'PU=200', 'l')
+  leg2.Draw('same')
+
+  h0.SetTitle(';'+_tmpRef+' MET [GeV];>>>>>>>')
+  h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+  canvas.SetLogy(0)
+  canvas.SetGrid(1, 1)
+
+  for _tmpExt in exts:
+    canvas.SaveAs(outputName+'_'+_etaTag+'.'+_tmpExt)
+
+  canvas.Close()
+
+  print '\033[1m'+outputName+'_'+_etaTag+'\033[0m'
 
 #### main
 if __name__ == '__main__':
@@ -1288,21 +1742,21 @@ if __name__ == '__main__':
     print '='*110
 
     plotJetResponse(
-      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',#!!
+      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU140.root',
       fpath_PU200 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',
       outputName = outputDir+'/jetResponse',
       exts = EXTS,
     )
 
     plotJetResolution(
-      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',#!!
+      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU140.root',
       fpath_PU200 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',
       outputName = outputDir+'/jetResolution',
       exts = EXTS,
     )
 
     plotJetMatchingEff(
-      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',#!!
+      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU140.root',
       fpath_PU200 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',
       outputName = outputDir+'/jetMatchingEff',
       exts = EXTS,
@@ -1314,18 +1768,18 @@ if __name__ == '__main__':
     print '='*50
     print '='*50
 
+    ## SingleJet
     effysJet = {}
     for _tmpPU in ['PU140', 'PU200']:
       effysJet[_tmpPU] = {}
       for _tmpJetThresh in ['200', '350', '500']:
         effysJet[_tmpPU][_tmpJetThresh] = getJetEfficiencies(
-          fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root', #!!
+          fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_'+_tmpPU+'.root',
           hltThreshold_SingleJet = float(_tmpJetThresh),
         )
 
-    ## SingleJet
     for _tmpRef in [
-      'GEN',
+#!!      'GEN',
 #      'Offline',
     ]:
       canvas = ROOT.TCanvas(tmpName(), tmpName(False))
@@ -1414,7 +1868,7 @@ if __name__ == '__main__':
       l1tRateLabel.SetTextFont(42)
       l1tRateLabel.SetTextSize(0.035)
       l1tRateLabel.SetBorderSize(0)
-      l1tRateLabel.AddText('HLT: AK4 PF+Puppi Jets, |#eta|<5.0')
+      l1tRateLabel.AddText('HLT: AK4 PF+PUPPI Jets, |#eta|<5.0')
       l1tRateLabel.Draw('same')
 
       leg1 = ROOT.TLegend(0.60, 0.20, 0.95, 0.44)
@@ -1459,12 +1913,12 @@ if __name__ == '__main__':
       effysHT[_tmpPU] = {}
       for _tmpHTThresh in ['600', '800', '1000']:
         effysHT[_tmpPU][_tmpHTThresh] = getHTEfficiencies(
-          fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root', #!!
+          fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_'+_tmpPU+'.root',
           hltThreshold_HT = float(_tmpHTThresh),
         )
 
     for _tmpRef in [
-      'GEN',
+#!!      'GEN',
 #      'Offline',
     ]:
       canvas = ROOT.TCanvas(tmpName(), tmpName(False))
@@ -1553,7 +2007,7 @@ if __name__ == '__main__':
       l1tRateLabel.SetTextFont(42)
       l1tRateLabel.SetTextSize(0.035)
       l1tRateLabel.SetBorderSize(0)
-      l1tRateLabel.AddText('HLT: AK4 PF+Puppi Jets, p_{T}>30 GeV, |#eta|<2.4')
+      l1tRateLabel.AddText('HLT: AK4 PF+PUPPI Jets, p_{T}>30 GeV, |#eta|<2.4')
       l1tRateLabel.Draw('same')
 
       leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.44)
@@ -1592,6 +2046,109 @@ if __name__ == '__main__':
 
       print '\033[1m'+outputDir+'/triggerEff_HT_wrt'+_tmpRef+'\033[0m'
 
+    ## MET
+    effysMET = {}
+    for _tmpPU in ['PU140', 'PU200']:
+      effysMET[_tmpPU] = {}
+      for _tmpMETThresh in ['120', '150']:
+        effysMET[_tmpPU][_tmpMETThresh] = getMETEfficiencies(
+          fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_'+_tmpPU+'.root',
+          hltThreshold_MET = float(_tmpMETThresh),
+          hltThreshold_MET2 = float(_tmpMETThresh),
+        )
+
+    for _tmpRef in [
+#      'GEN',
+#      'Offline',
+    ]:
+      canvas = ROOT.TCanvas(tmpName(), tmpName(False))
+      canvas.cd()
+
+      h0 = canvas.DrawFrame(0, 0.0001, 450, 1.19)
+
+      effysMET['PU200']['150']['MET_L1T_wrt_'+_tmpRef].SetMarkerSize(1)
+      effysMET['PU200']['150']['MET_L1T_wrt_'+_tmpRef].SetLineWidth(2)
+      effysMET['PU200']['150']['MET_L1T_wrt_'+_tmpRef].SetMarkerColor(1)
+      effysMET['PU200']['150']['MET_L1T_wrt_'+_tmpRef].SetLineColor(1)
+      effysMET['PU200']['150']['MET_L1T_wrt_'+_tmpRef].SetLineStyle(1)
+      effysMET['PU200']['150']['MET_L1T_wrt_'+_tmpRef].Draw('lepz')
+
+      effysMET['PU200']['150']['MET_HLT_wrt_'+_tmpRef].SetMarkerSize(1)
+      effysMET['PU200']['150']['MET_HLT_wrt_'+_tmpRef].SetLineWidth(2)
+      effysMET['PU200']['150']['MET_HLT_wrt_'+_tmpRef].SetMarkerColor(2)
+      effysMET['PU200']['150']['MET_HLT_wrt_'+_tmpRef].SetLineColor(2)
+      effysMET['PU200']['150']['MET_HLT_wrt_'+_tmpRef].SetLineStyle(1)
+      effysMET['PU200']['150']['MET_HLT_wrt_'+_tmpRef].Draw('lepz')
+
+      effysMET['PU200']['150']['MET_L1TpHLT_wrt_'+_tmpRef].SetMarkerSize(1)
+      effysMET['PU200']['150']['MET_L1TpHLT_wrt_'+_tmpRef].SetLineWidth(2)
+      effysMET['PU200']['150']['MET_L1TpHLT_wrt_'+_tmpRef].SetMarkerColor(4)
+      effysMET['PU200']['150']['MET_L1TpHLT_wrt_'+_tmpRef].SetLineColor(4)
+      effysMET['PU200']['150']['MET_L1TpHLT_wrt_'+_tmpRef].SetLineStyle(1)
+      effysMET['PU200']['150']['MET_L1TpHLT_wrt_'+_tmpRef].Draw('lepz')
+
+      topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
+      topLabel.SetFillColor(0)
+      topLabel.SetFillStyle(1001)
+      topLabel.SetTextColor(ROOT.kBlack)
+      topLabel.SetTextAlign(12)
+      topLabel.SetTextFont(42)
+      topLabel.SetTextSize(0.035)
+      topLabel.SetBorderSize(0)
+      topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+      topLabel.Draw('same')
+
+      objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+      objLabel.SetFillColor(0)
+      objLabel.SetFillStyle(1001)
+      objLabel.SetTextColor(ROOT.kBlack)
+      objLabel.SetTextAlign(32)
+      objLabel.SetTextFont(42)
+      objLabel.SetTextSize(0.035)
+      objLabel.SetBorderSize(0)
+      objLabel.AddText('PU=200 (14 TeV)')
+      objLabel.Draw('same')
+
+#      l1tRateVal = rateDict[_tmpReco][_tmp['l1tPathKey']]['MB'][0]
+#      l1tRateErr = rateDict[_tmpReco][_tmp['l1tPathKey']]['MB'][1]
+#
+#      hltRateVal = 0.
+#      hltRateErr2 = 0.
+#      for _tmpSample in QCDSamples+['Wln', 'Zll']:
+#        hltRateVal += rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][0]
+#        hltRateErr2 += math.pow(rateDict[_tmpReco][_tmp['hltPathKey']][_tmpSample][1], 2)
+
+      l1tRateLabel = ROOT.TPaveText(0.165, 0.82, 0.65, 0.88, 'NDC')
+      l1tRateLabel.SetFillColor(0)
+      l1tRateLabel.SetFillStyle(1001)
+      l1tRateLabel.SetTextColor(ROOT.kBlack)
+      l1tRateLabel.SetTextAlign(12)
+      l1tRateLabel.SetTextFont(42)
+      l1tRateLabel.SetTextSize(0.035)
+      l1tRateLabel.SetBorderSize(0)
+      l1tRateLabel.AddText('HLT: PF+PUPPI MET > 150 GeV')
+      l1tRateLabel.Draw('same')
+
+      leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.44)
+      leg1.SetNColumns(1)
+      leg1.SetTextFont(42)
+      leg1.AddEntry(effysMET['PU200']['150']['MET_L1T_wrt_'+_tmpRef], 'L1T', 'lepx')
+      leg1.AddEntry(effysMET['PU200']['150']['MET_HLT_wrt_'+_tmpRef], 'HLT', 'lepx')
+      leg1.AddEntry(effysMET['PU200']['150']['MET_L1TpHLT_wrt_'+_tmpRef], 'L1T+HLT', 'lepx')
+      leg1.Draw('same')
+
+      h0.SetTitle(';'+_tmpRef+' MET [GeV];Efficiency')
+      h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+      canvas.SetLogy(0)
+      canvas.SetGrid(1, 1)
+
+      for _tmpExt in EXTS:
+        canvas.SaveAs(outputDir+'/triggerEff_MET_wrt'+_tmpRef+'.'+_tmpExt)
+
+      canvas.Close()
+
+      print '\033[1m'+outputDir+'/triggerEff_MET_wrt'+_tmpRef+'\033[0m'
 
 
 
@@ -2029,7 +2586,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 75,
         'outputName': outputDir+'/rate_SingleJet',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi Jet p_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
+        'title': ';HLT PF+PUPPI Jet p_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':  400,
@@ -2051,7 +2608,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 75,
         'outputName': outputDir+'/rate_HT',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi H_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
+        'title': ';HLT PF+PUPPI H_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':  900,
@@ -2073,7 +2630,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 225,
         'outputName': outputDir+'/rate_MET',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi MET Threshold [GeV];L1T+HLT Rate [Hz]',
+        'title': ';HLT PF+PUPPI MET Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':    0,
@@ -2095,7 +2652,7 @@ if __name__ == '__main__':
         'hltTargetRateHz': 225,
         'outputName': outputDir+'/rate_MET2',
         'outputExts': EXTS,
-        'title': ';HLT PF+Puppi MET Threshold [GeV];L1T+HLT Rate [Hz]',
+        'title': ';HLT PF+PUPPI MET Threshold [GeV];L1T+HLT Rate [Hz]',
         'objLabel': '',
         'topLabel': 'MC: QCD + V+jets',
         'xmin':    0,
