@@ -193,14 +193,15 @@ void JMETriggerAnalysisDriverPhase2::init(){
     {"l1tPFMET"     , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFMET_Raw"}}},
     {"l1tPFPuppiMET", {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFPuppiMET_Raw"}}},
 
-//  {"hltPFClusterMET"   , {{"GEN", "genMETCalo"}}},
-//  {"hltPFMETNoMu"      , {{"GEN", "genMETCalo"}}},
-    {"hltPFMET"          , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFMET_Raw"}}},
-    {"hltPFCHSMET"       , {{"GEN", "genMETTrue"}}},
-    {"hltPFSoftKillerMET", {{"GEN", "genMETTrue"}}},
-//  {"hltPFPuppiMETNoMu" , {{"GEN", "genMETCalo"}}},
-    {"hltPFPuppiMET"     , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFPuppiMET_Raw"}}},
-    {"hltPFPuppiMETv0"   , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePuppiMET_Raw"}}},
+//    {"hltPFClusterMET"     , {{"GEN", "genMETCalo"}}},
+//    {"hltPFMETNoMu"        , {{"GEN", "genMETCalo"}}},
+    {"hltPFMET"            , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFMET_Raw"}}},
+    {"hltPFCHSMET"         , {{"GEN", "genMETTrue"}}},
+    {"hltPFSoftKillerMET"  , {{"GEN", "genMETTrue"}}},
+//    {"hltPFPuppiMETNoMu"   , {{"GEN", "genMETCalo"}}},
+    {"hltPFPuppiMET"       , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePFPuppiMET_Raw"}}},
+    {"hltPFPuppiMETv0"     , {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePuppiMET_Raw"}}},
+    {"hltPFPuppiMETTypeOne", {{"GEN", "genMETTrue"}}},//, {"Offline", "offlinePuppiMET_Raw"}}},
 
 //    {"offlinePFMET_Raw"       , {{"GEN", "genMETTrue"}}},
 //    {"offlinePFMET_Type1"     , {{"GEN", "genMETTrue"}}},
@@ -239,6 +240,9 @@ void JMETriggerAnalysisDriverPhase2::init(){
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "l1tPFPuppiMET");
 //    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "offlinePFPuppiMET_Raw");
+
+    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "l1tPFPuppiMET");
+//    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "offlinePFPuppiMET_Type1");
   }
 
   l1tSeeds_1Jet_ = {
@@ -309,6 +313,9 @@ void JMETriggerAnalysisDriverPhase2::init(){
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "l1tPFPuppiMET");
 //    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMET", "offlinePFPuppiMET_Raw");
+
+    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "l1tPFPuppiMET");
+//    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "offlinePFPuppiMET_Type1");
   }
 }
 
@@ -446,16 +453,22 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     }
   }
 
-  for(std::string const& metType : {"PF", "PFPuppi"}){
+  std::vector<std::vector<std::string>> metTypes({
+    {"l1tPFMET", "hltPFMET", "offlinePFMET_Raw"},
+    {"l1tPFPuppiMET", "hltPFPuppiMET", "offlinePFPuppiMET_Raw"},
+    {"l1tPFPuppiMET", "hltPFPuppiMETTypeOne", "offlinePFPuppiMET_Type1"},
+  });
+
+  for(auto const& metType : metTypes){
 
     fillHistoDataMET fhDataL1TMET;
-    fhDataL1TMET.metCollection = "l1t"+metType+"MET";
+    fhDataL1TMET.metCollection = metType.at(0);
 
     fillHistoDataMET fhDataHLTMET;
-    fhDataHLTMET.metCollection = "hlt"+metType+"MET";
+    fhDataHLTMET.metCollection = metType.at(1);
 
 //    fillHistoDataMET fhDataOffMET;
-//    fhDataOffMET.metCollection = "offline"+metType+"MET_Raw";
+//    fhDataOffMET.metCollection = metType.at(2);
 
     fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataL1TMET);
 //    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataOffMET);

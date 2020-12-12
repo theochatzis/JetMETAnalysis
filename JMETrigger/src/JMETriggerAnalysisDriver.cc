@@ -513,8 +513,8 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
   if(not dirPrefix.empty()){ dirPrefix += "/"; }
 
-  std::vector<float> binEdges_pt(81);
-  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = idx * 10.; }
+  std::vector<float> binEdges_pt(161);
+  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = idx * 5.; }
 
   std::vector<float> binEdges_phi(41);
   for(uint idx=0; idx<binEdges_phi.size(); ++idx){ binEdges_phi.at(idx) = M_PI*(0.05*idx - 1.); }
