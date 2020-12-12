@@ -20,20 +20,20 @@ def tmpName(increment=True):
   COUNTER += 1
   return 'tmp'+str(COUNTER)
 
-def getRateFactor(processName):
+def getRateFactor(processName, instLumiHzPerPb):
   if   processName == 'MinBias_14TeV'             : return 1e6 * 30. # 30.903 (L1T TDR)
-  elif processName == 'QCD_Pt020to030_14TeV'      : return 0.075 * 436000000.0
-  elif processName == 'QCD_Pt030to050_14TeV'      : return 0.075 * 118400000.0
-  elif processName == 'QCD_Pt050to080_14TeV'      : return 0.075 *  17650000.0
-  elif processName == 'QCD_Pt080to120_14TeV'      : return 0.075 *   2671000.0
-  elif processName == 'QCD_Pt120to170_14TeV'      : return 0.075 *    469700.0
-  elif processName == 'QCD_Pt170to300_14TeV'      : return 0.075 *    121700.0
-  elif processName == 'QCD_Pt300to470_14TeV'      : return 0.075 *      8251.0
-  elif processName == 'QCD_Pt470to600_14TeV'      : return 0.075 *       686.4
-  elif processName == 'QCD_Pt600toInf_14TeV'      : return 0.075 *       244.8
-  elif processName == 'WJetsToLNu_14TeV'          : return 0.075 *     56990.0
-  elif processName == 'DYJetsToLL_M010to050_14TeV': return 0.075 *     16880.0
-  elif processName == 'DYJetsToLL_M050toInf_14TeV': return 0.075 *      5795.0
+  elif processName == 'QCD_Pt020to030_14TeV'      : return instLumiHzPerPb * 436000000.0
+  elif processName == 'QCD_Pt030to050_14TeV'      : return instLumiHzPerPb * 118400000.0
+  elif processName == 'QCD_Pt050to080_14TeV'      : return instLumiHzPerPb *  17650000.0
+  elif processName == 'QCD_Pt080to120_14TeV'      : return instLumiHzPerPb *   2671000.0
+  elif processName == 'QCD_Pt120to170_14TeV'      : return instLumiHzPerPb *    469700.0
+  elif processName == 'QCD_Pt170to300_14TeV'      : return instLumiHzPerPb *    121700.0
+  elif processName == 'QCD_Pt300to470_14TeV'      : return instLumiHzPerPb *      8251.0
+  elif processName == 'QCD_Pt470to600_14TeV'      : return instLumiHzPerPb *       686.4
+  elif processName == 'QCD_Pt600toInf_14TeV'      : return instLumiHzPerPb *       244.8
+  elif processName == 'WJetsToLNu_14TeV'          : return instLumiHzPerPb *     56990.0
+  elif processName == 'DYJetsToLL_M010to050_14TeV': return instLumiHzPerPb *     16880.0
+  elif processName == 'DYJetsToLL_M050toInf_14TeV': return instLumiHzPerPb *      5795.0
   else:
     raise RuntimeError(processName)
 
@@ -66,7 +66,7 @@ def getRateHistogram(h1, rateFac):
 
   return theRateHisto
 
-def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThreshold_MET, hltThreshold_MET2):
+def getRates(fpath, instLumiHzPerPb, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThreshold_MET, hltThreshold_MET2):
   global L1T_SingleJet, L1T_HT
 
   ret = {}
@@ -78,7 +78,7 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
   _eventsProcessed = _tfile.Get('eventsProcessed')
   ret['v_eventsProcessed'] = _eventsProcessed.GetEntries()
 
-  rateFactor = getRateFactor(processName) / ret['v_eventsProcessed']
+  rateFactor = getRateFactor(processName, instLumiHzPerPb) / ret['v_eventsProcessed']
 
   ret['t_rates'] = {}
   ret['v_rates'] = {}
@@ -90,7 +90,7 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
   ret['t_rates']['hltAK4PFPuppiJet_woL1T'] = getRateHistogram(_tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0'), rateFactor)
   ret['t_rates']['hltAK4PFPuppiJet'] = getRateHistogram(_tfile.Get(L1T_SingleJet+'/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0'), rateFactor)
 
-  _tmp = _tfile.Get(L1T_SingleJet+'/l1tSlwPFPuppiJetsCorrected_EtaIncl_pt0')
+  _tmp = _tfile.Get(L1T_SingleJet+'/hltAK4PFPuppiJetsCorrected_EtaIncl_pt0')
   _tmp_integErr = ctypes.c_double(0.)
   _tmp_integ = _tmp.IntegralAndError(0, -1, _tmp_integErr)
   ret['v_rates'] [L1T_SingleJet] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
@@ -103,11 +103,9 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
   ret['v_counts']['HLT_AK4PFPuppiJet'+str(hltThreshold_SingleJet)] = [_tmp_integ, _tmp_integErr.value]
 
   # HT
-  ret['t_rates']['l1tPFPuppiHT'] = getRateHistogram(_tfile.Get('NoSelection/l1tPFPuppiHT_sumEt'), rateFactor)
-  ret['t_rates']['l1tPFPuppiHT_2'] = getRateHistogram(_tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_Eta2p4_HT'), rateFactor)
-
-  ret['t_rates']['hltPFPuppiHT_woL1T'] = getRateHistogram(_tfile.Get('NoSelection/hltPFPuppiHT_sumEt'), rateFactor)
-  ret['t_rates']['hltPFPuppiHT'] = getRateHistogram(_tfile.Get(L1T_HT+'/hltPFPuppiHT_sumEt'), rateFactor)
+  ret['t_rates']['l1tPFPuppiHT'] = getRateHistogram(_tfile.Get('NoSelection/l1tSlwPFPuppiJetsCorrected_Eta2p4_HT'), rateFactor)
+  ret['t_rates']['hltPFPuppiHT_woL1T'] = getRateHistogram(_tfile.Get('NoSelection/hltAK4PFPuppiJetsCorrected_Eta2p4_HT'), rateFactor)
+  ret['t_rates']['hltPFPuppiHT'] = getRateHistogram(_tfile.Get(L1T_HT+'/hltAK4PFPuppiJetsCorrected_Eta2p4_HT'), rateFactor)
 
   _tmp = _tfile.Get(L1T_HT+'/l1tPFPuppiHT_sumEt')
   _tmp_integErr = ctypes.c_double(0.)
@@ -115,7 +113,7 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
   ret['v_rates'] [L1T_HT] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
   ret['v_counts'][L1T_HT] = [_tmp_integ, _tmp_integErr.value]
 
-  _tmp = _tfile.Get(L1T_HT+'/hltPFPuppiHT_sumEt')
+  _tmp = _tfile.Get(L1T_HT+'/hltAK4PFPuppiJetsCorrected_Eta2p4_HT')
   _tmp_integErr = ctypes.c_double(0.)
   _tmp_integ = _tmp.IntegralAndError(_tmp.GetXaxis().FindBin(float(hltThreshold_HT)), -1, _tmp_integErr)
   ret['v_rates'] ['HLT_PFPuppiHT'+str(hltThreshold_HT)] = [rateFactor * _tmp_integ, rateFactor * _tmp_integErr.value]
@@ -123,8 +121,7 @@ def getRates(fpath, processName, hltThreshold_SingleJet, hltThreshold_HT, hltThr
 
   # MET
   ret['t_rates']['l1tPFPuppiMET'] = getRateHistogram(_tfile.Get('NoSelection/l1tPFPuppiMET_pt'), rateFactor)
-
-  ret['t_rates']['hltPFPuppiMET_woL1T'] = getRateHistogram(_tfile.Get('NoSelection/hltPFPuppiHT_sumEt'), rateFactor)
+  ret['t_rates']['hltPFPuppiMET_woL1T'] = getRateHistogram(_tfile.Get('NoSelection/hltPFPuppiMET_pt'), rateFactor)
   ret['t_rates']['hltPFPuppiMET'] = getRateHistogram(_tfile.Get('L1T_PFPuppiMET200off/hltPFPuppiMET_pt'), rateFactor)
   ret['t_rates']['hltPFPuppiMET2'] = getRateHistogram(_tfile.Get('L1T_PFPuppiMET245off/hltPFPuppiMET_pt'), rateFactor)
 
@@ -2058,7 +2055,7 @@ if __name__ == '__main__':
         )
 
     for _tmpRef in [
-#      'GEN',
+#!!      'GEN',
 #      'Offline',
     ]:
       canvas = ROOT.TCanvas(tmpName(), tmpName(False))
@@ -2150,6 +2147,187 @@ if __name__ == '__main__':
 
       print '\033[1m'+outputDir+'/triggerEff_MET_wrt'+_tmpRef+'\033[0m'
 
+  ###
+  ### Rates
+  ###
+  rateGroup = {
+
+#    'MB': [
+#      'MinBias_14TeV',
+#    ],
+
+    'QCD': [
+#      'QCD_Pt020to030_14TeV',
+#      'QCD_Pt030to050_14TeV',
+      'QCD_Pt050to080_14TeV',
+      'QCD_Pt080to120_14TeV',
+      'QCD_Pt120to170_14TeV',
+      'QCD_Pt170to300_14TeV',
+      'QCD_Pt300to470_14TeV',
+      'QCD_Pt470to600_14TeV',
+      'QCD_Pt600toInf_14TeV',
+    ],
+
+#    'QCD_020': ['QCD_Pt020to030_14TeV'],
+#    'QCD_030': ['QCD_Pt030to050_14TeV'],
+    'QCD_050': ['QCD_Pt050to080_14TeV'],
+    'QCD_080': ['QCD_Pt080to120_14TeV'],
+    'QCD_120': ['QCD_Pt120to170_14TeV'],
+    'QCD_170': ['QCD_Pt170to300_14TeV'],
+    'QCD_300': ['QCD_Pt300to470_14TeV'],
+    'QCD_470': ['QCD_Pt470to600_14TeV'],
+    'QCD_600': ['QCD_Pt600toInf_14TeV'],
+
+#    'Wln': [
+#      'WJetsToLNu_14TeV',
+#    ],
+
+#    'Zll': [
+#      'DYJetsToLL_M010to050_14TeV',
+#      'DYJetsToLL_M050toInf_14TeV',
+#    ],
+  }
+
+  QCDSamples = [
+#    'QCD_020',
+#    'QCD_030',
+    'QCD_050',
+    'QCD_080',
+    'QCD_120',
+    'QCD_170',
+    'QCD_300',
+    'QCD_470',
+    'QCD_600',
+  ]
+
+  rateSamples = []
+  for _tmp in rateGroup:
+    rateSamples += rateGroup[_tmp]
+  rateSamples = sorted(list(set(rateSamples)))
+
+  rates = {}
+  rateHistos = {}
+  rateDict = {}
+  countDict = {}
+
+  for _tmpReco in recoKeys:
+
+    rates[_tmpReco] = {}
+    rateDict[_tmpReco] = {}
+    countDict[_tmpReco] = {}
+    rateHistos[_tmpReco] = {}
+
+    for _puTag in ['PU140', 'PU200']:
+     print '='*110
+     print '='*110
+     print '\033[1m'+'Rates ['+_puTag+']'+'\033[0m'
+     print '='*110
+     print '='*110
+
+     if _puTag == 'PU140':
+       iLumiHzPerPb = 0.050
+       hltThresholdSingleJet = 490.
+       hltThresholdHT = 1000.
+       hltThresholdMET = 110.
+       hltThresholdMET2 = 110.
+     elif _puTag == 'PU200':
+       iLumiHzPerPb = 0.075
+       hltThresholdSingleJet = 530.
+       hltThresholdHT = 1100.
+       hltThresholdMET = 120.
+       hltThresholdMET2 = 120.
+
+     rates[_tmpReco][_puTag] = {}
+     for _tmp in rateSamples:
+      rates[_tmpReco][_puTag][_tmp] = getRates(
+        fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_'+_tmp+'_'+_puTag+'.root', instLumiHzPerPb = iLumiHzPerPb,
+        processName = _tmp,
+        hltThreshold_SingleJet = hltThresholdSingleJet,
+        hltThreshold_HT = hltThresholdHT,
+        hltThreshold_MET = hltThresholdMET,
+        hltThreshold_MET2 = hltThresholdMET2,
+      )
+
+     rateDict[_tmpReco][_puTag] = {}
+     countDict[_tmpReco][_puTag] = {}
+     for _tmpTrg in [
+       L1T_SingleJet, 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet),
+       L1T_HT, 'HLT_PFPuppiHT'+str(hltThresholdHT),
+       'L1T_PFPuppiMET200off', 'HLT_PFPuppiMET'+str(hltThresholdMET),
+       'L1T_PFPuppiMET245off', 'HLT_PFPuppiMET'+str(hltThresholdMET2),
+     ]:
+      rateDict[_tmpReco][_puTag][_tmpTrg] = {}
+      countDict[_tmpReco][_puTag][_tmpTrg] = {}
+      for _tmp1 in rateGroup:
+        theRate, theRateErr2 = 0., 0.
+        theCount, theCountErr2 = 0., 0.
+        for _tmp2 in rateGroup[_tmp1]:
+          theRate += rates[_tmpReco][_puTag][_tmp2]['v_rates'][_tmpTrg][0]
+          theRateErr2 += math.pow(rates[_tmpReco][_puTag][_tmp2]['v_rates'][_tmpTrg][1], 2)
+          theCount += rates[_tmpReco][_puTag][_tmp2]['v_counts'][_tmpTrg][0]
+          theCountErr2 += math.pow(rates[_tmpReco][_puTag][_tmp2]['v_counts'][_tmpTrg][1], 2)
+        rateDict[_tmpReco][_puTag][_tmpTrg][_tmp1] = [theRate, math.sqrt(theRateErr2)]
+        countDict[_tmpReco][_puTag][_tmpTrg][_tmp1] = [theCount, math.sqrt(theCountErr2)]
+
+     for _tmpL1T, _tmpHLT in [
+       [L1T_SingleJet, 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet)],
+       [L1T_HT, 'HLT_PFPuppiHT'+str(hltThresholdHT)],
+       ['L1T_PFPuppiMET200off', 'HLT_PFPuppiMET'+str(hltThresholdMET)],
+       ['L1T_PFPuppiMET245off', 'HLT_PFPuppiMET'+str(hltThresholdMET2)],
+     ]:
+      print '-'*110
+      print '\033[1m{:10}\033[0m | \033[1m{:47}\033[0m | \033[1m{:47}\033[0m'.format('Rate [Hz]', '[L1T] '+_tmpL1T, '[L1T+HLT] '+_tmpHLT)
+      print '-'*110
+
+      for _tmp1 in sorted(rateGroup.keys()):
+        l1tRate    = rateDict[_tmpReco][_puTag][_tmpL1T][_tmp1][0]
+        l1tRateErr = rateDict[_tmpReco][_puTag][_tmpL1T][_tmp1][1]
+
+        hltRate    = rateDict[_tmpReco][_puTag][_tmpHLT][_tmp1][0]
+        hltRateErr = rateDict[_tmpReco][_puTag][_tmpHLT][_tmp1][1]
+
+        l1tCount = countDict[_tmpReco][_puTag][_tmpL1T][_tmp1][0]
+        hltCount = countDict[_tmpReco][_puTag][_tmpHLT][_tmp1][0]
+
+        if l1tCount < opts.minCountsForValidRate:
+          l1tRate, l1tRateErr = -99., -99.
+
+        if hltCount < opts.minCountsForValidRate:
+          hltRate, hltRateErr = -99., -99.
+
+        print '{:<10} | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}] | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}]'.format(_tmp1,
+          l1tRate, l1tRateErr, l1tCount,
+          hltRate, hltRateErr, hltCount
+        )
+
+     rateHistos[_tmpReco][_puTag] = {}
+     for _tmpVar, _tmpSamples in {
+#       # L1T
+#       'l1tSlwPFPuppiJet': ['MB'],
+#       'l1tPFPuppiHT'    : ['MB'],
+#       'l1tPFPuppiHT_2'  : ['MB'],
+#       'l1tPFPuppiMET'   : ['MB'],
+
+       # HLT
+       'hltAK4PFPuppiJet_woL1T': QCDSamples, #!!+['Wln', 'Zll'],
+       'hltAK4PFPuppiJet'      : QCDSamples, #!!+['Wln', 'Zll'],
+       'hltPFPuppiHT_woL1T'    : QCDSamples, #!!+['Wln', 'Zll'],
+       'hltPFPuppiHT'          : QCDSamples, #!!+['Wln', 'Zll'],
+       'hltPFPuppiMET_woL1T'   : QCDSamples, #!!+['Wln', 'Zll'],
+       'hltPFPuppiMET'         : QCDSamples, #!!+['Wln', 'Zll'],
+       'hltPFPuppiMET2'        : QCDSamples, #!!+['Wln', 'Zll'],
+     }.items():
+       rateHistos[_tmpReco][_puTag][_tmpVar] = None
+       for _tmp1 in _tmpSamples:
+         for _tmp2 in rateGroup[_tmp1]:
+           h0 = rates[_tmpReco][_puTag][_tmp2]['t_rates'][_tmpVar]
+           if rateHistos[_tmpReco][_puTag][_tmpVar]:
+             rateHistos[_tmpReco][_puTag][_tmpVar].Add(h0)
+           else:
+             rateHistos[_tmpReco][_puTag][_tmpVar] = h0.Clone()
+
+
+
 
 
 
@@ -2178,207 +2356,40 @@ if __name__ == '__main__':
 
 
 
-  hltThresholds = {
 
-    'HLT_TRKv06p1_TICL': {
 
-      'SingleJet': 470,
-      'HT': 1000,
-      'MET': 150,
-      'MET2': 150,
-    },
-  }
 
-  rateGroup = {
 
-    'MB': [
-      'MinBias_14TeV',
-    ],
 
-    'QCD': [
-#      'QCD_Pt020to030_14TeV',
-#      'QCD_Pt030to050_14TeV',
-      'QCD_Pt050to080_14TeV',
-      'QCD_Pt080to120_14TeV',
-      'QCD_Pt120to170_14TeV',
-      'QCD_Pt170to300_14TeV',
-      'QCD_Pt300to470_14TeV',
-      'QCD_Pt470to600_14TeV',
-      'QCD_Pt600toInf_14TeV',
-    ],
 
-    'QCD_020': ['QCD_Pt020to030_14TeV'],
-    'QCD_030': ['QCD_Pt030to050_14TeV'],
-    'QCD_050': ['QCD_Pt050to080_14TeV'],
-    'QCD_080': ['QCD_Pt080to120_14TeV'],
-    'QCD_120': ['QCD_Pt120to170_14TeV'],
-    'QCD_170': ['QCD_Pt170to300_14TeV'],
-    'QCD_300': ['QCD_Pt300to470_14TeV'],
-    'QCD_470': ['QCD_Pt470to600_14TeV'],
-    'QCD_600': ['QCD_Pt600toInf_14TeV'],
 
-    'Wln': [
-      'WJetsToLNu_14TeV',
-    ],
-  
-    'Zll': [
-      'DYJetsToLL_M010to050_14TeV',
-      'DYJetsToLL_M050toInf_14TeV',
-    ],
-  }
 
-  QCDSamples = [
-#    'QCD_020',
-#    'QCD_030',
-    'QCD_050',
-    'QCD_080',
-    'QCD_120',
-    'QCD_170',
-    'QCD_300',
-    'QCD_470',
-    'QCD_600',
-  ]
 
-  rateSamples = []
-  for _tmp in rateGroup:
-    rateSamples += rateGroup[_tmp]
-  rateSamples = sorted(list(set(rateSamples)))
 
-  rates = {}
-  rateHistos = {}
-  effys = {}
-  effysJet = {}
-  effysMET = {}
 
-  rateDict = {}
-  countDict = {}
 
-  for _tmpReco in sorted(hltThresholds.keys()):
-    print '='*110
-    print '='*110
-    print '\033[1m'+_tmpReco+'\033[0m'
-    print '='*110
-    print '='*110
-  
-    hltThresholdSingleJet = hltThresholds[_tmpReco]['SingleJet']
-    hltThresholdHT = hltThresholds[_tmpReco]['HT']
-    hltThresholdMET = hltThresholds[_tmpReco]['MET']
-    hltThresholdMET2 = hltThresholds[_tmpReco]['MET2']
-  
-    hltPath_SingleJet = 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet)
-    hltPath_HT = 'HLT_PFPuppiHT'+str(hltThresholdHT)
-    hltPath_MET = 'HLT_PFPuppiMET'+str(hltThresholdMET)
-    hltPath_MET2 = 'HLT_PFPuppiMET'+str(hltThresholdMET2)
 
-    rates[_tmpReco] = {}
-    for _tmp in rateSamples:
-      rates[_tmpReco][_tmp] = getRates(
-        fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_'+_tmp+'_PU200.root',
-        processName = _tmp,
-        hltThreshold_SingleJet = hltThresholdSingleJet,
-        hltThreshold_HT = hltThresholdHT,
-        hltThreshold_MET = hltThresholdMET,
-        hltThreshold_MET2 = hltThresholdMET2,
-      )
-  
-    rateDict[_tmpReco] = {}
-    countDict[_tmpReco] = {}
-    for _tmpTrg in [
-      L1T_SingleJet,
-      hltPath_SingleJet,
-  
-      L1T_HT,
-      hltPath_HT,
-  
-      'L1T_PFPuppiMET200off',
-      hltPath_MET,
-  
-      'L1T_PFPuppiMET245off',
-      hltPath_MET2,
-    ]:
-      rateDict[_tmpReco][_tmpTrg] = {}
-      countDict[_tmpReco][_tmpTrg] = {}
-      for _tmp1 in rateGroup:
-        theRate, theRateErr2 = 0., 0.
-        theCount, theCountErr2 = 0., 0.
-        for _tmp2 in rateGroup[_tmp1]:
-          theRate += rates[_tmpReco][_tmp2]['v_rates'][_tmpTrg][0]
-          theRateErr2 += math.pow(rates[_tmpReco][_tmp2]['v_rates'][_tmpTrg][1], 2)
-          theCount += rates[_tmpReco][_tmp2]['v_counts'][_tmpTrg][0]
-          theCountErr2 += math.pow(rates[_tmpReco][_tmp2]['v_counts'][_tmpTrg][1], 2)
-        rateDict[_tmpReco][_tmpTrg][_tmp1] = [theRate, math.sqrt(theRateErr2)]
-        countDict[_tmpReco][_tmpTrg][_tmp1] = [theCount, math.sqrt(theCountErr2)]
-  
-    for _tmpL1T, _tmpHLT in [
-      [L1T_SingleJet, hltPath_SingleJet],
-      [L1T_HT, hltPath_HT],
-      ['L1T_PFPuppiMET200off', hltPath_MET],
-      ['L1T_PFPuppiMET245off', hltPath_MET2],
-    ]:
-      print '-'*110
-      print '\033[1m{:10}\033[0m | \033[1m{:47}\033[0m | \033[1m{:47}\033[0m'.format('Rate [Hz]', '[L1T] '+_tmpL1T, '[L1T+HLT] '+_tmpHLT)
-      print '-'*110
 
-      for _tmp1 in sorted(rateGroup.keys()):
 
-        l1tRate    = rateDict[_tmpReco][_tmpL1T][_tmp1][0]
-        l1tRateErr = rateDict[_tmpReco][_tmpL1T][_tmp1][1]
 
-        hltRate    = rateDict[_tmpReco][_tmpHLT][_tmp1][0]
-        hltRateErr = rateDict[_tmpReco][_tmpHLT][_tmp1][1]
 
-        l1tCount = countDict[_tmpReco][_tmpL1T][_tmp1][0]
-        hltCount = countDict[_tmpReco][_tmpHLT][_tmp1][0]
 
-        if l1tCount < opts.minCountsForValidRate:
-          l1tRate, l1tRateErr = -99., -99.
 
-        if hltCount < opts.minCountsForValidRate:
-          hltRate, hltRateErr = -99., -99.
 
-        print '{:<10} | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}] | {:>11.2f} +/- {:>10.2f} [counts = {:9.1f}]'.format(_tmp1,
-          l1tRate, l1tRateErr, l1tCount,
-          hltRate, hltRateErr, hltCount
-        )
 
-    rateHistos[_tmpReco] = {}
 
-    for _tmpVar, _tmpSamples in {
-      # L1T
-      'l1tSlwPFPuppiJet': ['MB'],
-      'l1tPFPuppiHT'    : ['MB'],
-      'l1tPFPuppiHT_2'  : ['MB'],
-      'l1tPFPuppiMET'   : ['MB'],
 
-      # HLT
-      'hltAK4PFPuppiJet_woL1T': QCDSamples+['Wln', 'Zll'],
-      'hltAK4PFPuppiJet'      : QCDSamples+['Wln', 'Zll'],
-      'hltPFPuppiHT_woL1T'    : QCDSamples+['Wln', 'Zll'],
-      'hltPFPuppiHT'          : QCDSamples+['Wln', 'Zll'],
-      'hltPFPuppiMET_woL1T'   : QCDSamples+['Wln', 'Zll'],
-      'hltPFPuppiMET'         : QCDSamples+['Wln', 'Zll'],
-      'hltPFPuppiMET2'        : QCDSamples+['Wln', 'Zll'],
-    }.items():
-      rateHistos[_tmpReco][_tmpVar] = None
-      for _tmp1 in _tmpSamples:
-        for _tmp2 in rateGroup[_tmp1]:
-          h0 = rates[_tmpReco][_tmp2]['t_rates'][_tmpVar]
-          if rateHistos[_tmpReco][_tmpVar]:
-            rateHistos[_tmpReco][_tmpVar].Add(h0)
-          else:
-            rateHistos[_tmpReco][_tmpVar] = h0.Clone()
 
-    effysJet[_tmpReco] = getJetEfficiencies(
-      fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',
-      hltThreshold_SingleJet = hltThresholdSingleJet,
-      hltThreshold_HT = hltThresholdHT,
-    )
 
-    effysMET[_tmpReco] = getMETEfficiencies(
-      fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200.root',
-      hltThreshold_MET = hltThresholdMET,
-      hltThreshold_MET2 = hltThresholdMET2,
-    )
+
+
+
+
+
+
+
+
+
 
   ### Plots
   if not opts.no_plots:
@@ -2396,10 +2407,10 @@ if __name__ == '__main__':
 
     for _tmpReco in sorted(hltThresholds.keys()):
 
-      hltThresholdSingleJet = hltThresholds[_tmpReco]['SingleJet']
-      hltThresholdHT = hltThresholds[_tmpReco]['HT']
-      hltThresholdMET = hltThresholds[_tmpReco]['MET']
-      hltThresholdMET2 = hltThresholds[_tmpReco]['MET2']
+      hltThresholdSingleJet = 500. #!! hltThresholds[_tmpReco]['SingleJet']
+      hltThresholdHT = 1000. #!! hltThresholds[_tmpReco]['HT']
+      hltThresholdMET = 150. #!! hltThresholds[_tmpReco]['MET']
+      hltThresholdMET2 = 150. #!! hltThresholds[_tmpReco]['MET2']
 
       hltPath_SingleJet = 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet)
       hltPath_HT = 'HLT_PFPuppiHT'+str(hltThresholdHT)
