@@ -139,10 +139,10 @@ void JMETriggerAnalysisDriverPhase2::init(){
 //      {"offlPFPuppiCorr", "offlineAK4PFPuppiJetsCorrected"},
     }},
 
-    {"l1tAK4CaloJetsCorrected"   , {{"GEN", "ak4GenJetsNoNu"}}},
-    {"l1tAK4PFJetsCorrected"     , {{"GEN", "ak4GenJetsNoNu"}}},
+//    {"l1tAK4CaloJetsCorrected"   , {{"GEN", "ak4GenJetsNoNu"}}},
+//    {"l1tAK4PFJetsCorrected"     , {{"GEN", "ak4GenJetsNoNu"}}},
 //    {"l1tAK4PFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
-//    {"l1tSlwPFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
+    {"l1tSlwPFPuppiJetsCorrected", {{"GEN", "ak4GenJetsNoNu"}}},//, {"Offline", "offlineAK4PFPuppiJetsCorrected"}}},
 
 //  {"hltAK4CaloJets"            , {{"GEN", "ak4GenJetsNoNu"}}},
 //  {"hltAK4PFClusterJets"       , {{"GEN", "ak4GenJetsNoNu"}}},
@@ -256,6 +256,9 @@ void JMETriggerAnalysisDriverPhase2::init(){
   for(auto const& selLabel : l1tSeeds_1Jet_){
     // histograms: AK4 Jets
     for(auto const& jetLabel : labelMap_jetAK4_){
+//      if(jetLabel.first.find("GenJets") != std::string::npos) continue;
+      if(jetLabel.first.find("l1t") == 0) continue;
+
       bookHistograms_Jets(selLabel, jetLabel.first, utils::mapKeys(jetLabel.second));
     }
   }
@@ -275,6 +278,9 @@ void JMETriggerAnalysisDriverPhase2::init(){
   for(auto const& selLabel : l1tSeeds_HT_){
 
     for(auto const& jetLabel : labelMap_jetAK4_){
+      if(jetLabel.first.find("GenJets") != std::string::npos) continue;
+      if(jetLabel.first.find("l1t") == 0) continue;
+
       bookHistograms_Jets(selLabel, jetLabel.first, utils::mapKeys(jetLabel.second));
     }
 
@@ -316,10 +322,10 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
 
   // Single-Jet
   for(auto const& jetLabel : labelMap_jetAK4_){
-    auto jetPt1(minAK4JetPt), jetPt2(minAK4JetPtRef);
-    if(jetLabel.first.find("GenJets") != std::string::npos){
-      std::swap(jetPt1, jetPt2);
-    }
+    auto const isGENJets = (jetLabel.first.find("GenJets") != std::string::npos);
+
+    auto const jetPt1 = isGENJets ? minAK4JetPtRef : minAK4JetPt;
+    auto const jetPt2 = isGENJets ? minAK4JetPtRef * 0.75 : minAK4JetPtRef;
 
     fillHistoDataJets fhDataAK4Jets;
     fhDataAK4Jets.jetCollection = jetLabel.first;
@@ -331,6 +337,8 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
 
     fillHistograms_Jets("NoSelection", fhDataAK4Jets);
 
+    if(jetLabel.first.find("l1t") == 0) continue;
+
     for(auto const& selLabel : l1tSeeds_1Jet_){
       auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tSingleJetSeed(selLabel);
       if(not l1tSeed){
@@ -339,6 +347,8 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
 
       fillHistograms_Jets(selLabel, fhDataAK4Jets);
     }
+
+    if(isGENJets) continue;
 
     for(auto const& selLabel : l1tSeeds_HT_){
       auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tHTSeed(selLabel);
@@ -400,10 +410,10 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
   const float maxAK8JetDeltaRmatchRef(0.1);
 
   for(auto const& jetLabel : labelMap_jetAK8_){
-    auto jetPt1(minAK8JetPt), jetPt2(minAK8JetPtRef);
-    if(jetLabel.first.find("GenJets") != std::string::npos){
-      std::swap(jetPt1, jetPt2);
-    }
+    auto const isGENJets = (jetLabel.first.find("GenJets") != std::string::npos);
+
+    auto const jetPt1 = isGENJets ? minAK8JetPtRef : minAK8JetPt;
+    auto const jetPt2 = isGENJets ? minAK8JetPtRef * 0.75 : minAK8JetPtRef;
 
     fillHistoDataJets fhDataAK8Jets;
     fhDataAK8Jets.jetCollection = jetLabel.first;

@@ -379,7 +379,7 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   for(uint idx=0; idx<binEdges_MHT.size(); ++idx){ binEdges_MHT.at(idx) = idx * 10.; }
 
   std::vector<float> binEdges_pt(101);
-  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = idx * 10.; }
+  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = 10.*idx; }
 
   std::vector<float> binEdges_eta(101);
   for(uint idx=0; idx<binEdges_eta.size(); ++idx){ binEdges_eta.at(idx) = -5.0+0.1*idx; }
@@ -406,8 +406,8 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
   std::vector<float> binEdges_dRmatch(26);
   for(uint idx=0; idx<binEdges_dRmatch.size(); ++idx){ binEdges_dRmatch.at(idx) = 0.2*idx; }
 
-  std::vector<float> binEdges_response(51);
-  for(uint idx=0; idx<binEdges_response.size(); ++idx){ binEdges_response.at(idx) = 0.1*idx; }
+  std::vector<float> binEdges_response(101);
+  for(uint idx=0; idx<binEdges_response.size(); ++idx){ binEdges_response.at(idx) = 0.05*idx; }
 
   for(auto const& catLabel : jetCategoryLabels_){
 
@@ -433,6 +433,11 @@ void JMETriggerAnalysisDriver::bookHistograms_Jets(const std::string& dir, const
     addTH1D(dirPrefix+jetType+catLabel+"_muonMultiplicity", binEdges_dauMult2);
 
     for(auto const& matchLabel : matchLabels){
+
+      addTH2D(dirPrefix+jetType+catLabel+"_pt__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_pt__vs__"+matchLabel+"_eta", binEdges_pt, binEdges_eta);
+      addTH2D(dirPrefix+jetType+catLabel+"_pt0__vs__"+matchLabel+"_pt", binEdges_pt, binEdges_pt);
+      addTH2D(dirPrefix+jetType+catLabel+"_pt0__vs__"+matchLabel+"_eta", binEdges_pt, binEdges_eta);
 
       addTH2D(dirPrefix+jetType+catLabel+"_HT__vs__"+matchLabel+"_HT", binEdges_HT, binEdges_HT);
       addTH2D(dirPrefix+jetType+catLabel+"_MHT__vs__"+matchLabel+"_MHT", binEdges_MHT, binEdges_MHT);
@@ -529,14 +534,14 @@ void JMETriggerAnalysisDriver::bookHistograms_MET(const std::string& dir, const 
     return;
   }
 
-  std::vector<float> binEdges_response(51);
-  for(uint idx=0; idx<51; ++idx){ binEdges_response.at(idx) = 0.1*idx; }
+  std::vector<float> binEdges_response(101);
+  for(uint idx=0; idx<binEdges_response.size(); ++idx){ binEdges_response.at(idx) = 0.05*idx; }
 
   std::vector<float> binEdges_deltaPhi(21);
-  for(uint idx=0; idx<21; ++idx){ binEdges_deltaPhi.at(idx) = M_PI*0.05*idx; }
+  for(uint idx=0; idx<binEdges_deltaPhi.size(); ++idx){ binEdges_deltaPhi.at(idx) = M_PI*0.05*idx; }
 
   std::vector<float> binEdges_deltaPt(61);
-  for(uint idx=0; idx<61; ++idx){ binEdges_deltaPt.at(idx) = -240+8.*idx; }
+  for(uint idx=0; idx<binEdges_deltaPt.size(); ++idx){ binEdges_deltaPt.at(idx) = -240+8.*idx; }
 
   for(auto const& matchLabel : matchLabels){
 
@@ -786,7 +791,9 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
       int indexMaxPtJetWithMatch(-1), indexMaxPtJetWithNoMatch(-1);
       float maxPtJetPtWithMatch(-1.), maxPtJetPtWithNoMatch(-1.);
 
+      int indexCounter(-1);
       for(auto const jetIdx : jetIndices){
+        ++indexCounter;
 
         auto const jetPt(v_pt->at(jetIdx));
         auto const jetEta(v_eta->at(jetIdx));
@@ -833,6 +840,14 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
           auto const jetMatchPhi(v_match_phi->at(jetMatchIdx));
           auto const jetMatchMass(v_match_mass->at(jetMatchIdx));
 
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_pt__vs__"+matchLabel+"_eta")->Fill(jetPt, jetMatchEta);
+
+          if(indexCounter == 0){
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_pt0__vs__"+matchLabel+"_eta")->Fill(jetPt, jetMatchEta);
+          }
+
           H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, jetMatchPt);
           H2(dirPrefix+fhData.jetCollection+catLabel+"_MatchedTo"+matchLabel+"_eta__vs__"+matchLabel+"_eta")->Fill(jetEta, jetMatchEta);
 
@@ -865,6 +880,14 @@ void JMETriggerAnalysisDriver::fillHistograms_Jets(const std::string& dir, const
           if((nJetsNotMatched == 1) or (jetPt > maxPtJetPtWithNoMatch)){
 	    maxPtJetPtWithNoMatch = jetPt;
             indexMaxPtJetWithNoMatch = jetIdx;
+          }
+
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_pt__vs__"+matchLabel+"_pt")->Fill(jetPt, -1.);
+          H2(dirPrefix+fhData.jetCollection+catLabel+"_pt__vs__"+matchLabel+"_eta")->Fill(jetPt, -99.);
+
+          if(indexCounter == 0){
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_pt0__vs__"+matchLabel+"_pt")->Fill(jetPt, -1.);
+            H2(dirPrefix+fhData.jetCollection+catLabel+"_pt0__vs__"+matchLabel+"_eta")->Fill(jetPt, -99.);
           }
 
           H1(dirPrefix+fhData.jetCollection+catLabel+"_NotMatchedTo"+matchLabel+"_pt")->Fill(jetPt);
