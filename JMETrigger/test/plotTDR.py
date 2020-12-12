@@ -2210,6 +2210,23 @@ if __name__ == '__main__':
   rateDict = {}
   countDict = {}
 
+  rateConfig = {
+    'PU140': {
+      'iLumiHzPerPb': 0.050,
+      'hltThresholdSingleJet': 490.,
+      'hltThresholdHT': 1000.,
+      'hltThresholdMET': 110.,
+      'hltThresholdMET2': 110.,
+    },
+    'PU200': {
+      'iLumiHzPerPb': 0.075,
+      'hltThresholdSingleJet': 530.,
+      'hltThresholdHT': 1100.,
+      'hltThresholdMET': 120.,
+      'hltThresholdMET2': 120.,
+    }
+  }
+
   for _tmpReco in recoKeys:
 
     rates[_tmpReco] = {}
@@ -2224,37 +2241,24 @@ if __name__ == '__main__':
      print '='*110
      print '='*110
 
-     if _puTag == 'PU140':
-       iLumiHzPerPb = 0.050
-       hltThresholdSingleJet = 490.
-       hltThresholdHT = 1000.
-       hltThresholdMET = 110.
-       hltThresholdMET2 = 110.
-     elif _puTag == 'PU200':
-       iLumiHzPerPb = 0.075
-       hltThresholdSingleJet = 530.
-       hltThresholdHT = 1100.
-       hltThresholdMET = 120.
-       hltThresholdMET2 = 120.
-
      rates[_tmpReco][_puTag] = {}
      for _tmp in rateSamples:
       rates[_tmpReco][_puTag][_tmp] = getRates(
-        fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_'+_tmp+'_'+_puTag+'.root', instLumiHzPerPb = iLumiHzPerPb,
+        fpath = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_'+_tmp+'_'+_puTag+'.root', instLumiHzPerPb = rateConfig[_puTag]['iLumiHzPerPb'],
         processName = _tmp,
-        hltThreshold_SingleJet = hltThresholdSingleJet,
-        hltThreshold_HT = hltThresholdHT,
-        hltThreshold_MET = hltThresholdMET,
-        hltThreshold_MET2 = hltThresholdMET2,
+        hltThreshold_SingleJet = rateConfig[_puTag]['hltThresholdSingleJet'],
+        hltThreshold_HT = rateConfig[_puTag]['hltThresholdHT'],
+        hltThreshold_MET = rateConfig[_puTag]['hltThresholdMET'],
+        hltThreshold_MET2 = rateConfig[_puTag]['hltThresholdMET2'],
       )
 
      rateDict[_tmpReco][_puTag] = {}
      countDict[_tmpReco][_puTag] = {}
      for _tmpTrg in [
-       L1T_SingleJet, 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet),
-       L1T_HT, 'HLT_PFPuppiHT'+str(hltThresholdHT),
-       'L1T_PFPuppiMET200off', 'HLT_PFPuppiMET'+str(hltThresholdMET),
-       'L1T_PFPuppiMET245off', 'HLT_PFPuppiMET'+str(hltThresholdMET2),
+       L1T_SingleJet, 'HLT_AK4PFPuppiJet'+str(rateConfig[_puTag]['hltThresholdSingleJet']),
+       L1T_HT, 'HLT_PFPuppiHT'+str(rateConfig[_puTag]['hltThresholdHT']),
+       'L1T_PFPuppiMET200off', 'HLT_PFPuppiMET'+str(rateConfig[_puTag]['hltThresholdMET']),
+       'L1T_PFPuppiMET245off', 'HLT_PFPuppiMET'+str(rateConfig[_puTag]['hltThresholdMET2']),
      ]:
       rateDict[_tmpReco][_puTag][_tmpTrg] = {}
       countDict[_tmpReco][_puTag][_tmpTrg] = {}
@@ -2270,10 +2274,10 @@ if __name__ == '__main__':
         countDict[_tmpReco][_puTag][_tmpTrg][_tmp1] = [theCount, math.sqrt(theCountErr2)]
 
      for _tmpL1T, _tmpHLT in [
-       [L1T_SingleJet, 'HLT_AK4PFPuppiJet'+str(hltThresholdSingleJet)],
-       [L1T_HT, 'HLT_PFPuppiHT'+str(hltThresholdHT)],
-       ['L1T_PFPuppiMET200off', 'HLT_PFPuppiMET'+str(hltThresholdMET)],
-       ['L1T_PFPuppiMET245off', 'HLT_PFPuppiMET'+str(hltThresholdMET2)],
+       [L1T_SingleJet, 'HLT_AK4PFPuppiJet'+str(rateConfig[_puTag]['hltThresholdSingleJet'])],
+       [L1T_HT, 'HLT_PFPuppiHT'+str(rateConfig[_puTag]['hltThresholdHT'])],
+       ['L1T_PFPuppiMET200off', 'HLT_PFPuppiMET'+str(rateConfig[_puTag]['hltThresholdMET'])],
+       ['L1T_PFPuppiMET245off', 'HLT_PFPuppiMET'+str(rateConfig[_puTag]['hltThresholdMET2'])],
      ]:
       print '-'*110
       print '\033[1m{:10}\033[0m | \033[1m{:47}\033[0m | \033[1m{:47}\033[0m'.format('Rate [Hz]', '[L1T] '+_tmpL1T, '[L1T+HLT] '+_tmpHLT)
@@ -2332,7 +2336,311 @@ if __name__ == '__main__':
 
 
 
+    print '='*50
+    print '='*50
+    print '\033[1m'+'Rate Plots'+'\033[0m'
+    print '='*50
+    print '='*50
 
+    ## Single-Jet
+    canvas = ROOT.TCanvas(tmpName(), tmpName(False))
+    canvas.cd()
+
+    h0 = canvas.DrawFrame(450, 20, 600, 349)
+
+    h140 = rateHistos[_tmpReco]['PU140']['hltAK4PFPuppiJet'].Clone()
+    h140.SetMarkerStyle(20)
+    h140.SetMarkerSize(0.)
+    h140.SetMarkerColor(1)
+    h140.SetLineColor(1)
+    h140.SetLineWidth(2)
+    h140.SetLineStyle(1)
+
+    h200 = rateHistos[_tmpReco]['PU200']['hltAK4PFPuppiJet'].Clone()
+    h200.SetMarkerStyle(20)
+    h200.SetMarkerSize(0.)
+    h200.SetMarkerColor(2)
+    h200.SetLineColor(2)
+    h200.SetLineWidth(2)
+    h200.SetLineStyle(1)
+
+    h140.Draw('hist,e0,same')
+    h200.Draw('hist,e0,same')
+
+    topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
+    topLabel.SetFillColor(0)
+    topLabel.SetFillStyle(1001)
+    topLabel.SetTextColor(ROOT.kBlack)
+    topLabel.SetTextAlign(12)
+    topLabel.SetTextFont(42)
+    topLabel.SetTextSize(0.035)
+    topLabel.SetBorderSize(0)
+    topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+    topLabel.Draw('same')
+
+    objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+    objLabel.SetFillColor(0)
+    objLabel.SetFillStyle(1001)
+    objLabel.SetTextColor(ROOT.kBlack)
+    objLabel.SetTextAlign(32)
+    objLabel.SetTextFont(42)
+    objLabel.SetTextSize(0.035)
+    objLabel.SetBorderSize(0)
+    objLabel.AddText('PU 140-200 (14 TeV)')
+    objLabel.Draw('same')
+
+    l1tRateLabel = ROOT.TPaveText(0.165, 0.80, 0.38, 0.90, 'NDC')
+    l1tRateLabel.SetFillColor(0)
+    l1tRateLabel.SetFillStyle(1001)
+    l1tRateLabel.SetTextColor(ROOT.kBlack)
+    l1tRateLabel.SetTextAlign(12)
+    l1tRateLabel.SetTextFont(42)
+    l1tRateLabel.SetTextSize(0.0325)
+    l1tRateLabel.SetBorderSize(0)
+    l1tRateLabel.AddText('HLT: Single-Jet')
+    l1tRateLabel.Draw('same')
+
+#    hltTargetRateLine = ROOT.TLine(_tmp['xmin'], _tmp['hltTargetRateHz'], _tmp['xmax'], _tmp['hltTargetRateHz'])
+#    hltTargetRateLine.SetLineWidth(2)
+#    hltTargetRateLine.SetLineStyle(2)
+#    hltTargetRateLine.SetLineColor(ROOT.kViolet-1)
+#    hltTargetRateLine.Draw('same')
+
+    hltTargetRateLabel = ROOT.TPaveText(0.50, 0.80, 0.94, 0.85, 'NDC')
+    hltTargetRateLabel.SetFillColor(0)
+    hltTargetRateLabel.SetFillStyle(1001)
+    hltTargetRateLabel.SetTextColor(ROOT.kViolet-1)
+    hltTargetRateLabel.SetTextAlign(32)
+    hltTargetRateLabel.SetTextFont(42)
+    hltTargetRateLabel.SetTextSize(0.0325)
+    l1tRateLabel.SetBorderSize(0)
+#    hltTargetRateLabel.AddText('Target HLT Rate: '+str(_tmp['hltTargetRateHz'])+' Hz')
+#    hltTargetRateLabel.Draw('same')
+
+    leg1 = ROOT.TLegend(0.41, 0.73, 0.94, 0.90)
+    leg1.SetNColumns(1)
+    leg1.SetTextFont(42)
+    leg1.AddEntry(h140, 'PU 140, L = 5.0 #upoint 10^{34} cm^{-2} s^{-1}', 'le')
+    leg1.AddEntry(h200, 'PU 200, L = 7.5 #upoint 10^{34} cm^{-2} s^{-1}', 'le')
+    leg1.Draw('same')
+
+    canvas.SetLogy(1)
+    canvas.SetGrid(1, 1)
+
+    h0.SetTitle(';HLT Jet p_{T} Threshold [GeV];HLT Rate [Hz]')
+    h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+    h0.GetYaxis().SetNoExponent()
+    h0.GetYaxis().SetMoreLogLabels()
+    h0.Draw('axis,same')
+
+    for _tmpExt in EXTS:
+      canvas.SaveAs(outputDir+'/triggerRate_SingleJet'+'.'+_tmpExt)
+
+    canvas.Close()
+
+    print '\033[1m'+outputDir+'/triggerRate_SingleJet'+'\033[0m'
+
+    ## HT
+    canvas = ROOT.TCanvas(tmpName(), tmpName(False))
+    canvas.cd()
+
+    h0 = canvas.DrawFrame(900, 10, 1400, 449)
+
+    h140 = rateHistos[_tmpReco]['PU140']['hltPFPuppiHT'].Clone()
+    h140.SetMarkerStyle(20)
+    h140.SetMarkerSize(0.)
+    h140.SetMarkerColor(1)
+    h140.SetLineColor(1)
+    h140.SetLineWidth(2)
+    h140.SetLineStyle(1)
+
+    h200 = rateHistos[_tmpReco]['PU200']['hltPFPuppiHT'].Clone()
+    h200.SetMarkerStyle(20)
+    h200.SetMarkerSize(0.)
+    h200.SetMarkerColor(2)
+    h200.SetLineColor(2)
+    h200.SetLineWidth(2)
+    h200.SetLineStyle(1)
+
+    h140.Draw('hist,e0,same')
+    h200.Draw('hist,e0,same')
+
+    topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
+    topLabel.SetFillColor(0)
+    topLabel.SetFillStyle(1001)
+    topLabel.SetTextColor(ROOT.kBlack)
+    topLabel.SetTextAlign(12)
+    topLabel.SetTextFont(42)
+    topLabel.SetTextSize(0.035)
+    topLabel.SetBorderSize(0)
+    topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+    topLabel.Draw('same')
+
+    objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+    objLabel.SetFillColor(0)
+    objLabel.SetFillStyle(1001)
+    objLabel.SetTextColor(ROOT.kBlack)
+    objLabel.SetTextAlign(32)
+    objLabel.SetTextFont(42)
+    objLabel.SetTextSize(0.035)
+    objLabel.SetBorderSize(0)
+    objLabel.AddText('PU 140-200 (14 TeV)')
+    objLabel.Draw('same')
+
+    l1tRateLabel = ROOT.TPaveText(0.165, 0.80, 0.38, 0.90, 'NDC')
+    l1tRateLabel.SetFillColor(0)
+    l1tRateLabel.SetFillStyle(1001)
+    l1tRateLabel.SetTextColor(ROOT.kBlack)
+    l1tRateLabel.SetTextAlign(12)
+    l1tRateLabel.SetTextFont(42)
+    l1tRateLabel.SetTextSize(0.0325)
+    l1tRateLabel.SetBorderSize(0)
+    l1tRateLabel.AddText('HLT: H_{T}')
+    l1tRateLabel.Draw('same')
+
+#    hltTargetRateLine = ROOT.TLine(_tmp['xmin'], _tmp['hltTargetRateHz'], _tmp['xmax'], _tmp['hltTargetRateHz'])
+#    hltTargetRateLine.SetLineWidth(2)
+#    hltTargetRateLine.SetLineStyle(2)
+#    hltTargetRateLine.SetLineColor(ROOT.kViolet-1)
+#    hltTargetRateLine.Draw('same')
+
+    hltTargetRateLabel = ROOT.TPaveText(0.50, 0.80, 0.94, 0.85, 'NDC')
+    hltTargetRateLabel.SetFillColor(0)
+    hltTargetRateLabel.SetFillStyle(1001)
+    hltTargetRateLabel.SetTextColor(ROOT.kViolet-1)
+    hltTargetRateLabel.SetTextAlign(32)
+    hltTargetRateLabel.SetTextFont(42)
+    hltTargetRateLabel.SetTextSize(0.0325)
+    l1tRateLabel.SetBorderSize(0)
+#    hltTargetRateLabel.AddText('Target HLT Rate: '+str(_tmp['hltTargetRateHz'])+' Hz')
+#    hltTargetRateLabel.Draw('same')
+
+    leg1 = ROOT.TLegend(0.41, 0.73, 0.94, 0.90)
+    leg1.SetNColumns(1)
+    leg1.SetTextFont(42)
+    leg1.AddEntry(h140, 'PU 140, L = 5.0 #upoint 10^{34} cm^{-2} s^{-1}', 'le')
+    leg1.AddEntry(h200, 'PU 200, L = 7.5 #upoint 10^{34} cm^{-2} s^{-1}', 'le')
+    leg1.Draw('same')
+
+    canvas.SetLogy(1)
+    canvas.SetGrid(1, 1)
+
+    h0.SetTitle(';HLT H_{T} Threshold [GeV];HLT Rate [Hz]')
+    h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+    h0.GetYaxis().SetNoExponent()
+    h0.GetYaxis().SetMoreLogLabels()
+    h0.Draw('axis,same')
+
+    for _tmpExt in EXTS:
+      canvas.SaveAs(outputDir+'/triggerRate_HT'+'.'+_tmpExt)
+
+    canvas.Close()
+
+    print '\033[1m'+outputDir+'/triggerRate_HT'+'\033[0m'
+
+    ## MET
+    canvas = ROOT.TCanvas(tmpName(), tmpName(False))
+    canvas.cd()
+
+    h0 = canvas.DrawFrame(100, 10, 180, 1199)
+
+    h140 = rateHistos[_tmpReco]['PU140']['hltPFPuppiMET'].Clone()
+    h140.SetMarkerStyle(20)
+    h140.SetMarkerSize(0.)
+    h140.SetMarkerColor(1)
+    h140.SetLineColor(1)
+    h140.SetLineWidth(2)
+    h140.SetLineStyle(1)
+
+    h200 = rateHistos[_tmpReco]['PU200']['hltPFPuppiMET'].Clone()
+    h200.SetMarkerStyle(20)
+    h200.SetMarkerSize(0.)
+    h200.SetMarkerColor(2)
+    h200.SetLineColor(2)
+    h200.SetLineWidth(2)
+    h200.SetLineStyle(1)
+
+    h140.Draw('hist,e0,same')
+    h200.Draw('hist,e0,same')
+
+    topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
+    topLabel.SetFillColor(0)
+    topLabel.SetFillStyle(1001)
+    topLabel.SetTextColor(ROOT.kBlack)
+    topLabel.SetTextAlign(12)
+    topLabel.SetTextFont(42)
+    topLabel.SetTextSize(0.035)
+    topLabel.SetBorderSize(0)
+    topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+    topLabel.Draw('same')
+
+    objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+    objLabel.SetFillColor(0)
+    objLabel.SetFillStyle(1001)
+    objLabel.SetTextColor(ROOT.kBlack)
+    objLabel.SetTextAlign(32)
+    objLabel.SetTextFont(42)
+    objLabel.SetTextSize(0.035)
+    objLabel.SetBorderSize(0)
+    objLabel.AddText('PU 140-200 (14 TeV)')
+    objLabel.Draw('same')
+
+    l1tRateLabel = ROOT.TPaveText(0.165, 0.80, 0.38, 0.90, 'NDC')
+    l1tRateLabel.SetFillColor(0)
+    l1tRateLabel.SetFillStyle(1001)
+    l1tRateLabel.SetTextColor(ROOT.kBlack)
+    l1tRateLabel.SetTextAlign(12)
+    l1tRateLabel.SetTextFont(42)
+    l1tRateLabel.SetTextSize(0.0325)
+    l1tRateLabel.SetBorderSize(0)
+    l1tRateLabel.AddText('HLT: Missing E_{T}')
+    l1tRateLabel.Draw('same')
+
+#    hltTargetRateLine = ROOT.TLine(_tmp['xmin'], _tmp['hltTargetRateHz'], _tmp['xmax'], _tmp['hltTargetRateHz'])
+#    hltTargetRateLine.SetLineWidth(2)
+#    hltTargetRateLine.SetLineStyle(2)
+#    hltTargetRateLine.SetLineColor(ROOT.kViolet-1)
+#    hltTargetRateLine.Draw('same')
+
+    hltTargetRateLabel = ROOT.TPaveText(0.50, 0.80, 0.94, 0.85, 'NDC')
+    hltTargetRateLabel.SetFillColor(0)
+    hltTargetRateLabel.SetFillStyle(1001)
+    hltTargetRateLabel.SetTextColor(ROOT.kViolet-1)
+    hltTargetRateLabel.SetTextAlign(32)
+    hltTargetRateLabel.SetTextFont(42)
+    hltTargetRateLabel.SetTextSize(0.0325)
+    l1tRateLabel.SetBorderSize(0)
+#    hltTargetRateLabel.AddText('Target HLT Rate: '+str(_tmp['hltTargetRateHz'])+' Hz')
+#    hltTargetRateLabel.Draw('same')
+
+    leg1 = ROOT.TLegend(0.41, 0.73, 0.94, 0.90)
+    leg1.SetNColumns(1)
+    leg1.SetTextFont(42)
+    leg1.AddEntry(h140, 'PU 140, L = 5.0 #upoint 10^{34} cm^{-2} s^{-1}', 'le')
+    leg1.AddEntry(h200, 'PU 200, L = 7.5 #upoint 10^{34} cm^{-2} s^{-1}', 'le')
+    leg1.Draw('same')
+
+    canvas.SetLogy(1)
+    canvas.SetGrid(1, 1)
+
+    h0.SetTitle(';HLT MET Threshold [GeV];HLT Rate [Hz]')
+    h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+    h0.GetYaxis().SetNoExponent()
+    h0.GetYaxis().SetMoreLogLabels()
+    h0.Draw('axis,same')
+
+    for _tmpExt in EXTS:
+      canvas.SaveAs(outputDir+'/triggerRate_MET'+'.'+_tmpExt)
+
+    canvas.Close()
+
+    print '\033[1m'+outputDir+'/triggerRate_MET'+'\033[0m'
+
+
+
+
+
+  print '='*50
 
 
   raise SystemExit(1) #!!!!!!!!!!!!!!!!
@@ -2584,199 +2892,6 @@ if __name__ == '__main__':
           print '\033[1m'+_tmp['outputName']+'\033[0m'
 
     raise SystemExit(1)
-
-    print '='*50
-    print '='*50
-    print '\033[1m'+'Rate Plots'+'\033[0m'
-    print '='*50
-    print '='*50
-
-    for _tmp in [
-      {
-        'l1tRateTuple': rateDict['HLT_TRKv06p1'][L1T_SingleJet]['MB'],
-        'hltTargetRateHz': 75,
-        'outputName': outputDir+'/rate_SingleJet',
-        'outputExts': EXTS,
-        'title': ';HLT PF+PUPPI Jet p_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
-        'objLabel': '',
-        'topLabel': 'MC: QCD + V+jets',
-        'xmin':  400,
-        'xmax':  550,
-        'ymin':   11,
-        'ymax':  299,
-        'logY': 1,
-        'histos': [
-          {'histo': rateHistos['HLT_TRKv06p1']       ['hltAK4PFPuppiJet'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltAK4PFPuppiJet'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltAK4PFPuppiJet'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltAK4PFPuppiJet'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltAK4PFPuppiJet'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltAK4PFPuppiJet'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
-        ],
-      },
-      {
-        'l1tRateTuple': rateDict['HLT_TRKv06p1'][L1T_HT]['MB'],
-        'hltTargetRateHz': 75,
-        'outputName': outputDir+'/rate_HT',
-        'outputExts': EXTS,
-        'title': ';HLT PF+PUPPI H_{T} Threshold [GeV];L1T+HLT Rate [Hz]',
-        'objLabel': '',
-        'topLabel': 'MC: QCD + V+jets',
-        'xmin':  900,
-        'xmax': 1400,
-        'ymin':    2,
-        'ymax':  299,
-        'logY': 1,
-        'histos': [
-          {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiHT'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiHT'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiHT'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiHT'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiHT'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiHT'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
-        ],
-      },
-      {
-        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_PFPuppiMET200off']['MB'],
-        'hltTargetRateHz': 225,
-        'outputName': outputDir+'/rate_MET',
-        'outputExts': EXTS,
-        'title': ';HLT PF+PUPPI MET Threshold [GeV];L1T+HLT Rate [Hz]',
-        'objLabel': '',
-        'topLabel': 'MC: QCD + V+jets',
-        'xmin':    0,
-        'xmax':  260,
-        'ymin':    2,
-        'ymax': 2999,
-        'logY': 1,
-        'histos': [
-          {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiMET'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiMET'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiMET'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
-        ],
-      },
-      {
-        'l1tRateTuple': rateDict['HLT_TRKv06p1']['L1T_PFPuppiMET245off']['MB'],
-        'hltTargetRateHz': 225,
-        'outputName': outputDir+'/rate_MET2',
-        'outputExts': EXTS,
-        'title': ';HLT PF+PUPPI MET Threshold [GeV];L1T+HLT Rate [Hz]',
-        'objLabel': '',
-        'topLabel': 'MC: QCD + V+jets',
-        'xmin':    0,
-        'xmax':  260,
-        'ymin':    2,
-        'ymax': 2999,
-        'logY': 1,
-        'histos': [
-          {'histo': rateHistos['HLT_TRKv06p1']       ['hltPFPuppiMET2'], 'color': 1, 'lineStyle': 1, 'legName': 'TRK-v6.1 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv06p1_TICL']  ['hltPFPuppiMET2'], 'color': 2, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv06p1_TICLv2']['hltPFPuppiMET2'], 'color': 4, 'lineStyle': 1, 'legName': 'TRK-v6.1 + TICLnew'},
-          {'histo': rateHistos['HLT_TRKv07p2']       ['hltPFPuppiMET2'], 'color': 1, 'lineStyle': 2, 'legName': 'TRK-v7.2 + simPF'  },
-          {'histo': rateHistos['HLT_TRKv07p2_TICL']  ['hltPFPuppiMET2'], 'color': 2, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLold'},
-          {'histo': rateHistos['HLT_TRKv07p2_TICLv2']['hltPFPuppiMET2'], 'color': 4, 'lineStyle': 2, 'legName': 'TRK-v7.2 + TICLnew'},
-        ],
-      },
-    ]:
-      canvasCount += 1
-      canvasNamePostfix = '_'+str(canvasCount)
-
-      theRates = []
-      for _tmpIdx in range(len(_tmp['histos'])):
-        h0 = _tmp['histos'][_tmpIdx]['histo']
-        h0.SetMarkerSize(0.5)
-        h0.SetLineWidth(2)
-        h0.SetMarkerColor(_tmp['histos'][_tmpIdx]['color'])
-        h0.SetLineColor(_tmp['histos'][_tmpIdx]['color'])
-        h0.SetLineStyle(_tmp['histos'][_tmpIdx]['lineStyle'])
-        h0.SetName(_tmp['histos'][_tmpIdx]['legName'])
-        theRates += [h0]
-
-      canvas = ROOT.TCanvas('c'+canvasNamePostfix, 'c'+canvasNamePostfix)
-      canvas.cd()
-
-      h0 = canvas.DrawFrame(_tmp['xmin'], _tmp['ymin'], _tmp['xmax'], _tmp['ymax'])
-
-      for _tmp2 in theRates:
-        if _tmp2 is not None:
-          _tmp2.Draw('hist,e,same')
-
-      topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
-      topLabel.SetFillColor(0)
-      topLabel.SetFillStyle(1001)
-      topLabel.SetTextColor(ROOT.kBlack)
-      topLabel.SetTextAlign(12)
-      topLabel.SetTextFont(42)
-      topLabel.SetTextSize(0.035)
-      topLabel.SetBorderSize(0)
-      topLabel.AddText(_tmp['topLabel'])
-      topLabel.Draw('same')
-
-      objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
-      objLabel.SetFillColor(0)
-      objLabel.SetFillStyle(1001)
-      objLabel.SetTextColor(ROOT.kBlack)
-      objLabel.SetTextAlign(32)
-      objLabel.SetTextFont(42)
-      objLabel.SetTextSize(0.035)
-      objLabel.SetBorderSize(0)
-      objLabel.AddText(_tmp['objLabel'])
-      objLabel.Draw('same')
-
-      l1tRateVal = _tmp['l1tRateTuple'][0]
-      l1tRateErr = _tmp['l1tRateTuple'][1]
-
-      l1tRateLabel = ROOT.TPaveText(0.50, 0.85, 0.94, 0.90, 'NDC')
-      l1tRateLabel.SetFillColor(0)
-      l1tRateLabel.SetFillStyle(1001)
-      l1tRateLabel.SetTextColor(ROOT.kBlack)
-      l1tRateLabel.SetTextAlign(12)
-      l1tRateLabel.SetTextFont(42)
-      l1tRateLabel.SetTextSize(0.0325)
-      l1tRateLabel.SetBorderSize(0)
-      l1tRateLabel.AddText('L1T Rate = {:4.1f} +/- {:4.1f} kHz (MB)'.format(l1tRateVal/1000., l1tRateErr/1000.))
-      l1tRateLabel.Draw('same')
-
-      hltTargetRateLine = ROOT.TLine(_tmp['xmin'], _tmp['hltTargetRateHz'], _tmp['xmax'], _tmp['hltTargetRateHz'])
-      hltTargetRateLine.SetLineWidth(2)
-      hltTargetRateLine.SetLineStyle(2)
-      hltTargetRateLine.SetLineColor(ROOT.kViolet-1)
-      hltTargetRateLine.Draw('same')
-
-      hltTargetRateLabel = ROOT.TPaveText(0.50, 0.80, 0.94, 0.85, 'NDC')
-      hltTargetRateLabel.SetFillColor(0)
-      hltTargetRateLabel.SetFillStyle(1001)
-      hltTargetRateLabel.SetTextColor(ROOT.kViolet-1)
-      hltTargetRateLabel.SetTextAlign(32)
-      hltTargetRateLabel.SetTextFont(42)
-      hltTargetRateLabel.SetTextSize(0.0325)
-      l1tRateLabel.SetBorderSize(0)
-      hltTargetRateLabel.AddText('Target HLT Rate: '+str(_tmp['hltTargetRateHz'])+' Hz')
-      hltTargetRateLabel.Draw('same')
-
-      leg = ROOT.TLegend(0.165, 0.17, 0.50, 0.55)
-      leg.SetNColumns(1)
-      for _tmpRate in theRates:
-        leg.AddEntry(_tmpRate, _tmpRate.GetName(), 'le')
-      leg.Draw('same')
-
-      h0.SetTitle(_tmp['title'])
-      h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
-
-      canvas.SetLogy(_tmp['logY'])
-      canvas.SetGrid(1, 1)
-
-      for _tmpExt in _tmp['outputExts']:
-        canvas.SaveAs(_tmp['outputName']+'.'+_tmpExt)
-
-      canvas.Close()
-
-      print '\033[1m'+_tmp['outputName']+'\033[0m'
-
-    print '='*50
 
 
 
