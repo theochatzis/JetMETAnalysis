@@ -30,6 +30,10 @@ std::vector<std::string> utils::stringTokens(const std::string& str, const std::
   return toks;
 }
 
+bool utils::stringContains(const std::string& str, const std::string& substr){
+  return (str.find(substr) != std::string::npos);
+}
+
 bool utils::stringStartsWith(const std::string& str, const std::string& substr){
   return (str.find(substr) == 0);
 }

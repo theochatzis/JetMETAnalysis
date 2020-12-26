@@ -190,6 +190,46 @@ void AnalysisDriverBase::write(TFile& outFile){
   }
 }
 
+void AnalysisDriverBase::addTH1D(const std::string& name, int const nxbins, float const xmin, float const xmax){
+
+  if(hasTH1D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH1D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH2D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH2D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(hasTH3D(name)){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "TH3D object associated to key \"" << name << "\" already exists";
+    throw std::runtime_error(oss.str());
+  }
+  else if(xmin >= xmax){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "x-min value is not smaller than x-max value (" << xmin << " >= " << xmax << ")";
+    throw std::runtime_error(oss.str());
+  }
+  else if(nxbins <= 0){
+    std::ostringstream oss;
+    oss << "AnalysisDriverBase::addTH1D(\"" << name << "\", const std::vector<float>&) -- "
+        << "number of x-axis bins is not positive (" << nxbins << " <= 0)";
+    throw std::runtime_error(oss.str());
+  }
+
+  mapTH1D_.insert(std::make_pair(name, std::unique_ptr<TH1D>(new TH1D(name.c_str(), name.c_str(), nxbins, xmin, xmax))));
+  mapTH1D_.at(name)->SetDirectory(0);
+  mapTH1D_.at(name)->Sumw2();
+
+  outputKeys_.emplace_back(name);
+}
+
 void AnalysisDriverBase::addTH1D(const std::string& name, const std::vector<float>& binEdges){
 
   if(hasTH1D(name)){

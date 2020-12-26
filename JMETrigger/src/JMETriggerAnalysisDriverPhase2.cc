@@ -120,6 +120,7 @@ void JMETriggerAnalysisDriverPhase2::init(){
 
   // histogram: events counter
   addTH1D("eventsProcessed", {0, 1});
+  addTH1D("weight", 100, -5, 5);
 
   labelMap_jetAK4_.clear();
   labelMap_jetAK4_ = {
@@ -322,6 +323,20 @@ void JMETriggerAnalysisDriverPhase2::init(){
 void JMETriggerAnalysisDriverPhase2::analyze(){
   H1("eventsProcessed")->Fill(0.5, 1.);
 
+  float wgt(1.f);
+  std::string const tfileName = theFile_->GetName();
+  auto const tfileBasename = tfileName.substr(tfileName.find_last_of("/\\") + 1);
+  if(utils::stringContains(tfileBasename, "MinBias") or
+     (utils::stringContains(tfileBasename, "QCD") and not utils::stringContains(tfileBasename, "Flat"))){
+    if(utils::stringContains(tfileBasename, "PU200"))
+      wgt = value<float>("qcdWeightPU200");
+    else if(utils::stringContains(tfileBasename, "PU140"))
+      wgt = value<float>("qcdWeightPU140");
+    else
+      throw std::runtime_error("failed to determine weight choice from TFile basename: "+tfileName);
+  }
+  H1("weight")->Fill(wgt);
+
   //// AK4 Jets
   const float minAK4JetPt(30.);
   const float minAK4JetPtRef(20.);
@@ -342,7 +357,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
       fhDataAK4Jets.matches.emplace_back(fillHistoDataJets::Match(jetLabelRefs.first, jetLabelRefs.second, jetPt2, maxAK4JetDeltaRmatchRef));
     }
 
-    fillHistograms_Jets("NoSelection", fhDataAK4Jets);
+    fillHistograms_Jets("NoSelection", fhDataAK4Jets, wgt);
 
     if(jetLabel.first.find("l1t") == 0) continue;
 
@@ -352,7 +367,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
         continue;
       }
 
-      fillHistograms_Jets(selLabel, fhDataAK4Jets);
+      fillHistograms_Jets(selLabel, fhDataAK4Jets, wgt);
     }
 
     if(isGENJets) continue;
@@ -363,7 +378,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
         continue;
       }
 
-      fillHistograms_Jets(selLabel, fhDataAK4Jets);
+      fillHistograms_Jets(selLabel, fhDataAK4Jets, wgt);
     }
   }
 
@@ -385,8 +400,8 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
 //    fhDataOffAK4Jets.jetPtMin = minAK4JetPt;
 //    fhDataOffAK4Jets.jetAbsEtaMax = 5.0;
 
-    fillHistograms_Jets_2DMaps("NoSelection", fhDataHLTAK4Jets, fhDataL1TSLWJets);
-//    fillHistograms_Jets_2DMaps("NoSelection", fhDataHLTAK4Jets, fhDataOffAK4Jets);
+    fillHistograms_Jets_2DMaps("NoSelection", fhDataHLTAK4Jets, fhDataL1TSLWJets, wgt);
+//    fillHistograms_Jets_2DMaps("NoSelection", fhDataHLTAK4Jets, fhDataOffAK4Jets, wgt);
 
     fillHistoDataMET fhDataHLTHT;
     fhDataHLTHT.metCollection = "hlt"+jetType+"HT";
@@ -394,7 +409,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     fillHistoDataMET fhDataL1THT;
     fhDataL1THT.metCollection = "l1t"+jetType+"HT";
 
-    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTHT, fhDataL1THT, true);
+    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTHT, fhDataL1THT, true, wgt);
 
     for(auto const& selLabel : l1tSeeds_HT_){
       auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tHTSeed(selLabel);
@@ -402,11 +417,11 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
         continue;
       }
 
-      fillHistograms_Jets_2DMaps(selLabel, fhDataHLTAK4Jets, fhDataL1TSLWJets);
-//      fillHistograms_Jets_2DMaps(selLabel, fhDataHLTAK4Jets, fhDataOffAK4Jets);
+      fillHistograms_Jets_2DMaps(selLabel, fhDataHLTAK4Jets, fhDataL1TSLWJets, wgt);
+//      fillHistograms_Jets_2DMaps(selLabel, fhDataHLTAK4Jets, fhDataOffAK4Jets, wgt);
 
       if(jetType == "PFPuppi"){
-        fillHistograms_MET_2DMaps(selLabel, fhDataHLTHT, fhDataL1THT, true);
+        fillHistograms_MET_2DMaps(selLabel, fhDataHLTHT, fhDataL1THT, true, wgt);
       }
     }
   }
@@ -431,7 +446,7 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
       fhDataAK8Jets.matches.emplace_back(fillHistoDataJets::Match(jetLabelRefs.first, jetLabelRefs.second, jetPt2, maxAK8JetDeltaRmatchRef));
     }
 
-    fillHistograms_Jets("NoSelection", fhDataAK8Jets);
+    fillHistograms_Jets("NoSelection", fhDataAK8Jets, wgt);
   }
 
   //// MET
@@ -442,14 +457,14 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
       fhDataMET.matches.emplace_back(fillHistoDataMET::Match(metRefs.first, metRefs.second));
     }
 
-    fillHistograms_MET("NoSelection", fhDataMET);
+    fillHistograms_MET("NoSelection", fhDataMET, wgt);
 
     for(auto const& selLabel : l1tSeeds_MET_){
       if(not value<bool>(selLabel)){
         continue;
       }
 
-      fillHistograms_MET(selLabel, fhDataMET);
+      fillHistograms_MET(selLabel, fhDataMET, wgt);
     }
   }
 
@@ -470,12 +485,16 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
 //    fillHistoDataMET fhDataOffMET;
 //    fhDataOffMET.metCollection = metType.at(2);
 
-    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataL1TMET);
-//    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataOffMET);
+    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataL1TMET, false, wgt);
+//    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataOffMET, false, wgt);
 
     for(auto const& selLabel : l1tSeeds_MET_){
-      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataL1TMET);
-//      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataOffMET);
+      if(not value<bool>(selLabel)){
+        continue;
+      }
+
+      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataL1TMET, false, wgt);
+//      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataOffMET, false, wgt);
     }
   }
 }
@@ -522,7 +541,7 @@ void JMETriggerAnalysisDriverPhase2::bookHistograms_MET_2DMaps(const std::string
   addTH2D(dirPrefix+metType1+"_sumEt__vs__"+metType2+"_sumEt", binEdges_sumEt, binEdges_sumEt);
 }
 
-void JMETriggerAnalysisDriverPhase2::fillHistograms_Jets_2DMaps(const std::string& dir, const fillHistoDataJets& fhData1, const fillHistoDataJets& fhData2){
+void JMETriggerAnalysisDriverPhase2::fillHistograms_Jets_2DMaps(const std::string& dir, const fillHistoDataJets& fhData1, const fillHistoDataJets& fhData2, float const weight){
 
   auto dirPrefix(dir);
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
@@ -566,10 +585,10 @@ void JMETriggerAnalysisDriverPhase2::fillHistograms_Jets_2DMaps(const std::strin
     }
   }
 
-  H2(dirPrefix+fhData1.jetCollection+"_HT__vs__"+fhData2.jetCollection+"_HT")->Fill(sumPt1, sumPt2);
+  H2(dirPrefix+fhData1.jetCollection+"_HT__vs__"+fhData2.jetCollection+"_HT")->Fill(sumPt1, sumPt2, weight);
 }
 
-void JMETriggerAnalysisDriverPhase2::fillHistograms_MET_2DMaps(const std::string& dir, const fillHistoDataMET& fhData1, const fillHistoDataMET& fhData2, bool const fill1D){
+void JMETriggerAnalysisDriverPhase2::fillHistograms_MET_2DMaps(const std::string& dir, const fillHistoDataMET& fhData1, const fillHistoDataMET& fhData2, bool const fill1D, float const weight){
 
   auto dirPrefix(dir);
   while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
@@ -621,18 +640,18 @@ void JMETriggerAnalysisDriverPhase2::fillHistograms_MET_2DMaps(const std::string
   auto const met2_pt(v_pt2->at(0)), met2_phi(v_phi2->at(0)), met2_sumEt(v_sumEt2->at(0));
 
   if(fill1D){
-    H1(dirPrefix+fhData1.metCollection+"_pt")->Fill(met1_pt);
-    H1(dirPrefix+fhData1.metCollection+"_phi")->Fill(met1_phi);
-    H1(dirPrefix+fhData1.metCollection+"_sumEt")->Fill(met1_sumEt);
+    H1(dirPrefix+fhData1.metCollection+"_pt")->Fill(met1_pt, weight);
+    H1(dirPrefix+fhData1.metCollection+"_phi")->Fill(met1_phi, weight);
+    H1(dirPrefix+fhData1.metCollection+"_sumEt")->Fill(met1_sumEt, weight);
 
-    H1(dirPrefix+fhData2.metCollection+"_pt")->Fill(met2_pt);
-    H1(dirPrefix+fhData2.metCollection+"_phi")->Fill(met2_phi);
-    H1(dirPrefix+fhData2.metCollection+"_sumEt")->Fill(met2_sumEt);
+    H1(dirPrefix+fhData2.metCollection+"_pt")->Fill(met2_pt, weight);
+    H1(dirPrefix+fhData2.metCollection+"_phi")->Fill(met2_phi, weight);
+    H1(dirPrefix+fhData2.metCollection+"_sumEt")->Fill(met2_sumEt, weight);
   }
 
-  H2(dirPrefix+fhData1.metCollection+"_pt__vs__"+fhData2.metCollection+"_pt")->Fill(met1_pt, met2_pt);
-  H2(dirPrefix+fhData1.metCollection+"_phi__vs__"+fhData2.metCollection+"_phi")->Fill(met1_phi, met2_phi);
-  H2(dirPrefix+fhData1.metCollection+"_sumEt__vs__"+fhData2.metCollection+"_sumEt")->Fill(met1_sumEt, met2_sumEt);
+  H2(dirPrefix+fhData1.metCollection+"_pt__vs__"+fhData2.metCollection+"_pt")->Fill(met1_pt, met2_pt, weight);
+  H2(dirPrefix+fhData1.metCollection+"_phi__vs__"+fhData2.metCollection+"_phi")->Fill(met1_phi, met2_phi, weight);
+  H2(dirPrefix+fhData1.metCollection+"_sumEt__vs__"+fhData2.metCollection+"_sumEt")->Fill(met1_sumEt, met2_sumEt, weight);
 }
 
 bool JMETriggerAnalysisDriverPhase2::l1tSingleJetSeed(std::string const& key) const {

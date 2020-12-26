@@ -72,6 +72,7 @@ class AnalysisDriverBase {
   TH2D* H2(const std::string&);
   TH3D* H3(const std::string&);
 
+  void addTH1D(const std::string&, int const, float const, float const);
   void addTH1D(const std::string&, const std::vector<float>&);
   void addTH2D(const std::string&, const std::vector<float>&, const std::vector<float>&);
   void addTH3D(const std::string&, const std::vector<float>&, const std::vector<float>&, const std::vector<float>&);
