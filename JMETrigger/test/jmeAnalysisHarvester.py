@@ -290,7 +290,7 @@ if __name__ == '__main__':
           ### Histograms for trigger rates
           for i_h2_key in sorted(histograms.keys()):
 
-              if histograms[i_h2_key].InheritsFrom('TH2'):
+              if histograms[i_h2_key].InheritsFrom('TH2') or histograms[i_h2_key].InheritsFrom('TH3'):
                  continue
 
               if not (histograms[i_h2_key].InheritsFrom('TH1') and (histograms[i_h2_key].GetEntries() > 0)):

@@ -30,19 +30,19 @@ void JMETriggerAnalysisDriverPhase2MET::init(){
 }
 
 void JMETriggerAnalysisDriverPhase2MET::analyze(){
-  H1("eventsProcessed")->Fill(0.5, 1.);
+  H1("eventsProcessed")->Fill(0.5);
 
   float wgt(1.f);
-  std::string const tfileName = theFile_->GetName();
-  auto const tfileBasename = tfileName.substr(tfileName.find_last_of("/\\") + 1);
-  if(utils::stringContains(tfileBasename, "MinBias") or (utils::stringContains(tfileBasename, "QCD") and not utils::stringContains(tfileBasename, "Flat"))){
-    if(utils::stringContains(tfileBasename, "PU200"))
-      wgt = value<float>("qcdWeightPU200");
-    else if(utils::stringContains(tfileBasename, "PU140"))
-      wgt = value<float>("qcdWeightPU140");
-    else
-      throw std::runtime_error("failed to determine weight choice from TFile basename: "+tfileName);
-  }
+//  std::string const tfileName = theFile_->GetName();
+//  auto const tfileBasename = tfileName.substr(tfileName.find_last_of("/\\") + 1);
+//  if(utils::stringContains(tfileBasename, "MinBias") or (utils::stringContains(tfileBasename, "QCD") and not utils::stringContains(tfileBasename, "Flat"))){
+//    if(utils::stringContains(tfileBasename, "PU200"))
+//      wgt = value<double>("qcdWeightPU200");
+//    else if(utils::stringContains(tfileBasename, "PU140"))
+//      wgt = value<double>("qcdWeightPU140");
+//    else
+//      throw std::runtime_error("failed to determine weight choice from TFile basename: "+tfileName);
+//  }
   H1("weight")->Fill(wgt);
 
   // MET

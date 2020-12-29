@@ -9,7 +9,7 @@ fi
 
 OUTPUT_DIR=${1}
 
-#batch_driver.py -l 1 -i ${OUTPUT_DIR}/ntuples/*/* -o ${OUTPUT_DIR}/jobs -n 25000 -p JMETriggerAnalysisDriverPhase2
+#batch_driver.py -l 1 -i ${OUTPUT_DIR}/ntuples/*/* -o ${OUTPUT_DIR}/jobs -n 50000 -p JMETriggerAnalysisDriverPhase2
 #batch_monitor.py -i ${OUTPUT_DIR}/jobs
 
 merge_batchOutputs.py -l 1 -i ${OUTPUT_DIR}/jobs/*/*.root -o ${OUTPUT_DIR}/outputs

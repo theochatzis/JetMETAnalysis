@@ -1,6 +1,9 @@
 #include <NTupleAnalysis/JMETrigger/interface/JMETriggerAnalysisDriverPhase2.h>
 #include <NTupleAnalysis/JMETrigger/interface/Utils.h>
 #include <utility>
+#include <cmath>
+#include <Math/GenVector/LorentzVector.h>
+#include <Math/GenVector/PtEtaPhiM4D.h>
 
 JMETriggerAnalysisDriverPhase2::JMETriggerAnalysisDriverPhase2(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
   : JMETriggerAnalysisDriverPhase2(outputFilePath, outputFileMode) {
@@ -244,47 +247,45 @@ void JMETriggerAnalysisDriverPhase2::init(){
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "l1tPFPuppiMET");
 //    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "offlinePFPuppiMET_Type1");
+
+    bookHistograms_METMHT(selLabel);
   }
 
   l1tSeeds_1Jet_ = {
     "L1T_SinglePFPuppiJet200off",
     "L1T_SinglePFPuppiJet200off2",
     "L1T_SinglePFPuppiJet230off2",
-    "L1T_SinglePFPuppiJet280off2",
-    "L1T_SinglePFPuppiJet320off2",
-    "L1T_SinglePFPuppiJet350off2",
-    "L1T_SinglePFPuppiJet380off2",
-    "L1T_SinglePFPuppiJet400off2",
-    "L1T_SinglePFPuppiJet420off2",
+//    "L1T_SinglePFPuppiJet280off2",
+//    "L1T_SinglePFPuppiJet320off2",
+//    "L1T_SinglePFPuppiJet350off2",
+//    "L1T_SinglePFPuppiJet380off2",
+//    "L1T_SinglePFPuppiJet400off2",
+//    "L1T_SinglePFPuppiJet420off2",
   };
 
   for(auto const& selLabel : l1tSeeds_1Jet_){
     // histograms: AK4 Jets
     for(auto const& jetLabel : labelMap_jetAK4_){
-//      if(jetLabel.first.find("GenJets") != std::string::npos) continue;
-      if(jetLabel.first.find("l1t") == 0) continue;
-
       bookHistograms_Jets(selLabel, jetLabel.first, utils::mapKeys(jetLabel.second));
     }
   }
 
   l1tSeeds_HT_ = {
     "L1T_PFPuppiHT450off",
-    "L1T_PFPuppiHT450off2",
-    "L1T_PFPuppiHT500off2",
-    "L1T_PFPuppiHT550off2",
-    "L1T_PFPuppiHT600off2",
-    "L1T_PFPuppiHT650off2",
-    "L1T_PFPuppiHT700off2",
-    "L1T_PFPuppiHT750off2",
-    "L1T_PFPuppiHT800off2",
+//    "L1T_PFPuppiHT450off2",
+//    "L1T_PFPuppiHT500off2",
+//    "L1T_PFPuppiHT550off2",
+//    "L1T_PFPuppiHT600off2",
+//    "L1T_PFPuppiHT650off2",
+//    "L1T_PFPuppiHT700off2",
+//    "L1T_PFPuppiHT750off2",
+//    "L1T_PFPuppiHT800off2",
   };
 
   for(auto const& selLabel : l1tSeeds_HT_){
 
     for(auto const& jetLabel : labelMap_jetAK4_){
       if(jetLabel.first.find("GenJets") != std::string::npos) continue;
-      if(jetLabel.first.find("l1t") == 0) continue;
 
       bookHistograms_Jets(selLabel, jetLabel.first, utils::mapKeys(jetLabel.second));
     }
@@ -300,7 +301,9 @@ void JMETriggerAnalysisDriverPhase2::init(){
 
   l1tSeeds_MET_ = {
     "L1T_PFPuppiMET200off",
-    "L1T_PFPuppiMET245off",
+    "L1T_PFPuppiMET200off2",
+    "L1T_PFPuppiMET220off2",
+//    "L1T_PFPuppiMET250off2",
   };
 
   for(auto const& selLabel : l1tSeeds_MET_){
@@ -317,11 +320,13 @@ void JMETriggerAnalysisDriverPhase2::init(){
 
     bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "l1tPFPuppiMET");
 //    bookHistograms_MET_2DMaps(selLabel, "hltPFPuppiMETTypeOne", "offlinePFPuppiMET_Type1");
+
+    bookHistograms_METMHT(selLabel);
   }
 }
 
 void JMETriggerAnalysisDriverPhase2::analyze(){
-  H1("eventsProcessed")->Fill(0.5, 1.);
+  H1("eventsProcessed")->Fill(0.5);
 
   float wgt(1.f);
   std::string const tfileName = theFile_->GetName();
@@ -329,9 +334,9 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
   if(utils::stringContains(tfileBasename, "MinBias") or
      (utils::stringContains(tfileBasename, "QCD") and not utils::stringContains(tfileBasename, "Flat"))){
     if(utils::stringContains(tfileBasename, "PU200"))
-      wgt = value<float>("qcdWeightPU200");
+      wgt = value<double>("qcdWeightPU200");
     else if(utils::stringContains(tfileBasename, "PU140"))
-      wgt = value<float>("qcdWeightPU140");
+      wgt = value<double>("qcdWeightPU140");
     else
       throw std::runtime_error("failed to determine weight choice from TFile basename: "+tfileName);
   }
@@ -460,11 +465,10 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
     fillHistograms_MET("NoSelection", fhDataMET, wgt);
 
     for(auto const& selLabel : l1tSeeds_MET_){
-      if(not value<bool>(selLabel)){
-        continue;
+      auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tMETSeed(selLabel);
+      if(l1tSeed){
+        fillHistograms_MET(selLabel, fhDataMET, wgt);
       }
-
-      fillHistograms_MET(selLabel, fhDataMET, wgt);
     }
   }
 
@@ -489,12 +493,21 @@ void JMETriggerAnalysisDriverPhase2::analyze(){
 //    fillHistograms_MET_2DMaps("NoSelection", fhDataHLTMET, fhDataOffMET, false, wgt);
 
     for(auto const& selLabel : l1tSeeds_MET_){
-      if(not value<bool>(selLabel)){
-        continue;
+      auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tMETSeed(selLabel);
+      if(l1tSeed){
+        fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataL1TMET, false, wgt);
+//        fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataOffMET, false, wgt);
       }
+    }
+  }
 
-      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataL1TMET, false, wgt);
-//      fillHistograms_MET_2DMaps(selLabel, fhDataHLTMET, fhDataOffMET, false, wgt);
+  //// MET+MHT
+  fillHistograms_METMHT("NoSelection", wgt);
+
+  for(auto const& selLabel : l1tSeeds_MET_){
+    auto const l1tSeed = hasTTreeReaderValue(selLabel) ? value<bool>(selLabel) : l1tMETSeed(selLabel);
+    if(l1tSeed){
+      fillHistograms_METMHT(selLabel, wgt);
     }
   }
 }
@@ -654,6 +667,68 @@ void JMETriggerAnalysisDriverPhase2::fillHistograms_MET_2DMaps(const std::string
   H2(dirPrefix+fhData1.metCollection+"_sumEt__vs__"+fhData2.metCollection+"_sumEt")->Fill(met1_sumEt, met2_sumEt, weight);
 }
 
+void JMETriggerAnalysisDriverPhase2::bookHistograms_METMHT(const std::string& dir){
+
+  auto dirPrefix(dir);
+  while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
+  if(not dirPrefix.empty()){ dirPrefix += "/"; }
+
+  std::vector<float> binEdges_pt(161);
+  for(uint idx=0; idx<binEdges_pt.size(); ++idx){ binEdges_pt.at(idx) = idx * 5.; }
+
+  std::vector<float> binEdges_pt_2(37);
+  for(uint idx=0; idx<binEdges_pt_2.size(); ++idx){ binEdges_pt_2.at(idx) = 80. + idx * 5.; }
+
+  addTH2D(dirPrefix+"genMETTrue_pt__vs__l1tPFPuppiMET_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT20_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT30_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT40_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT50_pt", binEdges_pt, binEdges_pt);
+  addTH3D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT20_pt", binEdges_pt, binEdges_pt_2, binEdges_pt_2);
+  addTH3D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT30_pt", binEdges_pt, binEdges_pt_2, binEdges_pt_2);
+  addTH3D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT40_pt", binEdges_pt, binEdges_pt_2, binEdges_pt_2);
+  addTH3D(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT50_pt", binEdges_pt, binEdges_pt_2, binEdges_pt_2);
+  addTH2D(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT20_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT30_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT40_pt", binEdges_pt, binEdges_pt);
+  addTH2D(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT50_pt", binEdges_pt, binEdges_pt);
+}
+
+void JMETriggerAnalysisDriverPhase2::fillHistograms_METMHT(const std::string& dir, float const weight){
+
+  auto dirPrefix(dir);
+  while (dirPrefix.back() == '/') { dirPrefix.pop_back(); }
+  if(not dirPrefix.empty()){ dirPrefix += "/"; }
+
+  // MET
+  auto const genMETTrue_pt = getMET("genMETTrue_pt");
+  auto const l1tPFPuppiMET_pt = getMET("l1tPFPuppiMET_pt");
+  auto const hltPFPuppiMETTypeOne_pt = getMET("hltPFPuppiMETTypeOne_pt");
+
+  // MHT
+  auto const hltPFPuppiMHT20_pt = getMHT(20., 5.0);
+  auto const hltPFPuppiMHT30_pt = getMHT(30., 5.0);
+  auto const hltPFPuppiMHT40_pt = getMHT(40., 5.0);
+  auto const hltPFPuppiMHT50_pt = getMHT(50., 5.0);
+
+  // filling of histograms
+  H2(dirPrefix+"genMETTrue_pt__vs__l1tPFPuppiMET_pt")->Fill(genMETTrue_pt, l1tPFPuppiMET_pt, weight);
+  H2(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt")->Fill(genMETTrue_pt, hltPFPuppiMETTypeOne_pt, weight);
+  H2(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT20_pt")->Fill(genMETTrue_pt, hltPFPuppiMHT20_pt, weight);
+  H2(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT30_pt")->Fill(genMETTrue_pt, hltPFPuppiMHT30_pt, weight);
+  H2(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT40_pt")->Fill(genMETTrue_pt, hltPFPuppiMHT40_pt, weight);
+  H2(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMHT50_pt")->Fill(genMETTrue_pt, hltPFPuppiMHT50_pt, weight);
+  H3(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT20_pt")->Fill(genMETTrue_pt, hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT20_pt, weight);
+  H3(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT30_pt")->Fill(genMETTrue_pt, hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT30_pt, weight);
+  H3(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT40_pt")->Fill(genMETTrue_pt, hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT40_pt, weight);
+  H3(dirPrefix+"genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT50_pt")->Fill(genMETTrue_pt, hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT50_pt, weight);
+  H2(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT20_pt")->Fill(hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT20_pt, weight);
+  H2(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT30_pt")->Fill(hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT30_pt, weight);
+  H2(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT40_pt")->Fill(hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT40_pt, weight);
+  H2(dirPrefix+"hltPFPuppiMETTypeOne_pt__vs__hltPFPuppiMHT50_pt")->Fill(hltPFPuppiMETTypeOne_pt, hltPFPuppiMHT50_pt, weight);
+}
+
 bool JMETriggerAnalysisDriverPhase2::l1tSingleJetSeed(std::string const& key) const {
 
   auto const* v_pt = vector_ptr<float>("l1tSlwPFPuppiJetsCorrected_pt");
@@ -687,7 +762,7 @@ bool JMETriggerAnalysisDriverPhase2::l1tSingleJetSeed(std::string const& key) co
   else if(std::abs(eta) < 2.4) offlinePt = 1.4152 * pt + 24.8375;
   else offlinePt = 1.33052 * pt + 42.4039;
 
-  if     (key == "L1T_SinglePFPuppiJet200off2") return offlinePt > 200.;
+  if(key == "L1T_SinglePFPuppiJet200off2") return offlinePt > 200.;
   else if(key == "L1T_SinglePFPuppiJet230off2") return offlinePt > 230.;
   else if(key == "L1T_SinglePFPuppiJet280off2") return offlinePt > 280.;
   else if(key == "L1T_SinglePFPuppiJet320off2") return offlinePt > 320.;
@@ -722,7 +797,7 @@ bool JMETriggerAnalysisDriverPhase2::l1tHTSeed(std::string const& key) const {
 
   auto const offlineHT = l1tHT * 1.0961 + 50.0182;
 
-  if     (key == "L1T_PFPuppiHT450off2") return offlineHT > 450.;
+  if(key == "L1T_PFPuppiHT450off2") return offlineHT > 450.;
   else if(key == "L1T_PFPuppiHT500off2") return offlineHT > 500.;
   else if(key == "L1T_PFPuppiHT550off2") return offlineHT > 550.;
   else if(key == "L1T_PFPuppiHT600off2") return offlineHT > 600.;
@@ -734,4 +809,51 @@ bool JMETriggerAnalysisDriverPhase2::l1tHTSeed(std::string const& key) const {
     throw std::runtime_error("JMETriggerAnalysisDriverPhase2::l1tHTSeed(\""+key+"\") -- invalid key");
 
   return false;
+}
+
+bool JMETriggerAnalysisDriverPhase2::l1tMETSeed(std::string const& key) const {
+
+  auto const offlineMET = getMET("l1tPFPuppiMET_pt") * 1.39739 + 54.2859;
+
+  if(key == "L1T_PFPuppiMET200off2") return offlineMET > 200.;
+  else if(key == "L1T_PFPuppiMET220off2") return offlineMET > 220.;
+  else if(key == "L1T_PFPuppiMET250off2") return offlineMET > 250.;
+  else
+    throw std::runtime_error("JMETriggerAnalysisDriverPhase2::l1tMETSeed(\""+key+"\") -- invalid key");
+
+  return false;
+}
+
+float JMETriggerAnalysisDriverPhase2::getMET(std::string const& branchName) const {
+  auto const& v_pt = this->vector<float>(branchName);
+
+  if(v_pt.size() != 1){
+    std::ostringstream oss;
+    oss << "JMETriggerAnalysisDriverPhase2::fillHistograms(\"" << branchName << "\") -- "
+        << "MET branches have invalid size (" << v_pt.size() << " != 1)";
+    throw std::runtime_error(oss.str());
+  }
+
+  return v_pt.at(0);
+}
+
+float JMETriggerAnalysisDriverPhase2::getMHT(float const jetPtMin, float const jetAbsEtaMax) const {
+  auto const& v_pt = vector<float>("hltAK4PFPuppiJetsCorrected_pt");
+  auto const& v_eta = vector<float>("hltAK4PFPuppiJetsCorrected_eta");
+  auto const& v_phi = vector<float>("hltAK4PFPuppiJetsCorrected_phi");
+  auto const& v_mass = vector<float>("hltAK4PFPuppiJetsCorrected_mass");
+
+  float MHT_x(0.f), MHT_y(0.f);
+  for(size_t jetIdx=0; jetIdx<v_pt.size(); ++jetIdx){
+    if(std::abs(v_eta.at(jetIdx)) >= jetAbsEtaMax) continue;
+
+    ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> const p4polar(v_pt.at(jetIdx), v_eta.at(jetIdx), v_phi.at(jetIdx), v_mass.at(jetIdx));
+
+    if(v_pt.at(jetIdx) > jetPtMin){
+      MHT_x += p4polar.Px();
+      MHT_y += p4polar.Py();
+    }
+  }
+
+  return sqrt(MHT_x*MHT_x + MHT_y*MHT_y);
 }
