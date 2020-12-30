@@ -429,7 +429,7 @@ def getMETEfficiencies(**kwargs):
       ret['METTypeOne'+_tmpMHT+'_L1T_wrt_'+_tmpRef].SetName('METTypeOne'+_tmpMHT+'_L1T_wrt_'+_tmpRef)
 
       _tmp_num = _tfile.Get('NoSelection/genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppi'+_tmpMHT+'_pt')
-      _tmp_num = _tmp_num.ProjectionX(tmpName(), _tmp_num.GetYaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), -1, _tmp_num.GetZaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), -1)
+      _tmp_num = _tmp_num.ProjectionX(tmpName(), _tmp_num.GetYaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), _tmp_num.GetNbinsY()+1, _tmp_num.GetZaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), _tmp_num.GetNbinsZ()+1)
       _tmp_num = _tmp_num.Rebin(len(binEdges_MET)-1, tmpName(), binEdges_MET)
 
       _tmp_den = _tfile.Get('NoSelection/hltPFPuppiMETTypeOne_pt__vs__'+_tmpRef+'_pt')
@@ -440,7 +440,7 @@ def getMETEfficiencies(**kwargs):
       ret['METTypeOne'+_tmpMHT+'_HLT_wrt_'+_tmpRef].SetName('METTypeOne'+_tmpMHT+'_HLT_wrt_'+_tmpRef)
 
       _tmp_num = _tfile.Get('L1T_PFPuppiMET220off2/genMETTrue_pt__vs__hltPFPuppiMETTypeOne_pt__vs__hltPFPuppi'+_tmpMHT+'_pt')
-      _tmp_num = _tmp_num.ProjectionX(tmpName(), _tmp_num.GetYaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), -1, _tmp_num.GetZaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), -1)
+      _tmp_num = _tmp_num.ProjectionX(tmpName(), _tmp_num.GetYaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), _tmp_num.GetNbinsY()+1, _tmp_num.GetZaxis().FindBin(kwargs['hltThreshold_METTypeOne'+_tmpMHT]), _tmp_num.GetNbinsZ()+1)
       _tmp_num = _tmp_num.Rebin(len(binEdges_MET)-1, tmpName(), binEdges_MET)
 
       _tmp_den = _tfile.Get('NoSelection/hltPFPuppiMETTypeOne_pt__vs__'+_tmpRef+'_pt')
@@ -2667,7 +2667,7 @@ if __name__ == '__main__':
             hltRateLabel.SetTextSize(0.035)
             hltRateLabel.SetBorderSize(0)
             hltRateLabel.AddText('HLT p_{T}^{miss} / MHT Threshold = '+_tmpHLTthr+' GeV')
-            hltRateLabel.Draw('same')
+#            hltRateLabel.Draw('same')
 
             leg1 = ROOT.TLegend(0.65, 0.20, 0.94, 0.64)
             leg1.SetNColumns(1)
