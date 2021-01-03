@@ -349,7 +349,7 @@ def getMETEfficiencies(**kwargs):
   ]
 
   binEdges_MET = array.array('d', [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 140, 160, 180, 200, 220, 240, 280, 320, 360, 430, 500])
-  tmptmptmp = 0
+
   for _tmpRef in _tmpRefs:
     # MET
     _tmp_num = _tfile.Get('L1T_PFPuppiMET220off2/l1tPFPuppiMET_pt__vs__'+_tmpRef+'_pt')
@@ -2049,7 +2049,7 @@ if __name__ == '__main__':
   ROOT.gROOT.SetBatch() # disable interactive graphics
   ROOT.gErrorIgnoreLevel = ROOT.kError # do not display ROOT warnings
 
-  ROOT.TH1.AddDirectory(False)
+#  ROOT.TH1.AddDirectory(False)
 
   apply_style(0)
 
@@ -2421,6 +2421,37 @@ if __name__ == '__main__':
           'hltThreshold_METTypeOneMHT40': float(_tmpMETThresh),
           'hltThreshold_METTypeOneMHT50': float(_tmpMETThresh),
         })
+    # 2018
+    _fpath_MET2018 = '/eos/cms/store/group/dpg_trigger/comm_trigger/TriggerStudiesGroup/Upgrade/JetMET_PhaseII/JMETriggerAnalysis_phase2/ntuples/output_mc2018_forHLTTDR/RunIIAutumn18MiniAOD_VBF_HToInvisible_13TeV.root'
+    _tfile_MET2018 = ROOT.TFile.Open(_fpath_MET2018)
+    if not _tfile_MET2018:
+      WARNING('failed to open target TFile: '+_fpath_MET2018)
+    else:
+      binEdges_MET = array.array('d', [_tmp*10 for _tmp in range(13)] + [140, 160, 180, 200, 220, 240, 280, 320, 360, 430, 500])
+      _ttree_MET2018 = _tfile_MET2018.Get('JMETriggerNTuple/Events')
+
+      _tmp_denname = tmpName()
+      _tmp_den = ROOT.TH1D(_tmp_denname, _tmp_denname, len(binEdges_MET)-1, binEdges_MET)
+      _tmp_den.Sumw2()
+      _ttree_MET2018.Draw('genMETTrue_pt>>'+_tmp_denname, '', 'goff')
+
+      _tmp_num1name = tmpName()
+      _tmp_num1 = ROOT.TH1D(_tmp_num1name, _tmp_num1name, len(binEdges_MET)-1, binEdges_MET)
+      _tmp_num1.Sumw2()
+      _ttree_MET2018.Draw('genMETTrue_pt>>'+_tmp_num1name, 'Flag_HLT_PFMET120_PFMHT120_IDTight_L1TSeedAccept == 1', 'goff')
+
+      _tmp_num2name = tmpName()
+      _tmp_num2 = ROOT.TH1D(_tmp_num2name, _tmp_num2name, len(binEdges_MET)-1, binEdges_MET)
+      _tmp_num2.Sumw2()
+      _ttree_MET2018.Draw('genMETTrue_pt>>'+_tmp_num2name, 'HLT_PFMET120_PFMHT120_IDTight == 1', 'goff')
+
+      effysMET['2018'] = {'120': {}}
+      effysMET['2018']['120']['METMHT_L1T_wrt_GEN'] = get_efficiency_graph(_tmp_num1, _tmp_den)
+      effysMET['2018']['120']['METMHT_L1T_wrt_GEN'].SetName('METMHT_L1T_wrt_GEN')
+      effysMET['2018']['120']['METMHT_L1TpHLT_wrt_GEN'] = get_efficiency_graph(_tmp_num2, _tmp_den)
+      effysMET['2018']['120']['METMHT_L1TpHLT_wrt_GEN'].SetName('METMHT_L1TpHLT_wrt_GEN')
+
+    _tfile_MET2018.Close()
 
     for _tmpRef in [
       'GEN',
@@ -2574,7 +2605,12 @@ if __name__ == '__main__':
             objLabel.AddText(_tmpPU[2:]+' PU (14 TeV)')
             objLabel.Draw('same')
 
-            l1tRateLabel = ROOT.TPaveText(0.165, 0.82, 0.65, 0.88, 'NDC')
+            if 'MHT' in _tmpMET:
+              l1tRateLabel = ROOT.TPaveText(0.165, 0.82, 0.92, 0.88, 'NDC')
+              l1tRateLabel.AddText('HLT : PF+PUPPI Type-1 p_{T}^{miss} > '+_tmpHLTthr+' GeV, MHT > '+_tmpHLTthr+' GeV')
+            else:
+              l1tRateLabel = ROOT.TPaveText(0.165, 0.82, 0.65, 0.88, 'NDC')
+              l1tRateLabel.AddText('HLT : PF+PUPPI Type-1 p_{T}^{miss} > '+_tmpHLTthr+' GeV')
             l1tRateLabel.SetFillColor(0)
             l1tRateLabel.SetFillStyle(1001)
             l1tRateLabel.SetTextColor(ROOT.kBlack)
@@ -2582,10 +2618,6 @@ if __name__ == '__main__':
             l1tRateLabel.SetTextFont(42)
             l1tRateLabel.SetTextSize(0.035)
             l1tRateLabel.SetBorderSize(0)
-            if 'MHT' in _tmpMET:
-              l1tRateLabel.AddText('HLT : PF+PUPPI Type-1 p_{T}^{miss} > '+_tmpHLTthr+' GeV, MHT > '+_tmpHLTthr+' GeV')
-            else:
-              l1tRateLabel.AddText('HLT : PF+PUPPI Type-1 p_{T}^{miss} > '+_tmpHLTthr+' GeV')
             l1tRateLabel.Draw('same')
 
             leg1 = ROOT.TLegend(0.65, 0.20, 0.94, 0.44)
@@ -2719,7 +2751,11 @@ if __name__ == '__main__':
             leg1.AddEntry(effysMET[_tmpPU][_tmpHLTthr]['METTypeOneMHT50_'+_tmpEff+'_wrt_'+_tmpRef], 'Type-1 + MHT_{50}', 'lepx')
             leg1.Draw('same')
 
-            h0.SetTitle(';'+_tmpRef+' p_{T}^{miss} [GeV];Efficiency')
+            _tmpYaxis = 'Efficiency'
+            if _tmpEff == 'L1TpHLT': _tmpYaxis = 'L1T+HLT Efficiency'
+            elif _tmpEff == 'HLT': _tmpYaxis = 'HLT Efficiency'
+
+            h0.SetTitle(';'+_tmpRef+' p_{T}^{miss} [GeV];'+_tmpYaxis)
             h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
 
             canvas.SetLogy(0)
@@ -2731,6 +2767,102 @@ if __name__ == '__main__':
             canvas.Close()
 
             print '\033[1m'+outputDir+'/triggerEff_METTypeOneX_wrt'+_tmpRef+'_'+_tmpPU+'_'+_tmpEff+'_'+_tmpHLTthr+'\033[0m'
+
+      # MET (TypeOne vs TypeOne+MHT vs 2018)
+      for _tmpPU in [
+        'PU140',
+        'PU200',
+      ]:
+        canvas = ROOT.TCanvas(tmpName(), tmpName(False))
+        canvas.cd()
+
+        h0 = canvas.DrawFrame(0, 0.000, 500, 1.19)
+
+        effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].SetMarkerSize(0)
+        effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].SetLineWidth(2)
+        effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].SetMarkerColor(ROOT.kBlack)
+        effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].SetLineColor(ROOT.kBlack)
+        effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].SetLineStyle(1)
+        effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].Draw('lepz')
+
+        effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef].SetMarkerSize(0)
+        effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef].SetLineWidth(2)
+        effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef].SetMarkerColor(ROOT.kRed)
+        effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef].SetLineColor(ROOT.kRed)
+        effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef].SetLineStyle(1)
+        effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef].Draw('lepz')
+
+        effysMET[_tmpPU]['150']['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef].SetMarkerSize(0)
+        effysMET[_tmpPU]['150']['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef].SetLineWidth(2)
+        effysMET[_tmpPU]['150']['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef].SetMarkerColor(ROOT.kBlue)
+        effysMET[_tmpPU]['150']['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef].SetLineColor(ROOT.kBlue)
+        effysMET[_tmpPU]['150']['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef].SetLineStyle(1)
+        effysMET[_tmpPU]['150']['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef].Draw('lepz')
+
+        topLabel = ROOT.TPaveText(0.11, 0.93, 0.95, 0.98, 'NDC')
+        topLabel.SetFillColor(0)
+        topLabel.SetFillStyle(1001)
+        topLabel.SetTextColor(ROOT.kBlack)
+        topLabel.SetTextAlign(12)
+        topLabel.SetTextFont(42)
+        topLabel.SetTextSize(0.035)
+        topLabel.SetBorderSize(0)
+        topLabel.AddText('#font[62]{CMS} #font[52]{Phase-2 Simulation}')
+        topLabel.Draw('same')
+
+        objLabel = ROOT.TPaveText(0.80, 0.93, 0.96, 0.98, 'NDC')
+        objLabel.SetFillColor(0)
+        objLabel.SetFillStyle(1001)
+        objLabel.SetTextColor(ROOT.kBlack)
+        objLabel.SetTextAlign(32)
+        objLabel.SetTextFont(42)
+        objLabel.SetTextSize(0.035)
+        objLabel.SetBorderSize(0)
+        objLabel.AddText(_tmpPU[2:]+' PU (14 TeV)')
+        objLabel.Draw('same')
+
+        l1tRateLabel = ROOT.TPaveText(0.165, 0.82, 0.65, 0.88, 'NDC')
+        l1tRateLabel.SetFillColor(0)
+        l1tRateLabel.SetFillStyle(1001)
+        l1tRateLabel.SetTextColor(ROOT.kBlack)
+        l1tRateLabel.SetTextAlign(12)
+        l1tRateLabel.SetTextFont(42)
+        l1tRateLabel.SetTextSize(0.035)
+        l1tRateLabel.SetBorderSize(0)
+        l1tRateLabel.AddText('HLT : PF+PUPPI Type-1 p_{T}^{miss} (+MHT)')
+        l1tRateLabel.Draw('same')
+
+        hltRateLabel = ROOT.TPaveText(0.165, 0.76, 0.65, 0.82, 'NDC')
+        hltRateLabel.SetFillColor(0)
+        hltRateLabel.SetFillStyle(1001)
+        hltRateLabel.SetTextColor(ROOT.kBlack)
+        hltRateLabel.SetTextAlign(12)
+        hltRateLabel.SetTextFont(42)
+        hltRateLabel.SetTextSize(0.035)
+        hltRateLabel.SetBorderSize(0)
+        hltRateLabel.AddText('HLT p_{T}^{miss} / MHT Threshold = '+_tmpHLTthr+' GeV')
+#        hltRateLabel.Draw('same')
+
+        leg1 = ROOT.TLegend(0.48, 0.20, 0.94, 0.45)
+        leg1.SetNColumns(1)
+        leg1.SetTextFont(42)
+        leg1.AddEntry(effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef], 'Run-2 (2018), MET120 + MHT120', 'lepx')
+        leg1.AddEntry(effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef], 'Phase-2, Type-1 MET160', 'lepx')
+        leg1.AddEntry(effysMET[_tmpPU]['150']['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef], 'Phase-2, Type-1 MET150 + MHT150', 'lepx')
+        leg1.Draw('same')
+
+        h0.SetTitle(';'+_tmpRef+' p_{T}^{miss} [GeV];L1T+HLT Efficiency')
+        h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
+
+        canvas.SetLogy(0)
+        canvas.SetGrid(1, 1)
+
+        for _tmpExt in EXTS:
+          canvas.SaveAs(outputDir+'/triggerEff_METTypeOneXvs2018_wrt'+_tmpRef+'_'+_tmpPU+'.'+_tmpExt)
+
+        canvas.Close()
+
+        print '\033[1m'+outputDir+'/triggerEff_METTypeOneXvs2018_wrt'+_tmpRef+'_'+_tmpPU+'\033[0m'
 
   ###
   ### Rates
@@ -2845,7 +2977,7 @@ if __name__ == '__main__':
       'hltThresholdSingleJet': 530,
       'hltThresholdHT': 1100,
       'hltThresholdMET': 115,
-      'hltThresholdMETTypeOne': 150,
+      'hltThresholdMETTypeOne': 160,
       'hltThresholdMETTypeOneMHT20': 150,
       'hltThresholdMETTypeOneMHT30': 150,
       'hltThresholdMETTypeOneMHT40': 150,
