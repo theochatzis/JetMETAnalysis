@@ -849,10 +849,15 @@ float JMETriggerAnalysisDriverPhase2::getMHT(float const jetPtMin, float const j
 
     ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> const p4polar(v_pt.at(jetIdx), v_eta.at(jetIdx), v_phi.at(jetIdx), v_mass.at(jetIdx));
 
-    if(v_pt.at(jetIdx) > jetPtMin){
-      MHT_x += p4polar.Px();
-      MHT_y += p4polar.Py();
+    if(p4polar.Pt() > jetPtMin){
+      MHT_x -= p4polar.Px();
+      MHT_y -= p4polar.Py();
     }
+
+//!!    if(p4polar.Et() > jetPtMin){
+//!!      MHT_x -= p4polar.Et() * std::cos(v_phi.at(jetIdx));
+//!!      MHT_y -= p4polar.Et() * std::sin(v_phi.at(jetIdx));
+//!!    }
   }
 
   return sqrt(MHT_x*MHT_x + MHT_y*MHT_y);
