@@ -348,7 +348,7 @@ def getMETEfficiencies(**kwargs):
 #    'Offline',
   ]
 
-  binEdges_MET = array.array('d', [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 140, 160, 180, 200, 220, 240, 280, 320, 360, 430, 500])
+  binEdges_MET = array.array('d', [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 140, 160, 180, 200, 220, 240, 280, 320, 360, 430, 500, 600, 700, 800])
 
   for _tmpRef in _tmpRefs:
     # MET
@@ -2427,7 +2427,7 @@ if __name__ == '__main__':
     if not _tfile_MET2018:
       WARNING('failed to open target TFile: '+_fpath_MET2018)
     else:
-      binEdges_MET = array.array('d', [_tmp*10 for _tmp in range(13)] + [140, 160, 180, 200, 220, 240, 280, 320, 360, 430, 500])
+      binEdges_MET = array.array('d', [_tmp*10 for _tmp in range(13)] + [140, 160, 180, 200, 220, 240, 280, 320, 360, 430, 500, 600, 700, 800])
       _ttree_MET2018 = _tfile_MET2018.Get('JMETriggerNTuple/Events')
 
       _tmp_denname = tmpName()
@@ -2776,7 +2776,14 @@ if __name__ == '__main__':
         canvas = ROOT.TCanvas(tmpName(), tmpName(False))
         canvas.cd()
 
-        h0 = canvas.DrawFrame(0, 0.000, 500, 1.19)
+        h0 = canvas.DrawFrame(0, 0.000, 800, 1.19)
+
+        effysMET['2018']['120']['METMHT_L1T_wrt_'+_tmpRef].SetMarkerSize(0)
+        effysMET['2018']['120']['METMHT_L1T_wrt_'+_tmpRef].SetLineWidth(2)
+        effysMET['2018']['120']['METMHT_L1T_wrt_'+_tmpRef].SetMarkerColor(ROOT.kBlack)
+        effysMET['2018']['120']['METMHT_L1T_wrt_'+_tmpRef].SetLineColor(ROOT.kBlack)
+        effysMET['2018']['120']['METMHT_L1T_wrt_'+_tmpRef].SetLineStyle(2)
+        effysMET['2018']['120']['METMHT_L1T_wrt_'+_tmpRef].Draw('lepz')
 
         effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].SetMarkerSize(0)
         effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef].SetLineWidth(2)
@@ -2842,6 +2849,7 @@ if __name__ == '__main__':
         leg1 = ROOT.TLegend(0.48, 0.20, 0.94, 0.45)
         leg1.SetNColumns(1)
         leg1.SetTextFont(42)
+        leg1.AddEntry(effysMET['2018']['120']['METMHT_L1T_wrt_'+_tmpRef], '[L1T] Run-2 (2018)', 'lepx')
         leg1.AddEntry(effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef], '[L1T+HLT] Run-2 (2018), MET120 + MHT120', 'lepx')
         leg1.AddEntry(effysMET[_tmpPU]['160']['METTypeOne_L1T_wrt_'+_tmpRef], '[L1T] Phase-2, L1T MET118', 'lepx')
         leg1.AddEntry(effysMET[_tmpPU]['160']['METTypeOne_L1TpHLT_wrt_'+_tmpRef], '[L1T+HLT] Phase-2, Type-1 MET160', 'lepx')
