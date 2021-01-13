@@ -75,16 +75,11 @@ if __name__ == '__main__':
    PYSCRIPT_ABSPATH = os.path.abspath(os.path.realpath(PYSCRIPT_PATH))
 
    INPUT_FILES = []
-
    for i_inpf in opts.inputs:
-
-       i_inpf_ls = glob.glob(i_inpf)
-
-       for i_inpf_2 in i_inpf_ls:
-
-           if os.path.isfile(i_inpf_2):
-              INPUT_FILES += [os.path.abspath(os.path.realpath(i_inpf_2))]
-
+     i_inpf_ls = glob.glob(i_inpf)
+     for i_inpf_2 in i_inpf_ls:
+       if os.path.isfile(i_inpf_2):
+         INPUT_FILES += [os.path.abspath(i_inpf_2)]
    INPUT_FILES = sorted(list(set(INPUT_FILES)))
 
    if len(INPUT_FILES) == 0:
