@@ -88,7 +88,7 @@ def getRates(**kwargs):
     return ret
 
   rateFactor = 1.
-  if kwargs['qcd_weighted'] and not (kwargs['processName'].startswith('MinBias') or kwargs['processName'].startswith('QCD')):
+  if not (kwargs['qcd_weighted'] and (kwargs['processName'].startswith('MinBias') or kwargs['processName'].startswith('QCD'))):
     rateFactor = getRateFactor(kwargs['processName'], kwargs['instLumiHzPerPb']) / ret['v_eventsProcessed']
 
   def _addTH1(theDict, theKey, theTH1):
