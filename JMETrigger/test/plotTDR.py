@@ -1810,7 +1810,7 @@ def plotMETResponse(fpath_PU140, fpath_PU200, outputName, exts):
 
   print '\033[1m'+outputName+'\033[0m'
 
-def plotMETResolution(fpath_PU140, fpath_PU200, outputName, exts):
+def plotMETResolution(resType, fpath_PU140, fpath_PU200, outputName, exts):
   fpaths = {}
   fpaths['PU140'] = ROOT.TFile.Open(fpath_PU140)
   fpaths['PU200'] = ROOT.TFile.Open(fpath_PU200)
@@ -1845,7 +1845,7 @@ def plotMETResolution(fpath_PU140, fpath_PU200, outputName, exts):
       binEdges = array.array('d', histos[_puTag][_metTag])
       # mean
       _h2tmp_mean = getHistogram(_tmpTFile, _metHistPrefix+'overGEN__vs__GEN_pt')
-      _h2tmp_reso = getHistogram(_tmpTFile, _metHistPrefix+'perpToGEN__vs__GEN_pt')
+      _h2tmp_reso = getHistogram(_tmpTFile, _metHistPrefix+resType+'__vs__GEN_pt')
       for pTbinEdge_idx in range(len(binEdges)-1):
         _h1tmp_mean = _h2tmp_mean.ProjectionX(tmpName(), _h2tmp_mean.GetYaxis().FindBin(1.0001*binEdges[pTbinEdge_idx]), _h2tmp_mean.GetYaxis().FindBin(0.9999*binEdges[pTbinEdge_idx+1]))
         _h1tmp_reso = _h2tmp_reso.ProjectionX(tmpName(), _h2tmp_reso.GetYaxis().FindBin(1.0001*binEdges[pTbinEdge_idx]), _h2tmp_reso.GetYaxis().FindBin(0.9999*binEdges[pTbinEdge_idx+1]))
@@ -1953,28 +1953,6 @@ def plotMETResolution(fpath_PU140, fpath_PU200, outputName, exts):
   objLabel.AddText('14 TeV')
   objLabel.Draw('same')
 
-  l1tRateLabel = ROOT.TPaveText(0.165, 0.85, 0.65, 0.90, 'NDC')
-  l1tRateLabel.SetFillColor(0)
-  l1tRateLabel.SetFillStyle(1001)
-  l1tRateLabel.SetTextColor(ROOT.kBlack)
-  l1tRateLabel.SetTextAlign(12)
-  l1tRateLabel.SetTextFont(42)
-  l1tRateLabel.SetTextSize(0.035)
-  l1tRateLabel.SetBorderSize(0)
-#  l1tRateLabel.AddText('AK4 PF+PUPPI Jets')
-#  l1tRateLabel.Draw('same')
-
-  hltRateLabel = ROOT.TPaveText(0.165, 0.80, 0.65, 0.85, 'NDC')
-  hltRateLabel.SetFillColor(0)
-  hltRateLabel.SetFillStyle(1001)
-  hltRateLabel.SetTextColor(ROOT.kBlack)
-  hltRateLabel.SetTextAlign(12)
-  hltRateLabel.SetTextFont(42)
-  hltRateLabel.SetTextSize(0.035)
-  hltRateLabel.SetBorderSize(0)
-#  hltRateLabel.AddText(_etaLabel)
-#  hltRateLabel.Draw('same')
-
   leg1 = ROOT.TLegend(0.165, 0.72, 0.94, 0.90)
   leg1.SetNColumns(2)
   leg1.SetTextFont(42)
@@ -1992,14 +1970,17 @@ def plotMETResolution(fpath_PU140, fpath_PU200, outputName, exts):
   _htmpPU200.SetLineColor(1)
   _htmpPU200.SetLineStyle(1)
 
-  leg2 = ROOT.TLegend(0.165, 0.55, 0.40, 0.70)
+  leg2 = ROOT.TLegend(0.165, 0.56, 0.38, 0.72)
   leg2.SetNColumns(1)
   leg2.SetTextFont(42)
   leg2.AddEntry(_htmpPU140, '140 PU', 'l')
   leg2.AddEntry(_htmpPU200, '200 PU', 'l')
   leg2.Draw('same')
 
-  h0.SetTitle(';GEN p_{T}^{miss} [GeV];#sigma_{#perp}  (p^{HLT}_{T,miss}) / #LTp^{HLT}_{T,miss} / p^{GEN}_{T,miss}#GT [GeV]')
+  if resType == 'perpToGEN':
+    h0.SetTitle(';GEN p_{T}^{miss} [GeV];#sigma_{#perp}  (p^{HLT}_{T,miss}) / #LTp^{HLT}_{T,miss} / p^{GEN}_{T,miss}#GT [GeV]')
+  elif resType == 'paraToGENMinusGEN':
+    h0.SetTitle(';GEN p_{T}^{miss} [GeV];#sigma_{#parallel}(p^{HLT}_{T,miss}) / #LTp^{HLT}_{T,miss} / p^{GEN}_{T,miss}#GT [GeV]')
   h0.GetYaxis().SetTitleOffset(h0.GetYaxis().GetTitleOffset() * 1.0)
 
   canvas.SetLogy(0)
@@ -2105,12 +2086,14 @@ if __name__ == '__main__':
       exts = EXTS,
     )
 
-    plotMETResolution(
-      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU140.root',
-      fpath_PU200 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200.root',
-      outputName = outputDir+'/metResolution',
-      exts = EXTS,
-    )
+    for _tmp in ['perpToGEN', 'paraToGENMinusGEN']:
+      plotMETResolution(
+        resType = _tmp,
+        fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU140.root',
+        fpath_PU200 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU200.root',
+        outputName = outputDir+'/metResolution_'+_tmp,
+        exts = EXTS,
+      )
 
     print '='*50
     print '='*50
