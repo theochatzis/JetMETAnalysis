@@ -2974,7 +2974,7 @@ if __name__ == '__main__':
     'PU200': {
       'iLumiHzPerPb': 0.075,
       'hltThresholdSingleJet': 530,
-      'hltThresholdHT': 1100,
+      'hltThresholdHT': 1070,
       'hltThresholdMET': 115,
       'hltThresholdMETTypeOne': 160,
       'hltThresholdMETTypeOneMHT20': 150,
