@@ -3514,7 +3514,7 @@ if __name__ == '__main__':
       canvas = ROOT.TCanvas(tmpName(), tmpName(False))
       canvas.cd()
 
-      h0 = canvas.DrawFrame(100, 25, 180, 4999)
+      h0 = canvas.DrawFrame(100, 18, 180, 3999)
 
       h140 = rateHistos[_tmpReco]['PU140']['hltPFPuppi'+_metType].Clone()
       h140.SetMarkerStyle(20)
