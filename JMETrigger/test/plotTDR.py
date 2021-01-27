@@ -2973,14 +2973,14 @@ if __name__ == '__main__':
     },
     'PU200': {
       'iLumiHzPerPb': 0.075,
-      'hltThresholdSingleJet': 530,
+      'hltThresholdSingleJet': 520,
       'hltThresholdHT': 1070,
       'hltThresholdMET': 115,
       'hltThresholdMETTypeOne': 160,
-      'hltThresholdMETTypeOneMHT20': 150,
-      'hltThresholdMETTypeOneMHT30': 150,
-      'hltThresholdMETTypeOneMHT40': 150,
-      'hltThresholdMETTypeOneMHT50': 150,
+      'hltThresholdMETTypeOneMHT20': 140,
+      'hltThresholdMETTypeOneMHT30': 140,
+      'hltThresholdMETTypeOneMHT40': 140,
+      'hltThresholdMETTypeOneMHT50': 140,
     }
   }
 
