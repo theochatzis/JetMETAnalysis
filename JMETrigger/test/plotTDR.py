@@ -856,10 +856,6 @@ def plotJetResolution(fpath_PU140, fpath_PU200, outputName, exts):
   print '\033[1m'+outputName+'\033[0m'
 
 def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
-  fpaths = {}
-  fpaths['PU140'] = ROOT.TFile.Open(fpath_PU140)
-  fpaths['PU200'] = ROOT.TFile.Open(fpath_PU200)
-
   # HLT - MatchedToGEN
   graphs = {
     'PU140': {
@@ -874,10 +870,13 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
     },
   }
 
-  for _puTag in fpaths:
-    _tmpTFile = fpaths[_puTag]
+  for [_puTag, _tmpFilePath] in [
+    ['PU140', fpath_PU140],
+    ['PU200', fpath_PU200],
+  ]:
+    _tmpTFile = ROOT.TFile.Open(_tmpFilePath)
     if not _tmpTFile:
-      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      WARNING('failed to open target TFile: '+_tmpFilePath)
       continue
 
     for _etaTag in graphs[_puTag]:
@@ -899,54 +898,57 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
 
   h0 = canvas.DrawFrame(30., 0.0001, 600., 1.2)
 
-  graphs['PU140']['HB'].SetMarkerStyle(24)
-  graphs['PU140']['HB'].SetMarkerSize(1)
-  graphs['PU140']['HB'].SetLineWidth(2)
-  graphs['PU140']['HB'].SetLineStyle(2)
-  graphs['PU140']['HB'].SetLineColor(1)
-  graphs['PU140']['HB'].SetMarkerColor(1)
+  try:
+    graphs['PU140']['HB'].SetMarkerStyle(24)
+    graphs['PU140']['HB'].SetMarkerSize(1)
+    graphs['PU140']['HB'].SetLineWidth(2)
+    graphs['PU140']['HB'].SetLineStyle(2)
+    graphs['PU140']['HB'].SetLineColor(1)
+    graphs['PU140']['HB'].SetMarkerColor(1)
+    graphs['PU140']['HB'].Draw('lepz')
+  
+    graphs['PU140']['HGCal'].SetMarkerStyle(25)
+    graphs['PU140']['HGCal'].SetMarkerSize(1)
+    graphs['PU140']['HGCal'].SetLineWidth(2)
+    graphs['PU140']['HGCal'].SetLineStyle(2)
+    graphs['PU140']['HGCal'].SetLineColor(2)
+    graphs['PU140']['HGCal'].SetMarkerColor(2)
+    graphs['PU140']['HGCal'].Draw('lepz')
+  
+    graphs['PU140']['HF'].SetMarkerStyle(27)
+    graphs['PU140']['HF'].SetMarkerSize(1.5)
+    graphs['PU140']['HF'].SetLineWidth(2)
+    graphs['PU140']['HF'].SetLineStyle(2)
+    graphs['PU140']['HF'].SetLineColor(4)
+    graphs['PU140']['HF'].SetMarkerColor(4)
+    graphs['PU140']['HF'].Draw('lepz')
+  except: pass
 
-  graphs['PU140']['HGCal'].SetMarkerStyle(25)
-  graphs['PU140']['HGCal'].SetMarkerSize(1)
-  graphs['PU140']['HGCal'].SetLineWidth(2)
-  graphs['PU140']['HGCal'].SetLineStyle(2)
-  graphs['PU140']['HGCal'].SetLineColor(2)
-  graphs['PU140']['HGCal'].SetMarkerColor(2)
-
-  graphs['PU140']['HF'].SetMarkerStyle(27)
-  graphs['PU140']['HF'].SetMarkerSize(1.5)
-  graphs['PU140']['HF'].SetLineWidth(2)
-  graphs['PU140']['HF'].SetLineStyle(2)
-  graphs['PU140']['HF'].SetLineColor(4)
-  graphs['PU140']['HF'].SetMarkerColor(4)
-
-  graphs['PU200']['HB'].SetMarkerStyle(20)
-  graphs['PU200']['HB'].SetMarkerSize(1)
-  graphs['PU200']['HB'].SetLineWidth(2)
-  graphs['PU200']['HB'].SetLineStyle(1)
-  graphs['PU200']['HB'].SetLineColor(1)
-  graphs['PU200']['HB'].SetMarkerColor(1)
-
-  graphs['PU200']['HGCal'].SetMarkerStyle(21)
-  graphs['PU200']['HGCal'].SetMarkerSize(1)
-  graphs['PU200']['HGCal'].SetLineWidth(2)
-  graphs['PU200']['HGCal'].SetLineStyle(1)
-  graphs['PU200']['HGCal'].SetLineColor(2)
-  graphs['PU200']['HGCal'].SetMarkerColor(2)
-
-  graphs['PU200']['HF'].SetMarkerStyle(33)
-  graphs['PU200']['HF'].SetMarkerSize(1.5)
-  graphs['PU200']['HF'].SetLineWidth(2)
-  graphs['PU200']['HF'].SetLineStyle(1)
-  graphs['PU200']['HF'].SetLineColor(4)
-  graphs['PU200']['HF'].SetMarkerColor(4)
-
-  graphs['PU140']['HF'].Draw('lepz')
-  graphs['PU140']['HGCal'].Draw('lepz')
-  graphs['PU140']['HB'].Draw('lepz')
-  graphs['PU200']['HF'].Draw('lepz')
-  graphs['PU200']['HGCal'].Draw('lepz')
-  graphs['PU200']['HB'].Draw('lepz')
+  try:
+    graphs['PU200']['HB'].SetMarkerStyle(20)
+    graphs['PU200']['HB'].SetMarkerSize(1)
+    graphs['PU200']['HB'].SetLineWidth(2)
+    graphs['PU200']['HB'].SetLineStyle(1)
+    graphs['PU200']['HB'].SetLineColor(1)
+    graphs['PU200']['HB'].SetMarkerColor(1)
+    graphs['PU200']['HB'].Draw('lepz')
+  
+    graphs['PU200']['HGCal'].SetMarkerStyle(21)
+    graphs['PU200']['HGCal'].SetMarkerSize(1)
+    graphs['PU200']['HGCal'].SetLineWidth(2)
+    graphs['PU200']['HGCal'].SetLineStyle(1)
+    graphs['PU200']['HGCal'].SetLineColor(2)
+    graphs['PU200']['HGCal'].SetMarkerColor(2)
+    graphs['PU200']['HGCal'].Draw('lepz')
+  
+    graphs['PU200']['HF'].SetMarkerStyle(33)
+    graphs['PU200']['HF'].SetMarkerSize(1.5)
+    graphs['PU200']['HF'].SetLineWidth(2)
+    graphs['PU200']['HF'].SetLineStyle(1)
+    graphs['PU200']['HF'].SetLineColor(4)
+    graphs['PU200']['HF'].SetMarkerColor(4)
+    graphs['PU200']['HF'].Draw('lepz')
+  except: pass
 
   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
   topLabel.SetFillColor(0)
@@ -998,52 +1000,58 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
   hltTargetRateLine.SetLineColor(ROOT.kGray)
   hltTargetRateLine.Draw('same')
 
-  _htmpHB = ROOT.TH1D()
-  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
-  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
-  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
-  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
-  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
-  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+  try:
+    _htmpHB = ROOT.TH1D()
+    _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+    _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+    _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+    _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+    _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+    _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
 
-  _htmpHGCal = ROOT.TH1D()
-  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
-  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
-  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
-  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
-  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
-  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+    _htmpHGCal = ROOT.TH1D()
+    _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+    _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+    _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+    _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+    _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+    _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
 
-  _htmpHF = ROOT.TH1D()
-  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
-  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
-  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
-  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
-  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
-  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+    _htmpHF = ROOT.TH1D()
+    _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+    _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+    _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+    _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+    _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+    _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
 
-  leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
-  leg1.SetNColumns(1)
-  leg1.SetTextFont(42)
-  leg1.SetEntrySeparation(0.4)
-  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
-  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
-  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
-  leg1.Draw('same')
-
-  _htmpPU140 = graphs['PU140']['HB'].Clone()
-  _htmpPU140.SetLineColor(1)
-  _htmpPU140.SetLineStyle(2)
-
-  _htmpPU200 = graphs['PU200']['HB'].Clone()
-  _htmpPU200.SetLineColor(1)
-  _htmpPU200.SetLineStyle(1)
+    leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
+    leg1.SetNColumns(1)
+    leg1.SetTextFont(42)
+    leg1.SetEntrySeparation(0.4)
+    leg1.AddEntry(_htmpHB, '|#eta|<1.5', 'ep')
+    leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+    leg1.AddEntry(_htmpHF, '3.0<|#eta|<5.0', 'ep')
+    leg1.Draw('same')
+  except: pass
 
   leg2 = ROOT.TLegend(0.70, 0.47, 0.94, 0.62)
   leg2.SetNColumns(1)
   leg2.SetTextFont(42)
-  leg2.AddEntry(_htmpPU140, '140 PU', 'l')
-  leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  try:
+    _htmpPU140 = graphs['PU140']['HB'].Clone()
+    _htmpPU140.SetLineColor(1)
+    _htmpPU140.SetLineStyle(2)
+    leg2.AddEntry(_htmpPU140, '140 PU', 'l')
+  except: pass
+
+  try:
+    _htmpPU200 = graphs['PU200']['HB'].Clone()
+    _htmpPU200.SetLineColor(1)
+    _htmpPU200.SetLineStyle(1)
+    leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  except: pass
+
   leg2.Draw('same')
 
   h0.SetTitle(';HLT Jet p_{T} [GeV];GEN-Matching Efficiency')
@@ -1077,10 +1085,13 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
     },
   }
 
-  for _puTag in fpaths:
-    _tmpTFile = fpaths[_puTag]
+  for [_puTag, _tmpFilePath] in [
+    ['PU140', fpath_PU140],
+    ['PU200', fpath_PU200],
+  ]:
+    _tmpTFile = ROOT.TFile.Open(_tmpFilePath)
     if not _tmpTFile:
-      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      WARNING('failed to open target TFile: '+_tmpFilePath)
       continue
 
     for _etaTag in graphs[_puTag]:
@@ -1102,54 +1113,57 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
 
   h0 = canvas.DrawFrame(30., 0.001, 500., 4.9)
 
-  graphs['PU140']['HB'].SetMarkerStyle(20)
-  graphs['PU140']['HB'].SetMarkerSize(1)
-  graphs['PU140']['HB'].SetLineWidth(2)
-  graphs['PU140']['HB'].SetLineStyle(2)
-  graphs['PU140']['HB'].SetLineColor(1)
-  graphs['PU140']['HB'].SetMarkerColor(1)
+  try:
+    graphs['PU140']['HB'].SetMarkerStyle(20)
+    graphs['PU140']['HB'].SetMarkerSize(1)
+    graphs['PU140']['HB'].SetLineWidth(2)
+    graphs['PU140']['HB'].SetLineStyle(2)
+    graphs['PU140']['HB'].SetLineColor(1)
+    graphs['PU140']['HB'].SetMarkerColor(1)
+    graphs['PU140']['HB'].Draw('lepz')
 
-  graphs['PU140']['HGCal'].SetMarkerStyle(21)
-  graphs['PU140']['HGCal'].SetMarkerSize(1)
-  graphs['PU140']['HGCal'].SetLineWidth(2)
-  graphs['PU140']['HGCal'].SetLineStyle(2)
-  graphs['PU140']['HGCal'].SetLineColor(2)
-  graphs['PU140']['HGCal'].SetMarkerColor(2)
+    graphs['PU140']['HGCal'].SetMarkerStyle(21)
+    graphs['PU140']['HGCal'].SetMarkerSize(1)
+    graphs['PU140']['HGCal'].SetLineWidth(2)
+    graphs['PU140']['HGCal'].SetLineStyle(2)
+    graphs['PU140']['HGCal'].SetLineColor(2)
+    graphs['PU140']['HGCal'].SetMarkerColor(2)
+    graphs['PU140']['HGCal'].Draw('lepz')
 
-  graphs['PU140']['HF'].SetMarkerStyle(33)
-  graphs['PU140']['HF'].SetMarkerSize(1.5)
-  graphs['PU140']['HF'].SetLineWidth(2)
-  graphs['PU140']['HF'].SetLineStyle(2)
-  graphs['PU140']['HF'].SetLineColor(4)
-  graphs['PU140']['HF'].SetMarkerColor(4)
+    graphs['PU140']['HF'].SetMarkerStyle(33)
+    graphs['PU140']['HF'].SetMarkerSize(1.5)
+    graphs['PU140']['HF'].SetLineWidth(2)
+    graphs['PU140']['HF'].SetLineStyle(2)
+    graphs['PU140']['HF'].SetLineColor(4)
+    graphs['PU140']['HF'].SetMarkerColor(4)
+    graphs['PU140']['HF'].Draw('lepz')
+  except: pass
 
-  graphs['PU200']['HB'].SetMarkerStyle(20)
-  graphs['PU200']['HB'].SetMarkerSize(1)
-  graphs['PU200']['HB'].SetLineWidth(2)
-  graphs['PU200']['HB'].SetLineStyle(1)
-  graphs['PU200']['HB'].SetLineColor(1)
-  graphs['PU200']['HB'].SetMarkerColor(1)
+  try:  
+    graphs['PU200']['HB'].SetMarkerStyle(20)
+    graphs['PU200']['HB'].SetMarkerSize(1)
+    graphs['PU200']['HB'].SetLineWidth(2)
+    graphs['PU200']['HB'].SetLineStyle(1)
+    graphs['PU200']['HB'].SetLineColor(1)
+    graphs['PU200']['HB'].SetMarkerColor(1)
+    graphs['PU200']['HB'].Draw('lepz')
 
-  graphs['PU200']['HGCal'].SetMarkerStyle(21)
-  graphs['PU200']['HGCal'].SetMarkerSize(1)
-  graphs['PU200']['HGCal'].SetLineWidth(2)
-  graphs['PU200']['HGCal'].SetLineStyle(1)
-  graphs['PU200']['HGCal'].SetLineColor(2)
-  graphs['PU200']['HGCal'].SetMarkerColor(2)
+    graphs['PU200']['HGCal'].SetMarkerStyle(21)
+    graphs['PU200']['HGCal'].SetMarkerSize(1)
+    graphs['PU200']['HGCal'].SetLineWidth(2)
+    graphs['PU200']['HGCal'].SetLineStyle(1)
+    graphs['PU200']['HGCal'].SetLineColor(2)
+    graphs['PU200']['HGCal'].SetMarkerColor(2)
+    graphs['PU200']['HGCal'].Draw('lepz')
 
-  graphs['PU200']['HF'].SetMarkerStyle(33)
-  graphs['PU200']['HF'].SetMarkerSize(1.5)
-  graphs['PU200']['HF'].SetLineWidth(2)
-  graphs['PU200']['HF'].SetLineStyle(1)
-  graphs['PU200']['HF'].SetLineColor(4)
-  graphs['PU200']['HF'].SetMarkerColor(4)
-
-  graphs['PU140']['HF'].Draw('lepz')
-  graphs['PU140']['HGCal'].Draw('lepz')
-  graphs['PU140']['HB'].Draw('lepz')
-  graphs['PU200']['HF'].Draw('lepz')
-  graphs['PU200']['HGCal'].Draw('lepz')
-  graphs['PU200']['HB'].Draw('lepz')
+    graphs['PU200']['HF'].SetMarkerStyle(33)
+    graphs['PU200']['HF'].SetMarkerSize(1.5)
+    graphs['PU200']['HF'].SetLineWidth(2)
+    graphs['PU200']['HF'].SetLineStyle(1)
+    graphs['PU200']['HF'].SetLineColor(4)
+    graphs['PU200']['HF'].SetMarkerColor(4)
+    graphs['PU200']['HF'].Draw('lepz')
+  except: pass
 
   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
   topLabel.SetFillColor(0)
@@ -1201,52 +1215,56 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
   hltTargetRateLine.SetLineColor(ROOT.kGray)
   hltTargetRateLine.Draw('same')
 
-  _htmpHB = ROOT.TH1D()
-  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
-  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
-  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
-  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
-  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
-  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
-
-  _htmpHGCal = ROOT.TH1D()
-  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
-  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
-  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
-  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
-  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
-  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
-
-  _htmpHF = ROOT.TH1D()
-  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
-  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
-  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
-  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
-  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
-  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
-
-  leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
-  leg1.SetNColumns(1)
-  leg1.SetTextFont(42)
-  leg1.SetEntrySeparation(0.4)
-  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
-  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
-  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
-  leg1.Draw('same')
-
-  _htmpPU140 = graphs['PU140']['HB'].Clone()
-  _htmpPU140.SetLineColor(1)
-  _htmpPU140.SetLineStyle(2)
-
-  _htmpPU200 = graphs['PU200']['HB'].Clone()
-  _htmpPU200.SetLineColor(1)
-  _htmpPU200.SetLineStyle(1)
+  try:
+    _htmpHB = ROOT.TH1D()
+    _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+    _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+    _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+    _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+    _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+    _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+  
+    _htmpHGCal = ROOT.TH1D()
+    _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+    _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+    _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+    _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+    _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+    _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+  
+    _htmpHF = ROOT.TH1D()
+    _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+    _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+    _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+    _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+    _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+    _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+  
+    leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
+    leg1.SetNColumns(1)
+    leg1.SetTextFont(42)
+    leg1.SetEntrySeparation(0.4)
+    leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
+    leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+    leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
+    leg1.Draw('same')
+  except: pass
 
   leg2 = ROOT.TLegend(0.70, 0.48, 0.94, 0.63)
   leg2.SetNColumns(1)
   leg2.SetTextFont(42)
-  leg2.AddEntry(_htmpPU140, '140 PU', 'l')
-  leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  try:
+    _htmpPU140 = graphs['PU140']['HB'].Clone()
+    _htmpPU140.SetLineColor(1)
+    _htmpPU140.SetLineStyle(2)
+    leg2.AddEntry(_htmpPU140, '140 PU', 'l')
+  except: pass
+  try:
+    _htmpPU200 = graphs['PU200']['HB'].Clone()
+    _htmpPU200.SetLineColor(1)
+    _htmpPU200.SetLineStyle(1)
+    leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  except: pass
   leg2.Draw('same')
 
   h0.SetTitle(';HLT Jet p_{T} [GeV];Jet Mistag Rate')
@@ -1280,10 +1298,13 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
     },
   }
 
-  for _puTag in fpaths:
-    _tmpTFile = fpaths[_puTag]
+  for [_puTag, _tmpFilePath] in [
+    ['PU140', fpath_PU140],
+    ['PU200', fpath_PU200],
+  ]:
+    _tmpTFile = ROOT.TFile.Open(_tmpFilePath)
     if not _tmpTFile:
-      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      WARNING('failed to open target TFile: '+_tmpFilePath)
       continue
 
     for _etaTag in graphs[_puTag]:
@@ -1305,54 +1326,57 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
 
   h0 = canvas.DrawFrame(30., 0.0001, 600., 1.2)
 
-  graphs['PU140']['HB'].SetMarkerStyle(20)
-  graphs['PU140']['HB'].SetMarkerSize(1)
-  graphs['PU140']['HB'].SetLineWidth(2)
-  graphs['PU140']['HB'].SetLineStyle(2)
-  graphs['PU140']['HB'].SetLineColor(1)
-  graphs['PU140']['HB'].SetMarkerColor(1)
+  try:
+    graphs['PU140']['HB'].SetMarkerStyle(20)
+    graphs['PU140']['HB'].SetMarkerSize(1)
+    graphs['PU140']['HB'].SetLineWidth(2)
+    graphs['PU140']['HB'].SetLineStyle(2)
+    graphs['PU140']['HB'].SetLineColor(1)
+    graphs['PU140']['HB'].SetMarkerColor(1)
+    graphs['PU140']['HB'].Draw('lepz')
+  
+    graphs['PU140']['HGCal'].SetMarkerStyle(21)
+    graphs['PU140']['HGCal'].SetMarkerSize(1)
+    graphs['PU140']['HGCal'].SetLineWidth(2)
+    graphs['PU140']['HGCal'].SetLineStyle(2)
+    graphs['PU140']['HGCal'].SetLineColor(2)
+    graphs['PU140']['HGCal'].SetMarkerColor(2)
+    graphs['PU140']['HGCal'].Draw('lepz')
+  
+    graphs['PU140']['HF'].SetMarkerStyle(33)
+    graphs['PU140']['HF'].SetMarkerSize(1.5)
+    graphs['PU140']['HF'].SetLineWidth(2)
+    graphs['PU140']['HF'].SetLineStyle(2)
+    graphs['PU140']['HF'].SetLineColor(4)
+    graphs['PU140']['HF'].SetMarkerColor(4)
+    graphs['PU140']['HF'].Draw('lepz')
+  except: pass
 
-  graphs['PU140']['HGCal'].SetMarkerStyle(21)
-  graphs['PU140']['HGCal'].SetMarkerSize(1)
-  graphs['PU140']['HGCal'].SetLineWidth(2)
-  graphs['PU140']['HGCal'].SetLineStyle(2)
-  graphs['PU140']['HGCal'].SetLineColor(2)
-  graphs['PU140']['HGCal'].SetMarkerColor(2)
-
-  graphs['PU140']['HF'].SetMarkerStyle(33)
-  graphs['PU140']['HF'].SetMarkerSize(1.5)
-  graphs['PU140']['HF'].SetLineWidth(2)
-  graphs['PU140']['HF'].SetLineStyle(2)
-  graphs['PU140']['HF'].SetLineColor(4)
-  graphs['PU140']['HF'].SetMarkerColor(4)
-
-  graphs['PU200']['HB'].SetMarkerStyle(20)
-  graphs['PU200']['HB'].SetMarkerSize(1)
-  graphs['PU200']['HB'].SetLineWidth(2)
-  graphs['PU200']['HB'].SetLineStyle(1)
-  graphs['PU200']['HB'].SetLineColor(1)
-  graphs['PU200']['HB'].SetMarkerColor(1)
-
-  graphs['PU200']['HGCal'].SetMarkerStyle(21)
-  graphs['PU200']['HGCal'].SetMarkerSize(1)
-  graphs['PU200']['HGCal'].SetLineWidth(2)
-  graphs['PU200']['HGCal'].SetLineStyle(1)
-  graphs['PU200']['HGCal'].SetLineColor(2)
-  graphs['PU200']['HGCal'].SetMarkerColor(2)
-
-  graphs['PU200']['HF'].SetMarkerStyle(33)
-  graphs['PU200']['HF'].SetMarkerSize(1.5)
-  graphs['PU200']['HF'].SetLineWidth(2)
-  graphs['PU200']['HF'].SetLineStyle(1)
-  graphs['PU200']['HF'].SetLineColor(4)
-  graphs['PU200']['HF'].SetMarkerColor(4)
-
-  graphs['PU140']['HF'].Draw('lepz')
-  graphs['PU140']['HGCal'].Draw('lepz')
-  graphs['PU140']['HB'].Draw('lepz')
-  graphs['PU200']['HF'].Draw('lepz')
-  graphs['PU200']['HGCal'].Draw('lepz')
-  graphs['PU200']['HB'].Draw('lepz')
+  try:
+    graphs['PU200']['HB'].SetMarkerStyle(20)
+    graphs['PU200']['HB'].SetMarkerSize(1)
+    graphs['PU200']['HB'].SetLineWidth(2)
+    graphs['PU200']['HB'].SetLineStyle(1)
+    graphs['PU200']['HB'].SetLineColor(1)
+    graphs['PU200']['HB'].SetMarkerColor(1)
+    graphs['PU200']['HB'].Draw('lepz')
+  
+    graphs['PU200']['HGCal'].SetMarkerStyle(21)
+    graphs['PU200']['HGCal'].SetMarkerSize(1)
+    graphs['PU200']['HGCal'].SetLineWidth(2)
+    graphs['PU200']['HGCal'].SetLineStyle(1)
+    graphs['PU200']['HGCal'].SetLineColor(2)
+    graphs['PU200']['HGCal'].SetMarkerColor(2)
+    graphs['PU200']['HGCal'].Draw('lepz')
+  
+    graphs['PU200']['HF'].SetMarkerStyle(33)
+    graphs['PU200']['HF'].SetMarkerSize(1.5)
+    graphs['PU200']['HF'].SetLineWidth(2)
+    graphs['PU200']['HF'].SetLineStyle(1)
+    graphs['PU200']['HF'].SetLineColor(4)
+    graphs['PU200']['HF'].SetMarkerColor(4)
+    graphs['PU200']['HF'].Draw('lepz')
+  except: pass
 
   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
   topLabel.SetFillColor(0)
@@ -1404,52 +1428,56 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
   hltTargetRateLine.SetLineColor(ROOT.kGray)
   hltTargetRateLine.Draw('same')
 
-  _htmpHB = ROOT.TH1D()
-  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
-  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
-  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
-  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
-  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
-  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
-
-  _htmpHGCal = ROOT.TH1D()
-  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
-  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
-  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
-  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
-  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
-  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
-
-  _htmpHF = ROOT.TH1D()
-  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
-  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
-  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
-  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
-  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
-  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
-
-  leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
-  leg1.SetNColumns(1)
-  leg1.SetTextFont(42)
-  leg1.SetEntrySeparation(0.4)
-  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
-  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
-  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
-  leg1.Draw('same')
-
-  _htmpPU140 = graphs['PU140']['HB'].Clone()
-  _htmpPU140.SetLineColor(1)
-  _htmpPU140.SetLineStyle(2)
-
-  _htmpPU200 = graphs['PU200']['HB'].Clone()
-  _htmpPU200.SetLineColor(1)
-  _htmpPU200.SetLineStyle(1)
+  try:
+    _htmpHB = ROOT.TH1D()
+    _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+    _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+    _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+    _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+    _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+    _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+  
+    _htmpHGCal = ROOT.TH1D()
+    _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+    _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+    _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+    _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+    _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+    _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+  
+    _htmpHF = ROOT.TH1D()
+    _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+    _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+    _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+    _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+    _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+    _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+  
+    leg1 = ROOT.TLegend(0.60, 0.20, 0.94, 0.45)
+    leg1.SetNColumns(1)
+    leg1.SetTextFont(42)
+    leg1.SetEntrySeparation(0.4)
+    leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
+    leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+    leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
+    leg1.Draw('same')
+  except: pass
 
   leg2 = ROOT.TLegend(0.70, 0.47, 0.94, 0.62)
   leg2.SetNColumns(1)
   leg2.SetTextFont(42)
-  leg2.AddEntry(_htmpPU140, '140 PU', 'l')
-  leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  try:
+    _htmpPU140 = graphs['PU140']['HB'].Clone()
+    _htmpPU140.SetLineColor(1)
+    _htmpPU140.SetLineStyle(2)
+    leg2.AddEntry(_htmpPU140, '140 PU', 'l')
+  except: pass
+  try:
+    _htmpPU200 = graphs['PU200']['HB'].Clone()
+    _htmpPU200.SetLineColor(1)
+    _htmpPU200.SetLineStyle(1)
+    leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  except: pass
   leg2.Draw('same')
 
   h0.SetTitle(';GEN Jet p_{T} [GeV];Jet-Finding Efficiency')
@@ -1483,10 +1511,13 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
     },
   }
 
-  for _puTag in fpaths:
-    _tmpTFile = fpaths[_puTag]
+  for [_puTag, _tmpFilePath] in [
+    ['PU140', fpath_PU140],
+    ['PU200', fpath_PU200],
+  ]:
+    _tmpTFile = ROOT.TFile.Open(_tmpFilePath)
     if not _tmpTFile:
-      WARNING('failed to open target TFile: '+fpaths[_puTag])
+      WARNING('failed to open target TFile: '+_tmpFilePath)
       continue
 
     for _etaTag in graphs[_puTag]:
@@ -1508,54 +1539,57 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
 
   h0 = canvas.DrawFrame(30., 0.001, 500., 4.9)
 
-  graphs['PU140']['HB'].SetMarkerStyle(20)
-  graphs['PU140']['HB'].SetMarkerSize(1)
-  graphs['PU140']['HB'].SetLineWidth(2)
-  graphs['PU140']['HB'].SetLineStyle(2)
-  graphs['PU140']['HB'].SetLineColor(1)
-  graphs['PU140']['HB'].SetMarkerColor(1)
+  try:
+    graphs['PU140']['HB'].SetMarkerStyle(20)
+    graphs['PU140']['HB'].SetMarkerSize(1)
+    graphs['PU140']['HB'].SetLineWidth(2)
+    graphs['PU140']['HB'].SetLineStyle(2)
+    graphs['PU140']['HB'].SetLineColor(1)
+    graphs['PU140']['HB'].SetMarkerColor(1)
+    graphs['PU140']['HB'].Draw('lepz')
+  
+    graphs['PU140']['HGCal'].SetMarkerStyle(21)
+    graphs['PU140']['HGCal'].SetMarkerSize(1)
+    graphs['PU140']['HGCal'].SetLineWidth(2)
+    graphs['PU140']['HGCal'].SetLineStyle(2)
+    graphs['PU140']['HGCal'].SetLineColor(2)
+    graphs['PU140']['HGCal'].SetMarkerColor(2)
+    graphs['PU140']['HGCal'].Draw('lepz')
+  
+    graphs['PU140']['HF'].SetMarkerStyle(33)
+    graphs['PU140']['HF'].SetMarkerSize(1.5)
+    graphs['PU140']['HF'].SetLineWidth(2)
+    graphs['PU140']['HF'].SetLineStyle(2)
+    graphs['PU140']['HF'].SetLineColor(4)
+    graphs['PU140']['HF'].SetMarkerColor(4)
+    graphs['PU140']['HF'].Draw('lepz')
+  except: pass
 
-  graphs['PU140']['HGCal'].SetMarkerStyle(21)
-  graphs['PU140']['HGCal'].SetMarkerSize(1)
-  graphs['PU140']['HGCal'].SetLineWidth(2)
-  graphs['PU140']['HGCal'].SetLineStyle(2)
-  graphs['PU140']['HGCal'].SetLineColor(2)
-  graphs['PU140']['HGCal'].SetMarkerColor(2)
+  try:  
+    graphs['PU200']['HB'].SetMarkerStyle(20)
+    graphs['PU200']['HB'].SetMarkerSize(1)
+    graphs['PU200']['HB'].SetLineWidth(2)
+    graphs['PU200']['HB'].SetLineStyle(1)
+    graphs['PU200']['HB'].SetLineColor(1)
+    graphs['PU200']['HB'].SetMarkerColor(1)
+    graphs['PU200']['HB'].Draw('lepz')
 
-  graphs['PU140']['HF'].SetMarkerStyle(33)
-  graphs['PU140']['HF'].SetMarkerSize(1.5)
-  graphs['PU140']['HF'].SetLineWidth(2)
-  graphs['PU140']['HF'].SetLineStyle(2)
-  graphs['PU140']['HF'].SetLineColor(4)
-  graphs['PU140']['HF'].SetMarkerColor(4)
+    graphs['PU200']['HGCal'].SetMarkerStyle(21)
+    graphs['PU200']['HGCal'].SetMarkerSize(1)
+    graphs['PU200']['HGCal'].SetLineWidth(2)
+    graphs['PU200']['HGCal'].SetLineStyle(1)
+    graphs['PU200']['HGCal'].SetLineColor(2)
+    graphs['PU200']['HGCal'].SetMarkerColor(2)
+    graphs['PU200']['HGCal'].Draw('lepz')
 
-  graphs['PU200']['HB'].SetMarkerStyle(20)
-  graphs['PU200']['HB'].SetMarkerSize(1)
-  graphs['PU200']['HB'].SetLineWidth(2)
-  graphs['PU200']['HB'].SetLineStyle(1)
-  graphs['PU200']['HB'].SetLineColor(1)
-  graphs['PU200']['HB'].SetMarkerColor(1)
-
-  graphs['PU200']['HGCal'].SetMarkerStyle(21)
-  graphs['PU200']['HGCal'].SetMarkerSize(1)
-  graphs['PU200']['HGCal'].SetLineWidth(2)
-  graphs['PU200']['HGCal'].SetLineStyle(1)
-  graphs['PU200']['HGCal'].SetLineColor(2)
-  graphs['PU200']['HGCal'].SetMarkerColor(2)
-
-  graphs['PU200']['HF'].SetMarkerStyle(33)
-  graphs['PU200']['HF'].SetMarkerSize(1.5)
-  graphs['PU200']['HF'].SetLineWidth(2)
-  graphs['PU200']['HF'].SetLineStyle(1)
-  graphs['PU200']['HF'].SetLineColor(4)
-  graphs['PU200']['HF'].SetMarkerColor(4)
-
-  graphs['PU140']['HF'].Draw('lepz')
-  graphs['PU140']['HGCal'].Draw('lepz')
-  graphs['PU140']['HB'].Draw('lepz')
-  graphs['PU200']['HF'].Draw('lepz')
-  graphs['PU200']['HGCal'].Draw('lepz')
-  graphs['PU200']['HB'].Draw('lepz')
+    graphs['PU200']['HF'].SetMarkerStyle(33)
+    graphs['PU200']['HF'].SetMarkerSize(1.5)
+    graphs['PU200']['HF'].SetLineWidth(2)
+    graphs['PU200']['HF'].SetLineStyle(1)
+    graphs['PU200']['HF'].SetLineColor(4)
+    graphs['PU200']['HF'].SetMarkerColor(4)
+    graphs['PU200']['HF'].Draw('lepz')
+  except: pass
 
   topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
   topLabel.SetFillColor(0)
@@ -1607,52 +1641,56 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
   hltTargetRateLine.SetLineColor(ROOT.kGray)
   hltTargetRateLine.Draw('same')
 
-  _htmpHB = ROOT.TH1D()
-  _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
-  _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
-  _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
-  _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
-  _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
-  _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
-
-  _htmpHGCal = ROOT.TH1D()
-  _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
-  _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
-  _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
-  _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
-  _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
-  _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
-
-  _htmpHF = ROOT.TH1D()
-  _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
-  _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
-  _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
-  _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
-  _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
-  _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
-
-  leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
-  leg1.SetNColumns(1)
-  leg1.SetTextFont(42)
-  leg1.SetEntrySeparation(0.4)
-  leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
-  leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
-  leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
-  leg1.Draw('same')
-
-  _htmpPU140 = graphs['PU140']['HB'].Clone()
-  _htmpPU140.SetLineColor(1)
-  _htmpPU140.SetLineStyle(2)
-
-  _htmpPU200 = graphs['PU200']['HB'].Clone()
-  _htmpPU200.SetLineColor(1)
-  _htmpPU200.SetLineStyle(1)
+  try:
+    _htmpHB = ROOT.TH1D()
+    _htmpHB.SetLineStyle(graphs['PU200']['HB'].GetLineStyle())
+    _htmpHB.SetLineWidth(graphs['PU200']['HB'].GetLineWidth())
+    _htmpHB.SetLineColor(graphs['PU200']['HB'].GetLineColor())
+    _htmpHB.SetMarkerColor(graphs['PU200']['HB'].GetMarkerColor())
+    _htmpHB.SetMarkerSize(graphs['PU200']['HB'].GetMarkerSize())
+    _htmpHB.SetMarkerStyle(graphs['PU200']['HB'].GetMarkerStyle())
+  
+    _htmpHGCal = ROOT.TH1D()
+    _htmpHGCal.SetLineStyle(graphs['PU200']['HGCal'].GetLineStyle())
+    _htmpHGCal.SetLineWidth(graphs['PU200']['HGCal'].GetLineWidth())
+    _htmpHGCal.SetLineColor(graphs['PU200']['HGCal'].GetLineColor())
+    _htmpHGCal.SetMarkerColor(graphs['PU200']['HGCal'].GetMarkerColor())
+    _htmpHGCal.SetMarkerSize(graphs['PU200']['HGCal'].GetMarkerSize())
+    _htmpHGCal.SetMarkerStyle(graphs['PU200']['HGCal'].GetMarkerStyle())
+  
+    _htmpHF = ROOT.TH1D()
+    _htmpHF.SetLineStyle(graphs['PU200']['HF'].GetLineStyle())
+    _htmpHF.SetLineWidth(graphs['PU200']['HF'].GetLineWidth())
+    _htmpHF.SetLineColor(graphs['PU200']['HF'].GetLineColor())
+    _htmpHF.SetMarkerColor(graphs['PU200']['HF'].GetMarkerColor())
+    _htmpHF.SetMarkerSize(graphs['PU200']['HF'].GetMarkerSize())
+    _htmpHF.SetMarkerStyle(graphs['PU200']['HF'].GetMarkerStyle())
+  
+    leg1 = ROOT.TLegend(0.60, 0.65, 0.94, 0.90)
+    leg1.SetNColumns(1)
+    leg1.SetTextFont(42)
+    leg1.SetEntrySeparation(0.4)
+    leg1.AddEntry(_htmpHB   ,     '|#eta|<1.5', 'ep')
+    leg1.AddEntry(_htmpHGCal, '1.5<|#eta|<3.0', 'ep')
+    leg1.AddEntry(_htmpHF   , '3.0<|#eta|<5.0', 'ep')
+    leg1.Draw('same')
+  except: pass
 
   leg2 = ROOT.TLegend(0.70, 0.48, 0.94, 0.63)
   leg2.SetNColumns(1)
   leg2.SetTextFont(42)
-  leg2.AddEntry(_htmpPU140, '140 PU', 'l')
-  leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  try:
+    _htmpPU140 = graphs['PU140']['HB'].Clone()
+    _htmpPU140.SetLineColor(1)
+    _htmpPU140.SetLineStyle(2)
+    leg2.AddEntry(_htmpPU140, '140 PU', 'l')
+  except: pass
+  try:
+    _htmpPU200 = graphs['PU200']['HB'].Clone()
+    _htmpPU200.SetLineColor(1)
+    _htmpPU200.SetLineStyle(1)
+    leg2.AddEntry(_htmpPU200, '200 PU', 'l')
+  except: pass
   leg2.Draw('same')
 
   h0.SetTitle(';GEN Jet p_{T} [GeV];% of Unreconstructed GEN Jets')
@@ -2097,8 +2135,8 @@ if __name__ == '__main__':
   inputDir = opts.inputDir
 
   recoKeys = [
-    'HLT_TRKv06p1',
-#    'HLT_TRKv06p1_TICL',
+#    'HLT_TRKv06p1',
+    'HLT_TRKv06p1_TICL',
   ]
 
 #      print '-'*110
@@ -2129,12 +2167,12 @@ if __name__ == '__main__':
       exts = EXTS,
     )
 
-#    plotJetMatchingEff(
-#      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU140.root',
-#      fpath_PU200 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',
-#      outputName = outputDir+'/jetMatchingEff',
-#      exts = EXTS,
-#    )
+    plotJetMatchingEff(
+      fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU140.root',
+      fpath_PU200 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_QCD_PtFlat15to3000_14TeV_PU200.root',
+      outputName = outputDir+'/jetMatchingEff',
+      exts = EXTS,
+    )
 
     plotMETResponse(
       fpath_PU140 = inputDir+'/'+_tmpReco+'/Phase2HLTTDR_VBF_HToInvisible_14TeV_PU140.root',
