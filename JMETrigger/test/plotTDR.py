@@ -2924,7 +2924,7 @@ if __name__ == '__main__':
         leg1.AddEntry(effysMET['2018']['120']['METMHT_L1TpHLT_wrt_'+_tmpRef], '[L1T+HLT] Run-2 (2018), MET120 + MHT120', 'lepx')
         try:
           leg1.AddEntry(effysMET[_tmpPU][_thrMETTypeOne]['METTypeOne_L1T_wrt_'+_tmpRef], '[L1T] Phase-2, L1T MET118', 'lepx')
-          leg1.AddEntry(effysMET[_tmpPU][_thrMETTypeOne]['METTypeOne_L1TpHLT_wrt_'+_tmpRef], '[L1T+HLT] Phase-2, Type-1 MET'+_thrMETTypeOneMHT, 'lepx')
+          leg1.AddEntry(effysMET[_tmpPU][_thrMETTypeOne]['METTypeOne_L1TpHLT_wrt_'+_tmpRef], '[L1T+HLT] Phase-2, Type-1 MET'+_thrMETTypeOne, 'lepx')
           leg1.AddEntry(effysMET[_tmpPU][_thrMETTypeOneMHT]['METTypeOneMHT30_L1TpHLT_wrt_'+_tmpRef], '[L1T+HLT] Phase-2, Type-1 MET'+_thrMETTypeOneMHT+' + MHT'+_thrMETTypeOneMHT, 'lepx')
           leg1.AddEntry(effysMET[_tmpPU][_thrMETTypeOneMHT]['METTypeOneMHT30_HLT_wrt_'+_tmpRef], '[HLT] Phase-2, Type-1 MET'+_thrMETTypeOneMHT+' + MHT'+_thrMETTypeOneMHT, 'lepx')
         except: pass
