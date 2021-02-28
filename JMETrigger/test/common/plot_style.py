@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import ROOT
 
-def apply_style(type_=0):
+def get_style(type_=0):
 
     s = ROOT.TStyle('swagger', 'plot swagger')
 
@@ -129,6 +129,4 @@ def apply_style(type_=0):
     s.SetPadTickX(1)
     s.SetPadTickY(1)
 
-    s.cd()
-
-    return
+    return s
