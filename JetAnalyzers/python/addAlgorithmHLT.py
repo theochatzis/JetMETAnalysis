@@ -4,12 +4,15 @@ stdClusteringAlgorithms = [
   'ak',
 ]
 stdJetTypes = [
-# 'caloHLT',
-# 'pfHLT',
-# 'pfchsHLT',
-  'puppiHLT',
+ 'pfHLT',
+ 'puppiHLT',
+ 'caloHLT',
+ 'pfclusterHLT',
 ]
 stdCorrectionLevels = {
+#
+# SPS 
+#    Not in use - deprecate?
 #  'l1'     : 'L1',
 #  'l2l3'   : 'L2L3',
 #  'l1l2l3' : 'L1FastL2L3'
@@ -22,14 +25,17 @@ corrJetsDict = {}
 jetColl = {
   'ak4pfHLT': 'hltAK4PFJets',
   'ak4puppiHLT': 'hltAK4PFPuppiJets',
-
+  'ak4caloHLT': 'hltAK4CaloJets',# SPS double check this
+  'ak4pfclusterHLT': 'hltAK4PFClusterJets',#and this
   'ak8pfHLT': 'hltAK8PFJets',
   'ak8puppiHLT': 'hltAK8PFPuppiJets',
+  'ak8caloHLT': 'hltAK8CaloJets',# SPS double check this
+  'ak8pfclusterHLT': 'hltAK8PFClusterJets',#and this
 }
 
 for ca in stdClusteringAlgorithms:
     for jt in stdJetTypes:
-        for r in [4, 8]:
+        for r in [4,8]:
             alg_size_type = str(ca)+str(r)+str(jt)
 
             ## Generator Jets
@@ -87,6 +93,10 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
         alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfchsHLT')]
         type          = 'PFchsHLT'
         alg_size_type = alg_size + 'pfchsHLT'
+    elif (alg_size_type_corr.find('pfclusterHLT') > 0) :
+        alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfclusterHLT')]
+        type          = 'PFclusterHLT'
+        alg_size_type = alg_size + 'pfclusterHLT'
     elif (alg_size_type_corr.find('pfchs') > 0) :
         alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfchs')]
         type          = 'PFchs'
@@ -102,18 +112,25 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
     else:
         raise ValueError("Can't identify valid jet type: calo|caloHLT|pf|pfchs|pfHLT|jpt|trk|tau|puppi")
         
-    if (alg_size_type_corr.find('l1') > 0):
-        correctl1 = True
-        if (alg_size_type_corr.find('l1off') > 0):
-            correctl1off = True
+    #
+    # SPS 
+    #    Not in use - deprecate?
+    #if (alg_size_type_corr.find('l1') > 0):
+    #    correctl1 = True
+    #    if (alg_size_type_corr.find('l1off') > 0):
+    #        correctl1off = True
 
-    if (alg_size_type_corr.find('l2l3') > 0):
-        correctl2l3 = True
+    #if (alg_size_type_corr.find('l2l3') > 0):
+    #    correctl2l3 = True
 
 
     ## check that alg_size_type_corr refers to valid jet configuration
     try:
         stdGenJetsDict.keys().index(alg_size_type)
+        # SPS debugging
+        print('Trying to find  ', alg_size_type)
+        print('.keys: ',stdRecJetsDict.keys())
+        print('.keys.index: ',stdRecJetsDict.keys().index(alg_size_type))
         stdRecJetsDict.keys().index(alg_size_type)
     except ValueError:
         raise ValueError("Algorithm unavailable in standard format: " + alg_size_type)
@@ -146,17 +163,23 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
     setattr(process, alg_size_type_corr + 'PtEtaUncor', jetPtEtaUncor)
     sequence = cms.Sequence(sequence * jetPtEtaUncor)
 
-    ## correct jets
-    corrLabel = ''
-    if correctl1 or correctl2l3:
-        process.load('JetMETAnalysis.JetAnalyzers.JetCorrection_cff')
-        (corrLabel, corrJets) = corrJetsDict[alg_size_type_corr]
-        setattr(process, corrLabel, corrJets)
-        sequence = cms.Sequence(eval(corrLabel.replace("Jets","")+"CorrectorChain") * corrJets * sequence)
+    #
+    # SPS 
+    #    Not in use - deprecate?
+    # ======================================
+    ### correct jets
+    #corrLabel = ''
+    #if correctl1 or correctl2l3:
+    #    process.load('JetMETAnalysis.JetAnalyzers.JetCorrection_cff')
+    #    (corrLabel, corrJets) = corrJetsDict[alg_size_type_corr]
+    #    setattr(process, corrLabel, corrJets)
+    #    sequence = cms.Sequence(eval(corrLabel.replace("Jets","")+"CorrectorChain") * corrJets * sequence)
 
-    ## add pu density calculation
-    if not correctl1 and not correctl1off:
-       pass
+    ### add pu density calculation
+    #if not correctl1 and not correctl1off:
+    #   pass
+    # ======================================
+
 #        if type == 'CaloHLT': #added 02/15/2012
 #            process.kt6CaloJets = kt6CaloJets 
 #            process.kt6CaloJets.doRhoFastjet = True
@@ -175,37 +198,42 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
 #            process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
 #            process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
 #            sequence = cms.Sequence(process.kt6PFJets * sequence)
-    elif correctl1 and not correctl1off:  #modified 10/10/2011
-        if type == 'CaloHLT': #added 02/15/2012
-            process.kt6CaloJets = kt6CaloJets 
-            process.kt6CaloJets.doRhoFastjet = True
-            process.kt6CaloJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
-            process.kt6CaloJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
-            sequence = cms.Sequence(process.kt6CaloJets * sequence)
-        elif type == 'PFchs':
-            process.kt6PFJets = kt6PFJets
-            process.kt6PFJets.doRhoFastjet = True
-            process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
-            process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
-            sequence = cms.Sequence(process.kt6PFJets * sequence)
-        elif type == 'PFHLT':
-            process.kt6PFJets = kt6PFJets
-            process.kt6PFJets.doRhoFastjet = True
-            process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
-            process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
-            sequence = cms.Sequence(process.kt6PFJets * sequence)
-        elif type == 'PFchsHLT':
-            process.kt6PFJets = kt6PFJets
-            process.kt6PFJets.doRhoFastjet = True
-            process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
-            process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
-            sequence = cms.Sequence(process.kt6PFJets * sequence)
-        elif type == 'PF':
-            process.kt6PFJets = kt6PFJets
-            process.kt6PFJets.doRhoFastjet = True
-            process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
-            process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
-            sequence = cms.Sequence(process.kt6PFJets * sequence)
+    #
+    # SPS 
+    #    Not in use - deprecate?
+    # ======================================
+    #elif correctl1 and not correctl1off:  #modified 10/10/2011
+    #    if type == 'CaloHLT': #added 02/15/2012
+    #        process.kt6CaloJets = kt6CaloJets 
+    #        process.kt6CaloJets.doRhoFastjet = True
+    #        process.kt6CaloJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
+    #        process.kt6CaloJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
+    #        sequence = cms.Sequence(process.kt6CaloJets * sequence)
+    #    elif type == 'PFchs':
+    #        process.kt6PFJets = kt6PFJets
+    #        process.kt6PFJets.doRhoFastjet = True
+    #        process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
+    #        process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
+    #        sequence = cms.Sequence(process.kt6PFJets * sequence)
+    #    elif type == 'PFHLT':
+    #        process.kt6PFJets = kt6PFJets
+    #        process.kt6PFJets.doRhoFastjet = True
+    #        process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
+    #        process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
+    #        sequence = cms.Sequence(process.kt6PFJets * sequence)
+    #    elif type == 'PFchsHLT':
+    #        process.kt6PFJets = kt6PFJets
+    #        process.kt6PFJets.doRhoFastjet = True
+    #        process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
+    #        process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
+    #        sequence = cms.Sequence(process.kt6PFJets * sequence)
+    #    elif type == 'PF':
+    #        process.kt6PFJets = kt6PFJets
+    #        process.kt6PFJets.doRhoFastjet = True
+    #        process.kt6PFJets.Ghost_EtaMax = Defaults.kt6PFJetParameters.Ghost_EtaMax.value()
+    #        process.kt6PFJets.Rho_EtaMax   = Defaults.kt6PFJetParameters.Rho_EtaMax
+    #        sequence = cms.Sequence(process.kt6PFJets * sequence)
+    # ==========================================
 
     ## reference to jet matching
     jetToRef = cms.EDProducer('MatchRecToGen',
@@ -259,6 +287,10 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
     elif type == 'PuppiHLT':
         jra.srcRho =    'fixedGridRhoFastjetAll'
         jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
+    elif type == 'PFclusterHLT':
+        # SPS double check this
+        jra.srcRho =    'fixedGridRhoFastjetAll'
+        jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
     elif type == 'PFchsHLT':
         jra.srcRho = ak4PFchsL1Fastjet.srcRho #added 02/15/2012
         jra.srcRhoHLT = ak5PFchsHLTL1Fastjet.srcRho
@@ -280,8 +312,13 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
         jra.srcRho = cms.InputTag("fixedGridRhoFastjetAll")
         jra.srcPFCandidates = cms.InputTag('puppi')
 
-    if correctl1 or correctl2l3:
-        jra.jecLabel = corrJets.correctors[0].replace("Corrector","")
+    #
+    # SPS 
+    #    Not in use - deprecate?
+    # ======================================
+    #if correctl1 or correctl2l3:
+    #    jra.jecLabel = corrJets.correctors[0].replace("Corrector","")
+    # ======================================
 
     setattr(process,alg_size_type_corr,jra)
     sequence = cms.Sequence(sequence * jra)
