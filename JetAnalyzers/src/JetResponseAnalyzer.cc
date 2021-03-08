@@ -62,14 +62,15 @@ JetResponseAnalyzer::JetResponseAnalyzer(const edm::ParameterSet& iConfig)
     deltaRPartonMax_  =iConfig.getParameter<double>       ("deltaRPartonMax");
     getFlavorFromMap_=true;
   }
-  
+
   isCaloJet_  = (moduleLabel_.find("calo")!=string::npos);
+  isPFClusterJet_ = (moduleLabel_.find("pfcluster") != string::npos);
   isJPTJet_   = (moduleLabel_.find("jpt") !=string::npos);
-  isPFJet_    = (moduleLabel_.find("pf")  !=string::npos || moduleLabel_.find("puppi")  !=string::npos);
+  isPFJet_    = (moduleLabel_.find("pf")  !=string::npos || moduleLabel_.find("puppi")  !=string::npos) and (moduleLabel_.find("pfcluster") == string::npos);
   isTrackJet_ = (moduleLabel_.find("trk") !=string::npos);
   isTauJet_   = (moduleLabel_.find("tau") !=string::npos);
 
-  int check = isCaloJet_+isJPTJet_+isPFJet_+isTrackJet_+isTauJet_;
+  int check = isCaloJet_+isPFClusterJet_+isJPTJet_+isPFJet_+isTrackJet_+isTauJet_;
   assert(check<2);
 
   //if (isCaloJet_)  cout<<"These are CaloJets  ("<<moduleLabel_<<")"<<endl;
@@ -446,6 +447,9 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
         edm::RefToBase<reco::Jet> jptjetRef = jptjet.getCaloJetRef();
         reco::CaloJet const * rawcalojet = dynamic_cast<reco::CaloJet const *>( &* jptjetRef);
         JRAEvt_->jtarea->at(JRAEvt_->nref) = rawcalojet->jetArea();
+     }
+     else if (isPFClusterJet_) {
+        JRAEvt_->jtarea->at(JRAEvt_->nref) = jet.castTo<reco::PFClusterJetRef>()->jetArea();
      }
      else if (isPFJet_) {
         JRAEvt_->jtarea->at(JRAEvt_->nref) = jet.castTo<reco::PFJetRef>()->jetArea();

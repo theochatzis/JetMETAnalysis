@@ -127,10 +127,6 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
     ## check that alg_size_type_corr refers to valid jet configuration
     try:
         stdGenJetsDict.keys().index(alg_size_type)
-        # SPS debugging
-        print('Trying to find  ', alg_size_type)
-        print('.keys: ',stdRecJetsDict.keys())
-        print('.keys.index: ',stdRecJetsDict.keys().index(alg_size_type))
         stdRecJetsDict.keys().index(alg_size_type)
     except ValueError:
         raise ValueError("Algorithm unavailable in standard format: " + alg_size_type)
@@ -139,7 +135,7 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
         correctl2l3 and corrJetsDict.keys().index(alg_size_type_corr)
     except ValueError:
         raise ValueError("Invalid jet correction: " + alg_size_type_corr)
-        
+
     ## reference (genjet) kinematic selection
     refPtEta = cms.EDFilter('EtaPtMinCandViewRefSelector',
         Defaults.RefPtEta,
@@ -155,7 +151,7 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
     )
 
     setattr(process, alg_size_type_corr + 'PtEta', jetPtEta)
-    
+
     ## create the sequence
     sequence = cms.Sequence(refPtEta * jetPtEta)
 
