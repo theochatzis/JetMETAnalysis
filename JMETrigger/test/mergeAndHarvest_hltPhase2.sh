@@ -14,7 +14,11 @@ OUTPUT_DIR=${1}
 
 merge_batchOutputs.py -l 1 -i ${OUTPUT_DIR}/jobs/*/*.root -o ${OUTPUT_DIR}/outputs
 
+rm -rf ${OUTPUT_DIR}/jobs
+
 for rootfile_i in ${OUTPUT_DIR}/outputs/*/*.root; do
   jmeAnalysisHarvester.py -l 1 -i ${rootfile_i} -o ${OUTPUT_DIR}/harvesting
 done
 unset rootfile_i
+
+rm -rf ${OUTPUT_DIR}/outputs

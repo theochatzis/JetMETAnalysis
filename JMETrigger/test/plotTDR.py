@@ -467,18 +467,17 @@ def getMETEfficiencies(**kwargs):
   return ret
 
 def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
-  histos = {
-    'PU140': {'pt030to100': None, 'pt100to300': None, 'pt300to600': None},
-    'PU200': {'pt030to100': None, 'pt100to300': None, 'pt300to600': None},
-  }
-
   for (_etaTag, _etaLabel) in {
     'EtaIncl': '|#eta|<5.0',
     'HB': '|#eta|<1.5',
     'HGCal': '1.5<|#eta|<3.0',
     'HF': '3.0<|#eta|<5.0',
   }.items():
-   for _tmp, _tmpFilePath in [
+   histos = {
+     'PU140': {'pt030to100': None, 'pt100to300': None, 'pt300to600': None},
+     'PU200': {'pt030to100': None, 'pt100to300': None, 'pt300to600': None},
+   }
+   for [_tmp, _tmpFilePath] in [
      ['PU140', fpath_PU140],
      ['PU200', fpath_PU200],
    ]:
@@ -492,12 +491,10 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
      histos[_tmp]['pt100to300'] = _h2tmp.ProjectionX(tmpName(), _h2tmp.GetYaxis().FindBin(100.001), _h2tmp.GetYaxis().FindBin(299.999))
      histos[_tmp]['pt300to600'] = _h2tmp.ProjectionX(tmpName(), _h2tmp.GetYaxis().FindBin(300.001), _h2tmp.GetYaxis().FindBin(599.999))
 
-   for _tmp1 in histos:
-    for _tmp2 in histos[_tmp1]:
-      if histos[_tmp1][_tmp2] is None: continue
-      histos[_tmp1][_tmp2].SetDirectory(0)
-      histos[_tmp1][_tmp2].UseCurrentStyle()
-      histos[_tmp1][_tmp2].Scale(1./histos[_tmp1][_tmp2].Integral())
+     for _tmp2 in histos[_tmp]:
+       histos[_tmp][_tmp2].SetDirectory(0)
+       histos[_tmp][_tmp2].UseCurrentStyle()
+       histos[_tmp][_tmp2].Scale(1./histos[_tmp][_tmp2].Integral())
 
    canvas = ROOT.TCanvas(tmpName(), tmpName(False))
    canvas.cd()
@@ -528,8 +525,7 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
      histos['PU140']['pt300to600'].SetLineColor(4)
      histos['PU140']['pt300to600'].SetMarkerColor(4)
      histos['PU140']['pt300to600'].Draw('hist,e0,same')
-   except:
-     pass
+   except: pass
 
    try:
      histos['PU200']['pt030to100'].SetMarkerStyle(20)
@@ -552,8 +548,7 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
      histos['PU200']['pt300to600'].SetLineColor(4)
      histos['PU200']['pt300to600'].SetMarkerColor(4)
      histos['PU200']['pt300to600'].Draw('hist,e0,same')
-   except:
-     pass
+   except: pass
 
    topLabel = ROOT.TPaveText(0.15, 0.93, 0.55, 0.98, 'NDC')
    topLabel.SetFillColor(0)
@@ -622,15 +617,13 @@ def plotJetResponse(fpath_PU140, fpath_PU200, outputName, exts):
     _htmpPU140 = histos['PU140']['pt030to100'].Clone()
     _htmpPU140.SetLineColor(1)
     _htmpPU140.SetLineStyle(2)
-   except:
-    pass
+   except: pass
 
    try:
     _htmpPU200 = histos['PU200']['pt030to100'].Clone()
     _htmpPU200.SetLineColor(1)
     _htmpPU200.SetLineStyle(1)
-   except:
-    pass
+   except: pass
 
    leg2 = ROOT.TLegend(0.75, 0.45, 0.94, 0.60)
    leg2.SetNColumns(1)
@@ -1419,7 +1412,7 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
   hltRateLabel.SetTextFont(42)
   hltRateLabel.SetTextSize(0.035)
   hltRateLabel.SetBorderSize(0)
-  hltRateLabel.AddText('p_{T}^{HLT} > 15 GeV')
+  hltRateLabel.AddText('p_{T}^{HLT} > 20 GeV')
   hltRateLabel.Draw('same')
 
   hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
@@ -1632,7 +1625,7 @@ def plotJetMatchingEff(fpath_PU140, fpath_PU200, outputName, exts):
   hltRateLabel.SetTextFont(42)
   hltRateLabel.SetTextSize(0.035)
   hltRateLabel.SetBorderSize(0)
-  hltRateLabel.AddText('p_{T}^{HLT} > 15 GeV')
+  hltRateLabel.AddText('p_{T}^{HLT} > 20 GeV')
   hltRateLabel.Draw('same')
 
   hltTargetRateLine = ROOT.TLine(30, 1, 600, 1)
@@ -2980,8 +2973,6 @@ if __name__ == '__main__':
         canvas.Close()
 
         print '\033[1m'+outputDir+'/triggerEff_METTypeOneXvs2018_wrt'+_tmpRef+'_'+_tmpPU+'\033[0m'
-
-  raise SystemExit(1) #!!
 
   ###
   ### Rates
