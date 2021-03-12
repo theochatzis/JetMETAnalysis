@@ -2119,7 +2119,8 @@ if __name__ == '__main__':
 
 #  ROOT.TH1.AddDirectory(False)
 
-  apply_style(0)
+  theStyle = get_style(0)
+  theStyle.cd()
 
   EXTS = list(set(opts.exts))
 
@@ -3073,8 +3074,8 @@ if __name__ == '__main__':
   rateConfig = {
     'PU140': {
       'iLumiHzPerPb': 0.053,
-      'hltThresholdSingleJet': 490,
-      'hltThresholdHT': 1000,
+      'hltThresholdSingleJet': 520,
+      'hltThresholdHT': 1070,
       'hltThresholdMET': 110,
       'hltThresholdMETTypeOne': 140,
       'hltThresholdMETTypeOneMHT20': 140,
