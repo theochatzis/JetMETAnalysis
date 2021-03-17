@@ -842,14 +842,32 @@ float JMETriggerAnalysisDriverPhase2::getMHT(float const jetPtMin, float const j
   auto const& v_eta = vector<float>("hltAK4PFPuppiJetsCorrected_eta");
   auto const& v_phi = vector<float>("hltAK4PFPuppiJetsCorrected_phi");
   auto const& v_mass = vector<float>("hltAK4PFPuppiJetsCorrected_mass");
-
+/*
+  auto const& v_GEN_pt = vector<float>("ak4GenJetsNoNu_pt");
+  auto const& v_GEN_eta = vector<float>("ak4GenJetsNoNu_eta");
+  auto const& v_GEN_phi = vector<float>("ak4GenJetsNoNu_phi");
+*/
   float MHT_x(0.f), MHT_y(0.f);
   for(size_t jetIdx=0; jetIdx<v_pt.size(); ++jetIdx){
     if(std::abs(v_eta.at(jetIdx)) >= jetAbsEtaMax) continue;
+/*
+    bool isMatchedToGEN = false;
+    for(size_t genJetIdx=0; genJetIdx<v_GEN_pt.size(); ++genJetIdx){
+      if(v_GEN_pt.at(genJetIdx) <= 20.) continue;
 
+      auto const dR2 = utils::deltaR2(v_eta.at(jetIdx), v_phi.at(jetIdx), v_GEN_eta.at(genJetIdx), v_GEN_phi.at(genJetIdx));
+      if(dR2 < 0.01){
+        isMatchedToGEN = true;
+        break;
+      }
+    }
+    if(not isMatchedToGEN) continue;
+*/
     ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<float>> const p4polar(v_pt.at(jetIdx), v_eta.at(jetIdx), v_phi.at(jetIdx), v_mass.at(jetIdx));
 
-    if(p4polar.Pt() > jetPtMin){
+    auto const jetPtMin_new = jetPtMin; //!! (std::abs(p4polar.Eta()) < 2.95 or std::abs(p4polar.Eta()) > 3.05) ? jetPtMin : std::max(60.f, jetPtMin);
+
+    if(p4polar.Pt() > jetPtMin_new){
       MHT_x -= p4polar.Px();
       MHT_y -= p4polar.Py();
     }
