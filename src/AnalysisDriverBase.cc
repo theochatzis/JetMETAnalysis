@@ -1,5 +1,5 @@
-#include <NTupleAnalysis/JMETrigger/interface/AnalysisDriverBase.h>
-#include <NTupleAnalysis/JMETrigger/interface/Utils.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/AnalysisDriverBase.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/Utils.h>
 
 #include <iostream>
 

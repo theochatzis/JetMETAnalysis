@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <NTupleAnalysis/JMETrigger/interface/AnalysisDriverBase.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/AnalysisDriverBase.h>
 
 class JMETriggerAnalysisDriver : public AnalysisDriverBase {
 

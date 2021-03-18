@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include <NTupleAnalysis/JMETrigger/interface/JMETriggerAnalysisDriver.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/JMETriggerAnalysisDriver.h>
 
 class JMETriggerAnalysisDriverPhase2 : public JMETriggerAnalysisDriver {
 

@@ -1,5 +1,5 @@
-#include <NTupleAnalysis/JMETrigger/interface/JMETriggerAnalysisDriverRun3.h>
-#include <NTupleAnalysis/JMETrigger/interface/Utils.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/JMETriggerAnalysisDriverRun3.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/Utils.h>
 #include <utility>
 #include <cmath>
 #include <Math/GenVector/LorentzVector.h>

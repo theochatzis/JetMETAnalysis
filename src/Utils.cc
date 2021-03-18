@@ -1,4 +1,4 @@
-#include <NTupleAnalysis/JMETrigger/interface/Utils.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/Utils.h>
 #include <cmath>
 
 float utils::deltaPhi(const float phi1, const float phi2){

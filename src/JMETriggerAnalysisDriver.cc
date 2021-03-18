@@ -1,5 +1,5 @@
-#include <NTupleAnalysis/JMETrigger/interface/JMETriggerAnalysisDriver.h>
-#include <NTupleAnalysis/JMETrigger/interface/Utils.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/JMETriggerAnalysisDriver.h>
+#include <JMETriggerAnalysis/NTupleAnalysis/interface/Utils.h>
 #include <cmath>
 
 JMETriggerAnalysisDriver::JMETriggerAnalysisDriver(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode)
