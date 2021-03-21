@@ -24,6 +24,7 @@ JetResponseAnalyzer::JetResponseAnalyzer(const edm::ParameterSet& iConfig)
   , srcRho_                 (consumes<double>(iConfig.getParameter<edm::InputTag>                             ("srcRho")))
   , srcRhoHLT_              (consumes<double>(iConfig.getParameter<edm::InputTag>                          ("srcRhoHLT")))
   , srcVtx_                 (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>             ("srcVtx")))
+  , applyVtxCuts_           (iConfig.getParameter<bool>("applyVtxCuts"))
   , srcGenInfo_             (consumes<GenEventInfoProduct>(edm::InputTag("generator"))                                   )
   , srcPileupInfo_          (consumes<vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"))                 )
   //, srcPFCandidates_      (consumes<vector<reco::PFCandidate> >(iConfig.getParameter<edm::InputTag>("srcPFCandidates")))
@@ -54,9 +55,8 @@ JetResponseAnalyzer::JetResponseAnalyzer(const edm::ParameterSet& iConfig)
     deltaPhiMin_=iConfig.getParameter<double>("deltaPhiMin");
   }
   else
-    throw cms::Exception("MissingParameter")<<"Set *either* deltaRMax (matching)"
-					    <<" *or* deltaPhiMin (balancing)";
-  
+    throw cms::Exception("MissingParameter")<<"Set *either* deltaRMax (matching) *or* deltaPhiMin (balancing)";
+
   if (doFlavor_&&iConfig.exists("srcRefToPartonMap")) {
      srcRefToPartonMap_=consumes<reco::JetMatchedPartonsCollection>(iConfig.getParameter<edm::InputTag>("srcRefToPartonMap"));
     deltaRPartonMax_  =iConfig.getParameter<double>       ("deltaRPartonMax");
@@ -102,9 +102,8 @@ void JetResponseAnalyzer::beginJob()
 //void JetResponseAnalyzer::setupTree()
 {
   edm::Service<TFileService> fs;
-  if (!fs) throw edm::Exception(edm::errors::Configuration,
-				"TFileService missing from configuration!");
-  
+  if (!fs) throw edm::Exception(edm::errors::Configuration, "TFileService missing from configuration!");
+
   // Configuration flags: Mapping in JRAEvent.h
   int flag_int = (saveCandidates_*pow(2,7)) + (isPFJet_*pow(2,6)) +
                  (isCaloJet_*pow(2,5)) + (doComposition_*pow(2,4)) +
@@ -219,7 +218,7 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
   if (iEvent.getByToken(srcVtx_,vtx)) {
      const reco::VertexCollection::const_iterator vtxEnd = vtx->end();
      for (reco::VertexCollection::const_iterator vtxIter = vtx->begin(); vtxEnd != vtxIter; ++vtxIter) {
-        if (!vtxIter->isFake() && vtxIter->ndof()>=4 && fabs(vtxIter->z())<=24) {
+        if (!applyVtxCuts_ or (!vtxIter->isFake() && vtxIter->ndof()>=4 && fabs(vtxIter->z())<=24)) {
            ++(JRAEvt_->npv);
            JRAEvt_->refdzvtx->push_back(0);//fabs(vtxIter->z()-);
         }
