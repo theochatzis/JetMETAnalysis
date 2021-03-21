@@ -157,6 +157,8 @@ for algorithm in [
   'ak8puppiHLT',
 ]:
   addAlgorithm(process, algorithm, Defaults)
+  getattr(process, algorithm).applyVtxCuts = cms.bool(False)
+  getattr(process, algorithm).srcVtx = 'hltPixelVertices'
   getattr(process, algorithm).srcRho = 'hltFixedGridRhoFastjetAll'
   getattr(process, algorithm).srcRhoHLT = ''
   getattr(process, algorithm).srcRhos = ''
