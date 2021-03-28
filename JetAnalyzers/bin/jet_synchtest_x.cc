@@ -37,6 +37,9 @@ using namespace std;
 
 typedef map<double, pair<Int_t, Int_t> > ITJ;
 
+bool ignoreNPV = false;
+bool overwriteNPVwithNPU = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 // declare class
 ////////////////////////////////////////////////////////////////////////////////
@@ -412,7 +415,7 @@ void MatchEventsAndJets::GetNtuples(string treeName) {
    int algo2_bit_number = (algo2JetInfo.jetType.Contains("calo",TString::kIgnoreCase)) ? 53 : 85;
 
    fpu->cd(algo1.c_str());
-   tpu   = new JRAEvent((TTree*) fpu->Get((algo1+"/"+treeName).c_str()),algo1_bit_number);
+   tpu = new JRAEvent((TTree*) fpu->Get((algo1+"/"+treeName).c_str()),algo1_bit_number);
 
    fnopu->cd(algo2.c_str());
    tnopu = new JRAEvent((TTree*) fnopu->Get((algo2+"/"+treeName).c_str()),algo2_bit_number);
@@ -807,18 +810,15 @@ void MatchEventsAndJets::LoopOverEvents(bool verbose, bool reduceHistograms, str
    ull nentries = mapTreePU.size();
    cout << endl << "after mapTreePU.size" << endl;
    int jetMapIndex = -1;
-   cout << endl << "before for loop" << endl;
+
    for (IT::const_iterator it = mapTreePU.begin(); it != mapTreePU.end(); ++it) {
 
-      cout << endl << "before iftest" << endl;
       if (iftest && nevs >= maxEvts) return;
 
       //if (nevs%10000==0) cout << "\t"<<nevs << endl;
-      cout << endl << "before loadbar" << endl;
       loadbar2(nevs+1,nentries,50,"\t\t");
 
       // if this entry does not exist on the second ntuple just skip this event
-      cout << endl << "before mapTreeNoPU.find(it->first)" << endl;
       if (mapTreeNoPU.find(it->first) == mapTreeNoPU.end()) {
          if(verbose) {
             cout << "\tWARNING::mapTreeNoPU.find(it->first) == mapTreeNoPU.end() failed" << endl
@@ -831,42 +831,46 @@ void MatchEventsAndJets::LoopOverEvents(bool verbose, bool reduceHistograms, str
       }
 
       // Load the entries at the proper place.
-      cout << endl << "before getentry pu" << endl;
       tpu->GetEntry(mapTreePU[it->first].second);
-      cout << endl << "before getentry nopu" << endl;
       tnopu->GetEntry(mapTreeNoPU[it->first].second);
 
+      // overwrite npv with npus
+      if(overwriteNPVwithNPU){
+
+        for(size_t idx=0; idx<tpu->bxns->size(); ++idx){
+          if(tpu->bxns->at(idx) == 0){
+            tpu->npv = tpu->npus->at(idx);
+            break;
+          }
+        }
+
+        for(size_t idx=0; idx<tnopu->bxns->size(); ++idx){
+          if(tnopu->bxns->at(idx) == 0){
+            tnopu->npv = tnopu->npus->at(idx);
+            break;
+          }
+        }
+      }
+
       //Skip events without any primary vertex as these make no sense
-      cout << endl << "before npv check" << endl;
-      if (tpu->npv == 0 || tnopu->npv == 0) continue;
+      if (!ignoreNPV and (tpu->npv == 0 or tnopu->npv == 0)) continue;
 
       // Set the in-time pileup index after the first event only
-      cout << endl << "before nevs==0" << endl;
       if(nevs==0) iIT = tpu->itIndex();
 
       // Create the mapping of matched jets.
       // key is PU, value is for NoPU
       //if(!readJetMap) FillJetMap();
-      cout << endl << "before readjetmap" << endl;
       if(readJetMap.empty() || !jetMapTreeFound) {
          FillRecToRecThroughGenMap();
       }
       else {
-         cout << endl << "inside else bit" << endl;
          jetMapIndex++;
          ReadJetMap(jetMapIndex,readJetMap);
       }  
 
-      cout << endl << "before fillhistograms" << endl;
-      cout << endl << "values are "<<reduceHistograms << endl;
-      cout << endl << "values are "<<FillHistograms(reduceHistograms) << endl;
       if(FillHistograms(reduceHistograms)) nevs++;
-      cout << endl << "after fillhistograms" << endl;
-      cout << endl << "values are"<<reduceHistograms << endl<< FillHistograms(reduceHistograms) << endl;
-
-   }//for
-
-   cout << endl << "finished for loop" << endl;
+   }
 }
 
 //______________________________________________________________________________
@@ -1047,7 +1051,7 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
    }
 
    //Skip events where the noPU sample has more than one vertex
-   if (tnopu->npv!=1) {
+   if (!ignoreNPV and tnopu->npv!=1) {
       noPUNpvGTOneEventCounter++;
       if(noPUNpvGTOneEventCounter==0) {
          cout << "\tWARNING::The NoPU sample has more than 1 PV." << endl
@@ -1145,6 +1149,7 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
             histograms["m_frac_nj_pt_f_match_pu"]   ->Fill(tpu->jtpt->at(j1),ismatch);
             histograms["m_frac_nj_pt_f_match_RG_pu"]->Fill(tpu->jtpt->at(j1),ismatchRG);
          }
+
          if (!ismatch) {
             hname = Form("m_njet_pt_npv%i_%i_unmatch",inpv*npvRhoNpuBinWidth,inpv*npvRhoNpuBinWidth+npvRhoNpuBinWidth-1);
             histograms[hname]->Fill(tpu->jtpt->at(j1),+1);
@@ -1536,6 +1541,10 @@ int main(int argc,char**argv)
    vector<int>  vptBins           = cl.getVector<int>    ("vptBins",       "14:::18:::20:::24:::28:::30");
    bool         reduceHistograms  = cl.getValue<bool>    ("reduceHistograms",                       true);
    bool         verbose           = cl.getValue<bool>    ("verbose",                               false);
+
+   ignoreNPV = cl.getValue<bool>("ignoreNPV", false);
+   overwriteNPVwithNPU = cl.getValue<bool>("overwriteNPVwithNPU", false);
+
    bool         help              = cl.getValue<bool>    ("help",                                  false);
 
    if (help) {cl.print(); return 0;}
