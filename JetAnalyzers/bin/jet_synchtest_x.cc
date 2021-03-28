@@ -1593,7 +1593,7 @@ int main(int argc,char**argv)
       cout << endl << "*****readevtmaps was not empty******" << endl;
       mej->ReadMatchedEventsMaps(readEvtMaps);
       }
-   cout << endl << "*****oppening output file******" << endl;
+   cout << endl << "*****opening output file******" << endl;
    mej->OpenOutputFile(outputPath);
    cout << endl << "*****checking if for applyJEC******" << endl;
    if (ApplyJEC) {
@@ -1601,15 +1601,11 @@ int main(int argc,char**argv)
       mej->SetJEC(JECpar);
       cout << "DONE" << endl;
    }
-   cout << endl << "*****setting npvrhonpu******" << endl;
+
    mej->SetNpvRhoNpuValues(NBinsNpvRhoNpu,npvRhoNpuBinWidth);
-   cout << endl << "*****setting vpt bins******" << endl;
    mej->SetVptBins(vptBins);
-   cout << endl << "*****declaring histograms******" << endl;
    mej->DeclareHistograms(reduceHistograms);
-   cout << endl << "*****looping over events******" << endl;
    mej->LoopOverEvents(verbose,reduceHistograms,readEvtMaps);
-   cout << endl << "*****wiritng ouptput******" << endl;
    mej->WriteOutput(outputPath,readEvtMaps.empty()||!mej->JetMapTreeFound());
    mej->Report();
 
