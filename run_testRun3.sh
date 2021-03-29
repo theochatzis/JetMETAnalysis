@@ -1,87 +1,160 @@
 #!/bin/bash
 
+##
+## Setup instructions:
+##
+## > scram p CMSSW CMSSW_11_2_0_Patatrack
+## > cd CMSSW_11_2_0_Patatrack/src
+## > eval `scram runtime -sh`
+## > git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b run3_jrantuples
+## > scram b -j 8
+## > cd JetMETAnalysis
+## > ./run_testRun3.sh test_output
+##
+
+##
+## Hard-coded inputs/options
+##
 JRANTuple_NoPU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/noPU/noPU_testingJRANtuple.root
 JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/flatPU/flatPU_testingJRANtuple.root
 
-ERA=ERA #Run3Winter20_MC_V1
+MAXEVENTS=1000000
+
+ERA=Run3Winter20_V1_MC
 
 JET_TYPES=(
+#  ak4caloHLT
+#  ak4pfclusterHLT
   ak4pfHLT
+#  ak4puppiHLT
+#  ak8caloHLT
+#  ak8pfclusterHLT
+#  ak8pfHLT
+#  ak8puppiHLT
 )
 
+##
+## Main
+##
 set -e
 
-for jet_type in ${JET_TYPES[@]}; do
-  OUTDIR=tmpout1/${jet_type}
-  mkdir -p ${OUTDIR}/jraNTuples
+if [ $# -eq 1 ]; then
+  OUTPUT_DIR=${1}
+else
+  printf "%s\n" ">> ERROR -- invalid number of command-line arguments ($#): \"$@\""
+  exit 1
+fi
+
+if [[ ${OUTPUT_DIR} == "" ]]; then
+  printf "%s\n" ">> ERROR -- empty path to output directory"
+fi
+
+stepCmd(){
+  echo -e "#!/bin/bash\n\nset -e\n\n${1} 2>&1 | tee ${2}.log" > ${2}.sh
+  chmod u+x ${2}.sh
+  ./${2}.sh
+  touch ${2}.done
+}
+
+for jet_type in "${JET_TYPES[@]}"; do
+  OUTDIR=${OUTPUT_DIR}/${jet_type}
+  mkdir -p ${OUTDIR}
   cd ${OUTDIR}
-  unset OUTDIR
+
+  stepN=0
 
   ###
-  ### L1
+  ### L1FastJet
   ###
-#  if [ ! -f step01.done ]; then
-#    CMD_STEP01="jet_synchtest_x -outputPath ./ -algo1 ${jet_type} -algo2 ${jet_type} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
-#    CMD_STEP01+=" -ApplyJEC false -useweight false -iftest true -maxEvts 1000000 -doNotSave true -ignoreNPV true -overwriteNPVwithNPUInTime true"
-#    echo "${CMD_STEP01} 2>&1 | tee step01.log" > step01.sh && source step01.sh && touch step01.done
+  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+  if [ ! -f ${stepName}.done ]; then
+    CMD_STEP="jet_synchtest_x -algo1 ${jet_type} -algo2 ${jet_type} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
+    CMD_STEP+=" -ApplyJEC false"
+    CMD_STEP+=" -useweight false -doNotSave true -ignoreNPV true -overwriteNPVwithNPUInTime true"
+    CMD_STEP+=" -iftest true -maxEvts ${MAXEVENTS} -outputPath ."
+    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+  fi
+
+  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+  if [ ! -f ${stepName}.done ]; then
+    CMD_STEP="jet_synchplot_x -algo1 ${jet_type} -algo2 ${jet_type} -fixedRange false -tdr true"
+    CMD_STEP+=" -inputDir ./ -outDir plots_${stepName} -outputFormat .png"
+    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+  fi
+
+  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+  if [ ! -f ${stepName}.done ]; then
+    CMD_STEP="jet_synchfit_x -algo1 ${jet_type} -algo2 ${jet_type} -functionType standard -era ${ERA} -inputDir ./ -outputDir ./"
+    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+  fi
+
+#  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+#  if [ ! -f ${stepName}.done ]; then
+#    CMD_STEP="jet_synchtest_x -algo1 ${jet_type} -algo2 ${jet_type} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
+#    CMD_STEP+=" -ApplyJEC true -JECpar ./${ERA}_L1FastJet_*.txt"
+#    CMD_STEP+=" -useweight false -doNotSave true -ignoreNPV true -overwriteNPVwithNPUInTime true"
+#    CMD_STEP+=" -iftest true -maxEvts ${MAXEVENTS} -outputPath plots_${stepName}"
+#    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
 #  fi
 #
-#  if [ ! -f step02.done ]; then
-#    CMD_STEP02="mkdir -p plots_step02 &&"
-#    CMD_STEP02+=" jet_synchplot_x -algo1 ${jet_type} -algo2 ${jet_type} -fixedRange false -tdr true"
-#    CMD_STEP02+=" -inputDir ./ -outDir ./plots_step02 -outputFormat .png"
-#    echo "${CMD_STEP02} 2>&1 | tee step02.log" > step02.sh && source step02.sh && touch step02.done
-#  fi
-#
-#  if [ ! -f step03.done ]; then
-#    CMD_STEP03="jet_synchfit_x -algo1 ${jet_type} -algo2 ${jet_type} -functionType standard -era ${ERA} -inputDir ./ -outputDir ./"
-#    echo "${CMD_STEP03} 2>&1 | tee step03.log" > step03.sh && source step03.sh && touch step03.done
-#  fi
-
-  if [ ! -f step04.done ]; then
-    CMD_STEP04="mkdir -p plots_step04 &&"
-    CMD_STEP04+=" jet_synchtest_x -algo1 ${jet_type} -algo2 ${jet_type} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
-    CMD_STEP04+=" -ApplyJEC true -JECpar ${ERA}_L1FastJet_*.txt -outputPath plots_step04"
-    CMD_STEP04+=" -useweight false -iftest true -maxEvts 1e6 -doNotSave true -ignoreNPV true -overwriteNPVwithNPUInTime true"
-    echo "${CMD_STEP04} 2>&1 | tee step04.log" > step04.sh && source step04.sh && touch step04.done
-  fi
-
-#  if [ ! -f step05.done ]; then
-#    CMD_STEP05="mkdir -p plots_step05 &&"
-#    CMD_STEP05+=" jet_synchplot_x -algo1 ${jet_type} -algo2 ${jet_type} -inputDir ./ -outputFormat .png"
-#    CMD_STEP05+=" -fixedRange false -tdr true -outDir ./plots_step05 2>&1 | tee step05.log"
-#    echo "${CMD_STEP05} 2>&1 | tee step05.log" > step05.sh && source step05.sh && touch step05.done
-#  fi
-#
-#  if [ ! -f step06.done ]; then
-#    CMD_STEP06="jet_apply_jec_x -algs ${jet_type} -input ${JRANTUPLE_DIR}/${JRANTUPLE_PU}"
-#    CMD_STEP06+=" -output jraNTuples/PU_jec.root -era ${ERA} -levels 1 -jecpath ./ -L1FastJet true"
-#    echo "${CMD_STEP06} 2>&1 | tee step06.log" > step06.sh && source step06.sh && touch step06.done
+#  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+#  if [ ! -f ${stepName}.done ]; then
+#    CMD_STEP="jet_synchplot_x -algo1 ${jet_type} -algo2 ${jet_type} -fixedRange false -tdr true"
+#    CMD_STEP+=" -inputDir plots_${stepNameOld} -outDir plots_${stepName} -outputFormat .png"
+#    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
 #  fi
 
   ###
-  ### L2+L3
+  ### L2Relative
+  ### - contains both L2 and L3 JECs
+  ###   (L3Absolute file will be dummy, i.e. equal to unity)
   ###
-  continue
-
-  if [ ! -f step07.done ]; then
-    echo "jet_response_analyzer_x ${CMSSW_BASE}/src/JetMETAnalysis/JetAnalyzers/config/jra_hltRun3.config -input jraNTuples/PU_jec.root -algs ${jet_type}l1:0.2 -nbinsabsrsp 0 -nbinsetarsp 0 -nbinsphirsp 0 -nbinsrelrsp 200 -doflavor false -output histogram_${jet_type}l1_step07.root -useweight false -nrefmax 50 -relrspmin 0.0 -relrspmax 5.0"
-    echo "${CMD_STEP07} 2>&1 | tee step07.log" > step07.sh && source step07.sh && touch step07.done
+  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+  if [ ! -f ${stepName}.done ]; then
+    CMD_STEP="jet_response_analyzer_x ${CMSSW_BASE}/src/JetMETAnalysis/JetAnalyzers/config/jra_hltRun3.config -input ${JRANTuple_PU} -algs ${jet_type}:0.2"
+    CMD_STEP+=" -levels 1 -path ./ -era ${ERA} -output plots_${stepName}/histogram_${jet_type}l1_${stepName}.root -maxEvts ${MAXEVENTS}"
+    CMD_STEP+=" -useweight false -nrefmax 50 -relrspmin 0.0 -relrspmax 5.0 -nbinsabsrsp 0 -nbinsetarsp 0 -nbinsphirsp 0 -nbinsrelrsp 200 -doflavor false"
+    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
-  if [ ! -f step08.done ]; then
-    echo "jet_l2_correction_x -input histogram_${jet_type}l1_step07.root -algs ${jet_type}l1 -era ${ERA} -output l2p3.root -outputDir ./ -makeCanvasVariable AbsCorVsJetPt:JetEta -l2l3 true -batch true -histMet median -l2pffit Standard+Gaussian -maxFitIter 30 -ptclipfit false"
-    echo "${CMD_STEP08} 2>&1 | tee step08.log" > step08.sh && source step08.sh && touch step08.done
+  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+  if [ ! -f ${stepName}.done ]; then
+    CMD_STEP="jet_l2_correction_x -algs ${jet_type} -era ${ERA} -l2l3 true"
+    CMD_STEP+=" -input plots_${stepNameOld}/histogram_${jet_type}l1_${stepNameOld}.root -outputDir ./ -output l2p3.root"
+    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard -maxFitIter 50 -ptclipfit true"
+    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
-  if [ ! -f step09.done ]; then
-    echo "mkdir -p plots_step09 && jet_correction_analyzer_x -evtmax 0  -ptmin 30 -inputFilename jraNTuples/PU_jec.root -algs ${jet_type}l1 -drmax 0.2 -L1FastJet false -useweight false -path ./ -era ${ERA} -levels 2 -outputDir ./plots_step09 -nbinsrelrsp 200 -relrspmin 0.0 -relrspmax 5.0 -nrefmax 50"
-    echo "${CMD_STEP09} 2>&1 | tee step09.log" > step09.sh && source step09.sh && touch step09.done
+  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+  if [ ! -f ${stepName}.done ]; then
+    CMD_STEP="jet_correction_analyzer_x -ptmin 0 -inputFilename ${JRANTuple_PU} -algs ${jet_type} -drmax 0.2 -evtmax ${MAXEVENTS}"
+    CMD_STEP+=" -useweight false -path ./ -era ${ERA} -levels 1 2 -L1FastJet true -outputDir plots_${stepName} -nbinsrelrsp 200 -relrspmin 0.0 -relrspmax 5.0 -nrefmax 50"
+    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
-  if [ ! -f step10.done ]; then
-    echo "jet_draw_closure_x -path plots_step09 -filename Closure_${jet_type}l1 -histMet median -outputDir plots_step10 -draw_guidelines true -doPt true -doEta true -doRatioPt false -doRatioEta false 2>&1 | tee step10.log"
-    echo "${CMD_STEP10} 2>&1 | tee step10.log" > step10.sh && source step10.sh && touch step10.done
+  stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+  if [ ! -f ${stepName}.done ]; then
+    CMD_STEP="jet_draw_closure_x -path plots_${stepNameOld} -filename Closure_${jet_type} -histMet median -outputDir plots_${stepName}"
+    CMD_STEP+=" -draw_guidelines true -doPt true -doEta true -doRatioPt false -doRatioEta false"
+    stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+  fi
+
+  ###
+  ### Final JEC .txt files
+  ### - copied in jesc/
+  ###
+  if [ ! -f ${ERA}_L1FastJet_*.txt ]; then
+    printf "%s\n" ">> ERROR -- text file with L1FastJet JEC not found: ${ERA}_L1FastJet_*.txt"
+  elif [ ! -f ${ERA}_L2Relative_*.txt ]; then
+    printf "%s\n" ">> ERROR -- text file with L2Relative JEC not found: ${ERA}_L2Relative_*.txt"
+  else
+    mkdir -p jesc
+    jecFile_l1=$(ls ${ERA}_L1FastJet_*.txt)
+    jecFile_l2=$(ls ${ERA}_L2Relative_*.txt)
+    jet_tag=${jecFile_l1/${ERA}_L1FastJet_/}
+    jet_tag=${jet_tag/.txt/}
+    cp ${jecFile_l1} ${jecFile_l2} jesc
+    cp ${CMSSW_BASE}/src/JetMETAnalysis/JetUtilities/data/JEC_L3Absolute_Dummy.txt jesc/${ERA}_L3Absolute_${jet_tag}.txt
   fi
 
 done
