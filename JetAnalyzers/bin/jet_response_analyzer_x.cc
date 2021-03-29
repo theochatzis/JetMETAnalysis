@@ -318,8 +318,8 @@ int main(int argc,char**argv)
     float weight(1.0);
     float flavorWeight(1.0);
     // SPS why is 85 hardcoded here? shouldn't this 
-    //     change accoring to the bitset explained in JRAEvent.h ?
-    // 
+    //     change according to the bitset explained in JRAEvent.h ?
+    //
     JRAEvent* JRAEvt = new JRAEvent(tree, 85);
     tree->SetBranchStatus("*",0);
     vector<string> branch_names = {"nref","weight","rho","rho_hlt","refpdgid","refpt",
@@ -2006,11 +2006,12 @@ int main(int argc,char**argv)
   //
   // close files
   //
-  cout<<"close output file "<<output<<" ... "<<flush;
+  cout << "Close output file " << output << " ... " << flush;
   ofile->Write();
   gROOT->GetListOfFiles()->Remove(ofile);
   ofile->Close();
   delete ofile;
+  cout << "DONE." << endl;
 
   ifile->Close();
   delete ifile;
