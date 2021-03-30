@@ -39,7 +39,6 @@ glob_pattern += '*.txt'
 textFiles = glob.glob(glob_pattern)
 
 algosPerEraDict = {}
-relDirPath = None
 for _txtFile in sorted(textFiles):
   _basename_woext = os.path.basename(_txtFile)[:-4]
   _basename_woext_split = _basename_woext.split('_')
@@ -49,12 +48,11 @@ for _txtFile in sorted(textFiles):
   _algo = _basename_woext_split[-1]
   _level = _basename_woext_split[-2]
   _era = '_'.join(_basename_woext_split[:-2])
-  if _era not in algosPerEraDict:
-    algosPerEraDict[_era] = []
-  if _algo not in algosPerEraDict[_era]:
-    algosPerEraDict[_era].append(_algo)
-  if relDirPath is None:
-    relDirPath = os.path.relpath(os.path.dirname(_txtFile), os.environ['CMSSW_BASE']+'/src')+'/'
+  if _era not in algosPerEraDict: algosPerEraDict[_era] = {}
+  relDirPath = os.path.relpath(os.path.dirname(_txtFile), os.environ['CMSSW_BASE']+'/src')+'/'
+  if _algo in algosPerEraDict[_era] and algosPerEraDict[_era][_algo] != relDirPath:
+    raise RuntimeError('logic error: attempt to overwrite directory for (era = "'+_era+'", algo = "'+_algo+'"): '+relDirPath)
+  algosPerEraDict[_era][_algo] = relDirPath
 
 if len(algosPerEraDict.keys()) == 0:
   raise RuntimeError('no valid input files found')
@@ -83,7 +81,9 @@ for _era in sorted(algosPerEraDict.keys()):
   setattr(process, 'PoolDBOutputService'+_modTag,
     cms.Service('PoolDBOutputService', getattr(process, 'CondDB'+_modTag), toPut = cms.VPSet()))
 
-  for _algo in algosPerEraDict[_era]:
+  for _algo in sorted(algosPerEraDict[_era].keys()):
+    _relDirPath = algosPerEraDict[_era][_algo]
+
     getattr(process, 'PoolDBOutputService'+_modTag).toPut += [cms.PSet(
       record = cms.string(_algo),
       tag = cms.string('JetCorrectorParametersCollection_{:}_{:}'.format(_era, _algo)),
@@ -93,7 +93,7 @@ for _era in sorted(algosPerEraDict.keys()):
     setattr(process, 'jecDBWriter'+_algo, cms.EDAnalyzer('JetCorrectorDBWriter',
       era = cms.untracked.string(_era),
       algo = cms.untracked.string(_algo),
-      path = cms.untracked.string(relDirPath),
+      path = cms.untracked.string(_relDirPath),
     ))
 
     process.seq += getattr(process, 'jecDBWriter'+_algo)
