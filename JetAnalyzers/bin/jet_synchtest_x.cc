@@ -813,7 +813,7 @@ void MatchEventsAndJets::LoopOverEvents(bool verbose, bool reduceHistograms, str
 
    for (IT::const_iterator it = mapTreePU.begin(); it != mapTreePU.end(); ++it) {
 
-      if(iftest){
+      if(iftest and maxEvts >= 0){
         if (nevs >= maxEvts) return;
         loadbar2(nevs+1, maxEvts, 50, "\t\t");
       }
