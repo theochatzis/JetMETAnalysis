@@ -23,10 +23,10 @@ MAXEVENTS=1000000
 ERA=Run3Winter20_V1_MC
 
 JET_TYPES=(
-#  ak4caloHLT
-#  ak4pfclusterHLT
+  ak4caloHLT
+  ak4pfclusterHLT
   ak4pfHLT
-#  ak4puppiHLT
+  ak4puppiHLT
 #  ak8caloHLT
 #  ak8pfclusterHLT
 #  ak8pfHLT
@@ -56,7 +56,10 @@ stepCmd(){
   touch ${2}.done
 }
 
+INIDIR=${PWD}
+
 for jet_type in "${JET_TYPES[@]}"; do
+  cd ${INIDIR}
   OUTDIR=${OUTPUT_DIR}/${jet_type}
   mkdir -p ${OUTDIR}
   cd ${OUTDIR}
