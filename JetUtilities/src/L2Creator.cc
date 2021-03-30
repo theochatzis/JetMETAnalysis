@@ -49,7 +49,7 @@ L2Creator::L2Creator(CommandLine& cl) {
 
     ptclip     = cl.getValue<float>   ("ptclip",            0.);
     statTh     = cl.getValue<int>     ("statTh",             4);
-    ptclipfit = cl.getValue<bool> ("ptclipfit", false);
+    ptclipfit  = cl.getValue<bool>    ("ptclipfit",      false);
 
     if (!cl.partialCheck()) return;
     cl.print();
@@ -175,7 +175,7 @@ void L2Creator::loopOverAlgorithms(string makeCanvasVariable) {
         //
         loopOverEtaBins();
         std::cout<<"***********OK after loopOverEtaBins *******************"<<endl;
-
+//!!std::cout << __LINE__ << std::endl;
         if(!l2l3) {
             //
             // Relative (L2) response/correction as a function of pT for each eta bin
@@ -183,7 +183,7 @@ void L2Creator::loopOverAlgorithms(string makeCanvasVariable) {
             //
             doRelCorFits();
         }
-
+//!!std::cout << __LINE__ << std::endl;
         //
         // Write the L2 correction text file for the current algorithm
         // Don't need splines for the separated L2/L3 file because no splines are implemented for thos fits
@@ -192,7 +192,7 @@ void L2Creator::loopOverAlgorithms(string makeCanvasVariable) {
             writeTextFileForCurrentAlgorithm_spline();
         else
             writeTextFileForCurrentAlgorithm();
-
+//!!std::cout << __LINE__ << std::endl;
         //
         // Check that the FormulaEvaluator returns the same value as the TF1 used to create the fit
         // This is necessary because several times in the past the FormulaEvaluator has returned strange values
@@ -200,7 +200,7 @@ void L2Creator::loopOverAlgorithms(string makeCanvasVariable) {
         //
         std::cout<<"***********OK before checkFormulaEvaluator *******************"<<endl;
         assert(checkFormulaEvaluator());
-
+//!!std::cout << __LINE__ << std::endl;
         //
         // Draw several canvases of the graphs and associated fits
         //
@@ -208,7 +208,7 @@ void L2Creator::loopOverAlgorithms(string makeCanvasVariable) {
         if(!makeCanvasVariable.empty()) {
             makeCanvas(makeCanvasVariable);
         }
-
+//!!std::cout << __LINE__ << std::endl;
         cout<<alg<<" is DONE."<<endl;
     }
 }
@@ -315,6 +315,7 @@ void L2Creator::loopOverEtaBins() {
         //
         // fit graphs if last pt of the current eta bin comes around
         //
+//!!std::cout << __LINE__ << " " << ipt << " " << hl_jetpt.nobjects(1)-1 << " / " << (vabsrsp_eta.back())->GetN() << " / " << (vabscor_eta.back())->GetN() << std::endl;
         if (ipt==hl_jetpt.nobjects(1)-1 && (vabsrsp_eta.back())->GetN()!=0 && (vabscor_eta.back())->GetN()!=0) {
             cout << "Doing fits for " << vabscor_eta.back()->GetName() << " ... " << endl;
             TGraphErrors* gabsrsp = vabsrsp_eta.back();
@@ -350,7 +351,7 @@ void L2Creator::loopOverEtaBins() {
                 fabscor->SetParameter(2,0.0);
             }
             else {
-                if (alg.find("pf")!=string::npos || alg.find("puppi")!=string::npos) {
+                if (true or alg.find("pf")!=string::npos or alg.find("puppi")!=string::npos) {
                     //
                     // Delphes
                     //
@@ -363,7 +364,7 @@ void L2Creator::loopOverEtaBins() {
                     //
                     // online (HLT)
                     //
-                    if(alg.find("HLT")!=string::npos){
+                    if(false and alg.find("HLT")!=string::npos){//!!
                         fabscor=new TF1("fit","(x>=[6])*([0]+[1]/(pow(log10(x),2)+[2])+[3]*exp(-[4]*(log10(x)-[5])*(log10(x)-[5])))+(x<[6])*[7]",xmin,xmax);
                         fabscor->FixParameter(6,xmin);
                         fabscor->FixParameter(7,0.0);
@@ -381,15 +382,18 @@ void L2Creator::loopOverEtaBins() {
                             if(xmax>1000.0)
                                 xmax = min(findNext(1000.0,gabscor,true),xmax);
                             vector<double> merge_points = {xmin,xmax};
+//!!std::cout << __LINE__ << std::endl;
                             vabscor_eta_spline.push_back(new PiecewiseSpline(string("spline_")+gabscor->GetName(),gabscor,merge_points,PiecewiseSpline::getROOTSplineType(string(l2pffit)),!l2pffit.Contains("akima",TString::kIgnoreCase)&&!l2pffit.Contains("steffen",TString::kIgnoreCase)));
                         }
                         else if(l2pffit.EqualTo("spline3",TString::kIgnoreCase) || l2pffit.EqualTo("spline5",TString::kIgnoreCase) || l2pffit.EqualTo("splineAkima",TString::kIgnoreCase) || l2pffit.EqualTo("splineSteffen",TString::kIgnoreCase)) {
                             xmin = gabscor->GetX()[0];
+//!!std::cout << __LINE__ << std::endl;
                             vabscor_eta_spline.push_back(new PiecewiseSpline(string("spline_")+gabscor->GetName(),gabscor,{},PiecewiseSpline::getROOTSplineType(string(l2pffit)),!l2pffit.Contains("akima",TString::kIgnoreCase)&&!l2pffit.Contains("steffen",TString::kIgnoreCase)));
                         }
                         if(l2pffit.Contains("akima",TString::kIgnoreCase)) {
                             gsl_spline *spline_akima = gsl_spline_alloc(gsl_interp_akima, gabscor->GetN());
                             gsl_spline_init(spline_akima, gabscor->GetX(), gabscor->GetY(), gabscor->GetN());
+//!!std::cout << __LINE__ << std::endl;
                             vabscor_eta_spline.back()->setSpline(PiecewiseSpline::gslToROOT_spline(spline_akima,"TSpline3_akima"));
                         }
 
@@ -408,6 +412,7 @@ void L2Creator::loopOverEtaBins() {
 			}
 */
                         if(l2pffit.Contains("spline",TString::kIgnoreCase)) {
+//!!std::cout << __LINE__ << std::endl;
                             vabscor_eta_spline.back()->setPartialFunction(fabscor);
                         }
                     }
@@ -504,7 +509,7 @@ void L2Creator::loopOverEtaBins() {
                         }
                     }
                 }
-                else if (alg.find("calo")!=string::npos) {
+                else if (alg.find("calo")!=string::npos or alg.find("pfcluster")!=string::npos) {//!!
                     if(l2calofit.EqualTo("standard",TString::kIgnoreCase)) {
                         if (xmin<6) xmin=6;
                         fabscor=new TF1("fit","[0]+[1]/(pow(log10(x),[2])+[3])",xmin,xmax);
@@ -561,19 +566,21 @@ void L2Creator::loopOverEtaBins() {
             perform_smart_fit(gabscor,fabscor,maxFitIter);
             gErrorIgnoreLevel = origIgnoreLevel;
 
-            if (alg.find("pf")!=string::npos) {
-                if (alg.find("HLT")!=string::npos) {
-                    ((TF1*)gabscor->GetListOfFunctions()->First())->FixParameter(7,fabscor->Eval(fabscor->GetParameter(6)));
-                    fabscor->FixParameter(7,fabscor->Eval(fabscor->GetParameter(6)));
-                }
-            }
-
+//!!            if (alg.find("pf")!=string::npos) {
+//!!                if (alg.find("HLT")!=string::npos) {
+//!!std::cout << __LINE__ << std::endl;
+//!!                    ((TF1*)gabscor->GetListOfFunctions()->First())->FixParameter(7,fabscor->Eval(fabscor->GetParameter(6)));
+//!!                    fabscor->FixParameter(7,fabscor->Eval(fabscor->GetParameter(6)));
+//!!std::cout << __LINE__ << std::endl;
+//!!                }
+//!!            }
 
 	    //edw ptclipfit 
 	    if (ptclipfit) 
 	    {    
                 if (xmin > 0.0001) 
 		{
+//!!std::cout << __LINE__ << std::endl;
                     int nPar = fabscor->GetNpar();
                     int clipPar = nPar;
 
@@ -583,22 +590,24 @@ void L2Creator::loopOverEtaBins() {
 		    {
                         fabscornew->SetParameter(ip, fabscor->GetParameter(ip));
                     }
-                    
-                    fabscornew->SetParameter(clipPar, fabscor->Eval(xmin));
 
+                    fabscornew->SetParameter(clipPar, fabscor->Eval(xmin));
+//!!std::cout << __LINE__ << std::endl;
 		    fabscornew->SetChisquare(fabscor->GetChisquare());
 		    fabscornew->SetNDF(fabscor->GetNDF());
 
                     fabscor = fabscornew;
                     gabscor->GetListOfFunctions()->Clear();
                     gabscor->GetListOfFunctions()->AddLast(fabscor);
+//!!std::cout << __LINE__ << std::endl;
 		}
 	    }
 
+//!!std::cout << __LINE__ << std::endl;
 	    //EDW print chi2 and prob for each fit in every eta bin
 	    std::cout<<"Chi2/NDF = "<<fabscor->GetChisquare()/fabscor->GetNDF()<<std::endl;
 	    std::cout<<"Prob = "<<fabscor->GetProb()<<std::endl;
-	
+
 	    FitResults<<ieta<<"\n";
 	    FitResults<<"Eta bin : "<<vabscor_eta.back()->GetName()<<"\n";
 	    FitResults<<"Chi2/NDF = "<<fabscor->GetChisquare()<<"/"<<fabscor->GetNDF()<<" = "<<fabscor->GetChisquare()/fabscor->GetNDF()<<"\n";
@@ -615,14 +624,16 @@ void L2Creator::loopOverEtaBins() {
             gabsrsp->Write();
             gabscor->Write();
             ofile->Write();
+//!!std::cout << __LINE__ << std::endl;
         }
         else if (ipt==hl_jetpt.nobjects(1)-1 && ((vabsrsp_eta.back())->GetN()==0 || (vabscor_eta.back())->GetN()==0)) {
+//!!std::cout << __LINE__ << std::endl;
             vabscor_eta_spline.push_back(nullptr);
         }
     }
-
+//!!std::cout << __LINE__ << std::endl;
     FitResults.close();
-
+//!!std::cout << __LINE__ << std::endl;
 }
 
 //______________________________________________________________________________
@@ -632,6 +643,7 @@ bool L2Creator::checkFormulaEvaluator() {
     unsigned int vector_size = 0;
     if(l2l3) vector_size = vabscor_eta.size(); //For L2L3 Corrections Together
     else vector_size = vrelcor_eta.size(); //For L2 & L3 Corrections Separate
+//!!std::cout << __LINE__ << std::endl;
     for (unsigned int ieta=0;ieta<vector_size;ieta++) {
         //
         // Load the appropriate graph
@@ -639,6 +651,7 @@ bool L2Creator::checkFormulaEvaluator() {
         TGraph* gcor;
         if(l2l3) gcor = vabscor_eta[ieta]; //For L2L3 Corrections Together
         else gcor = vrelcor_eta[ieta]; //For L2 & L3 Corrections Separate
+//!!std::cout << __LINE__ << std::endl;
 
         //
         // Load the appropriate TF1
@@ -646,35 +659,46 @@ bool L2Creator::checkFormulaEvaluator() {
         TF1 *root_func(nullptr);
         PiecewiseSpline* spline(nullptr);
 
+//!!std::cout << __LINE__ << std::endl;
         // This checks if this is a spline function or simply a regular TF1
         if(vabscor_eta_spline.size()>0) {
             //Load the spline function
+//!!std::cout << __LINE__ << std::endl;
             spline = vabscor_eta_spline[ieta];
+//!!std::cout << __LINE__ << std::endl;
             //If the spline is a nullptr then skip this ieta as it indicates that the abscor graph wasn't filled
             if (spline==nullptr) continue;
+//!!std::cout << __LINE__ << std::endl;
             root_func = spline->getFullFunction();
         }
         else {
             //Load the regular TF1
+//!!std::cout << __LINE__ << std::endl;
             root_func = (TF1*)gcor->GetListOfFunctions()->Last();
+//!!std::cout << __LINE__ << std::endl;
         }
 
+//!!std::cout << __LINE__ << std::endl;
         //
         // Load the FactorizedJetCorrector
         //
+//!!std::cout << __LINE__ << std::endl;
         string txtfilename = string(outputDir + era + "_L2Relative_" + ji->getAlias() + ".txt");
         JetCorrectorParameters *L2JetPar = new JetCorrectorParameters(txtfilename);
         vector<JetCorrectorParameters> vPar;
         vPar.push_back(*L2JetPar);
         FactorizedJetCorrector *JetCorrector = new FactorizedJetCorrector(vPar);
+//!!std::cout << __LINE__ << std::endl;
 
         //
         // Do the actual testing
         //
+//!!std::cout << __LINE__ << std::endl;
         if(root_func!=nullptr) {
             double  eta_avg  = (hl_jetpt.minimum(0,ieta)+hl_jetpt.maximum(0,ieta))/2.0;
             double  ptmin = gcor->GetX()[0];
             double  ptmax = gcor->GetX()[gcor->GetN()-1];
+//!!std::cout << __LINE__ << std::endl;
 
             double pt_limit = 70.0;
             //For eta-dependent spline clipping
@@ -687,6 +711,7 @@ bool L2Creator::checkFormulaEvaluator() {
             else if (abs(eta_avg) < 3.6641) pt_limit = 300;
             else if (abs(eta_avg) < 4.0131) pt_limit = 200;
             else if (abs(eta_avg) < 4.5381) pt_limit = 100;
+//!!std::cout << __LINE__ << std::endl;
 
             for(auto ipt : pt_to_check) {
 
@@ -699,14 +724,17 @@ bool L2Creator::checkFormulaEvaluator() {
                 // Check that the ipt is not outside the pt clipping area
                 //
                 if(ipt > pt_limit) continue;
+//!!std::cout << __LINE__ << std::endl;
 
                 //
                 // Set the inputs for the FactorizedJetCorrector
                 // Need to return the correction here because one must reset the inputs each time there is a call to getCorrection()
                 //
+//!!std::cout << __LINE__ << std::endl;
                 JetCorrector->setJetPt(ipt);
                 JetCorrector->setJetEta(eta_avg);
                 double fe_value = JetCorrector->getCorrection();
+//!!std::cout << __LINE__ << std::endl;
 
                 //
                 // Need the actual pT value to determine the spline section and load the appropriate parameters.
@@ -714,15 +742,21 @@ bool L2Creator::checkFormulaEvaluator() {
                 int spline_section = -1;
                 pair<double,double> spline_section_bounds;
                 if(vabscor_eta_spline.size()>0) {
+//!!std::cout << __LINE__ << std::endl;
                     root_func = spline->setParameters(spline->getSection(ipt));
+//!!std::cout << __LINE__ << std::endl;
                     spline_section = spline->getSection(ipt);
+//!!std::cout << __LINE__ << std::endl;
                     spline_section_bounds = spline->getSectionBounds(spline_section);
+//!!std::cout << __LINE__ << std::endl;
                 }
 
+//!!std::cout << __LINE__ << std::endl;
                 //
                 // Do the comparison
                 //
                 if(abs(fe_value-std::max(0.0001,root_func->Eval(ipt)))>0.0006) {
+//!!std::cout << __LINE__ << std::endl;
                     cout << "ERROR::L2Creator::checkFormulaEvaluator TF1 and FormulaEvaluator do not agree!" << endl
                          << "pT: " << ipt << " eta: " << eta_avg << endl
                          << " TF1: " << std::setprecision(10) << root_func->Eval(ipt) << endl
@@ -746,27 +780,24 @@ bool L2Creator::checkFormulaEvaluator() {
                        cout << " " << L2JetPar->record(bi).parameter(ipar) << " ";
                     }
                     cout << endl;
+//!!std::cout << __LINE__ << std::endl;
                     L2JetPar->printScreen();
                     return false;
                 }
             }
         }
     }
+//!!std::cout << __LINE__ << std::endl;
 
     cout << "L2Creator::checkFormulaEvaluator All pT and eta values checked agree for TF1 and FormulaEvaluator." << endl;
 
     return true;
 
-
-
     /*
 
-TF1* f = new TF1("f","[0]+[1]/(pow(log10(x),2)+[2])+[3]*exp(-[4]*(log10(x)-[5])*(log10(x)-[5]))",3.70269,3499.16)
-f->SetParameters( 0.7111,9.24906,16.3009,-0.127602,0.96894,1.57828)
-f->Eval(10.0)
-
-
-
+TF1* f = new TF1("f","[0]+[1]/(pow(log10(x),2)+[2])+[3]*exp(-[4]*(log10(x)-[5])*(log10(x)-[5]))",3.70269,3499.16);
+f->SetParameters( 0.7111,9.24906,16.3009,-0.127602,0.96894,1.57828);
+f->Eval(10.0);
 
     */
 }
@@ -941,7 +972,7 @@ void L2Creator::setAndFitFLogAndFGaus(TGraphErrors* gabscor, TF1* flog, TF1* fga
 
 //______________________________________________________________________________
 TString L2Creator::getOfflinePFFunction() {
-    if(l2pffit.EqualTo("standard",TString::kIgnoreCase) || (l2pffit.Contains("standard",TString::kIgnoreCase)&&l2pffit.Contains("spline",TString::kIgnoreCase)) ) {
+    if(l2pffit.EqualTo("standard",TString::kIgnoreCase) || (l2pffit.Contains("standard",TString::kIgnoreCase) && l2pffit.Contains("spline",TString::kIgnoreCase)) ) {
         return "[0]+([1]/(pow(log10(x),2)+[2]))+([3]*exp(-[4]*(log10(x)-[5])*(log10(x)-[5])))";
     }
     else if(l2pffit.EqualTo("standard+Gaussian",TString::kIgnoreCase)) {

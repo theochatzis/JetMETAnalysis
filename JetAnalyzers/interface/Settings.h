@@ -35,7 +35,7 @@ const int RhoHigh                     = 100;
 const int NTNPU                       = 200;
 const int NNPU                        = 200;
 const int NAlgorithms                 = 6;
-const int NJetTypes                   = 28;
+const int NJetTypes                   = 29;
 const int NCorrectionLevels           = 7;
 const int NConeSizes                  = 10;
 const int NDetectorNames              = 4;
@@ -146,7 +146,7 @@ const double veta_half[NETA_Half+1] = {0, 0.087, 0.174, 0.261, 0.348, 0.435 ,0.5
 2.964,  3.139, 3.314, 3.489, 3.664, 3.839, 4.013 ,4.191, 4.363, 4.538,
 4.716,4.889,5.191};
 
-const double veta_coarse[NETA_Coarse+1] = {-5.0,-3.0,-2.5,-1.5,0,1.5,2.5,3,5};
+const double veta_coarse[NETA_Coarse+1] = {-5.0, -3.0, -2.5, -1.3, 0, 1.3, 2.5, 3.0, 5.0};
 
 const double veta_HLT[NETA_HLT+1] = {-5.191,-4.538,-4.363,-4.191,-4.013,-3.839,-3.664,-3.489,
 -3.314, -3.139,-2.964,-2.853,-2.65, -2.5,  -2.322,-2.172,-2.043,-1.93,
@@ -194,9 +194,10 @@ const double drmax_all[NAlgs] = {0.210,0.250,0.210,0.240,0.200,0.240,0.190,0.220
 
 const TString algorithms[NAlgorithms] = {"IC","GK","SC","KT","AK","CA"};
 
-const TString jet_types[NJetTypes] = {"Calo","JPT","TRK","PF","PFchs","PFPuppi","PUPPI",
-		"CaloHLT","PFHLT","PFchsHLT","JPTHLT","PuppiHLT",
-		"tau",
+const TString jet_types[NJetTypes] = {
+  "Calo", "JPT", "TRK", "PF", "PFchs", "PFPuppi", "PUPPI",
+  "CaloHLT", "PFHLT", "PFchsHLT", "JPTHLT", "PuppiHLT", "PFClusterHLT",
+	"tau",
         "tauHPSlooseCombDBcorrAll",
         "tauHPSlooseCombDBcorrOneProng0Pi0",
         "tauHPSlooseCombDBcorrOneProng1Pi0",
@@ -221,7 +222,7 @@ const TString cone_sizes[NConeSizes] = {"0.1","0.2","0.3","0.4","0.5","0.6","0.7
 
 const TString detector_names[NDetectorNames] = {"Barrel","Inner Endcap","Outer Endcap","Forward"};
 
-const TString detector_regions_eta[NDetectorNames] = {"|#eta| < 1.5","1.5 < |#eta| < 2.5","2.5 < |#eta| < 3.0","3.0 < |#eta| < 5.0"};
+const TString detector_regions_eta[NDetectorNames] = {"|#eta| < 1.3","1.3 < |#eta| < 2.5","2.5 < |#eta| < 3.0","3.0 < |#eta| < 5.0"};
 
 const TString detector_regions[NDetectorRegions] = {"Barrel","Endcap","Forward"};
 

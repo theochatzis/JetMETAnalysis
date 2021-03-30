@@ -57,17 +57,17 @@ TGraph2DErrors * getGraph2D(int iEta, TProfile3D * prof,
         nEvt += prof->GetBinEntries(Gbin);
         // avoid points with empty content or too small error
         if (prof   ->GetBinError  (iEta,itnpu,irefpt)  > 0.000001 &&
-        // hist   ->GetBinContent(iEta,itnpu,irefpt)  >=20  &&
-        fabs(prof   ->GetBinContent  (iEta,itnpu,irefpt))  != TMath::Infinity() &&
-        prof   ->GetBinError  (iEta,itnpu,irefpt)  < 5.0 &&
-        prof   ->GetBinEffectiveEntries(Gbin)      > sqrt(nJets/(5.0E+06)) &&
-        // (fabs(prof->GetBinError(iEta,itnpu,irefpt)/prof->GetBinContent(iEta,itnpu,irefpt)))<0.5 &&// 0.3 ==> 0.5
-        // (fabs(prof->GetBinError(iEta,itnpu,irefpt)/prof->GetBinContent(iEta,itnpu,irefpt)))>0.01 &&// 0.05 ==> 0.01
-        profPt ->GetBinContent(iEta,itnpu,irefpt)  > 0 &&
-        profPt ->GetBinError  (iEta,itnpu,irefpt)  > 0.1 &&
-        // profPt ->GetBinError  (iEta,itnpu,irefpt)  < 10*log10(profPt ->GetBinContent(iEta,itnpu,irefpt)) &&
-        profRho->GetBinContent(iEta,itnpu,irefpt)  > 0 &&
-        profRho->GetBinError  (iEta,itnpu,irefpt)  > 0.1){
+            // hist   ->GetBinContent(iEta,itnpu,irefpt)  >=20  &&
+            fabs(prof   ->GetBinContent  (iEta,itnpu,irefpt))  != TMath::Infinity() &&
+            prof   ->GetBinError  (iEta,itnpu,irefpt)  < 5.0 &&
+            prof   ->GetBinEffectiveEntries(Gbin)      > sqrt(nJets/(5.0E+06)) &&
+            // (fabs(prof->GetBinError(iEta,itnpu,irefpt)/prof->GetBinContent(iEta,itnpu,irefpt)))<0.5 &&// 0.3 ==> 0.5
+            // (fabs(prof->GetBinError(iEta,itnpu,irefpt)/prof->GetBinContent(iEta,itnpu,irefpt)))>0.01 &&// 0.05 ==> 0.01
+            profPt ->GetBinContent(iEta,itnpu,irefpt)  > 0 &&
+            profPt ->GetBinError  (iEta,itnpu,irefpt)  > 0.1 &&
+            // profPt ->GetBinError  (iEta,itnpu,irefpt)  < 10*log10(profPt ->GetBinContent(iEta,itnpu,irefpt)) &&
+            profRho->GetBinContent(iEta,itnpu,irefpt)  > 0 &&
+            profRho->GetBinError  (iEta,itnpu,irefpt)  > 0.1){
 
           // get the relevant values
           double rho  = profRho->GetBinContent(iEta, itnpu, irefpt);
@@ -81,28 +81,16 @@ TGraph2DErrors * getGraph2D(int iEta, TProfile3D * prof,
           int n = graph->GetN();
           graph->SetPoint(n, rho, pt, ooa);
           graph->SetPointError(n, rhoe, pte, ooae);
-
-        }//if
-
-      } // irefpt
-
-    }// itnpu
+        }
+      }
+    }
 
     cout << "\tgraph has (Entries,Evts):  (" << graph->GetN() << "," << nEvt << ")" << endl;
 
     return graph;
+}
 
-} // getGraph2D
-
-//===========================================================================
-//
-void fitClosurePlots(TProfile3D * prof,
-
-  const TProfile3D * profPt,
-  const TProfile3D * profRho,
-  vector <FitRes> fitResults,
-  TH3I * hist,
-  TFile* fout){
+void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfile3D * profRho, vector <FitRes> fitResults, TH3I * hist, TFile* fout){
     //
     // SPS investigating ak8 crash
     //
@@ -405,11 +393,11 @@ void fitClosurePlots(TProfile3D * prof,
     h_eff_entries->Write();
 
     cout<<endl<<endl;
-} // fitClosurePlots
+}
 
 //===========================================================================
 // This method tries to obtain all the relevant TProfiles from the inputFilename
-// It returns true if successfull
+// It returns true if successful
 bool getInputProfiles(TString inputFilename, TProfile3D *& prof,
   TProfile3D *& profPt,
   TProfile3D *& profRho,
@@ -454,8 +442,7 @@ bool getInputProfiles(TString inputFilename, TProfile3D *& prof,
 
     // if everything went well just return true.
     return true;
-
-}//getInputProfiles
+}
 
 //===========================================================================
 // This method creates a new fit function and fits it to the graph
@@ -936,13 +923,7 @@ int main(int argc,char**argv){
     // Save the graph to file
     graph->Write();
     fitfunc->Write();
-
-  }// eta bins
-
-  //
-  // SPS investigating ak8 crash
-  //
-  cout << "after eta bins loop" << endl;
+  }
 
   //
   // SPS commet this out to avout  ak8 crash...
@@ -962,6 +943,4 @@ int main(int argc,char**argv){
   delete fout;
 
   return 0;
-
-} // jet_synchfit_x
-
+}

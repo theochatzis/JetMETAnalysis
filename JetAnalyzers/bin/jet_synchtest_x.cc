@@ -37,6 +37,9 @@ using namespace std;
 
 typedef map<double, pair<Int_t, Int_t> > ITJ;
 
+bool ignoreNPV = false;
+bool overwriteNPVwithNPUInTime = false;
+
 ////////////////////////////////////////////////////////////////////////////////
 // declare class
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,8 +216,8 @@ void MatchEventsAndJets::SetupLumiWeights(string dataFile, string mcFile, string
       cout << endl;
    }
    else {
-      cout << "WARNING::MatchEventsAndJets::SetupLumiWeights LumiWeights not set." << std::endl
-           << "\tOne or both of the input files was not set." << endl << endl;
+     cout << endl << "WARNING::MatchEventsAndJets::SetupLumiWeights LumiWeights not set." << std::endl
+          << "\tOne or both of the input files was not set." << endl;
    }
 }
 
@@ -233,7 +236,7 @@ void MatchEventsAndJets::getMaxDeltaR() {
         << setw(13) << algo2JetInfo.alias << endl;
    cout << std::setfill ('-') << setw(34) << " " << std::setfill (' ') << endl;
    cout << setw(18) << "0.5 * minConeSize:" << setw(4) << minConeSize << endl;
-   cout << setw(18) << "maxDeltaR:" << setw(4) << maxDeltaR << endl << endl;
+   cout << setw(18) << "maxDeltaR:" << setw(4) << maxDeltaR << endl;
 }
 
 //______________________________________________________________________________
@@ -277,6 +280,7 @@ ITS MatchEventsAndJets::fillMap(bool noPU, string treeName, string outputPath) {
    t->fChain->SetBranchStatus("refpt",1);
    Int_t lumi = 0;
 
+   cout << endl;
    cout << "Filling map with event signatures from: "<<endl;
    cout << "\tfile: "<<f->GetName()<< endl;
    cout << "\talgo: "<<algo<< endl;
@@ -408,11 +412,11 @@ void MatchEventsAndJets::ReadMatchedEventsMaps(string pathToMaps) {
 
 //______________________________________________________________________________
 void MatchEventsAndJets::GetNtuples(string treeName) {
-   int algo1_bit_number = (algo1JetInfo.jetType.Contains("calo",TString::kIgnoreCase)) ? 53 : 85;
-   int algo2_bit_number = (algo2JetInfo.jetType.Contains("calo",TString::kIgnoreCase)) ? 53 : 85;
+   int algo1_bit_number = 1;//!! (algo1JetInfo.jetType.Contains("calo",TString::kIgnoreCase)) ? 53 : 85;
+   int algo2_bit_number = 1;//!! (algo2JetInfo.jetType.Contains("calo",TString::kIgnoreCase)) ? 53 : 85;
 
    fpu->cd(algo1.c_str());
-   tpu   = new JRAEvent((TTree*) fpu->Get((algo1+"/"+treeName).c_str()),algo1_bit_number);
+   tpu = new JRAEvent((TTree*) fpu->Get((algo1+"/"+treeName).c_str()),algo1_bit_number);
 
    fnopu->cd(algo2.c_str());
    tnopu = new JRAEvent((TTree*) fnopu->Get((algo2+"/"+treeName).c_str()),algo2_bit_number);
@@ -805,20 +809,18 @@ void MatchEventsAndJets::LoopOverEvents(bool verbose, bool reduceHistograms, str
 
    cout << endl << "Looping over the mapped events:" << endl << "\tprogress:" << endl;
    ull nentries = mapTreePU.size();
-   cout << endl << "after mapTreePU.size" << endl;
    int jetMapIndex = -1;
-   cout << endl << "before for loop" << endl;
+
    for (IT::const_iterator it = mapTreePU.begin(); it != mapTreePU.end(); ++it) {
 
-      cout << endl << "before iftest" << endl;
-      if (iftest && nevs >= maxEvts) return;
-
-      //if (nevs%10000==0) cout << "\t"<<nevs << endl;
-      cout << endl << "before loadbar" << endl;
-      loadbar2(nevs+1,nentries,50,"\t\t");
+      if(iftest){
+        if (nevs >= maxEvts) return;
+        loadbar2(nevs+1, maxEvts, 50, "\t\t");
+      }
+      else
+        loadbar2(nevs+1, nentries, 50, "\t\t");
 
       // if this entry does not exist on the second ntuple just skip this event
-      cout << endl << "before mapTreeNoPU.find(it->first)" << endl;
       if (mapTreeNoPU.find(it->first) == mapTreeNoPU.end()) {
          if(verbose) {
             cout << "\tWARNING::mapTreeNoPU.find(it->first) == mapTreeNoPU.end() failed" << endl
@@ -831,42 +833,46 @@ void MatchEventsAndJets::LoopOverEvents(bool verbose, bool reduceHistograms, str
       }
 
       // Load the entries at the proper place.
-      cout << endl << "before getentry pu" << endl;
       tpu->GetEntry(mapTreePU[it->first].second);
-      cout << endl << "before getentry nopu" << endl;
       tnopu->GetEntry(mapTreeNoPU[it->first].second);
 
+      // overwrite npv with npus
+      if(overwriteNPVwithNPUInTime){
+
+        for(size_t idx=0; idx<tpu->bxns->size(); ++idx){
+          if(tpu->bxns->at(idx) == 0){
+            tpu->npv = tpu->npus->at(idx);
+            break;
+          }
+        }
+
+        for(size_t idx=0; idx<tnopu->bxns->size(); ++idx){
+          if(tnopu->bxns->at(idx) == 0){
+            tnopu->npv = tnopu->npus->at(idx);
+            break;
+          }
+        }
+      }
+
       //Skip events without any primary vertex as these make no sense
-      cout << endl << "before npv check" << endl;
-      if (tpu->npv == 0 || tnopu->npv == 0) continue;
+      if (!ignoreNPV and (tpu->npv == 0 or tnopu->npv == 0)) continue;
 
       // Set the in-time pileup index after the first event only
-      cout << endl << "before nevs==0" << endl;
       if(nevs==0) iIT = tpu->itIndex();
 
       // Create the mapping of matched jets.
       // key is PU, value is for NoPU
       //if(!readJetMap) FillJetMap();
-      cout << endl << "before readjetmap" << endl;
       if(readJetMap.empty() || !jetMapTreeFound) {
          FillRecToRecThroughGenMap();
       }
       else {
-         cout << endl << "inside else bit" << endl;
          jetMapIndex++;
          ReadJetMap(jetMapIndex,readJetMap);
       }  
 
-      cout << endl << "before fillhistograms" << endl;
-      cout << endl << "values are "<<reduceHistograms << endl;
-      cout << endl << "values are "<<FillHistograms(reduceHistograms) << endl;
       if(FillHistograms(reduceHistograms)) nevs++;
-      cout << endl << "after fillhistograms" << endl;
-      cout << endl << "values are"<<reduceHistograms << endl<< FillHistograms(reduceHistograms) << endl;
-
-   }//for
-
-   cout << endl << "finished for loop" << endl;
+   }
 }
 
 //______________________________________________________________________________
@@ -1020,7 +1026,6 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
    //
    // retrieve the correct weight and fill some histograms to keep track of them
    //
-   cout << endl << "Filling Histograms!" << endl;
    weight = 1.0;
    if(useweight) {
       weight *= tpu->weight;
@@ -1047,7 +1052,7 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
    }
 
    //Skip events where the noPU sample has more than one vertex
-   if (tnopu->npv!=1) {
+   if (!ignoreNPV and tnopu->npv!=1) {
       noPUNpvGTOneEventCounter++;
       if(noPUNpvGTOneEventCounter==0) {
          cout << "\tWARNING::The NoPU sample has more than 1 PV." << endl
@@ -1145,6 +1150,7 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
             histograms["m_frac_nj_pt_f_match_pu"]   ->Fill(tpu->jtpt->at(j1),ismatch);
             histograms["m_frac_nj_pt_f_match_RG_pu"]->Fill(tpu->jtpt->at(j1),ismatchRG);
          }
+
          if (!ismatch) {
             hname = Form("m_njet_pt_npv%i_%i_unmatch",inpv*npvRhoNpuBinWidth,inpv*npvRhoNpuBinWidth+npvRhoNpuBinWidth-1);
             histograms[hname]->Fill(tpu->jtpt->at(j1),+1);
@@ -1511,7 +1517,7 @@ int main(int argc,char**argv)
    if (!cl.parse(argc,argv)) return 0;
    string       samplePU          = cl.getValue<string>  ("samplePU");
    string       sampleNoPU        = cl.getValue<string>  ("sampleNoPU");
-   string       basepath          = cl.getValue<string>  ("basepath", "/afs/cern.ch/work/s/saparede/private/jet_stuff/hlt_phase2_jec/v2/CMSSW_11_1_4/src/");
+   string       basepath          = cl.getValue<string>  ("basepath", "");
    string       algo1             = cl.getValue<string>  ("algo1",                               "ak5pf");
    string       algo2             = cl.getValue<string>  ("algo2",                               "ak5pf");
    bool         iftest            = cl.getValue<bool>    ("iftest",                                false);
@@ -1536,6 +1542,10 @@ int main(int argc,char**argv)
    vector<int>  vptBins           = cl.getVector<int>    ("vptBins",       "14:::18:::20:::24:::28:::30");
    bool         reduceHistograms  = cl.getValue<bool>    ("reduceHistograms",                       true);
    bool         verbose           = cl.getValue<bool>    ("verbose",                               false);
+
+   ignoreNPV = cl.getValue<bool>("ignoreNPV", false);
+   overwriteNPVwithNPUInTime = cl.getValue<bool>("overwriteNPVwithNPUInTime", false);
+
    bool         help              = cl.getValue<bool>    ("help",                                  false);
 
    if (help) {cl.print(); return 0;}
@@ -1561,7 +1571,7 @@ int main(int argc,char**argv)
 
    if(outputPath.empty()) outputPath = string(gSystem->pwd())+"/";
    if(outputPath.back() != '/') outputPath+='/';
-   if(basepath.back() != '/') basepath+='/';
+   if(!basepath.empty() and basepath.back() != '/') basepath+='/';
 
    MatchEventsAndJets* mej = new MatchEventsAndJets(algo1,algo2,iftest);
    mej->SetDoNotSaveFlag(doNotSave);
@@ -1571,36 +1581,21 @@ int main(int argc,char**argv)
    mej->SetupLumiWeights((DataPUReWeighting.empty())? "" : basepath+DataPUReWeighting,
                          (MCPUReWeighting.empty()) ? "" : basepath+MCPUReWeighting,
                          DataPUHistoName,MCPUHistoName);
-   cout << endl << "*****oppening input files******" << endl;
+
    mej->OpenInputFiles(basepath+samplePU,basepath+sampleNoPU);
-   cout << endl << "*****gettingntuples******" << endl;
    mej->GetNtuples(treeName);
-   cout << endl << "*****checking readevtmaps******" << endl;
-   if(readEvtMaps.empty()){
-      cout << endl << "*****readevtmaps was empty******" << endl;
-      mej->MakeMatchedEventsMaps(treeName,outputPath);
-      }
-   else{
-      cout << endl << "*****readevtmaps was not empty******" << endl;
-      mej->ReadMatchedEventsMaps(readEvtMaps);
-      }
-   cout << endl << "*****oppening output file******" << endl;
+
+   if(readEvtMaps.empty()) mej->MakeMatchedEventsMaps(treeName,outputPath);
+   else mej->ReadMatchedEventsMaps(readEvtMaps);
+
    mej->OpenOutputFile(outputPath);
-   cout << endl << "*****checking if for applyJEC******" << endl;
-   if (ApplyJEC) {
-      cout << "jet_synchtest_x::Setting the JEC parameter file to " << JECpar << " ... ";
-      mej->SetJEC(JECpar);
-      cout << "DONE" << endl;
-   }
-   cout << endl << "*****setting npvrhonpu******" << endl;
+
+   if (ApplyJEC) mej->SetJEC(JECpar);
+
    mej->SetNpvRhoNpuValues(NBinsNpvRhoNpu,npvRhoNpuBinWidth);
-   cout << endl << "*****setting vpt bins******" << endl;
    mej->SetVptBins(vptBins);
-   cout << endl << "*****declaring histograms******" << endl;
    mej->DeclareHistograms(reduceHistograms);
-   cout << endl << "*****looping over events******" << endl;
    mej->LoopOverEvents(verbose,reduceHistograms,readEvtMaps);
-   cout << endl << "*****wiritng ouptput******" << endl;
    mej->WriteOutput(outputPath,readEvtMaps.empty()||!mej->JetMapTreeFound());
    mej->Report();
 
