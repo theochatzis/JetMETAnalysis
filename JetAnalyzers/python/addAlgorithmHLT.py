@@ -3,12 +3,14 @@ import FWCore.ParameterSet.Config as cms
 stdClusteringAlgorithms = [
   'ak',
 ]
+
 stdJetTypes = [
- 'pfHLT',
- 'puppiHLT',
  'caloHLT',
  'pfclusterHLT',
+ 'pfHLT',
+ 'pfpuppiHLT',
 ]
+
 stdCorrectionLevels = {
 #
 # SPS 
@@ -23,14 +25,15 @@ stdRecJetsDict = {}
 corrJetsDict = {}
 
 jetColl = {
+  'ak4caloHLT': 'hltAK4CaloJets',
+  'ak4pfclusterHLT': 'hltAK4PFClusterJets',
   'ak4pfHLT': 'hltAK4PFJets',
-  'ak4puppiHLT': 'hltAK4PFPuppiJets',
-  'ak4caloHLT': 'hltAK4CaloJets',# SPS double check this
-  'ak4pfclusterHLT': 'hltAK4PFClusterJets',#and this
+  'ak4pfpuppiHLT': 'hltAK4PFPuppiJets',
+
+  'ak8caloHLT': 'hltAK8CaloJets',
+  'ak8pfclusterHLT': 'hltAK8PFClusterJets',
   'ak8pfHLT': 'hltAK8PFJets',
-  'ak8puppiHLT': 'hltAK8PFPuppiJets',
-  'ak8caloHLT': 'hltAK8CaloJets',# SPS double check this
-  'ak8pfclusterHLT': 'hltAK8PFClusterJets',#and this
+  'ak8pfpuppiHLT': 'hltAK8PFPuppiJets',
 }
 
 for ca in stdClusteringAlgorithms:
@@ -81,22 +84,22 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
         alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('calo')]
         type          = 'Calo'
         alg_size_type = alg_size + 'calo'
-    elif (alg_size_type_corr.find('pfHLT') > 0) :
-        alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfHLT')]
-        type          = 'PFHLT'
-        alg_size_type = alg_size + 'pfHLT'
-    elif (alg_size_type_corr.find('puppiHLT') > 0) :
-        alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('puppiHLT')]
-        type          = 'PuppiHLT'
-        alg_size_type = alg_size + 'puppiHLT'
-    elif (alg_size_type_corr.find('pfchsHLT') > 0) :
-        alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfchsHLT')]
-        type          = 'PFchsHLT'
-        alg_size_type = alg_size + 'pfchsHLT'
     elif (alg_size_type_corr.find('pfclusterHLT') > 0) :
         alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfclusterHLT')]
         type          = 'PFclusterHLT'
         alg_size_type = alg_size + 'pfclusterHLT'
+    elif (alg_size_type_corr.find('pfHLT') > 0) :
+        alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfHLT')]
+        type          = 'PFHLT'
+        alg_size_type = alg_size + 'pfHLT'
+    elif (alg_size_type_corr.find('pfchsHLT') > 0) :
+        alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfchsHLT')]
+        type          = 'PFchsHLT'
+        alg_size_type = alg_size + 'pfchsHLT'
+    elif (alg_size_type_corr.find('pfpuppiHLT') > 0) :
+        alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfpuppiHLT')]
+        type          = 'PFPuppiHLT'
+        alg_size_type = alg_size + 'pfpuppiHLT'
     elif (alg_size_type_corr.find('pfchs') > 0) :
         alg_size      = alg_size_type_corr[0:alg_size_type_corr.find('pfchs')]
         type          = 'PFchs'
@@ -277,19 +280,18 @@ def addAlgorithm(process, alg_size_type_corr, Defaults):
         jra.srcRhos = cms.InputTag("kt6PFchsJetsRhos", "rhos")
         jra.srcRho = cms.InputTag("fixedGridRhoFastjetAll")
         jra.srcPFCandidates = cms.InputTag('pfNoPileUpJME')
+    elif type == 'PFClusterHLT':
+        jra.srcRho = 'fixedGridRhoFastjetAll' #!! wrong
+        jra.srcRhoHLT = 'fixedGridRhoFastjetAll' #!! wrong
     elif type == 'PFHLT':
         jra.srcRho = 'fixedGridRhoFastjetAll'
         jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
-    elif type == 'PuppiHLT':
-        jra.srcRho =    'fixedGridRhoFastjetAll'
-        jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
-    elif type == 'PFclusterHLT':
-        # SPS double check this
-        jra.srcRho =    'fixedGridRhoFastjetAll'
-        jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
     elif type == 'PFchsHLT':
-        jra.srcRho = ak4PFchsL1Fastjet.srcRho #added 02/15/2012
-        jra.srcRhoHLT = ak5PFchsHLTL1Fastjet.srcRho
+        jra.srcRho = 'fixedGridRhoFastjetAll'
+        jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
+    elif type == 'PFPuppiHLT':
+        jra.srcRho = 'fixedGridRhoFastjetAll'
+        jra.srcRhoHLT = 'fixedGridRhoFastjetAll'
     elif type == 'PF':
         process.kt6PFJetsRhos = kt6PFJets.clone(doFastJetNonUniform = cms.bool(True),
                                                 puCenters = cms.vdouble(-5,-4,-3,-2,-1,0,1,2,3,4,5),
