@@ -200,6 +200,7 @@ runJECWorflowForOneAlgo(){
       jetTag=${jetTag/.txt/}
       cp ${jecFile_l1} ${jecFile_l2} jesc
       cp ${CMSSW_BASE}/src/JetMETAnalysis/JetUtilities/data/JEC_L3Absolute_Dummy.txt jesc/${ERA}_L3Absolute_${jetTag}.txt
+      cp ${CMSSW_BASE}/src/JetMETAnalysis/JetUtilities/data/JEC_L2L3Residual_Dummy.txt jesc/${ERA}_L2L3Residual_${jetTag}.txt
     fi
   fi
 }
