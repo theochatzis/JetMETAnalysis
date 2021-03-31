@@ -15,9 +15,16 @@ git cms-merge-topic missirol:devel_puppiPUProxy_1120patatrack -u
 git cms-merge-topic mmasciov:tracking-allPVs -u
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 
-# Run-3 PFHC: copy preliminary HLT-PFHC for Run-3
+# external data
 mkdir -p ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data
-cp /afs/cern.ch/user/c/chuh/public/PFCalibration/run3/PFCalibration.db ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db
+
+# PFHC: preliminary HLT-PFHC for Run-3
+cp /afs/cern.ch/work/m/missirol/public/run3/PFHC/PFHC_Run3Winter20_HLT_v01.db \
+   ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db
+
+# JESC: preliminary HLT-JESCs for Run-3
+cp /afs/cern.ch/work/m/missirol/public/run3/JESC/Run3Winter20_V1_MC/Run3Winter20_V1_MC.db \
+   ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db
 
 git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b run3_jrantuples
 
