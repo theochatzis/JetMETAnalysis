@@ -146,6 +146,64 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 
+## ES modules for HLT JECs
+process.jescESSource = cms.ESSource('PoolDBESSource',
+  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
+  toGet = cms.VPSet(
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),
+      label = cms.untracked.string('AK4CaloHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),
+      label = cms.untracked.string('AK4PFClusterHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      label = cms.untracked.string('AK4PFHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      label = cms.untracked.string('AK4PFchsHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),
+      label = cms.untracked.string('AK4PFPuppiHLT'),
+    ),
+#    cms.PSet(
+#      record = cms.string('JetCorrectionsRecord'),
+#      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK8CaloHLT'),
+#      label = cms.untracked.string('AK8CaloHLT'),
+#    ),
+#    cms.PSet(
+#      record = cms.string('JetCorrectionsRecord'),
+#      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK8PFClusterHLT'),
+#      label = cms.untracked.string('AK8PFClusterHLT'),
+#    ),
+#    cms.PSet(
+#      record = cms.string('JetCorrectionsRecord'),
+#      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK8PFHLT'),
+#      label = cms.untracked.string('AK8PFHLT'),
+#    ),
+#    cms.PSet(
+#      record = cms.string('JetCorrectionsRecord'),
+#      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK8PFHLT'),
+#      label = cms.untracked.string('AK8PFchsHLT'),
+#    ),
+#    cms.PSet(
+#      record = cms.string('JetCorrectionsRecord'),
+#      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK8PFPuppiHLT'),
+#      label = cms.untracked.string('AK8PFPuppiHLT'),
+#    ),
+  ),
+)
+process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
+
 ## Output NTuple
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
 
@@ -190,25 +248,35 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   recoCaloJetCollections = cms.PSet(
 
+    hltAK4CaloJets = cms.InputTag('hltAK4CaloJets'),
     hltAK4CaloJetsCorrected = cms.InputTag('hltAK4CaloJetsCorrected'),
+
+    hltAK8CaloJets = cms.InputTag('hltAK8CaloJets'),
     hltAK8CaloJetsCorrected = cms.InputTag('hltAK8CaloJetsCorrected'),
   ),
 
   recoPFClusterJetCollections = cms.PSet(
 
     hltAK4PFClusterJets = cms.InputTag('hltAK4PFClusterJets'),
+    hltAK4PFClusterJetsCorrected = cms.InputTag('hltAK4PFClusterJetsCorrected'),
+
     hltAK8PFClusterJets = cms.InputTag('hltAK8PFClusterJets'),
+    hltAK8PFClusterJetsCorrected = cms.InputTag('hltAK8PFClusterJetsCorrected'),
   ),
 
   recoPFJetCollections = cms.PSet(
 
+    hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
+
+    hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
     hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
 
     hltAK4PFPuppiJets = cms.InputTag('hltAK4PFPuppiJets'),
-#    hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
+    hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
+
     hltAK8PFPuppiJets = cms.InputTag('hltAK8PFPuppiJets'),
-#    hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
+    hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
   ),
 
   patJetCollections = cms.PSet(
@@ -227,18 +295,22 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   recoCaloMETCollections = cms.PSet(
 
     hltCaloMET = cms.InputTag('hltMet'),
+    hltCaloMETTypeOne = cms.InputTag('hltCaloMETTypeOne'),
   ),
 
   recoPFClusterMETCollections = cms.PSet(
 
     hltPFClusterMET = cms.InputTag('hltPFClusterMET'),
+    hltPFClusterMETTypeOne = cms.InputTag('hltPFClusterMETTypeOne'),
   ),
 
   recoPFMETCollections = cms.PSet(
 
     hltPFMET = cms.InputTag('hltPFMETProducer'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
+
     hltPFPuppiMET = cms.InputTag('hltPFPuppiMET'),
+    hltPFPuppiMETTypeOne = cms.InputTag('hltPFPuppiMETTypeOne'),
   ),
 
   patMETCollections = cms.PSet(
