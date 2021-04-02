@@ -4,11 +4,10 @@
 INPDIR=/eos/cms/store/group/dpg_trigger/comm_trigger/TriggerStudiesGroup/Upgrade/JetMET_PhaseII/JMETriggerAnalysis_run3/ntuples/hltRun3_testTRK_210331
 
 # directory with outputs of NTupleAnalysis
-OUTDIR=output_hltRun3_testTRK_210331_v01
+OUTDIR=output_hltRun3_testTRK_210331_v03
 
 mkdir -p ${OUTDIR}
-
-ln -sf ${INPDIR} ${OUTDIR}/ntuples
+[ -d ${OUTDIR}/ntuples ] || (ln -sf ${INPDIR} ${OUTDIR}/ntuples)
 
 batch_driver.py -l 1 -n 50000 -p JMETriggerAnalysisDriverRun3 \
  -i ${OUTDIR}/ntuples/*/*.root -o ${OUTDIR}/jobs \
@@ -20,6 +19,7 @@ merge_batchOutputs.py -l 1 -i ${OUTDIR}/jobs/*/*.root -o ${OUTDIR}/outputs
 rm -rf ${OUTDIR}/jobs
 
 NUM_PROC=$(nproc)
+if [[ ${HOSTNAME} == lxplus* ]]; then NUM_PROC=3; fi;
 for rootfile_i in ${OUTDIR}/outputs/*/*.root; do
   while [ $(jobs -p | wc -l) -ge ${NUM_PROC} ]; do sleep 5; done
   jmeAnalysisHarvester.py -l 1 -i ${rootfile_i} -o ${OUTDIR}/harvesting || true &
@@ -30,5 +30,3 @@ jobs
 wait || true
 
 rm -rf ${OUTDIR}/outputs
-
-#./plotTDR.py -i ${OUTDIR}/harvesting -o ${OUTDIR}_plots

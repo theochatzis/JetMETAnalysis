@@ -167,29 +167,33 @@ void JMETriggerAnalysisDriverRun3::init(){
 
   labelMap_jetAK8_.clear();
   labelMap_jetAK8_ = {
-//    {"ak8GenJetsNoNu", {
-////    {"hltCalo"        , "hltAK8CaloJets"},
-////    {"hltPFCluster"   , "hltAK8PFClusterJets"},
-////    {"hltPF"          , "hltAK8PFJets"},
-//      {"hltPFCorr"      , "hltAK8PFJetsCorrected"},
-////    {"hltPFCHS"       , "hltAK8PFCHSJets"},
+    {"ak8GenJetsNoNu", {
+      {"hltCalo"         , "hltAK8CaloJets"},
+      {"hltCaloCorr"     , "hltAK8CaloJetsCorrected"},
+      {"hltPFCluster"    , "hltAK8PFClusterJets"},
+      {"hltPFClusterCorr", "hltAK8PFClusterJetsCorrected"},
+      {"hltPF"           , "hltAK8PFJets"},
+      {"hltPFCorr"       , "hltAK8PFJetsCorrected"},
+//      {"hltPFCHS"       , "hltAK8PFCHSJets"},
 //      {"hltPFCHSCorr"   , "hltAK8PFCHSJetsCorrected"},
-////    {"hltPFPuppi"     , "hltAK8PFPuppiJets"},
-//      {"hltPFPuppiCorr" , "hltAK8PFPuppiJetsCorrected"},
+      {"hltPFPuppi"     , "hltAK8PFPuppiJets"},
+      {"hltPFPuppiCorr" , "hltAK8PFPuppiJetsCorrected"},
 ////    {"offlPFPuppiCorr", "offlineAK8PFPuppiJetsCorrected"},
-//    }},
-//
-////  {"hltAK8CaloJets"            , {{"GEN", "ak8GenJetsNoNu"}}},
-////  {"hltAK8PFClusterJets"       , {{"GEN", "ak8GenJetsNoNu"}}},
-////  {"hltAK8PFJets"              , {{"GEN", "ak8GenJetsNoNu"}}},
-//    {"hltAK8PFJetsCorrected"     , {{"GEN", "ak8GenJetsNoNu"}}},
-////  {"hltAK8PFCHSJets"           , {{"GEN", "ak8GenJetsNoNu"}}},
-//    {"hltAK8PFCHSJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}}}, //, {"Offline", "offlineAK8PFCHSJetsCorrected"}}},
-////  {"hltAK8PFPuppiJets"         , {{"GEN", "ak8GenJetsNoNu"}}},
-//    {"hltAK8PFPuppiJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}}}, //, {"Offline", "offlineAK8PFPuppiJetsCorrected"}}},
-//
-////    {"offlineAK8PFCHSJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}}},
-////    {"offlineAK8PFPuppiJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}}},
+    }},
+
+    {"hltAK8CaloJets"              , {{"GEN", "ak8GenJetsNoNu"}}},
+    {"hltAK8CaloJetsCorrected"     , {{"GEN", "ak8GenJetsNoNu"}}},
+    {"hltAK8PFClusterJets"         , {{"GEN", "ak8GenJetsNoNu"}}},
+    {"hltAK8PFClusterJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}}},
+    {"hltAK8PFJets"                , {{"GEN", "ak8GenJetsNoNu"}}},
+    {"hltAK8PFJetsCorrected"       , {{"GEN", "ak8GenJetsNoNu"}}},
+//    {"hltAK8PFCHSJets"             , {{"GEN", "ak8GenJetsNoNu"}}},
+//    {"hltAK8PFCHSJetsCorrected"    , {{"GEN", "ak8GenJetsNoNu"}}}, //, {"Offline", "offlineAK8PFCHSJetsCorrected"}}},
+    {"hltAK8PFPuppiJets"           , {{"GEN", "ak8GenJetsNoNu"}}},
+    {"hltAK8PFPuppiJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}}}, //, {"Offline", "offlineAK8PFPuppiJetsCorrected"}}},
+
+//    {"offlineAK8PFCHSJetsCorrected"  , {{"GEN", "ak8GenJetsNoNu"}}},
+//    {"offlineAK8PFPuppiJetsCorrected", {{"GEN", "ak8GenJetsNoNu"}}},
   };
 
   labelMap_MET_.clear();
