@@ -49,6 +49,11 @@ opts.register('output', 'out.root',
               vpo.VarParsing.varType.string,
               'path to output ROOT file')
 
+opts.register('keepPFPuppi', False,
+              vpo.VarParsing.multiplicity.singleton,
+              vpo.VarParsing.varType.bool,
+              'keep full collection of PFlow and PFPuppi candidates')
+
 opts.register('verbosity', 0,
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.int,
@@ -228,6 +233,9 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPixelClustersMultiplicity = cms.InputTag('hltPixelClustersMultiplicity'),
   ),
 
+  vdoubles = cms.PSet(
+  ),
+
   recoVertexCollections = cms.PSet(
 
     hltPixelVertices = cms.InputTag('hltPixelVertices'),
@@ -237,9 +245,6 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   ),
 
   recoPFCandidateCollections = cms.PSet(
-
-#    hltParticleFlow = cms.InputTag('hltParticleFlow'),
-#    hltPFPuppi = cms.InputTag('hltPFPuppi'),
   ),
 
   recoGenJetCollections = cms.PSet(
@@ -321,6 +326,19 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     offlinePFPuppiMET = cms.InputTag('slimmedMETsPuppi'),
   ),
 )
+
+if opts.keepPFPuppi:
+  process.hltPFPuppi.puppiDiagnostics = True
+  process.JMETriggerNTuple.vdoubles = cms.PSet(
+    hltPFPuppi_PuppiRawAlphas = cms.InputTag('hltPFPuppi:PuppiRawAlphas'),
+    hltPFPuppi_PuppiAlphas = cms.InputTag('hltPFPuppi:PuppiAlphas'),
+    hltPFPuppi_PuppiAlphasMed = cms.InputTag('hltPFPuppi:PuppiAlphasMed'),
+    hltPFPuppi_PuppiAlphasRms = cms.InputTag('hltPFPuppi:PuppiAlphasRms'),
+  )
+  process.JMETriggerNTuple.recoPFCandidateCollections = cms.PSet(
+    hltParticleFlow = cms.InputTag('hltParticleFlow'),
+    hltPFPuppi = cms.InputTag('hltPFPuppi'),
+  )
 
 process.analysisNTupleEndPath = cms.EndPath(process.JMETriggerNTuple)
 #process.HLTSchedule.extend([process.analysisNTupleEndPath])
