@@ -122,8 +122,8 @@ if hasattr(process, 'MessageLogger'):
 
 ## customised JME collections
 from JMETriggerAnalysis.Common.customise_hlt import *
-process = addPaths_MC_PFClusterJME(process)
-process = addPaths_MC_PFPuppiJME(process)
+process = addPaths_MC_JMEPFCluster(process)
+process = addPaths_MC_JMEPFPuppi(process)
 
 ## ES modules for PF-Hadron Calibrations
 import os
@@ -150,11 +150,11 @@ for algorithm in [
   'ak4caloHLT',
   'ak4pfclusterHLT',
   'ak4pfHLT',
-  'ak4puppiHLT',
+  'ak4pfpuppiHLT',
   'ak8caloHLT',
   'ak8pfclusterHLT',
   'ak8pfHLT',
-  'ak8puppiHLT',
+  'ak8pfpuppiHLT',
 ]:
   addAlgorithm(process, algorithm, Defaults)
   getattr(process, algorithm).applyVtxCuts = cms.bool(False)
