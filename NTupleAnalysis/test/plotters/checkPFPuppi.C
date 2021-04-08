@@ -1,6 +1,12 @@
 {
-  TFile* f0 = TFile::Open("out_HLT_Run3TRK.root");
-  TFile* f1 = TFile::Open("out_HLT_Run3TRKWithPU.root");
+//  TFile* f0 = TFile::Open("../../NTuplizers/test/out_HLT_Run3TRK.root");
+//  TFile* f1 = TFile::Open("../../NTuplizers/test/out_HLT_Run3TRKWithPU.root");
+//
+//  TFile* f0 = TFile::Open("output_hltRun3_testTRK_210331_v01/ntuples/HLT_Run3TRK/Run3Winter20_QCD_PtFlat15to3000_14TeV_PU.root");
+//  TFile* f1 = TFile::Open("output_hltRun3_testTRK_210331_v01/ntuples/HLT_Run3TRKWithPU/Run3Winter20_QCD_PtFlat15to3000_14TeV_PU.root");
+
+  TFile* f0 = TFile::Open("output_hltRun3_testTRK_210331_v01/ntuples/HLT_Run3TRK/Run3Winter20_VBF_HToInvisible_14TeV_PU.root");
+  TFile* f1 = TFile::Open("output_hltRun3_testTRK_210331_v01/ntuples/HLT_Run3TRKWithPU/Run3Winter20_VBF_HToInvisible_14TeV_PU.root");
 
   TTree* t0 = (TTree*) f0->Get("JMETriggerNTuple/Events");
   TTree* t1 = (TTree*) f1->Get("JMETriggerNTuple/Events");
