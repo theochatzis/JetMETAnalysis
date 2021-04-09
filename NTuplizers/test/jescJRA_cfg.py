@@ -141,43 +141,78 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 
+## ES modules for HLT JECs
+process.jescESSource = cms.ESSource('PoolDBESSource',
+  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
+  toGet = cms.VPSet(
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),
+      label = cms.untracked.string('AK4CaloHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),
+      label = cms.untracked.string('AK4PFClusterHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      label = cms.untracked.string('AK4PFHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      label = cms.untracked.string('AK4PFchsHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),
+      label = cms.untracked.string('AK4PFPuppiHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),#!!
+      label = cms.untracked.string('AK8CaloHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),#!!
+      label = cms.untracked.string('AK8PFClusterHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
+      label = cms.untracked.string('AK8PFHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
+      label = cms.untracked.string('AK8PFchsHLT'),
+    ),
+    cms.PSet(
+      record = cms.string('JetCorrectionsRecord'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),#!!
+      label = cms.untracked.string('AK8PFPuppiHLT'),
+    ),
+  ),
+)
+process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
+
 ###
 ### Jet Response Analyzer (JRA) NTuple
 ###
-from addAlgorithmHLT import addAlgorithm
-for algo_i in [
-  'ak4caloHLT',
-  'ak4pfclusterHLT',
-  'ak4pfHLT',
-  'ak4pfpuppiHLT',
-  'ak8caloHLT',
-  'ak8pfclusterHLT',
-  'ak8pfHLT',
-  'ak8pfpuppiHLT',
-]:
-  addAlgorithm(process, algo_i)
-  getattr(process, algo_i).applyVtxCuts = False
-  getattr(process, algo_i).srcVtx = 'hltPixelVertices'
-  getattr(process, algo_i).srcRhoHLT = ''
-  getattr(process, algo_i).srcRhos = ''
+from jescJRA_utils import addJRAPath
 
-  if algo_i.endswith('caloHLT'):
-    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAllCalo'
-  elif algo_i.endswith('pfclusterHLT'):
-    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAllPFCluster'
-  elif algo_i.endswith('pfHLT'):
-    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAll'
-  elif algo_i.endswith('pfpuppiHLT'):
-    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAll'
-  else:
-    raise RuntimeError('invalid algorithm name for JetResponseAnalyzer: '+algo_i)
+addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4caloHLT'     , recoJets = 'hltAK4CaloJets'     , rho = 'hltFixedGridRhoFastjetAllCalo')
+addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4pfclusterHLT', recoJets = 'hltAK4PFClusterJets', rho = 'hltFixedGridRhoFastjetAllPFCluster')
+addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4pfHLT'       , recoJets = 'hltAK4PFJets'       , rho = 'hltFixedGridRhoFastjetAll')
+addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4pfpuppiHLT'  , recoJets = 'hltAK4PFPuppiJets'  , rho = 'hltFixedGridRhoFastjetAll')
 
-  if algo_i.startswith('ak4'):
-    getattr(process, algo_i).deltaRMax = 0.2
-  elif algo_i.startswith('ak8'):
-    getattr(process, algo_i).deltaRMax = 0.4
-  else:
-    raise RuntimeError('invalid algorithm name for JetResponseAnalyzer: '+algo_i)
+addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8caloHLT'     , recoJets = 'hltAK8CaloJets'     , rho = 'hltFixedGridRhoFastjetAllCalo')
+addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8pfclusterHLT', recoJets = 'hltAK8PFClusterJets', rho = 'hltFixedGridRhoFastjetAllPFCluster')
+addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8pfHLT'       , recoJets = 'hltAK8PFJets'       , rho = 'hltFixedGridRhoFastjetAll')
+addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8pfpuppiHLT'  , recoJets = 'hltAK8PFPuppiJets'  , rho = 'hltFixedGridRhoFastjetAll')
 
 ###
 ### standard options

@@ -106,6 +106,12 @@ def addPaths_MC_JMEPFCluster(process):
     )
 
     ## AK4 Jets
+    process.hltFixedGridRhoFastjetAllPFCluster = cms.EDProducer('FixedGridRhoProducerFastjet',
+      gridSpacing = cms.double(0.55),
+      maxRapidity = cms.double(5.0),
+      pfCandidatesTag = cms.InputTag('hltParticleFlowClusterRefs'),
+    )
+
     process.hltAK4PFClusterJets = _ak4PFClusterJets.clone(
       src = 'hltParticleFlowClusterRefs',
       doAreaDiskApprox = True,
@@ -115,7 +121,7 @@ def addPaths_MC_JMEPFCluster(process):
     process.hltAK4PFClusterJetCorrectorL1 = cms.EDProducer('L1FastjetCorrectorProducer',
       algorithm = cms.string('AK4PFClusterHLT'),
       level = cms.string('L1FastJet'),
-      srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'),#!!
+      srcRho = cms.InputTag('hltFixedGridRhoFastjetAllPFCluster'),
     )
 
     process.hltAK4PFClusterJetCorrectorL2 = cms.EDProducer('LXXXCorrectorProducer',
@@ -209,6 +215,7 @@ def addPaths_MC_JMEPFCluster(process):
       + process.HLTParticleFlowClusterRefsSequence
       ## AK4 Jets
       + process.hltAK4PFClusterJets
+      + process.hltFixedGridRhoFastjetAllPFCluster
       + process.hltAK4PFClusterJetCorrectorL1
       + process.hltAK4PFClusterJetCorrectorL2
       + process.hltAK4PFClusterJetCorrectorL3
