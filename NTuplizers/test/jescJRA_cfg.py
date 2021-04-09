@@ -144,9 +144,8 @@ process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 ###
 ### Jet Response Analyzer (JRA) NTuple
 ###
-import JetMETAnalysis.JetAnalyzers.DefaultsHLT_cff as Defaults
-from JetMETAnalysis.JetAnalyzers.addAlgorithmHLT import addAlgorithm
-for algorithm in [
+from addAlgorithmHLT import addAlgorithm
+for algo_i in [
   'ak4caloHLT',
   'ak4pfclusterHLT',
   'ak4pfHLT',
@@ -156,13 +155,29 @@ for algorithm in [
   'ak8pfHLT',
   'ak8pfpuppiHLT',
 ]:
-  addAlgorithm(process, algorithm, Defaults)
-  getattr(process, algorithm).applyVtxCuts = cms.bool(False)
-  getattr(process, algorithm).srcVtx = 'hltPixelVertices'
-  getattr(process, algorithm).srcRho = 'hltFixedGridRhoFastjetAll'
-  getattr(process, algorithm).srcRhoHLT = ''
-  getattr(process, algorithm).srcRhos = ''
-  getattr(process, algorithm).deltaRMax = 0.2
+  addAlgorithm(process, algo_i)
+  getattr(process, algo_i).applyVtxCuts = False
+  getattr(process, algo_i).srcVtx = 'hltPixelVertices'
+  getattr(process, algo_i).srcRhoHLT = ''
+  getattr(process, algo_i).srcRhos = ''
+
+  if algo_i.endswith('caloHLT'):
+    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAllCalo'
+  elif algo_i.endswith('pfclusterHLT'):
+    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAllPFCluster'
+  elif algo_i.endswith('pfHLT'):
+    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAll'
+  elif algo_i.endswith('pfpuppiHLT'):
+    getattr(process, algo_i).srcRho = 'hltFixedGridRhoFastjetAll'
+  else:
+    raise RuntimeError('invalid algorithm name for JetResponseAnalyzer: '+algo_i)
+
+  if algo_i.startswith('ak4'):
+    getattr(process, algo_i).deltaRMax = 0.2
+  elif algo_i.startswith('ak8'):
+    getattr(process, algo_i).deltaRMax = 0.4
+  else:
+    raise RuntimeError('invalid algorithm name for JetResponseAnalyzer: '+algo_i)
 
 ###
 ### standard options
