@@ -25,6 +25,9 @@ L2Creator::L2Creator() {
     delphes = false;
     maxFitIter = 30;
     useOfflinePFFunctions = false;
+    statTh = 4;
+    ptclipfit = false;
+    ptclip = 10.;
 }
 
 //______________________________________________________________________________
@@ -47,6 +50,9 @@ L2Creator::L2Creator(CommandLine& cl) {
     histMet    = cl.getValue<string>  ("histMet",       "mu_h");
     histogramMetric = HistUtil::getHistogramMetricType(histMet);
     useOfflinePFFunctions = cl.getValue<bool>("useOfflinePFFunctions", false);
+    statTh     = cl.getValue<int>     ("statTh",             4);
+    ptclipfit  = cl.getValue<bool>    ("ptclipfit",      false);
+    ptclip     = cl.getValue<float>   ("ptclip",            0.);
 
     if (!cl.partialCheck()) return;
     cl.print();
@@ -209,6 +215,11 @@ void L2Creator::loopOverEtaBins() {
     TH1F* hrsp(0);
     hl_rsp.begin_loop();
 
+    // print fit results for all eta bins in a txt file
+    TString txtFitResultsFilename = outputDir + "Fit_Results.txt";
+    ofstream FitResults(txtFitResultsFilename);
+    FitResults.setf(ios::right);
+
     while ((hrsp=hl_rsp.next_object(indices))) {
 
         unsigned int ieta=indices[0];
@@ -230,8 +241,7 @@ void L2Creator::loopOverEtaBins() {
         // only add points to the graphs if the current histo is not empty
         // the current setting might be a little high
         // 
-        if (hrsp->GetEntries() > 4) {//hrsp->Integral()!=0) {//EDW 4
-
+        if (hrsp->GetEntries() > statTh) {
             //TF1*  frsp    = (TF1*)hrsp->GetListOfFunctions()->Last();
             //std::cout << "hrspName = " << hrsp->GetName() << ": frsp = " << frsp << std::endl;
             TH1F* hrefpt  = hl_refpt.object(indices);
@@ -515,7 +525,36 @@ void L2Creator::loopOverEtaBins() {
             perform_smart_fit(gabscor,fabscor,maxFitIter);
             gErrorIgnoreLevel = origIgnoreLevel;
 
+            if (ptclipfit)
+            {
+              if (xmin > 0.0001)
+              {
+                int nPar = fabscor->GetNpar();
+                int clipPar = nPar;
+                TString const ptclip_str(std::to_string(int(ptclip)));
+                TString const clip = TString::Format("((x<"+ptclip_str+")*([%d]))+((x>="+ptclip_str+")*("+(TString)fabscor->GetTitle()+"))", clipPar);
+                TF1 * fabscornew = new TF1(fabscor->GetName(), clip, 0.001, 6500);
+                for (int ip=0; ip<nPar; ip++)
+                {
+                  fabscornew->SetParameter(ip, fabscor->GetParameter(ip));
+                }
+
+                fabscornew->SetParameter(clipPar, fabscor->Eval(xmin));
+                fabscornew->SetChisquare(fabscor->GetChisquare());
+                fabscornew->SetNDF(fabscor->GetNDF());
+
+                fabscor = fabscornew;
+                gabscor->GetListOfFunctions()->Clear();
+                gabscor->GetListOfFunctions()->AddLast(fabscor);
+              }
+            }
+
             //EDW print chi2 and prob for each fit in every eta bin
+            FitResults<<ieta<<"\n";
+            FitResults<<"Eta bin : "<<vabscor_eta.back()->GetName()<<"\n";
+            FitResults<<"Chi2/NDF = "<<fabscor->GetChisquare()<<"/"<<fabscor->GetNDF()<<" = "<<fabscor->GetChisquare()/fabscor->GetNDF()<<"\n";
+            FitResults<<"Prob = "<<fabscor->GetProb()<<"\n\n\n";
+
             std::cout<<"Eta bin : "<<vabscor_eta.back()->GetName()<<"\n";
             std::cout<<"Chi2/NDF = "<<fabscor->GetChisquare()<<"/"<<fabscor->GetNDF()<<" = "<<fabscor->GetChisquare()/fabscor->GetNDF()<<"\n";
             std::cout<<"Prob = "<<fabscor->GetProb()<<"\n\n\n";
@@ -536,6 +575,8 @@ void L2Creator::loopOverEtaBins() {
             vabscor_eta_spline.push_back(nullptr);
         }
     }
+
+    FitResults.close();
 }
 
 //______________________________________________________________________________

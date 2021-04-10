@@ -102,13 +102,17 @@ private:
     int                       maxFitIter;
     HistUtil::HistogramMetric histogramMetric;
     bool                      useOfflinePFFunctions;
+    int                       statTh;
+    bool                      ptclipfit;
+    float                     ptclip;
+
     TFile*                    ofile;
     TFile*                    ifile;
     TFile*                    l3file;
     TDirectoryFile*           l3dir;
     TDirectoryFile*           odir;
     TGraphErrors*             gl3rsp;
-    TF1* 			          fl3rsp;
+    TF1*                      fl3rsp;
     JetInfo*                  ji;
     ObjectLoader<TH1F>        hl_rsp;
     ObjectLoader<TH1F>        hl_refpt;
