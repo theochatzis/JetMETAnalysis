@@ -213,13 +213,6 @@ TString JetInfo::getJetType(TString s) {
 }
 
 //______________________________________________________________________________
-bool JetInfo::isHLT() {
-  if(getJetType(abbreviation).Contains("hlt",TString::kIgnoreCase))
-    return true;
-  return false;
-}
-
-//______________________________________________________________________________
 TString JetInfo::getCorrString(TString s) {
   TRegexp e3("l[0-9]"); //to get first l[0-9]
 
