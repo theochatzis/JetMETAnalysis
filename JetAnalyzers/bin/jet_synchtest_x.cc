@@ -224,7 +224,7 @@ void MatchEventsAndJets::SetupLumiWeights(string dataFile, string mcFile, string
 //______________________________________________________________________________
 void MatchEventsAndJets::getMaxDeltaR() {
    double minConeSize = min(algo1JetInfo.coneSize,algo2JetInfo.coneSize)/20.0;
-   maxDeltaR = min(0.25,minConeSize);
+   maxDeltaR = min(1.0, minConeSize);//!!
 
    cout << setw(10) << " " << setw(13) << "Algo1" << setw(13) << "Algo2" << endl;
    cout << std::setfill ('=') << setw(34) << " " << std::setfill (' ') << endl;
