@@ -297,10 +297,9 @@ int main(int argc,char**argv)
       chain->SetBranchStatus("*",0);
       vector<string> branch_names = {"nref","refpt","refeta","jtpt","jteta","jtphi","jtarea",
                                      "bxns","npus","tnpus","sumpt_lowpt","refdrjt",
-                                     "refpdgid","npv","rho","rho_hlt","pthat","weight"};
+                                     "refpdgid","npv","rho","pthat","weight"};
       for(auto n : branch_names) {
          if(!doflavor && n=="refpdgid") continue;
-         if(n=="rho_hlt" && 0==chain->GetBranch("rho_hlt")) continue;
          if(n=="weight") {
             if (xsection>0.0) { 
                 useweight = false;
@@ -346,8 +345,6 @@ int main(int argc,char**argv)
       TH1F *MiddleDist(nullptr);
       TH1F *LowerDist(nullptr);
       TH1F *RelContributions[NPtBins];
-      TProfile *rhoVsRhoHLT(nullptr);
-      TProfile *npvVsRhoHLT(nullptr);
       TH1F *TPUDistribution(nullptr);
       TProfile *DPtVsNPU[3];
       TProfile *DPtVsPtGen[3];
@@ -520,14 +517,6 @@ int main(int argc,char**argv)
          RhoVsOffITVsEta->Sumw2();
          RhoVsOffLTVsEta = new TProfile2D("RhoVsOffLTVsEta","RhoVsOffLTVsEta",100,0,50,NETA,veta);
          RhoVsOffLTVsEta->Sumw2();
-         rhoVsRhoHLT = new TProfile("rhoVsRhoHLT","rhoVsRhoHLT",1000,0,100);
-         rhoVsRhoHLT->Sumw2();
-         rhoVsRhoHLT->GetXaxis()->SetTitle("Rho^{HLT}");
-         rhoVsRhoHLT->GetYaxis()->SetTitle("Rho^{RECO}");
-         npvVsRhoHLT = new TProfile("npvVsRhoHLT","npvVsRhoHLT",100,0,100);
-         npvVsRhoHLT->Sumw2();
-         npvVsRhoHLT->GetXaxis()->SetTitle("Rho^{HLT}");
-         npvVsRhoHLT->GetYaxis()->SetTitle("NPV^{RECO}");
          for(unsigned int i=0; i<NPileup/2; i++)
          {
             sprintf(name,"SumPtDistribution_NPU%sto%s",pileup_boundaries[i*2],pileup_boundaries[(i*2)+1]);
@@ -594,15 +583,9 @@ int main(int argc,char**argv)
             continue;
          }
 
-         if(!reduceHistograms) {
-            rhoVsRhoHLT->Fill(JRAEvt->rho_hlt,JRAEvt->rho);
-            npvVsRhoHLT->Fill(JRAEvt->rho_hlt,JRAEvt->npv);
-         }
-
          if(nrefmax>0 && JRAEvt->nref>nrefmax) JRAEvt->nref = nrefmax;
          for (unsigned char iref=0;iref<JRAEvt->nref;iref++) {
             float rho = JRAEvt->rho;
-            float rho_hlt = (0!=chain->GetBranch("rho_hlt")) ? JRAEvt->rho_hlt : 0;
             float ptgen  = JRAEvt->refpt->at(iref);
             if (ptgen<ptgenmin) continue;
             if (doflavor && abs(pdgid)!=123 && abs(JRAEvt->refpdgid->at(iref))!=abs(pdgid)) continue;
@@ -629,10 +612,7 @@ int main(int argc,char**argv)
                      continue;
                   }
 
-                  if (jetInfo.isHLT())
-                     JetCorrector->setRho(JRAEvt->rho_hlt);
-                  else
-                     JetCorrector->setRho(JRAEvt->rho);
+                  JetCorrector->setRho(JRAEvt->rho);
                }
                if(!L1FastJet) JetCorrector->setNPV(JRAEvt->npv);
             }
@@ -715,41 +695,23 @@ int main(int argc,char**argv)
                   { 
                      coord[0] = ptgen;
                      coord[1] = eta;
-                     /*
-                     if(!algs[a].Contains("HLT"))
-                        coord[2] = rho;
-                     else
-                        coord[2] = rho_hlt;
-                     */
                      coord[2] = sumEOOT(JRAEvt->npus,iIT);
                      coord[3] = JRAEvt->npus->at(iIT);
                      coord[4] = sumLOOT(JRAEvt->npus,iIT);
                      RespVsPileup->Fill(coord,relrsp);
                   
-                     if(!jetInfo.isHLT())
-                        RespVsRho->Fill(ptgen,eta,rho,relrsp);
-                     else
-                        RespVsRho->Fill(ptgen,eta,rho_hlt,relrsp);
+                     RespVsRho->Fill(ptgen,eta,rho,relrsp);
 
                      coord2[0] = eta;
                      coord2[1] = sumEOOT(JRAEvt->npus,iIT);
                      coord2[2] = JRAEvt->npus->at(iIT);
                      coord2[3] = sumLOOT(JRAEvt->npus,iIT);
-                     if(!jetInfo.isHLT())
-                        RhoVsPileupVsEta->Fill(coord2,rho);
-                     else
-                        RhoVsPileupVsEta->Fill(coord2,rho_hlt);
+                     RhoVsPileupVsEta->Fill(coord2,rho);
                   }
                   else if(doTProfileMDF)
                   {
                      coord[0] = ptgen;
                      coord[1] = eta;
-                     /*
-                     if(!algs[a].Contains("HLT"))
-                        coord[2] = rho;
-                     else
-                        coord[2] = rho_hlt;
-                     */
                      coord[2] = 5;
                      coord[3] = JRAEvt->npus->at(iIT);
                      coord[4] = sumLOOT(JRAEvt->npus,iIT);
@@ -805,7 +767,7 @@ int main(int argc,char**argv)
                         ErrorForPtGen[0]->Fill(ptgen,ePsi_EOOT);
                         Error2ForPtGen[0]->Fill(ptgen,ePsiPrime_EOOT);
    
-                        RhoVsOffETVsEta->Fill(eootnpu,eta,rho_hlt);
+                        RhoVsOffETVsEta->Fill(eootnpu,eta,rho);
                      }
                      if(resp_IT!=0)
                      {
@@ -816,7 +778,7 @@ int main(int argc,char**argv)
                         ErrorForPtGen[1]->Fill(ptgen,ePsi_IT);
                         Error2ForPtGen[1]->Fill(ptgen,ePsiPrime_IT);
    
-                        RhoVsOffITVsEta->Fill(itnpu,eta,rho_hlt);
+                        RhoVsOffITVsEta->Fill(itnpu,eta,rho);
                      } 
                      if(resp_LOOT!=0)
                      {
@@ -827,10 +789,10 @@ int main(int argc,char**argv)
                         ErrorForPtGen[2]->Fill(ptgen,ePsi_LOOT);
                         Error2ForPtGen[2]->Fill(ptgen,ePsiPrime_LOOT);
    
-                        RhoVsOffLTVsEta->Fill(lootnpu,eta,rho_hlt);
+                        RhoVsOffLTVsEta->Fill(lootnpu,eta,rho);
                      }
    
-                     OffVsRhoVsEta->Fill(rho_hlt,eta,off_rho);
+                     OffVsRhoVsEta->Fill(rho,eta,off_rho);
                   }//if(!readRespVsPileup.IsNull())
                }//if(!reduceHistograms)
             }//if (j<NPtBins && j>=0)

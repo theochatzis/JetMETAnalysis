@@ -242,10 +242,7 @@ int main(int argc,char**argv)
                 continue;
              }
 
-             if (jetInfo.isHLT())
-                corrector->setRho(JRAEvt->rho_hlt);
-             else
-                corrector->setRho(JRAEvt->rho);
+             corrector->setRho(JRAEvt->rho);
           }
           if(!L1FastJet) corrector->setNPV(JRAEvt->npv);
           float jec=corrector->getCorrection();

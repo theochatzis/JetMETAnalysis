@@ -61,7 +61,6 @@ public :
    vector<int>*     ntrks_highpt;
    vector<float>*   rhos;
    Float_t          rho;
-   Float_t          rho_hlt;
    Float_t          pthat;
    Float_t          beta;
    Float_t          betaStar;
@@ -121,7 +120,6 @@ public :
    TBranch        *b_ntrks_highpt;   //!
    TBranch        *b_rhos;   //!
    TBranch        *b_rho;   //!
-   TBranch        *b_rho_hlt;   //!
    TBranch        *b_pthat;   //!
    TBranch        *b_beta;   //!
    TBranch        *b_betaStar;   //!
