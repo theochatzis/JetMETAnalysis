@@ -293,7 +293,7 @@ int main(int argc,char**argv)
          return 0;
       }
       if (0==chain) { cout<<"no tree/chain found."<<endl; continue; }
-      JRAEvent* JRAEvt = new JRAEvent(chain,85);
+      JRAEvent* JRAEvt = new JRAEvent(chain,1+4*doflavor);
       chain->SetBranchStatus("*",0);
       vector<string> branch_names = {"nref","refpt","refeta","jtpt","jteta","jtphi","jtarea",
                                      "bxns","npus","tnpus","sumpt_lowpt","refdrjt",
