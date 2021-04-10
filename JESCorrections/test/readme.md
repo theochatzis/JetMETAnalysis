@@ -10,7 +10,7 @@ scram p CMSSW CMSSW_11_2_0_Patatrack
 cd CMSSW_11_2_0_Patatrack/src
 eval `scram runtime -sh`
 git cms-init
-git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b devel_hlt
+git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b devel_hlt2
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 scram b -j 8
 ```
