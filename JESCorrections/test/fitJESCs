@@ -11,14 +11,14 @@ JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/run
 ERA=Run3Winter20_V1_MC
 
 JET_TYPES=(
-#  ak4caloHLT
-#  ak4pfclusterHLT
+  ak4caloHLT
+  ak4pfclusterHLT
   ak4pfHLT
-#  ak4puppiHLT
-#  ak8caloHLT
-#  ak8pfclusterHLT
-#  ak8pfHLT
-#  ak8puppiHLT
+  ak4puppiHLT
+  ak8caloHLT
+  ak8pfclusterHLT
+  ak8pfHLT
+  ak8puppiHLT
 )
 ## -------------------------
 
