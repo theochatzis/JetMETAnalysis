@@ -98,7 +98,6 @@ private:
   edm::EDGetTokenT<reco::JetMatchedPartonsCollection> srcRefToPartonMap_;
   edm::EDGetTokenT<vector<double> > srcRhos_;
   edm::EDGetTokenT<double> srcRho_;
-  edm::EDGetTokenT<double> srcRhoHLT_;
   edm::EDGetTokenT<reco::VertexCollection> srcVtx_;
   bool const applyVtxCuts_;
   edm::EDGetTokenT<GenEventInfoProduct> srcGenInfo_;
@@ -114,7 +113,6 @@ private:
   bool          doFlavor_;
   bool          doJetPt_;
   bool          doRefPt_;
-  bool          doHLT_;
   bool          saveCandidates_;
   unsigned int  nRefMax_;
 

@@ -88,7 +88,6 @@ private:
   edm::InputTag srcRefToPartonMap_;
   edm::InputTag srcRho_;
   edm::InputTag srcRho50_;
-  edm::InputTag srcRhoHLT_;
   edm::InputTag srcVtx_;
 
   std::string   jecLabel_;
@@ -97,7 +96,6 @@ private:
   bool          doFlavor_;
   bool          doJetPt_;
   bool          doRefPt_;
-  bool          doHLT_;
   unsigned int  nRefMax_;
 
   double        deltaRMax_;
