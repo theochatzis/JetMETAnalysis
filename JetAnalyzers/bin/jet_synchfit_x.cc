@@ -91,10 +91,6 @@ TGraph2DErrors * getGraph2D(int iEta, TProfile3D * prof,
 }
 
 void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfile3D * profRho, vector <FitRes> fitResults, TH3I * hist, TFile* fout){
-    //
-    // SPS investigating ak8 crash
-    //
-    cout << "+++++++++++++++ starting fitclosureplots" << endl;
 
     cout<<"Creating clousure plots"<<endl;
 
@@ -123,10 +119,6 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
 
     fout->mkdir("rmsplots");
 
-    //
-    // SPS investigating ak8 crash
-    //
-    cout << "+++++++++++++++ aftermkdirs" << endl;
     vector<TH2D*> refpt_hists, tnpu_hists, refpt_residual_hists, tnpu_residual_hists, refpt_relative_residual_hists, tnpu_relative_residual_hists;
 
     TH2D * h_rms = new TH2D("rms","rms",prof->GetNbinsX(),prof->GetXaxis()->GetXbins()->GetArray(),prof->GetNbinsZ(),prof->GetZaxis()->GetXbins()->GetArray());
@@ -134,10 +126,6 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
     TH1D * h_eff_entries = new TH1D("eff_entries","eff_entries",1000,0,1000);
     vector <vector<TH1D*> > v_rms;
 
-    //
-    // SPS investigating ak8 crash
-    //
-    cout << "+++++++++++++++ after th2s starting for loop" << endl;
     for (int itnpu = 1 ; itnpu <= prof->GetYaxis()->GetNbins() ; itnpu++) {
       tnpu_hists.push_back((TH2D*)new TH2D(Form("itnpu_%d",itnpu),Form("itnpu_%d;#eta;refpt;ooa",itnpu),prof->GetXaxis()->GetNbins(),prof->GetXaxis()->GetXmin(),prof->GetXaxis()->GetXmax(),prof->GetZaxis()->GetNbins(),prof->GetZaxis()->GetXmin(),prof->GetZaxis()->GetXmax()));
       tnpu_residual_hists.push_back((TH2D*)new TH2D(Form("itnpu_%d_residual",itnpu),Form("itnpu_%d_residual;#eta;refpt;ooa residual",itnpu),prof->GetNbinsX(),prof->GetXaxis()->GetXbins()->GetArray(),prof->GetNbinsZ(),prof->GetZaxis()->GetXbins()->GetArray()));
@@ -145,10 +133,6 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
       tnpu_relative_residual_hists.push_back((TH2D*)new TH2D(Form("itnpu_%d_relative_residual",itnpu),Form("itnpu_%d_relative_residual;#eta;refpt;ooa relative residual",itnpu),prof->GetNbinsX(),prof->GetXaxis()->GetXbins()->GetArray(),prof->GetNbinsZ(),prof->GetZaxis()->GetXbins()->GetArray()));
       tnpu_relative_residual_hists.back()->GetZaxis()->SetRangeUser(-20,20);
     }
-    //
-    // SPS investigating ak8 crash
-    //
-    cout << "+++++++++++++++ after first loop starting second" << endl;
     for (int irefpt = 1 ; irefpt <= prof->GetZaxis()->GetNbins() ; irefpt++) {
       refpt_hists.push_back((TH2D*)new TH2D(Form("irefpt_%d",irefpt),Form("irefpt_%d;#eta;tnpu;ooa",irefpt),prof->GetXaxis()->GetNbins(),prof->GetXaxis()->GetXmin(),prof->GetXaxis()->GetXmax(),prof->GetYaxis()->GetNbins(),prof->GetYaxis()->GetXmin(),prof->GetYaxis()->GetXmax()));
       refpt_residual_hists.push_back((TH2D*)new TH2D(Form("irefpt_%d_residual",irefpt),Form("irefpt_%d_residual;#eta;tnpu;ooa residual",irefpt),prof->GetXaxis()->GetNbins(),prof->GetXaxis()->GetXmin(),prof->GetXaxis()->GetXmax(),prof->GetYaxis()->GetNbins(),prof->GetYaxis()->GetXmin(),prof->GetYaxis()->GetXmax()));
@@ -157,11 +141,6 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
       refpt_relative_residual_hists.back()->GetZaxis()->SetRangeUser(-20,20);
     }
 
-    //loop over eta bins
-    //
-    // SPS investigating ak8 crash
-    //
-    cout << "+++++++++++++++ after second starting third it is over eta bins" << endl;
     for (int iEta = 1 ; iEta <= prof->GetXaxis()->GetNbins() ; iEta++){
       cout<<"\r\tiEta: "<<iEta<<" out of "<<prof->GetXaxis()->GetNbins()<<flush;
 
@@ -169,36 +148,19 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
       v_rms.push_back(pt_dummy);
 
 
-      //loop over eta bins
-      //
-      // SPS investigating ak8 crash
-      //
-      cout << "+++++++++++++++ making th2s" << endl;
       TH2D* eta_hist = new TH2D(Form("iEta_%d",iEta),Form("iEta_%d;tnpu;refpt;ooa",iEta),prof->GetYaxis()->GetNbins(),prof->GetYaxis()->GetXmin(),prof->GetYaxis()->GetXmax(),prof->GetZaxis()->GetNbins(),prof->GetZaxis()->GetXmin(),prof->GetZaxis()->GetXmax());
       TH2D* eta_residual_hist = new TH2D(Form("iEta_%d_residual",iEta),Form("iEta_%d_residual;tnpu;refpt;ooa residual",iEta),prof->GetYaxis()->GetNbins(),prof->GetYaxis()->GetXmin(),prof->GetYaxis()->GetXmax(),prof->GetZaxis()->GetNbins(),prof->GetZaxis()->GetXmin(),prof->GetZaxis()->GetXmax());
       TH2D* eta_relative_residual_hist = new TH2D(Form("iEta_%d_relative_residual",iEta),Form("iEta_%d_relative_residual;tnpu;refpt;ooa relative residual",iEta),prof->GetYaxis()->GetNbins(),prof->GetYaxis()->GetXmin(),prof->GetYaxis()->GetXmax(),prof->GetZaxis()->GetNbins(),prof->GetZaxis()->GetXmin(),prof->GetZaxis()->GetXmax());
       eta_residual_hist->GetZaxis()->SetRangeUser(-10,10);
       eta_relative_residual_hist->GetZaxis()->SetRangeUser(-20,20);
 
-      //
-      // SPS investigating ak8 crash
-      //
-      cout << "+++++++++++++++ making vectors" << endl;
       vector<TGraphErrors*> rhographs, ptpugraphs;
       vector<TGraph*> rho_residual_graphs, ptpu_residual_graphs;
 
-      //
-      // SPS investigating ak8 crash
-      //
-      cout << "+++++++++++++++ starting tnpu loop" << endl;
       for (int itnpu = 1 ; itnpu <= prof->GetYaxis()->GetNbins() ; itnpu++) {
         ptpugraphs.push_back((TGraphErrors*)new TGraphErrors());
         ptpu_residual_graphs.push_back((TGraph*)new TGraphErrors());
       }
-      //
-      // SPS investigating ak8 crash
-      //
-      cout << "+++++++++++++++ looping refpt" << endl;
 
       for (int irefpt = 1 ; irefpt <= prof->GetZaxis()->GetNbins() ; irefpt++) {
         rhographs.push_back((TGraphErrors*)new TGraphErrors());
@@ -207,11 +169,6 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
       }
 
       //loop over tnpu and refpt bins
-      //
-      // SPS investigating ak8 crash
-      // Santi start here - crash is in this loop
-      //
-      cout << "+++++++++++++++ looping over both tnpu and refpt" << endl;
       for (int itnpu = 1 ; itnpu <= prof->GetYaxis()->GetNbins() ; itnpu++){
         for (int irefpt = 1 ; irefpt <= prof->GetZaxis()->GetNbins() ; irefpt++){
 
@@ -272,10 +229,6 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
 
       fout->cd("rmsplots");
 
-      //
-      // SPS investigating ak8 crash
-      //
-      cout << "+++++++++++++++ making th2s" << endl;
       for (unsigned irefpt = 0; irefpt<v_rms[iEta-1].size(); irefpt++){
         v_rms[iEta-1][irefpt]->Write();
         h_rms->SetBinContent(iEta,irefpt,100*(v_rms[iEta-1][irefpt]->GetRMS())/(h_rms->GetYaxis()->GetBinCenter(irefpt)));
@@ -339,10 +292,6 @@ void fitClosurePlots(TProfile3D * prof, const TProfile3D * profPt, const TProfil
 
     }// iEta
 
-    //
-    // SPS investigating ak8 crash
-    //
-    cout << "+++++++++++++++ after first loop starting second" << endl;
 
     fout->cd("histograms/refpt");
 
@@ -925,9 +874,6 @@ int main(int argc,char**argv){
     fitfunc->Write();
   }
 
-  //
-  // SPS commet this out to avout  ak8 crash...
-  //
   fitClosurePlots(prof, profPt, profRho, fitResults, hist, fout);
 
   // Create the txt file from the fitResults vector
