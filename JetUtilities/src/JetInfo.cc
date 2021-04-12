@@ -187,6 +187,9 @@ TString JetInfo::getConeSize(TString s) {
 
 //______________________________________________________________________________
 TString JetInfo::getJetType(TString s) {
+  if(s == "ak4puppiHLT") s = "ak4pfpuppiHLT";//!!
+  else if(s == "ak8puppiHLT") s = "ak8pfpuppiHLT";//!!
+
   TRegexp e2("[0-9][0-9]?"); //gets cone size
   TRegexp e3("l[0-9]"); //to get first l[0-9]
 
@@ -210,13 +213,6 @@ TString JetInfo::getJetType(TString s) {
   }
 
   return "";
-}
-
-//______________________________________________________________________________
-bool JetInfo::isHLT() {
-  if(getJetType(abbreviation).Contains("hlt",TString::kIgnoreCase))
-    return true;
-  return false;
 }
 
 //______________________________________________________________________________
@@ -358,7 +354,7 @@ TString JetInfo::get_detector_abbreviation(TString dn) {
   }
   else {
     cout << "ERROR::get_detector_abbreviation The number of words in the detector name is less than 1." << endl;
-//    assert(words->GetEntries() > 0);
+    assert(words->GetEntries() > 0);
   }
   words->Delete();
   delete words;

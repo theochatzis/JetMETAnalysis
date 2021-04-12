@@ -101,6 +101,7 @@ private:
     bool                      l2l3, delphes, ptclipfit;
     int                       maxFitIter, statTh;
     HistUtil::HistogramMetric histogramMetric;
+    bool                      useOfflinePFFunctions;
     TFile*                    ofile;
     TFile*                    ifile;
     TFile*                    l3file;

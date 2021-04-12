@@ -75,9 +75,6 @@ public:
   TString getJetType(TString s);
   TString getJetType() {return getJetType(abbreviation);}
 
-  /// return true if the jet type if an HLT jet
-  bool isHLT();
-  
   /// get the correction string i.e. l1l2l3
   TString getCorrString(TString s);
   TString getCorrString() {return getCorrString(abbreviation);}

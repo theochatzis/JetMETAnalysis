@@ -224,7 +224,7 @@ void MatchEventsAndJets::SetupLumiWeights(string dataFile, string mcFile, string
 //______________________________________________________________________________
 void MatchEventsAndJets::getMaxDeltaR() {
    double minConeSize = min(algo1JetInfo.coneSize,algo2JetInfo.coneSize)/20.0;
-   maxDeltaR = min(0.25,minConeSize);
+   maxDeltaR = min(1.0, minConeSize);//!!
 
    cout << setw(10) << " " << setw(13) << "Algo1" << setw(13) << "Algo2" << endl;
    cout << std::setfill ('=') << setw(34) << " " << std::setfill (' ') << endl;
@@ -1248,12 +1248,14 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
       idet = JetInfo::getDetIndex(tpu->jteta->at(jpu));
       detectorAbbreviation = JetInfo::get_detector_abbreviation(detector_names[idet]);
       detectorAbbreviation.ToLower();
-         //
-         // SPS commenting pdgid stuff to match l1 corr branch
-         //
-      //vector<int> pdgid_indecies = JetInfo::getPDGIDIndecies(tpu->refpdgid->at(jpu));
 
-      //diff_pdgid    = tpu->refpdgid->at(jpu) - tnopu->refpdgid->at(jnopu);
+      vector<int> pdgid_indecies;
+      if(tpu->refpdgid){
+        pdgid_indecies = JetInfo::getPDGIDIndecies(tpu->refpdgid->at(jpu));
+        if(tnopu->refpdgid)
+          diff_pdgid = tpu->refpdgid->at(jpu) - tnopu->refpdgid->at(jnopu);
+      }
+
       offset        = tpu->jtpt->at(jpu) - tnopu->jtpt->at(jnopu);
       offset_raw    = (tpu_jtpt_raw.size()>0) ? tpu_jtpt_raw[jpu] - tnopu->jtpt->at(jnopu) : -1.0;
       offsetOA      = offset / tpu->jtarea->at(jpu);
@@ -1427,13 +1429,11 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
          if(tpu->refpt->at(jpu)>10.0) {
             dynamic_cast<TH2D*>(histograms[hname])->Fill(tpu->npus->at(iIT),resp,weight);
          }
-         //
-         // SPS commenting pdgid stuff to match l1 corr branch
-         //
-         //for (unsigned int ipdgid=0; ipdgid<pdgid_indecies.size(); ipdgid++) {
-         //   hname = Form("p_offresVsrefpt_%s_pdgid_%s",detectorAbbreviation.Data(),pdgidstr[ipdgid].Data());
-         //   dynamic_cast<TH2D*>(histograms[hname])->Fill(tpu->refpt->at(jpu),offset,weight);
-         //}
+
+         for (unsigned int ipdgid=0; ipdgid<pdgid_indecies.size(); ipdgid++) {
+            hname = Form("p_offresVsrefpt_%s_pdgid_%s",detectorAbbreviation.Data(),pdgidstr[ipdgid].Data());
+            dynamic_cast<TH2D*>(histograms[hname])->Fill(tpu->refpt->at(jpu),offset,weight);
+         }
       }
 
       avg_offset +=  offset;
