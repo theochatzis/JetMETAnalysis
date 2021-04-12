@@ -645,6 +645,7 @@ int main(int argc,char**argv)
             if (scale < 0) continue;
             if (pt<ptrawmin) continue;
             if ((pt*scale)<ptmin) continue;
+            cout<<"Event "<<ievt<<" | Uncorr pt "<<JRAEvt->jtpt->at(iref)<<" | Corr pt "<<scale*JRAEvt->jtpt->at(iref)<<endl;
             float relrsp = scale*JRAEvt->jtpt->at(iref)/JRAEvt->refpt->at(iref);
             float theta  = 2.0*atan(exp(-eta));
             double weight(1.0);
