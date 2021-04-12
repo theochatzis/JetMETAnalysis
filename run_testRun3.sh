@@ -15,20 +15,20 @@
 ## -------------------------
 ## Hard-coded inputs/options
 ## -------------------------
-JRANTuple_NoPU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/noPU/noPU_testingJRANtuple.root
-JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/flatPU/flatPU_testingJRANtuple.root
+JRANTuple_NoPU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_noPU/npvFix_noPU.root
+JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_flatPU/npvFix_flatPU.root
 
 ERA=Run3Winter20_V1_MC
 
 JET_TYPES=(
-#  ak4caloHLT
-#  ak4pfclusterHLT
-#  ak4pfHLT
+  ak4caloHLT
+  ak4pfclusterHLT
+  ak4pfHLT
 #  ak4puppiHLT
   ak8caloHLT
   ak8pfclusterHLT
   ak8pfHLT
-  ak8puppiHLT
+#  ak8puppiHLT
 )
 ## -------------------------
 
@@ -114,7 +114,7 @@ runJECWorflowForOneAlgo(){
   if [ ! -f ${stepName}.done ]; then
     CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
     CMD_STEP+=" -ApplyJEC false"
-    CMD_STEP+=" -useweight false -doNotSave true -ignoreNPV true -overwriteNPVwithNPUInTime true"
+    CMD_STEP+=" -useweight false -doNotSave true "
     CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath ."
     stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
@@ -165,7 +165,7 @@ runJECWorflowForOneAlgo(){
   if [ ! -f ${stepName}.done ]; then
     CMD_STEP="jet_l2_correction_x -algs ${jetType} -era ${ERA} -l2l3 true"
     CMD_STEP+=" -input plots_${stepNameOld}/histogram_${jetType}l1_${stepNameOld}.root -outputDir ./ -output l2p3.root"
-    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard -maxFitIter 50 -ptclipfit true"
+    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit Standard+Gaussian -maxFitIter 50 -ptclipfit true"
     stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
