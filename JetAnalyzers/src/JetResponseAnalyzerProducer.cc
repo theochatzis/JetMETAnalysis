@@ -18,14 +18,12 @@ JetResponseAnalyzerProducer::JetResponseAnalyzerProducer(const edm::ParameterSet
   , srcRef_        (iConfig.getParameter<edm::InputTag>                 ("srcRef"))
   , srcRefToJetMap_(iConfig.getParameter<edm::InputTag>         ("srcRefToJetMap"))
   , srcRho_        (iConfig.getParameter<edm::InputTag>                 ("srcRho"))
-  , srcRhoHLT_     (iConfig.getParameter<edm::InputTag>              ("srcRhoHLT"))
   , srcVtx_        (iConfig.getParameter<edm::InputTag>                 ("srcVtx"))
   , jecLabel_      (iConfig.getParameter<std::string>                 ("jecLabel"))
   , doComposition_ (iConfig.getParameter<bool>                   ("doComposition"))
   , doFlavor_      (iConfig.getParameter<bool>                        ("doFlavor"))
   , doJetPt_       (iConfig.getParameter<bool>                         ("doJetPt"))
   , doRefPt_       (iConfig.getParameter<bool>                         ("doRefPt"))
-  , doHLT_         (iConfig.getParameter<bool>                           ("doHLT"))
   , nRefMax_       (iConfig.getParameter<unsigned int>                 ("nRefMax"))
   , deltaRMax_(0.0)
   , deltaPhiMin_(3.141)
@@ -114,7 +112,6 @@ void JetResponseAnalyzerProducer::produce(edm::Event& iEvent,
   edm::Handle<reco::CandViewMatchMap>            refToJetMap;
   edm::Handle<reco::JetMatchedPartonsCollection> refToPartonMap;
   edm::Handle<double>                            rho;
-  edm::Handle<double>                            rho_hlt;
   edm::Handle<reco::VertexCollection>            vtx;
 
   // JET CORRECTOR
@@ -134,14 +131,6 @@ void JetResponseAnalyzerProducer::produce(edm::Event& iEvent,
     JRAEvt_->rho = *rho;
   }
 
-  //HLT RHO INFORMATION
-  JRAEvt_->rho_hlt = 0.0;
-  if (doHLT_) {
-     if (iEvent.getByLabel(srcRhoHLT_,rho_hlt)) {
-       JRAEvt_->rho_hlt = *rho_hlt;
-     }
-  }
- 
   //NPV INFORMATION
   JRAEvt_->npv = 0;
   if (iEvent.getByLabel(srcVtx_,vtx)) {

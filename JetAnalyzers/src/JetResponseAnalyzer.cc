@@ -22,11 +22,10 @@ JetResponseAnalyzer::JetResponseAnalyzer(const edm::ParameterSet& iConfig)
   , srcRefToJetMap_         (consumes<reco::CandViewMatchMap>(iConfig.getParameter<edm::InputTag>     ("srcRefToJetMap")))
   , srcRhos_                (consumes<vector<double> >(iConfig.getParameter<edm::InputTag>                   ("srcRhos")))
   , srcRho_                 (consumes<double>(iConfig.getParameter<edm::InputTag>                             ("srcRho")))
-  , srcRhoHLT_              (consumes<double>(iConfig.getParameter<edm::InputTag>                          ("srcRhoHLT")))
   , srcVtx_                 (consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>             ("srcVtx")))
   , applyVtxCuts_           (iConfig.getParameter<bool>("applyVtxCuts"))
   , srcGenInfo_             (consumes<GenEventInfoProduct>(edm::InputTag("generator"))                                   )
-  , srcPileupInfo_          (consumes<vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo"))                 )
+  , srcPileupInfo_          (consumes<vector<PileupSummaryInfo> >(edm::InputTag("addPileupInfo")))
   //, srcPFCandidates_      (consumes<vector<reco::PFCandidate> >(iConfig.getParameter<edm::InputTag>("srcPFCandidates")))
   , srcPFCandidates_        (consumes<PFCandidateView>(iConfig.getParameter<edm::InputTag>("srcPFCandidates")))
   , srcPFCandidatesAsFwdPtr_(consumes<std::vector<edm::FwdPtr<reco::PFCandidate> > >(iConfig.getParameter<edm::InputTag>("srcPFCandidates")))
@@ -36,7 +35,6 @@ JetResponseAnalyzer::JetResponseAnalyzer(const edm::ParameterSet& iConfig)
   , doFlavor_      (iConfig.getParameter<bool>                        ("doFlavor"))
   , doJetPt_       (iConfig.getParameter<bool>                         ("doJetPt"))
   , doRefPt_       (iConfig.getParameter<bool>                         ("doRefPt"))
-  , doHLT_         (iConfig.getParameter<bool>                           ("doHLT"))
   , saveCandidates_(iConfig.getParameter<bool>                  ("saveCandidates"))
   , nRefMax_       (iConfig.getParameter<unsigned int>                 ("nRefMax"))
   , deltaRMax_(0.0)
@@ -108,7 +106,7 @@ void JetResponseAnalyzer::beginJob()
   int flag_int = (saveCandidates_*pow(2,7)) + (isPFJet_*pow(2,6)) +
                  (isCaloJet_*pow(2,5)) + (doComposition_*pow(2,4)) +
                  (doBalancing_*pow(2,3)) + (doFlavor_*pow(2,2)) +
-                 (doHLT_*pow(2,1)) + (1);
+                 (0*pow(2,1)) + (1);
   bitset<8> flags(flag_int);
   tree_=fs->make<TTree>("t","t");
   JRAEvt_ = new JRAEvent(tree_,flags);
@@ -175,7 +173,6 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
   edm::Handle<reco::JetMatchedPartonsCollection> refToPartonMap;
   edm::Handle<vector<double> >                   rhos;
   edm::Handle<double>                            rho;
-  edm::Handle<double>                            rho_hlt;
   edm::Handle<reco::VertexCollection>            vtx;
   edm::Handle<PFCandidateView>                   pfCandidates;
   edm::Handle<std::vector<edm::FwdPtr<reco::PFCandidate> > >  pfCandidatesAsFwdPtr;
@@ -196,14 +193,6 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
   JRAEvt_->rho = 0.0;
   if (iEvent.getByToken(srcRho_,rho)) {
     JRAEvt_->rho = *rho;
-  }
-
-  //HLT RHO INFORMATION
-  JRAEvt_->rho_hlt = 0.0;
-  if (doHLT_) {
-     if (iEvent.getByToken(srcRhoHLT_,rho_hlt)) {
-       JRAEvt_->rho_hlt = *rho_hlt;
-     }
   }
 
   //ETA DEPENDENT RHO INFORMATION
@@ -311,9 +300,11 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
         continue;
      }
 
-     // SPS when do we need to save refpdgid?
-     //     does it matter?
-     if (doFlavor_) JRAEvt_->refpdgid->push_back(0);
+     if (doFlavor_) {
+       JRAEvt_->refpdgid->push_back(0);
+       JRAEvt_->refpdgid_algorithmicDef->push_back(0);
+       JRAEvt_->refpdgid_physicsDef->push_back(0);
+     }
 
      if (getFlavorFromMap_) {
         JRAEvt_->refpdgid_algorithmicDef->push_back(0);
@@ -367,14 +358,6 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
            }
         }
      }  
-     //JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
-
-     // SPS when do we need to save refpdgid_*?
-     //     does it matter?
-     else if (doFlavor_) {
-        JRAEvt_->refpdgid_algorithmicDef->at(JRAEvt_->nref)=0;
-        JRAEvt_->refpdgid_physicsDef->at(JRAEvt_->nref)=0;
-     }
 
      if (doFlavor_) {
         JRAEvt_->refpdgid->at(JRAEvt_->nref)=ref->pdgId();
