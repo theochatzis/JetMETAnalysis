@@ -61,7 +61,7 @@ while [[ $# -gt 0 ]]; do
     -p|--parallelise) paralleliseByAlgo=true; shift;;
     --skip-L1-PFPuppi) skipL1PFPuppi=true; shift;;
     -d|--dry-run) dryRun=true; shift;;
-    *) shift;;
+    *) printf "%s\n" ">> ERROR -- unrecognised command-line argument: ${1}"; exit 1; shift;;
   esac
 done
 
