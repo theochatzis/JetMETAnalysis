@@ -5,21 +5,23 @@
 ## -------------------------
 JESC_BASE=${CMSSW_BASE}/src/JMETriggerAnalysis/JESCorrections/test
 
-JRANTuple_NoPU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/noPU/noPU_testingJRANtuple.root
-JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/flatPU/flatPU_testingJRANtuple.root
+JRANTuple_NoPU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_noPU/npvFix_noPU.root
+JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_flatPU/npvFix_flatPU.root
 
 ERA=Run3Winter20_V2_MC
 
 JET_TYPES=(
-  ak4caloHLT
-  ak4pfclusterHLT
-  ak4pfHLT
-  ak4puppiHLT
-  ak8caloHLT
-  ak8pfclusterHLT
-  ak8pfHLT
   ak8puppiHLT
 )
+#JET_TYPES=(
+#  ak4caloHLT
+#  ak4pfclusterHLT
+#  ak4pfHLT
+#  ak4puppiHLT
+#  ak8caloHLT
+#  ak8pfclusterHLT
+#  ak8pfHLT
+#)
 ## -------------------------
 
 ## -------------------------
@@ -115,7 +117,7 @@ runJECWorflowForOneAlgo(){
     if [ ! -f ${stepName}.done ]; then
       CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
       CMD_STEP+=" -ApplyJEC false"
-      CMD_STEP+=" -useweight false -doNotSave true -ignoreNPV true -overwriteNPVwithNPUInTime true"
+      CMD_STEP+=" -useweight false -doNotSave true"
       CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath ."
       stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
     fi
@@ -129,25 +131,27 @@ runJECWorflowForOneAlgo(){
 
     stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
     if [ ! -f ${stepName}.done ]; then
-      CMD_STEP="jet_synchfit_x__hlt -algo1 ${jetType} -algo2 ${jetType} -functionType standard -era ${ERA} -inputDir ./ -outputDir ./"
+      CMD_STEP="jet_synchfit_x__hlt -algo1 ${jetType} -algo2 ${jetType} -functionType standard  -era ${ERA} -inputDir ./ -outputDir ./"
       stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
     fi
 
-    stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
-    if [ ! -f ${stepName}.done ]; then
-      CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
-      CMD_STEP+=" -ApplyJEC true -JECpar ./${ERA}_L1FastJet_*.txt"
-      CMD_STEP+=" -useweight false -doNotSave true -ignoreNPV true -overwriteNPVwithNPUInTime true"
-      CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath plots_${stepName}"
-      stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
-    fi
+    #SPS turn off while testing 
+    #    
+    #stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+    #if [ ! -f ${stepName}.done ]; then
+    #  CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
+    #  CMD_STEP+=" -ApplyJEC true -JECpar ./${ERA}_L1FastJet_*.txt"
+    #  CMD_STEP+=" -useweight false -doNotSave true"
+    #  CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath plots_${stepName}"
+    #  stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+    #fi
 
-    stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
-    if [ ! -f ${stepName}.done ]; then
-      CMD_STEP="jet_synchplot_x -algo1 ${jetType} -algo2 ${jetType} -fixedRange false -tdr true"
-      CMD_STEP+=" -inputDir plots_${stepNameOld} -outDir plots_${stepName} -outputFormat .png"
-      stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
-    fi
+    #stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+    #if [ ! -f ${stepName}.done ]; then
+    #  CMD_STEP="jet_synchplot_x -algo1 ${jetType} -algo2 ${jetType} -fixedRange false -tdr true"
+    #  CMD_STEP+=" -inputDir plots_${stepNameOld} -outDir plots_${stepName} -outputFormat .png"
+    #  stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+    #fi
   fi
 
   ###
@@ -158,8 +162,13 @@ runJECWorflowForOneAlgo(){
   stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
   if [ ! -f ${stepName}.done ]; then
     CMD_STEP="jet_response_analyzer_x ${JESC_BASE}/config/jra_hltRun3.config -input ${JRANTuple_PU} -algs ${jetType}:${dRgen}"
-    CMD_STEP+=" -levels 1 -path ./ -era ${ERA} -output plots_${stepName}/histogram_${jetType}l1_${stepName}.root -maxEvts ${maxEvents}"
+    CMD_STEP+=" -era ${ERA} -output plots_${stepName}/histogram_${jetType}l1_${stepName}.root -maxEvts ${maxEvents}"
     CMD_STEP+=" -useweight false -nrefmax 50 -relrspmin 0.0 -relrspmax 5.0 -nbinsabsrsp 0 -nbinsetarsp 0 -nbinsphirsp 0 -nbinsrelrsp 200 -doflavor false"
+    if [ "X${skipL1}" != "Xtrue" ]; then
+      CMD_STEP+="  -path ./ -levels 1  "
+    else
+      echo '!!!skipping l1!!!'
+    fi
     stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
@@ -167,14 +176,22 @@ runJECWorflowForOneAlgo(){
   if [ ! -f ${stepName}.done ]; then
     CMD_STEP="jet_l2_correction_x -algs ${jetType} -era ${ERA} -l2l3 true"
     CMD_STEP+=" -input plots_${stepNameOld}/histogram_${jetType}l1_${stepNameOld}.root -outputDir ./ -output l2p3.root"
-    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50 -ptclipfit true -ptclip 10 -statTh 10 -useOfflinePFFunctions true"
+    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+Gaussian -maxFitIter 50 -ptclipfit false" # for ak8puppi only
+    #SPS Scenario 3 
+    #CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50 -ptclipfit true" # for all other jet collections
     stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
   stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
   if [ ! -f ${stepName}.done ]; then
     CMD_STEP="jet_correction_analyzer_x -ptmin 0 -inputFilename ${JRANTuple_PU} -algs ${jetType} -drmax ${dRgen} -evtmax ${maxEvents}"
-    CMD_STEP+=" -useweight false -path ./ -era ${ERA} -levels 1 2 -L1FastJet true -outputDir plots_${stepName} -nbinsrelrsp 200 -relrspmin 0.0 -relrspmax 5.0 -nrefmax 50"
+    CMD_STEP+=" -useweight false -path ./ -era ${ERA} -outputDir plots_${stepName} -nbinsrelrsp 200 -relrspmin 0.0 -relrspmax 5.0 -nrefmax 50 "
+    if [ "X${skipL1}" != "Xtrue" ]; then
+      CMD_STEP+=" -levels 1 2 -L1FastJet true  "
+    else
+      CMD_STEP+=" -levels  2 -L1FastJet false  "
+      echo '!!!skipping l1!!!'
+    fi
     stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
