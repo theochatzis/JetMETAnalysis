@@ -10,18 +10,19 @@ JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/run
 
 ERA=Run3Winter20_V2_MC
 
-JET_TYPES=(
-  ak8puppiHLT
-)
+# for ak8puppi only
 #JET_TYPES=(
-#  ak4caloHLT
-#  ak4pfclusterHLT
-#  ak4pfHLT
-#  ak4puppiHLT
-#  ak8caloHLT
-#  ak8pfclusterHLT
-#  ak8pfHLT
+#  ak8puppiHLT
 #)
+JET_TYPES=(
+  ak4caloHLT
+  ak4pfclusterHLT
+  ak4pfHLT
+  ak4puppiHLT
+  ak8caloHLT
+  ak8pfclusterHLT
+  ak8pfHLT
+)
 ## -------------------------
 
 ## -------------------------
@@ -135,23 +136,21 @@ runJECWorflowForOneAlgo(){
       stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
     fi
 
-    #SPS turn off while testing 
-    #    
-    #stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
-    #if [ ! -f ${stepName}.done ]; then
-    #  CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
-    #  CMD_STEP+=" -ApplyJEC true -JECpar ./${ERA}_L1FastJet_*.txt"
-    #  CMD_STEP+=" -useweight false -doNotSave true"
-    #  CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath plots_${stepName}"
-    #  stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
-    #fi
+    stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+    if [ ! -f ${stepName}.done ]; then
+      CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
+      CMD_STEP+=" -ApplyJEC true -JECpar ./${ERA}_L1FastJet_*.txt"
+      CMD_STEP+=" -useweight false -doNotSave true"
+      CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath plots_${stepName}"
+      stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+    fi
 
-    #stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
-    #if [ ! -f ${stepName}.done ]; then
-    #  CMD_STEP="jet_synchplot_x -algo1 ${jetType} -algo2 ${jetType} -fixedRange false -tdr true"
-    #  CMD_STEP+=" -inputDir plots_${stepNameOld} -outDir plots_${stepName} -outputFormat .png"
-    #  stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
-    #fi
+    stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
+    if [ ! -f ${stepName}.done ]; then
+      CMD_STEP="jet_synchplot_x -algo1 ${jetType} -algo2 ${jetType} -fixedRange false -tdr true"
+      CMD_STEP+=" -inputDir plots_${stepNameOld} -outDir plots_${stepName} -outputFormat .png"
+      stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
+    fi
   fi
 
   ###
@@ -176,9 +175,9 @@ runJECWorflowForOneAlgo(){
   if [ ! -f ${stepName}.done ]; then
     CMD_STEP="jet_l2_correction_x -algs ${jetType} -era ${ERA} -l2l3 true"
     CMD_STEP+=" -input plots_${stepNameOld}/histogram_${jetType}l1_${stepNameOld}.root -outputDir ./ -output l2p3.root"
-    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+Gaussian -maxFitIter 50 -ptclipfit false" # for ak8puppi only
-    #SPS Scenario 3 
-    #CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50 -ptclipfit true" # for all other jet collections
+    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50 -ptclipfit true" # for all other jet collections
+    # for ak8puppi only
+    #CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+Gaussian -maxFitIter 50 -ptclipfit false" # for ak8puppi only
     stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
