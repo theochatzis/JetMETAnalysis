@@ -36,29 +36,25 @@ The `fitJESCs` script is an example of
 a wrapper executing the various steps of the JESCs derivation
 (caveat: the script presently includes several hard-coded parameters).
 
-##### To derive `preliminary_jecs_may`
+List of Run-3 HLT JESCs:
 
-The JRA NTuples used for these corrections can be found here:
+  * `Run3Winter20_V2_MC`:
 
-```
-/eos/cms/store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_noPU/npvFix_noPU.root
-/eos/cms/store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_flatPU/npvFix_flatPU.root
-```
+    - Description: preliminary HLT JESCs for Run-3 studies
 
-This preliminary jecs were derived with the following parameters for the L1 and L2 fits (which can be found within the `fitJECs` wrapper script)
-for all jet types excep for `ak8puppiHLT`:
+    - Tag: `hltJESCs_Run3Winter20_V2_MC`
 
-```bash
-# For L1 Fit
-jet_synchfit_x__hlt -algo1 <jet-type> -algo2 ak4caloHLT -functionType standard  -era Run3Winter20_V2_MC -inputDir ./ -outputDir ./
-...
-# For L2 Fit
-jet_l2_correction_x -algs <jet-type> -era Run3Winter20_V2_MC -l2l3 true -input plots_step04/histogram_<jet-type>l1_step04.root -outputDir ./ -output l2p3.root -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50 -ptclipfit true
-```
+    - JRA NTuples:
+      ```
+      root://cms-xrd-global.cern.ch//eos/cms/store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_noPU/npvFix_noPU.root
+      root://cms-xrd-global.cern.ch//eos/cms/store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_flatPU/npvFix_flatPU.root
+      ```
 
-For `ak8puppiHLT` only the L2 correction was applied, with the following parameters:
+    - executable for JESCs fits (contains settings of all JESCs fits):
+      [`JESCorrections/test/fitJESCs`]()
 
-```bash
-jet_l2_correction_x -algs ak8puppiHLT -era Run3Winter20_V2_MC -l2l3 true -input plots_step01/histogram_ak8puppiHLTl1_step01.root -outputDir ./ -output l2p3.root -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+Gaussian -maxFitIter 50 -ptclipfit false
-```
+    - Notes:
 
+      - JRA NTuples affected by a bug in the `rho` value saved for Calo and PFCluster (AK4 and AK8) HLT jets:
+        the `rho` based on PF-candidates was erronously used,
+        instead of the `rho` values calculated from calo-towers and PFClusters, respectively.
