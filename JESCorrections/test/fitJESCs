@@ -171,7 +171,7 @@ runJECWorflowForOneAlgo(){
     CMD_STEP="jet_l2_correction_x -algs ${jetType} -era ${ERA} -l2l3 true"
     CMD_STEP+=" -input plots_${stepNameOld}/histogram_${jetType}l1_${stepNameOld}.root -outputDir ./ -output l2p3.root"
     CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50 -ptclipfit false"
-    if [ "X${jetType}" != "Xak8puppi" ]; then
+    if [ "X${jetType}" != "Xak8puppiHLT" ]; then
       CMD_STEP+=" -ptclipfit true"
     else
       CMD_STEP+=" -ptclipfit false"
