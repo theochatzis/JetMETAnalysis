@@ -106,6 +106,10 @@ runJECWorflowForOneAlgo(){
     skipL1=true
   fi
 
+  if [ "X${jetType}" = "Xak8puppiHLT" ]; then
+    skipL1=true
+  fi
+
   ###
   ### L1FastJet
   ###
