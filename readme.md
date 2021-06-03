@@ -1,3 +1,15 @@
+----------
+----------
+
+**Note**: for instructions on HLT PF-Hadron calibrations and Jet Energy Scale Corrections,
+please ignore this `readme`, and follow the instructions in the dedicated `readme` files:
+
+ * [`readme` for HLT PF-Hadron Calibrations](https://github.com/missirol/JMETriggerAnalysis/blob/run3/PFHadronCalibrations/readme.md)
+ * [`readme` for HLT Jet Energy Scale Corrections](https://github.com/missirol/JMETriggerAnalysis/blob/run3/JESCorrections/readme.md)
+
+----------
+----------
+
 ### Tools for JME studies on the Run-3 HLT reconstruction
 
 * [Tests on HLT Tracking for Run-3](#tests-on-hlt-tracking-for-run-3)
@@ -35,10 +47,10 @@ The baseline HLT menu for Run-3 in 11_2_X can be found in
 [Common/python/configs/HLT_dev_CMSSW_11_2_0_GRun_V19_configDump.py](https://github.com/missirol/JMETriggerAnalysis/blob/run3_devel_112X/Common/python/configs/HLT_dev_CMSSW_11_2_0_GRun_V19_configDump.py).
 
 It was created with `hltGetConfiguration` via the commands listed in
-[`Common/test/dumpHLTMenus_mcRun3.sh`](https://github.com/missirol/JMETriggerAnalysis/blob/run3_devel_112X/Common/test/dumpHLTMenus_mcRun3.sh).
+[`Common/test/dumpHLTMenus_mcRun3.sh`](https://github.com/missirol/JMETriggerAnalysis/blob/6a5807010c9934c25b0cb7bea22d7c90bbb87bc1/Common/test/dumpHLTMenus_mcRun3.sh).
 
 An example of how to enable the different tracking customisations can be found in
-[`NTuplizers/test/jmeTriggerNTuple_cfg.py`](https://github.com/missirol/JMETriggerAnalysis/blob/run3_devel_112X/NTuplizers/test/jmeTriggerNTuple_cfg.py)
+[`NTuplizers/test/jmeTriggerNTuple_cfg.py`](https://github.com/missirol/JMETriggerAnalysis/blob/6a5807010c9934c25b0cb7bea22d7c90bbb87bc1/Common/test/dumpHLTMenus_mcRun3.sh)
 (see option `reco`).
 Test commands:
 ```

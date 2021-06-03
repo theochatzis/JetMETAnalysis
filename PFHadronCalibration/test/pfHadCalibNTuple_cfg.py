@@ -45,30 +45,18 @@ opts.parseArguments()
 ### HLT configuration
 ###
 if opts.reco == 'HLT_GRun':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-
-elif opts.reco == 'HLT_Run3TRK':
-  # (a) Run-3 tracking: standard
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-  process = customizeHLTRun3Tracking(process)
-
-elif opts.reco == 'HLT_Run3TRKWithPU':
-  # (b) Run-3 tracking: all pixel vertices
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
-  process = customizeHLTRun3TrackingAllPixelVertices(process)
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_3_0_GRun_V14_configDump import cms, process
 
 else:
   raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
-    _mod = getattr(process, _modname)
-    if type(_mod) == cms.OutputModule:
-       process.__delattr__(_modname)
-       if opts.verbosity > 0:
-          print '> removed cms.OutputModule:', _modname
+  _mod = getattr(process, _modname)
+  if type(_mod) == cms.OutputModule:
+    process.__delattr__(_modname)
+    if opts.verbosity > 0:
+      print '> removed cms.OutputModule:', _modname
 
 # remove cms.EndPath objects from HLT config-dump
 for _modname in process.endpaths_():
@@ -83,15 +71,15 @@ print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
-    _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
-    if _keepPath:
-      print '{:<99} | {:<4} |'.format(_modname, '+')
-      continue
-    _mod = getattr(process, _modname)
-    if type(_mod) == cms.Path:
-      process.__delattr__(_modname)
-      print '{:<99} | {:<4} |'.format(_modname, '')
+  _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
+  _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
+  if _keepPath:
+    print '{:<99} | {:<4} |'.format(_modname, '+')
+    continue
+  _mod = getattr(process, _modname)
+  if type(_mod) == cms.Path:
+    process.__delattr__(_modname)
+    print '{:<99} | {:<4} |'.format(_modname, '')
 print '-'*108
 
 # remove FastTimerService
@@ -176,7 +164,7 @@ if opts.inputFiles:
   process.source.fileNames = opts.inputFiles
 else:
   process.source.fileNames = [
-    '/store/mc/Run3Winter20DRMiniAOD/SinglePion_PT0to200/GEN-SIM-RAW/NoPU_ECal_FixNoPUIssue_110X_mcRun3_2021_realistic_v6-v2/280000/2B9E2D1C-48C6-AC4D-8464-2321A096354A.root',
+    '/store/mc/Run3Winter21DRMiniAOD/SinglePion_PT0to200/GEN-SIM-DIGI-RAW/NoPUFEVT_112X_mcRun3_2021_realistic_v16-v2/140000/53fc39b0-c12c-419f-ba73-78c4d032ff3e.root',
   ]
 
 # output file
@@ -184,5 +172,5 @@ process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.ou
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
-   process.prune()
-   open(opts.dumpPython, 'w').write(process.dumpPython())
+  process.prune()
+  open(opts.dumpPython, 'w').write(process.dumpPython())

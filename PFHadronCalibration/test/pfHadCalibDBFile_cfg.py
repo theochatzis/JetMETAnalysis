@@ -105,4 +105,4 @@ process.p = cms.Path(process.pfCalObj)
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:
-   open(opts.dumpPython, 'w').write(process.dumpPython())
+  open(opts.dumpPython, 'w').write(process.dumpPython())
