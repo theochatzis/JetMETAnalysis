@@ -35,8 +35,8 @@ cp /afs/cern.ch/work/m/missirol/public/run3/PFHC/PFHC_Run3Winter20_HLT_v01.db \
    ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db
 
 # JESC: preliminary HLT-JESCs for Run-3
-cp /afs/cern.ch/work/m/missirol/public/run3/JESC/Run3Winter20_V1_MC/Run3Winter20_V1_MC.db \
-   ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db
+cp /afs/cern.ch/work/m/missirol/public/run3/JESC/Run3Winter20_V2_MC/Run3Winter20_V2_MC.db \
+   ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db
 
 git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b run3_jrantuples
 
