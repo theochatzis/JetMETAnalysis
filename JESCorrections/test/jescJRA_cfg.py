@@ -1,3 +1,5 @@
+import fnmatch
+
 ###
 ### command-line arguments
 ###
@@ -79,33 +81,43 @@ else:
 
 # remove cms.OutputModule objects from HLT config-dump
 for _modname in process.outputModules_():
-    _mod = getattr(process, _modname)
-    if type(_mod) == cms.OutputModule:
-       process.__delattr__(_modname)
-       if opts.verbosity > 0:
-          print '> removed cms.OutputModule:', _modname
+  _mod = getattr(process, _modname)
+  if type(_mod) == cms.OutputModule:
+    process.__delattr__(_modname)
+    if opts.verbosity > 0:
+      print '> removed cms.OutputModule:', _modname
 
 # remove cms.EndPath objects from HLT config-dump
 for _modname in process.endpaths_():
-    _mod = getattr(process, _modname)
-    if type(_mod) == cms.EndPath:
-       process.__delattr__(_modname)
-       if opts.verbosity > 0:
-          print '> removed cms.EndPath:', _modname
+  _mod = getattr(process, _modname)
+  if type(_mod) == cms.EndPath:
+    process.__delattr__(_modname)
+    if opts.verbosity > 0:
+      print '> removed cms.EndPath:', _modname
 
 # remove selected cms.Path objects from HLT config-dump
 print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
+
+# list of patterns to determine paths to keep
+keepPaths = [
+  'MC_*Jets*',
+  'MC_*AK8Calo*',
+]
+
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'AK8Calo' in _modname)
-    if _keepPath:
-      print '{:<99} | {:<4} |'.format(_modname, '+')
-      continue
-    _mod = getattr(process, _modname)
-    if type(_mod) == cms.Path:
-      process.__delattr__(_modname)
-      print '{:<99} | {:<4} |'.format(_modname, '')
+  _keepPath = False
+  for _tmpPatt in keepPaths:
+    _keepPath = fnmatch.fnmatch(_modname, _tmpPatt)
+    if _keepPath: break
+  if _keepPath:
+    print '{:<99} | {:<4} |'.format(_modname, '+')
+    continue
+  _mod = getattr(process, _modname)
+  if type(_mod) == cms.Path:
+    process.__delattr__(_modname)
+    print '{:<99} | {:<4} |'.format(_modname, '')
 print '-'*108
 
 # remove FastTimerService
@@ -123,6 +135,7 @@ if hasattr(process, 'MessageLogger'):
 ## customised JME collections
 from JMETriggerAnalysis.Common.customise_hlt import *
 process = addPaths_MC_JMEPFCluster(process)
+process = addPaths_MC_JMEPFCHS(process)
 process = addPaths_MC_JMEPFPuppi(process)
 
 ## ES modules for PF-Hadron Calibrations
@@ -141,64 +154,6 @@ process.pfhcESSource = cms.ESSource('PoolDBESSource',
 process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 
-## ES modules for HLT JECs
-process.jescESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
-  toGet = cms.VPSet(
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),
-      label = cms.untracked.string('AK4CaloHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),
-      label = cms.untracked.string('AK4PFClusterHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
-      label = cms.untracked.string('AK4PFHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
-      label = cms.untracked.string('AK4PFchsHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),
-      label = cms.untracked.string('AK4PFPuppiHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),#!!
-      label = cms.untracked.string('AK8CaloHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),#!!
-      label = cms.untracked.string('AK8PFClusterHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
-      label = cms.untracked.string('AK8PFHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
-      label = cms.untracked.string('AK8PFchsHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),#!!
-      label = cms.untracked.string('AK8PFPuppiHLT'),
-    ),
-  ),
-)
-process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
-
 ###
 ### Jet Response Analyzer (JRA) NTuple
 ###
@@ -207,11 +162,13 @@ from jescJRA_utils import addJRAPath
 addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4caloHLT'     , recoJets = 'hltAK4CaloJets'     , rho = 'hltFixedGridRhoFastjetAllCalo')
 addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4pfclusterHLT', recoJets = 'hltAK4PFClusterJets', rho = 'hltFixedGridRhoFastjetAllPFCluster')
 addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4pfHLT'       , recoJets = 'hltAK4PFJets'       , rho = 'hltFixedGridRhoFastjetAll')
+addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4pfchsHLT'    , recoJets = 'hltAK4PFCHSJets'    , rho = 'hltFixedGridRhoFastjetAll')
 addJRAPath(process, genJets = 'ak4GenJetsNoNu', maxDeltaR = 0.2, moduleNamePrefix = 'ak4pfpuppiHLT'  , recoJets = 'hltAK4PFPuppiJets'  , rho = 'hltFixedGridRhoFastjetAll')
 
 addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8caloHLT'     , recoJets = 'hltAK8CaloJets'     , rho = 'hltFixedGridRhoFastjetAllCalo')
 addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8pfclusterHLT', recoJets = 'hltAK8PFClusterJets', rho = 'hltFixedGridRhoFastjetAllPFCluster')
 addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8pfHLT'       , recoJets = 'hltAK8PFJets'       , rho = 'hltFixedGridRhoFastjetAll')
+addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8pfchsHLT'    , recoJets = 'hltAK8PFCHSJets'    , rho = 'hltFixedGridRhoFastjetAll')
 addJRAPath(process, genJets = 'ak8GenJetsNoNu', maxDeltaR = 0.4, moduleNamePrefix = 'ak8pfpuppiHLT'  , recoJets = 'hltAK8PFPuppiJets'  , rho = 'hltFixedGridRhoFastjetAll')
 
 ###
@@ -249,7 +206,7 @@ if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
    process.source.fileNames = [
-     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6-v1/100000/07634100-A880-4E4D-BAA3-D9C0B5356C2D.root',
+     '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/260003/E9C4BA27-0888-D646-9954-A4B15C7A4B32.root',
    ]
 
 # input EDM files [secondary]

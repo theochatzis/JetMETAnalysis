@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 ## -------------------------
 ## Hard-coded inputs/options
@@ -14,10 +15,12 @@ JET_TYPES=(
   ak4caloHLT
   ak4pfclusterHLT
   ak4pfHLT
+  ak4chsHLT
   ak4puppiHLT
   ak8caloHLT
   ak8pfclusterHLT
   ak8pfHLT
+  ak8chsHLT
   ak8puppiHLT
 )
 ## -------------------------
@@ -106,10 +109,6 @@ runJECWorflowForOneAlgo(){
     skipL1=true
   fi
 
-  if [ "X${jetType}" = "Xak8puppiHLT" ]; then
-    skipL1=true
-  fi
-
   ###
   ### L1FastJet
   ###
@@ -119,6 +118,7 @@ runJECWorflowForOneAlgo(){
     if [ ! -f ${stepName}.done ]; then
       CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
       CMD_STEP+=" -ApplyJEC false"
+      CMD_STEP+=" -ignoreNPV true -overwriteNPVwithNPUInTime true"
       CMD_STEP+=" -useweight false -doNotSave true"
       CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath ."
       stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
@@ -133,7 +133,7 @@ runJECWorflowForOneAlgo(){
 
     stepNameOld=${stepName} && ((++stepN)) && stepName="step"$(printf "%02d" ${stepN})
     if [ ! -f ${stepName}.done ]; then
-      CMD_STEP="jet_synchfit_x__hlt -algo1 ${jetType} -algo2 ${jetType} -functionType standard  -era ${ERA} -inputDir ./ -outputDir ./"
+      CMD_STEP="jet_synchfit_x__hlt -algo1 ${jetType} -algo2 ${jetType} -functionType standard -era ${ERA} -inputDir ./ -outputDir ./"
       stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
     fi
 
@@ -141,6 +141,7 @@ runJECWorflowForOneAlgo(){
     if [ ! -f ${stepName}.done ]; then
       CMD_STEP="jet_synchtest_x -algo1 ${jetType} -algo2 ${jetType} -sampleNoPU ${JRANTuple_NoPU} -samplePU ${JRANTuple_PU}"
       CMD_STEP+=" -ApplyJEC true -JECpar ./${ERA}_L1FastJet_*.txt"
+      CMD_STEP+=" -ignoreNPV true -overwriteNPVwithNPUInTime true"
       CMD_STEP+=" -useweight false -doNotSave true"
       CMD_STEP+=" -iftest true -maxEvts ${maxEvents} -outputPath plots_${stepName}"
       stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
@@ -174,12 +175,8 @@ runJECWorflowForOneAlgo(){
   if [ ! -f ${stepName}.done ]; then
     CMD_STEP="jet_l2_correction_x -algs ${jetType} -era ${ERA} -l2l3 true"
     CMD_STEP+=" -input plots_${stepNameOld}/histogram_${jetType}l1_${stepNameOld}.root -outputDir ./ -output l2p3.root"
-    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50 -ptclipfit false"
-    if [ "X${jetType}" != "Xak8puppiHLT" ]; then
-      CMD_STEP+=" -ptclipfit true"
-    else
-      CMD_STEP+=" -ptclipfit false"
-    fi
+    CMD_STEP+=" -makeCanvasVariable AbsCorVsJetPt:JetEta -batch true -histMet median -l2pffit standard+gaussian -maxFitIter 50"
+    CMD_STEP+=" -ptclipfit true"
     stepCmd "mkdir -p plots_${stepName}\n\n${CMD_STEP}" ${stepName}
   fi
 
