@@ -60,7 +60,7 @@ def merge_rootfiles(input_directories, output_file, input_skipKeywords=[], compr
          _valid_files += [fi]
 
          _tf.Close()
-         ROOT.gROOT.GetListOfFiles().Remove(_tf)
+#         ROOT.gROOT.GetListOfFiles().Remove(_tf)
 
     print colored_text('[output = '+output_file+']', ['1']), 'merging {0} files'.format(len(_valid_files))
 
