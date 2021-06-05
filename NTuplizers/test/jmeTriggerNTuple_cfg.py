@@ -1,3 +1,5 @@
+import fnmatch
+
 ###
 ### command-line arguments
 ###
@@ -107,10 +109,30 @@ for _modname in process.endpaths_():
 print '-'*108
 print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
 print '-'*108
+
+# list of patterns to determine paths to keep
+keepPaths = [
+  'MC_*Jets*',
+  'MC_*MET*',
+  'MC_*AK8Calo*',
+  'HLT_PFJet*_v*',
+  'HLT_AK4PFJet*_v*',
+  'HLT_AK8PFJet*_v*',
+  'HLT_PFHT*_v*',
+  'HLT_PFMET*_PFMHT*_v*',
+]
+
+# list of paths that are kept
+listOfPaths = []
+
 for _modname in sorted(process.paths_()):
-    _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname or 'AK8Calo' in _modname)
+    _keepPath = False
+    for _tmpPatt in keepPaths:
+      _keepPath = fnmatch.fnmatch(_modname, _tmpPatt)
+      if _keepPath: break
     if _keepPath:
       print '{:<99} | {:<4} |'.format(_modname, '+')
+      listOfPaths.append(_modname)
       continue
     _mod = getattr(process, _modname)
     if type(_mod) == cms.Path:
@@ -133,8 +155,9 @@ if hasattr(process, 'MessageLogger'):
 ## customised JME collections
 from JMETriggerAnalysis.Common.customise_hlt import *
 process = addPaths_MC_JMECalo(process)
-process = addPaths_MC_JMEPF(process)
 process = addPaths_MC_JMEPFCluster(process)
+process = addPaths_MC_JMEPF(process)
+process = addPaths_MC_JMEPFCHS(process)
 process = addPaths_MC_JMEPFPuppi(process)
 
 ## ES modules for PF-Hadron Calibrations
@@ -155,56 +178,56 @@ process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
 
 ## ES modules for HLT JECs
 process.jescESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V1_MC.db'),
+  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db'),
   toGet = cms.VPSet(
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4CaloHLT'),
       label = cms.untracked.string('AK4CaloHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFClusterHLT'),
       label = cms.untracked.string('AK4PFClusterHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),
       label = cms.untracked.string('AK4PFHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),#!!
       label = cms.untracked.string('AK4PFchsHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFPuppiHLT'),
       label = cms.untracked.string('AK4PFPuppiHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4CaloHLT'),#!!
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8CaloHLT'),
       label = cms.untracked.string('AK8CaloHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFClusterHLT'),#!!
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFClusterHLT'),
       label = cms.untracked.string('AK8PFClusterHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),
       label = cms.untracked.string('AK8PFHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFHLT'),#!!
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),#!!
       label = cms.untracked.string('AK8PFchsHLT'),
     ),
     cms.PSet(
       record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V1_MC_AK4PFPuppiHLT'),#!!
+      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFPuppiHLT'),
       label = cms.untracked.string('AK8PFPuppiHLT'),
     ),
   ),
@@ -219,7 +242,9 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
   TriggerResults = cms.InputTag('TriggerResults'),
   TriggerResultsFilterOR = cms.vstring(),
   TriggerResultsFilterAND = cms.vstring(),
-  TriggerResultsCollections = cms.vstring(),
+  TriggerResultsCollections = cms.vstring(
+    sorted(list(set([(_tmp[:_tmp.rfind('_v')] if '_v' in _tmp else _tmp) for _tmp in listOfPaths])))
+  ),
   outputBranchesToBeDropped = cms.vstring(),
 
   HepMCProduct = cms.InputTag('generatorSmeared'),
@@ -228,8 +253,11 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
 
   doubles = cms.PSet(
 
+    hltFixedGridRhoFastjetAllCalo = cms.InputTag('hltFixedGridRhoFastjetAllCalo'),
+    hltFixedGridRhoFastjetAllPFCluster = cms.InputTag('hltFixedGridRhoFastjetAllPFCluster'),
     hltFixedGridRhoFastjetAll = cms.InputTag('hltFixedGridRhoFastjetAll'),
     offlineFixedGridRhoFastjetAll = cms.InputTag('fixedGridRhoFastjetAll::RECO'),
+
     hltPixelClustersMultiplicity = cms.InputTag('hltPixelClustersMultiplicity'),
   ),
 
@@ -276,11 +304,17 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltAK4PFJets = cms.InputTag('hltAK4PFJets'),
     hltAK4PFJetsCorrected = cms.InputTag('hltAK4PFJetsCorrected'),
 
-    hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
-    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
+    hltAK4PFCHSJets = cms.InputTag('hltAK4PFCHSJets'),
+    hltAK4PFCHSJetsCorrected = cms.InputTag('hltAK4PFCHSJetsCorrected'),
 
     hltAK4PFPuppiJets = cms.InputTag('hltAK4PFPuppiJets'),
     hltAK4PFPuppiJetsCorrected = cms.InputTag('hltAK4PFPuppiJetsCorrected'),
+
+    hltAK8PFJets = cms.InputTag('hltAK8PFJets'),
+    hltAK8PFJetsCorrected = cms.InputTag('hltAK8PFJetsCorrected'),
+
+    hltAK8PFCHSJets = cms.InputTag('hltAK8PFCHSJets'),
+    hltAK8PFCHSJetsCorrected = cms.InputTag('hltAK8PFCHSJetsCorrected'),
 
     hltAK8PFPuppiJets = cms.InputTag('hltAK8PFPuppiJets'),
     hltAK8PFPuppiJetsCorrected = cms.InputTag('hltAK8PFPuppiJetsCorrected'),
@@ -378,14 +412,47 @@ if opts.lumis is not None:
 
 # input EDM files [primary]
 if opts.inputFiles:
-   process.source.fileNames = opts.inputFiles
+  process.source.fileNames = opts.inputFiles
+else:
+  process.source.fileNames = [
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/MINIAODSIM/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/CE60A1DD-226B-B742-98E9-A09249BEFDA2.root'
+  ]
 
 # input EDM files [secondary]
 if not hasattr(process.source, 'secondaryFileNames'):
-   process.source.secondaryFileNames = cms.untracked.vstring()
+  process.source.secondaryFileNames = cms.untracked.vstring()
 
 if opts.secondaryInputFiles:
-   process.source.secondaryFileNames = opts.secondaryInputFiles
+  process.source.secondaryFileNames = opts.secondaryInputFiles
+else:
+  process.source.secondaryFileNames = [
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/00E83D67-63EB-EB43-8989-68ACAD981A10.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/12D114E8-BBFF-574F-806A-3BE5C5FDBFB8.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/12DC883A-082B-4642-A445-868ECDDF3FA5.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/16972812-2808-314B-B5AA-54D41CC37285.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/1D58BA9D-EC39-7347-9CED-CA99D82D2206.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/388752E2-8A49-4E43-9869-D14BC0203087.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/48A588A8-36DE-1948-9AE6-DD458C1509F2.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/495788FC-5DC6-4A44-8B63-B591C19EB674.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/56AAD83C-751C-424D-B964-3556C93A595F.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/6A51016A-C628-9A4E-B007-50084FDBFC80.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/7F69AE21-49DD-7846-A809-FFADAAC3F4A9.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/871ECE14-7F8F-0E4A-A36A-6142B769A4D7.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/878DE7C3-CEC9-0747-9CB4-B8BC6E85DD4E.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/90035F4A-1F74-0643-8C75-D1AEC46E4A15.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/9B3E1268-7673-954A-AEA5-7D0BE6D94FEB.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/A56F1704-6E6B-674E-BA4E-F36C000204C7.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/B033B4EA-0733-4840-82FF-8EC14547383C.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/BEFB2C90-4912-3240-943F-8FFFAD875C32.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/C9939A7C-C9B8-F441-9041-62349DF7B092.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/CB5EE5CF-B0BE-6940-9B92-274556053F77.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/CE3B3CB9-AE21-B441-9412-91553043B444.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/D2F54AC7-7964-B54B-B9E6-43ABED588830.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/DB690341-0817-1E46-9B0B-CE1D4B552FA6.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/DF55BDEA-D820-F647-A9A5-B15D006DD6A2.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/EAB306EE-5E34-FF4A-A3B1-74C6116F75FC.root',
+    '/store/mc/Run3Winter20DRMiniAOD/QCD_Pt-15to7000_TuneCP5_Flat_14TeV_pythia8/GEN-SIM-RAW/FlatPU0to80_110X_mcRun3_2021_realistic_v6_ext1-v1/250000/F7CA9145-CC3D-5E4C-9610-33C17F15CC5F.root',
+  ]
 
 # dump content of cms.Process to python file
 if opts.dumpPython is not None:

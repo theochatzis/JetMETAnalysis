@@ -1,9 +1,15 @@
 import FWCore.ParameterSet.Config as cms
 
-from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets as _ak4PFClusterJets
-from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi as _ak4PFJetsPuppi
-from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsPuppi as _ak8PFJetsPuppi
+from CommonTools.ParticleFlow.pfPileUp_cfi  import pfPileUp as _pfPileUp
+from CommonTools.ParticleFlow.TopProjectors.pfNoPileUp_cfi import pfNoPileUp as _pfNoPileUp
 from CommonTools.PileupAlgos.Puppi_cff import puppi as _puppi, puppiNoLep as _puppiNoLep
+
+from RecoJets.JetProducers.ak4PFClusterJets_cfi import ak4PFClusterJets as _ak4PFClusterJets
+from RecoJets.JetProducers.ak4PFJets_cfi import ak4PFJetsPuppi as _ak4PFJetsPuppi, ak4PFJetsCHS as _ak4PFJetsCHS
+from RecoJets.JetProducers.ak8PFJets_cfi import ak8PFJetsPuppi as _ak8PFJetsPuppi, ak8PFJetsCHS as _ak8PFJetsCHS
+
+from RecoParticleFlow.PFProducer.particleFlowTmpPtrs_cfi import particleFlowTmpPtrs as _particleFlowTmpPtrs
+
 from JMETriggerAnalysis.Common.multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble_cfi\
  import multiplicityValueProducerFromNestedCollectionEdmNewDetSetVectorSiPixelClusterDouble as _nSiPixelClusters
 
@@ -158,7 +164,7 @@ def addPaths_MC_JMEPFCluster(process):
     process.hltAK8PFClusterJetCorrectorL1 = cms.EDProducer('L1FastjetCorrectorProducer',
       algorithm = cms.string('AK8PFClusterHLT'),
       level = cms.string('L1FastJet'),
-      srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'),
+      srcRho = cms.InputTag('hltFixedGridRhoFastjetAllPFCluster'),
     )
 
     process.hltAK8PFClusterJetCorrectorL2 = cms.EDProducer('LXXXCorrectorProducer',
@@ -259,6 +265,174 @@ def addPaths_MC_JMEPF(process):
 
     if process.schedule_():
        process.schedule_().append(process.MC_JMEPF_v1)
+
+    return process
+
+def addPaths_MC_JMEPFCHS(process):
+
+    process.hltPreMCJMEPFCHS = cms.EDFilter('HLTPrescaler',
+      L1GtReadoutRecordTag = cms.InputTag('hltGtStage2Digis'),
+      offset = cms.uint32(0)
+    )
+
+    process.hltParticleFlowPtrs = _particleFlowTmpPtrs.clone(src = 'hltParticleFlow')
+
+    process.hltPFPileUpJME = _pfPileUp.clone(
+      PFCandidates = 'hltParticleFlowPtrs',
+      Vertices = 'hltVerticesPF',
+      checkClosestZVertex = False,
+    )
+
+    process.hltPFNoPileUpJME = _pfNoPileUp.clone(
+      topCollection = 'hltPFPileUpJME',
+      bottomCollection = 'hltParticleFlowPtrs',
+    )
+
+    process.HLTPFCHSSequence = cms.Sequence(
+        process.HLTDoCaloSequencePF
+      + process.HLTL2muonrecoSequence
+      + process.HLTL3muonrecoSequence
+      + process.HLTTrackReconstructionForPF
+      + process.HLTParticleFlowSequence
+      + process.hltParticleFlowPtrs
+      + process.hltVerticesPF
+      + process.hltPFPileUpJME
+      + process.hltPFNoPileUpJME
+    )
+
+    ## AK4
+    process.hltAK4PFCHSJets = _ak4PFJetsCHS.clone(src = 'hltPFNoPileUpJME')
+
+    process.hltAK4PFCHSJetCorrectorL1 = cms.EDProducer('L1FastjetCorrectorProducer',
+      algorithm = cms.string('AK4PFchsHLT'),
+      level = cms.string('L1FastJet'),
+      srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'),
+    )
+
+    process.hltAK4PFCHSJetCorrectorL2 = cms.EDProducer('LXXXCorrectorProducer',
+      algorithm = cms.string('AK4PFchsHLT'),
+      level = cms.string('L2Relative')
+    )
+
+    process.hltAK4PFCHSJetCorrectorL3 = cms.EDProducer('LXXXCorrectorProducer',
+      algorithm = cms.string('AK4PFchsHLT'),
+      level = cms.string('L3Absolute')
+    )
+
+    process.hltAK4PFCHSJetCorrector = cms.EDProducer('ChainedJetCorrectorProducer',
+      correctors = cms.VInputTag(
+        'hltAK4PFCHSJetCorrectorL1',
+        'hltAK4PFCHSJetCorrectorL2',
+        'hltAK4PFCHSJetCorrectorL3',
+      ),
+    )
+
+    process.hltAK4PFCHSJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
+      src = cms.InputTag('hltAK4PFCHSJets'),
+      correctors = cms.VInputTag('hltAK4PFCHSJetCorrector'),
+    )
+
+    process.HLTAK4PFCHSJetsSequence = cms.Sequence(
+        process.hltAK4PFCHSJets
+      + process.hltAK4PFCHSJetCorrectorL1
+      + process.hltAK4PFCHSJetCorrectorL2
+      + process.hltAK4PFCHSJetCorrectorL3
+      + process.hltAK4PFCHSJetCorrector
+      + process.hltAK4PFCHSJetsCorrected
+    )
+
+    ## AK8
+    process.hltAK8PFCHSJets = _ak8PFJetsCHS.clone(src = 'hltPFNoPileUpJME')
+
+    process.hltAK8PFCHSJetCorrectorL1 = cms.EDProducer('L1FastjetCorrectorProducer',
+      algorithm = cms.string('AK8PFchsHLT'),
+      level = cms.string('L1FastJet'),
+      srcRho = cms.InputTag('hltFixedGridRhoFastjetAll'),
+    )
+
+    process.hltAK8PFCHSJetCorrectorL2 = cms.EDProducer('LXXXCorrectorProducer',
+      algorithm = cms.string('AK8PFchsHLT'),
+      level = cms.string('L2Relative')
+    )
+
+    process.hltAK8PFCHSJetCorrectorL3 = cms.EDProducer('LXXXCorrectorProducer',
+      algorithm = cms.string('AK8PFchsHLT'),
+      level = cms.string('L3Absolute')
+    )
+
+    process.hltAK8PFCHSJetCorrector = cms.EDProducer('ChainedJetCorrectorProducer',
+      correctors = cms.VInputTag(
+        'hltAK8PFCHSJetCorrectorL1',
+        'hltAK8PFCHSJetCorrectorL2',
+        'hltAK8PFCHSJetCorrectorL3',
+      ),
+    )
+
+    process.hltAK8PFCHSJetsCorrected = cms.EDProducer('CorrectedPFJetProducer',
+      src = cms.InputTag('hltAK8PFCHSJets'),
+      correctors = cms.VInputTag('hltAK8PFCHSJetCorrector'),
+    )
+
+    process.HLTAK8PFCHSJetsSequence = cms.Sequence(
+        process.hltAK8PFCHSJets
+      + process.hltAK8PFCHSJetCorrectorL1
+      + process.hltAK8PFCHSJetCorrectorL2
+      + process.hltAK8PFCHSJetCorrectorL3
+      + process.hltAK8PFCHSJetCorrector
+      + process.hltAK8PFCHSJetsCorrected
+    )
+
+    ## MET: CHS
+    process.hltParticleFlowCHS = cms.EDProducer('FwdPtrRecoPFCandidateConverter',
+      src = process.hltAK4PFCHSJets.src,
+    )
+
+    process.hltPFCHSMET = cms.EDProducer('PFMETProducer',
+      src = cms.InputTag('hltParticleFlowCHS'),
+      globalThreshold = cms.double(0.0),
+      calculateSignificance = cms.bool(False),
+    )
+
+    ## MET Type-1
+    process.hltPFCHSMETCorrection = cms.EDProducer('PFJetMETcorrInputProducer',
+      jetCorrEtaMax = cms.double(9.9),
+      jetCorrLabel = cms.InputTag('hltAK4PFCHSJetCorrector'),
+      jetCorrLabelRes = cms.InputTag('hltAK4PFCHSJetCorrector'),
+      offsetCorrLabel = cms.InputTag('hltAK4PFCHSJetCorrectorL1'),
+      skipEM = cms.bool(True),
+      skipEMfractionThreshold = cms.double(0.9),
+      skipMuonSelection = cms.string('isGlobalMuon | isStandAloneMuon'),
+      skipMuons = cms.bool(True),
+      src = cms.InputTag('hltAK4PFCHSJets'),
+      type1JetPtThreshold = cms.double(30.0),
+    )
+
+    process.hltPFCHSMETTypeOne = cms.EDProducer('CorrectedPFMETProducer',
+      src = cms.InputTag('hltPFCHSMET'),
+      srcCorrections = cms.VInputTag('hltPFCHSMETCorrection:type1'),
+    )
+
+    ## Sequence: MET CHS
+    process.HLTPFCHSMETSequence = cms.Sequence(
+        process.hltParticleFlowCHS
+      + process.hltPFCHSMET
+      + process.hltPFCHSMETCorrection
+      + process.hltPFCHSMETTypeOne
+    )
+
+    ## Path
+    process.MC_JMEPFCHS_v1 = cms.Path(
+        process.HLTBeginSequence
+      + process.hltPreMCJMEPFCHS
+      + process.HLTPFCHSSequence
+      + process.HLTAK4PFCHSJetsSequence
+      + process.HLTAK8PFCHSJetsSequence
+      + process.HLTPFCHSMETSequence
+      + process.HLTEndSequence
+    )
+
+    if process.schedule_():
+       process.schedule_().append(process.MC_JMEPFCHS_v1)
 
     return process
 
