@@ -174,7 +174,8 @@ PFHadCalibNTuple::~PFHadCalibNTuple() {
   edm::LogPrint("") << " - with E_ECAL+E_HCAL > " << minCaloEnergy_ << " GeV: " << globalCounter_[7];
   if (usePFBlockElements_)
     edm::LogPrint("") << " - with only 1 track in the block: " << globalCounter_[8];
-  edm::LogPrint("") << " - with track-p > " << minTrackP_ << " GeV and track-pT > " << minTrackPt_ << " GeV: " << globalCounter_[9];
+  edm::LogPrint("") << " - with track-p > " << minTrackP_ << " GeV and track-pT > " << minTrackPt_
+                    << " GeV: " << globalCounter_[9];
   edm::LogPrint("") << " - with min nb of pixel hits: " << globalCounter_[10];
   edm::LogPrint("") << " - with min nb of pixel+strip hits: " << globalCounter_[11];
   edm::LogPrint("") << " - with E_ECAL < " << maxECalEnergy_ << " GeV: " << globalCounter_[12];

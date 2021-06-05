@@ -38,16 +38,19 @@ protected:
 
 template <class T>
 CorrectedJetAnalyzer<T>::CorrectedJetAnalyzer(edm::ParameterSet const& iConfig)
-  : srcInputTag_(iConfig.getParameter<edm::InputTag>("src"))
-  , srcToken_(consumes<edm::View<T>>(srcInputTag_))
-  , jetCorrectorTokens_(edm::vector_transform(iConfig.getParameter<std::vector<edm::InputTag>>("correctors"), [this](edm::InputTag const& foo) { return consumes<reco::JetCorrector>(foo); }))
-  , textFilesInPath_(edm::vector_transform(iConfig.getParameter<std::vector<std::string>>("textFiles"), [this](std::string const& foo) { return edm::FileInPath(foo); }))
-  , useRho_(iConfig.getParameter<bool>("useRho"))
-  , rhoToken_(useRho_ ? consumes<double>(iConfig.getParameter<edm::InputTag>("rho")) : edm::EDGetTokenT<double>())
-  , verbose_(iConfig.getParameter<bool>("verbose")) {
+    : srcInputTag_(iConfig.getParameter<edm::InputTag>("src")),
+      srcToken_(consumes<edm::View<T>>(srcInputTag_)),
+      jetCorrectorTokens_(
+          edm::vector_transform(iConfig.getParameter<std::vector<edm::InputTag>>("correctors"),
+                                [this](edm::InputTag const& foo) { return consumes<reco::JetCorrector>(foo); })),
+      textFilesInPath_(edm::vector_transform(iConfig.getParameter<std::vector<std::string>>("textFiles"),
+                                             [this](std::string const& foo) { return edm::FileInPath(foo); })),
+      useRho_(iConfig.getParameter<bool>("useRho")),
+      rhoToken_(useRho_ ? consumes<double>(iConfig.getParameter<edm::InputTag>("rho")) : edm::EDGetTokenT<double>()),
+      verbose_(iConfig.getParameter<bool>("verbose")) {
   factorizedJetCorrectors_.clear();
   factorizedJetCorrectors_.reserve(textFilesInPath_.size());
-  for(auto const& foo : textFilesInPath_){
+  for (auto const& foo : textFilesInPath_) {
     std::vector<JetCorrectorParameters> jetCorrectorParameters({foo.fullPath()});
     factorizedJetCorrectors_.emplace_back(new FactorizedJetCorrector(jetCorrectorParameters));
   }
@@ -56,7 +59,7 @@ CorrectedJetAnalyzer<T>::CorrectedJetAnalyzer(edm::ParameterSet const& iConfig)
 template <class T>
 void CorrectedJetAnalyzer<T>::analyze(edm::Event const& iEvent, edm::EventSetup const&) {
   std::vector<reco::JetCorrector const*> correctors(jetCorrectorTokens_.size(), nullptr);
-  for (uint idx=0; idx<jetCorrectorTokens_.size(); ++idx) {
+  for (uint idx = 0; idx < jetCorrectorTokens_.size(); ++idx) {
     auto const handle = iEvent.getHandle(jetCorrectorTokens_.at(idx));
     correctors[idx] = handle.product();
   }
@@ -65,17 +68,17 @@ void CorrectedJetAnalyzer<T>::analyze(edm::Event const& iEvent, edm::EventSetup 
 
   auto const jets = iEvent.getHandle(srcToken_);
 
-  for (uint idx=0; idx<jets->size(); ++idx) {
+  for (uint idx = 0; idx < jets->size(); ++idx) {
     const T* referenceJet = &(jets->at(idx));
     edm::RefToBase<reco::Jet> jetRef(edm::Ref<edm::View<T>>(jets, idx));
-    T correctedJet = jets->at(idx); // copy original jet
+    T correctedJet = jets->at(idx);  // copy original jet
     if (verbose_) {
       edm::LogPrint("") << "[" << srcInputTag_.encode() << "] Jet #" << idx;
       edm::LogPrint("") << "  - Original: pt=" << referenceJet->pt() << " eta=" << referenceJet->eta();
     }
 
     // globaltag/database
-    for (uint corr_idx=0; corr_idx<jetCorrectorTokens_.size(); ++corr_idx) {
+    for (uint corr_idx = 0; corr_idx < jetCorrectorTokens_.size(); ++corr_idx) {
       if (correctors[corr_idx]->vectorialCorrection()) {
         // Vectorial correction
         reco::JetCorrector::LorentzVector corrected;
@@ -83,14 +86,17 @@ void CorrectedJetAnalyzer<T>::analyze(edm::Event const& iEvent, edm::EventSetup 
         correctedJet.setP4(corrected);
 
         if (verbose_)
-          edm::LogPrint("") << "  - [GT] After Correction #" << corr_idx+1 << ": pt=" << correctedJet.pt() << " eta=" << correctedJet.eta() << " JESC=" << scale;
+          edm::LogPrint("") << "  - [GT] After Correction #" << corr_idx + 1 << ": pt=" << correctedJet.pt()
+                            << " eta=" << correctedJet.eta() << " JESC=" << scale;
       } else {
         // Scalar correction
-        auto const scale = correctors[corr_idx]->refRequired() ? correctors[corr_idx]->correction(*referenceJet, jetRef) : correctors[corr_idx]->correction(*referenceJet);
+        auto const scale = correctors[corr_idx]->refRequired() ? correctors[corr_idx]->correction(*referenceJet, jetRef)
+                                                               : correctors[corr_idx]->correction(*referenceJet);
         correctedJet.scaleEnergy(scale);
 
         if (verbose_)
-          edm::LogPrint("") << "  - [GT] After Correction #" << corr_idx+1 << ": pt=" << correctedJet.pt() << " eta=" << correctedJet.eta() << " JESC=" << scale;
+          edm::LogPrint("") << "  - [GT] After Correction #" << corr_idx + 1 << ": pt=" << correctedJet.pt()
+                            << " eta=" << correctedJet.eta() << " JESC=" << scale;
       }
 
       referenceJet = &correctedJet;
@@ -98,9 +104,9 @@ void CorrectedJetAnalyzer<T>::analyze(edm::Event const& iEvent, edm::EventSetup 
 
     // .txt files
     referenceJet = &(jets->at(idx));
-    correctedJet = jets->at(idx); // copy original jet
+    correctedJet = jets->at(idx);  // copy original jet
 
-    for (uint corr_idx=0; corr_idx<factorizedJetCorrectors_.size(); ++corr_idx) {
+    for (uint corr_idx = 0; corr_idx < factorizedJetCorrectors_.size(); ++corr_idx) {
       auto& factorizedJetCorrector = factorizedJetCorrectors_.at(corr_idx);
 
       factorizedJetCorrector->setJetEta(referenceJet->eta());
@@ -113,7 +119,8 @@ void CorrectedJetAnalyzer<T>::analyze(edm::Event const& iEvent, edm::EventSetup 
       correctedJet.scaleEnergy(scale);
 
       if (verbose_)
-        edm::LogPrint("") << "  - [TXT] After Correction #" << corr_idx+1 << ": pt=" << correctedJet.pt() << " eta=" << correctedJet.eta() << " JESC=" << scale;
+        edm::LogPrint("") << "  - [TXT] After Correction #" << corr_idx + 1 << ": pt=" << correctedJet.pt()
+                          << " eta=" << correctedJet.eta() << " JESC=" << scale;
 
       referenceJet = &correctedJet;
     }

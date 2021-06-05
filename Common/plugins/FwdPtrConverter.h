@@ -14,44 +14,43 @@
 #include <DataFormats/Common/interface/FwdPtr.h>
 #include <HLTrigger/HLTcore/interface/defaultModuleLabel.h>
 
-template<class T>
+template <class T>
 class FwdPtrConverter : public edm::stream::EDProducer<> {
-
- public:
+public:
   explicit FwdPtrConverter(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
- private:
-  void produce(edm::Event&, const edm::EventSetup&);
+private:
+  void produce(edm::Event&, const edm::EventSetup&) override;
 
   const edm::EDGetTokenT<edm::View<edm::FwdPtr<T>>> src_token_;
   const edm::EDPutTokenT<std::vector<T>> out_token_;
 };
 
-template<class T>
+template <class T>
 FwdPtrConverter<T>::FwdPtrConverter(const edm::ParameterSet& iConfig)
-  : src_token_{consumes<edm::View<edm::FwdPtr<T>>>(iConfig.getParameter<edm::InputTag>("src"))}
-  , out_token_{produces<std::vector<T>>()} {
-}
+    : src_token_{consumes<edm::View<edm::FwdPtr<T>>>(iConfig.getParameter<edm::InputTag>("src"))},
+      out_token_{produces<std::vector<T>>()} {}
 
-template<class T>
-void FwdPtrConverter<T>::produce(edm::Event& iEvent,const edm::EventSetup& iSetup){
+template <class T>
+void FwdPtrConverter<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   auto const& coll(iEvent.get(src_token_));
 
   std::vector<T> output;
   output.reserve(coll.size());
 
-  for(auto const& fwdptr : coll){
+  for (auto const& fwdptr : coll) {
     output.emplace_back(*fwdptr);
   }
 
   iEvent.emplace(out_token_, std::move(output));
 }
 
-template<class T>
+template <class T>
 void FwdPtrConverter<T>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
-  desc.add<edm::InputTag>("src", edm::InputTag("pfNoPileUp"))->setComment("edm::InputTag of input collection (type: edm::View<edm::FwdPtr<T>>)");
+  desc.add<edm::InputTag>("src", edm::InputTag("pfNoPileUp"))
+      ->setComment("edm::InputTag of input collection (type: edm::View<edm::FwdPtr<T>>)");
   descriptions.add(defaultModuleLabel<FwdPtrConverter<T>>(), desc);
 }
 
