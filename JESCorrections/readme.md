@@ -42,7 +42,9 @@ List of Run-3 HLT JESCs:
 
     - Description: preliminary HLT JESCs for Run-3 studies
 
-    - Tag: `hltJESCs_Run3Winter20_V2_MC`
+    - Tag of `JMETriggerAnalysis`: `hltJESCs_Run3Winter20_V2_MC`
+
+    - Tag of `missirol/JetMETAnalysis`: `Run3Winter20_V2_MC`
 
     - JRA NTuples:
       ```
