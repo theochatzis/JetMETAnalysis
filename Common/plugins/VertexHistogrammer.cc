@@ -15,13 +15,12 @@
 #include <TH1D.h>
 
 class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+public:
+  explicit VertexHistogrammer(const edm::ParameterSet &);
+  static void fillDescriptions(edm::ConfigurationDescriptions &descriptions);
 
- public:
-  explicit VertexHistogrammer(const edm::ParameterSet&);
-  static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
-
- private:
-  void analyze(const edm::Event&, const edm::EventSetup&) override;
+private:
+  void analyze(const edm::Event &, const edm::EventSetup &) override;
 
   const edm::InputTag vertices_tag_;
   const edm::EDGetTokenT<reco::VertexCollection> vertices_token_;
@@ -48,15 +47,14 @@ class VertexHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources
   TH1D *h_track_dz_ = nullptr;
 };
 
-VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
-  : vertices_tag_(iConfig.getParameter<edm::InputTag>("src"))
-  , vertices_token_(consumes<reco::VertexCollection>(vertices_tag_)) {
-
+VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet &iConfig)
+    : vertices_tag_(iConfig.getParameter<edm::InputTag>("src")),
+      vertices_token_(consumes<reco::VertexCollection>(vertices_tag_)) {
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
-  if(not fs){
+  if (not fs) {
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -82,16 +80,16 @@ VertexHistogrammer::VertexHistogrammer(const edm::ParameterSet& iConfig)
   h_track_dz_ = fs->make<TH1D>("track_dz", "track_dz", 600, -1., 1.);
 }
 
-void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  auto const& vertices(iEvent.getHandle(vertices_token_));
+void VertexHistogrammer::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup) {
+  auto const &vertices(iEvent.getHandle(vertices_token_));
 
-  if(vertices.isValid()){
+  if (vertices.isValid()) {
     h_vertex_mult_->Fill(vertices->size());
 
-    for(uint idx=0; idx<vertices->size(); ++idx){
-      auto const& vtx(vertices->at(idx));
+    for (uint idx = 0; idx < vertices->size(); ++idx) {
+      auto const &vtx(vertices->at(idx));
 
-      if(idx == 0){
+      if (idx == 0) {
         h_vertex0_x_->Fill(vtx.x());
         h_vertex0_y_->Fill(vtx.y());
         h_vertex0_z_->Fill(vtx.z());
@@ -107,8 +105,8 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
       h_vertex_ndof_->Fill(vtx.ndof());
       h_vertex_nTracks_->Fill(vtx.nTracks());
 
-      if(vtx.hasRefittedTracks()){
-        for(auto const& trk : vtx.refittedTracks()){
+      if (vtx.hasRefittedTracks()) {
+        for (auto const &trk : vtx.refittedTracks()) {
           h_track_pt_->Fill(trk.pt());
           h_track_pt_2_->Fill(trk.pt());
           h_track_eta_->Fill(trk.eta());
@@ -116,10 +114,10 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
           h_track_dxy_->Fill(trk.dxy(vtx.position()));
           h_track_dz_->Fill(trk.dz(vtx.position()));
         }
-      }
-      else {
-        for(std::vector<reco::TrackBaseRef>::const_iterator trk_it = vtx.tracks_begin(); trk_it != vtx.tracks_end(); ++trk_it){
-          auto const& trk_ref(*trk_it);
+      } else {
+        for (std::vector<reco::TrackBaseRef>::const_iterator trk_it = vtx.tracks_begin(); trk_it != vtx.tracks_end();
+             ++trk_it) {
+          auto const &trk_ref(*trk_it);
           h_track_pt_->Fill(trk_ref->pt());
           h_track_pt_2_->Fill(trk_ref->pt());
           h_track_eta_->Fill(trk_ref->eta());
@@ -129,13 +127,12 @@ void VertexHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup
         }
       }
     }
-  }
-  else {
+  } else {
     edm::LogWarning("Input") << "invalid handle to reco::VertexCollection : " << vertices_tag_.encode();
   }
 }
 
-void VertexHistogrammer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void VertexHistogrammer::fillDescriptions(edm::ConfigurationDescriptions &descriptions) {
   edm::ParameterSetDescription desc;
   desc.add<edm::InputTag>("src")->setComment("edm::InputTag of reco::VertexCollection");
   descriptions.add("VertexHistogrammer", desc);

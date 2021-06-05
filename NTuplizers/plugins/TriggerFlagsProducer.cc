@@ -34,13 +34,12 @@ private:
 };
 
 TriggerFlagsProducer::TriggerFlagsProducer(const edm::ParameterSet& iConfig)
-  : triggerResultsInputTag_(iConfig.getParameter<edm::InputTag>("triggerResults")),
-    pathName_(iConfig.getParameter<std::string>("pathName")),
-    ignorePathVersion_(iConfig.getParameter<bool>("ignorePathVersion")),
-    hltPrescaleProvider_(iConfig, consumesCollector(), *this),
-    initFailed_(false),
-    skipRun_(false) {
-
+    : triggerResultsInputTag_(iConfig.getParameter<edm::InputTag>("triggerResults")),
+      pathName_(iConfig.getParameter<std::string>("pathName")),
+      ignorePathVersion_(iConfig.getParameter<bool>("ignorePathVersion")),
+      hltPrescaleProvider_(iConfig, consumesCollector(), *this),
+      initFailed_(false),
+      skipRun_(false) {
   if (pathName_.empty()) {
     edm::LogError("Input") << "Value of plugin argument \"pathName\" is an empty string";
     initFailed_ = true;
@@ -49,7 +48,7 @@ TriggerFlagsProducer::TriggerFlagsProducer(const edm::ParameterSet& iConfig)
 
   if (triggerResultsInputTag_.process().empty()) {
     edm::LogError("Input") << "Process name not specified in InputTag argument \"triggerResults\""
-      << " (plugin will not produce outputs): \"" << triggerResultsInputTag_.encode() << "\"";
+                           << " (plugin will not produce outputs): \"" << triggerResultsInputTag_.encode() << "\"";
     initFailed_ = true;
     return;
   } else {
@@ -67,7 +66,9 @@ void TriggerFlagsProducer::beginRun(edm::Run const& iRun, edm::EventSetup const&
     return;
   }
 
-  LogTrace("") << "[TriggerFlagsProducer] " << "----------------------------------------------------------------------------------------------------";
+  LogTrace("")
+      << "[TriggerFlagsProducer] "
+      << "----------------------------------------------------------------------------------------------------";
   LogTrace("") << "[TriggerFlagsProducer::beginRun] Run = " << iRun.id();
 
   // reset data members holding information from the previous run
@@ -76,11 +77,13 @@ void TriggerFlagsProducer::beginRun(edm::Run const& iRun, edm::EventSetup const&
   bool hltChanged(true);
   if (hltPrescaleProvider_.init(iRun, iSetup, triggerResultsInputTag_.process(), hltChanged)) {
     LogTrace("") << "[TriggerFlagsProducer::beginRun] HLTPrescaleProvider initialized [processName() = \""
-                 << hltPrescaleProvider_.hltConfigProvider().processName() << "\", tableName() = \"" << hltPrescaleProvider_.hltConfigProvider().tableName()
+                 << hltPrescaleProvider_.hltConfigProvider().processName() << "\", tableName() = \""
+                 << hltPrescaleProvider_.hltConfigProvider().tableName()
                  << "\", size() = " << hltPrescaleProvider_.hltConfigProvider().size() << "]";
   } else {
     edm::LogError("Input") << "Initialization of HLTPrescaleProvider failed for Run=" << iRun.id() << " (process=\""
-                           << triggerResultsInputTag_.process() << "\") -> plugin will not produce outputs for this Run";
+                           << triggerResultsInputTag_.process()
+                           << "\") -> plugin will not produce outputs for this Run";
     skipRun_ = true;
     return;
   }
@@ -92,7 +95,8 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   }
 
   LogTrace("") << "[TriggerFlagsProducer::produce] --------------------------------------------------------";
-  LogTrace("") << "[TriggerFlagsProducer::produce] Run = " << iEvent.id().run() << ", LuminosityBlock = " << iEvent.id().luminosityBlock() << ", Event = " << iEvent.id().event();
+  LogTrace("") << "[TriggerFlagsProducer::produce] Run = " << iEvent.id().run()
+               << ", LuminosityBlock = " << iEvent.id().luminosityBlock() << ", Event = " << iEvent.id().event();
 
   edm::Handle<edm::TriggerResults> triggerResults;
   iEvent.getByToken(triggerResultsToken_, triggerResults);
@@ -109,9 +113,10 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
   auto const& l1GlobalUtils(hltPrescaleProvider_.l1tGlobalUtil());
 
   LogTrace("") << "[TriggerFlagsProducer::produce] L1T Menu: " << l1GlobalUtils.gtTriggerMenuName()
-    << " (version = " << l1GlobalUtils.gtTriggerMenuVersion() << ", type = " << hltPrescaleProvider_.hltConfigProvider().l1tType() << ")";
+               << " (version = " << l1GlobalUtils.gtTriggerMenuVersion()
+               << ", type = " << hltPrescaleProvider_.hltConfigProvider().l1tType() << ")";
   LogTrace("") << "[TriggerFlagsProducer::produce] HLT Menu: " << hltPrescaleProvider_.hltConfigProvider().tableName()
-    << " (PS Column = " << psColumn << ")";
+               << " (PS Column = " << psColumn << ")";
 
   size_t numMatches(0);
   std::string originalMatch("");
@@ -123,27 +128,25 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
   auto const& triggerNames(hltPrescaleProvider_.hltConfigProvider().triggerNames());
   for (auto const& iPathName : triggerNames) {
-
-    if(ignorePathVersion_){
+    if (ignorePathVersion_) {
       auto const iPathNameUnv(iPathName.substr(0, iPathName.rfind("_v")));
-      if(iPathNameUnv != pathName_){
+      if (iPathNameUnv != pathName_) {
         continue;
       }
-    }
-    else {
-      if(iPathName != pathName_){
+    } else {
+      if (iPathName != pathName_) {
         continue;
       }
     }
 
     ++numMatches;
 
-    if(numMatches > 1){
-      edm::LogError("Logic") << "Attempting to overwrite output products -> new match for path name \""
-        << pathName_ << "\" will be ignored: " << iPathName << " (original match was \"" << originalMatch << "\")";
+    if (numMatches > 1) {
+      edm::LogError("Logic") << "Attempting to overwrite output products -> new match for path name \"" << pathName_
+                             << "\" will be ignored: " << iPathName << " (original match was \"" << originalMatch
+                             << "\")";
       continue;
-    }
-    else {
+    } else {
       originalMatch = iPathName;
     }
 
@@ -163,98 +166,105 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
     int hltL1TSeedModuleIndex(-1), hltPrescaleModuleIndex(-1), hltPathLastModuleIndex(-1);
 
-    auto const lastModuleExecutedInPath(hltPrescaleProvider_.hltConfigProvider().moduleLabel(iPathIndex, triggerResults->index(iPathIndex)));
+    auto const lastModuleExecutedInPath(
+        hltPrescaleProvider_.hltConfigProvider().moduleLabel(iPathIndex, triggerResults->index(iPathIndex)));
 
     auto const& moduleLabels(hltPrescaleProvider_.hltConfigProvider().moduleLabels(iPathIndex));
-    for(size_t idx=0; idx<moduleLabels.size(); ++idx){
+    for (size_t idx = 0; idx < moduleLabels.size(); ++idx) {
       auto const& moduleLabel(moduleLabels.at(idx));
 
-      if(moduleLabel == lastModuleExecutedInPath){
+      if (moduleLabel == lastModuleExecutedInPath) {
         hltPathLastModuleIndex = idx;
       }
 
-      if((hltPrescaleProvider_.hltConfigProvider().moduleEDMType(moduleLabel) != "EDFilter") or (moduleLabel == "hltTriggerType") or (moduleLabel == "hltBoolEnd")){
+      if ((hltPrescaleProvider_.hltConfigProvider().moduleEDMType(moduleLabel) != "EDFilter") or
+          (moduleLabel == "hltTriggerType") or (moduleLabel == "hltBoolEnd")) {
         continue;
       }
 
-      if(moduleLabel.find("hltL1", 0) == 0){
-        if((hltL1TSeedModuleIndex < 0) and (hltPrescaleModuleIndex < 0)){
+      if (moduleLabel.find("hltL1", 0) == 0) {
+        if ((hltL1TSeedModuleIndex < 0) and (hltPrescaleModuleIndex < 0)) {
           hltL1TSeedModuleIndex = idx;
-        }
-        else if(hltL1TSeedModuleIndex >= 0){
+        } else if (hltL1TSeedModuleIndex >= 0) {
           throw cms::Exception("InputError") << "found more than one match for L1T-Seed module of HLT-Path"
-            << " (1st match = \"" << moduleLabels.at(hltL1TSeedModuleIndex) << "\", 2nd match = \"" << moduleLabel << "\")"
-            << ", HLT-Path = \"" << iPathName << "\"";
-        }
-        else {
-          throw cms::Exception("InputError") << "found L1T-Seed module of HLT-Path after its HLT-Prescale module"
-            << " (L1T-Seed module = \"" << moduleLabel << ", HLT-Prescale module = " << moduleLabels.at(hltPrescaleModuleIndex) << "\")"
-            << ", HLT-Path = \"" << iPathName << "\"";
+                                             << " (1st match = \"" << moduleLabels.at(hltL1TSeedModuleIndex)
+                                             << "\", 2nd match = \"" << moduleLabel << "\")"
+                                             << ", HLT-Path = \"" << iPathName << "\"";
+        } else {
+          throw cms::Exception("InputError")
+              << "found L1T-Seed module of HLT-Path after its HLT-Prescale module"
+              << " (L1T-Seed module = \"" << moduleLabel
+              << ", HLT-Prescale module = " << moduleLabels.at(hltPrescaleModuleIndex) << "\")"
+              << ", HLT-Path = \"" << iPathName << "\"";
         }
       }
 
-      if(moduleLabel.find("hltPre", 0) == 0){
-        if((hltL1TSeedModuleIndex >= 0) and (hltPrescaleModuleIndex < 0)){
+      if (moduleLabel.find("hltPre", 0) == 0) {
+        if ((hltL1TSeedModuleIndex >= 0) and (hltPrescaleModuleIndex < 0)) {
           hltPrescaleModuleIndex = idx;
-        }
-        else if(hltPrescaleModuleIndex >= 0){
+        } else if (hltPrescaleModuleIndex >= 0) {
           throw cms::Exception("InputError") << "found more than one match for HLT-Prescale module of HLT-Path"
-            << " (1st match = \"" << moduleLabels.at(hltPrescaleModuleIndex) << "\", 2nd match = \"" << moduleLabel << "\")"
-            << ", HLT-Path = \"" << iPathName << "\"";
-        }
-        else {
-          throw cms::Exception("InputError") << "found HLT-Prescale module of HLT-Path before its L1T-Seed module"
-            << " (HLT-Prescale module = \"" << moduleLabel << "\"), HLT-Path = \"" << iPathName << "\"";
+                                             << " (1st match = \"" << moduleLabels.at(hltPrescaleModuleIndex)
+                                             << "\", 2nd match = \"" << moduleLabel << "\")"
+                                             << ", HLT-Path = \"" << iPathName << "\"";
+        } else {
+          throw cms::Exception("InputError")
+              << "found HLT-Prescale module of HLT-Path before its L1T-Seed module"
+              << " (HLT-Prescale module = \"" << moduleLabel << "\"), HLT-Path = \"" << iPathName << "\"";
         }
       }
 
       LogTrace("") << "[TriggerFlagsProducer::produce]         " << moduleLabel;
     }
 
-    if(hltPathLastModuleIndex < 0){
+    if (hltPathLastModuleIndex < 0) {
       throw cms::Exception("InputError") << "failed to find last module executed in the HLT-Path: " << iPathName;
-    }
-    else if(hltL1TSeedModuleIndex < 0){
+    } else if (hltL1TSeedModuleIndex < 0) {
       throw cms::Exception("InputError") << "failed to find L1T-Seed module of HLT-Path: " << iPathName;
-    }
-    else if(hltPrescaleModuleIndex < 0){
+    } else if (hltPrescaleModuleIndex < 0) {
       throw cms::Exception("InputError") << "failed to find HLT-Prescale module of HLT-Path: " << iPathName;
     }
 
     LogTrace("") << "[TriggerFlagsProducer::produce]       "
-      << "hltL1TSeedModuleIndex = " << hltL1TSeedModuleIndex << " (\"" << moduleLabels.at(hltL1TSeedModuleIndex) << "\")";
+                 << "hltL1TSeedModuleIndex = " << hltL1TSeedModuleIndex << " (\""
+                 << moduleLabels.at(hltL1TSeedModuleIndex) << "\")";
 
     LogTrace("") << "[TriggerFlagsProducer::produce]       "
-      << "hltPrescaleModuleIndex = " << hltPrescaleModuleIndex << " (\"" << moduleLabels.at(hltPrescaleModuleIndex) << "\")";
+                 << "hltPrescaleModuleIndex = " << hltPrescaleModuleIndex << " (\""
+                 << moduleLabels.at(hltPrescaleModuleIndex) << "\")";
 
     LogTrace("") << "[TriggerFlagsProducer::produce]       "
-      << "hltPathLastModuleIndex = " << hltPathLastModuleIndex << " (\"" << moduleLabels.at(hltPathLastModuleIndex) << "\")";
+                 << "hltPathLastModuleIndex = " << hltPathLastModuleIndex << " (\""
+                 << moduleLabels.at(hltPathLastModuleIndex) << "\")";
 
-    l1tSeedAccept = (hltL1TSeedModuleIndex == hltPathLastModuleIndex) ? triggerResults->accept(iPathIndex) : (hltL1TSeedModuleIndex < hltPathLastModuleIndex);
-    hltPathPrescaled = (hltPrescaleModuleIndex == hltPathLastModuleIndex) ? (not triggerResults->accept(iPathIndex)) : false;
+    l1tSeedAccept = (hltL1TSeedModuleIndex == hltPathLastModuleIndex)
+                        ? triggerResults->accept(iPathIndex)
+                        : (hltL1TSeedModuleIndex < hltPathLastModuleIndex);
+    hltPathPrescaled =
+        (hltPrescaleModuleIndex == hltPathLastModuleIndex) ? (not triggerResults->accept(iPathIndex)) : false;
     hltPathAccept = triggerResults->accept(iPathIndex);
 
     LogTrace("") << "[TriggerFlagsProducer::produce]       hltL1TSeeds";
     auto const& hltL1TSeeds(hltPrescaleProvider_.hltConfigProvider().hltL1TSeeds(iPathIndex));
 
-    if(hltL1TSeeds.size() == 0){
+    if (hltL1TSeeds.empty()) {
       edm::LogWarning("Input") << "No L1T-Seed expression associated to the HLT-Path \"" << iPathName << "\""
-        << " (hltL1TSeeds.size() = " << hltL1TSeeds.size() << ") -- L1T-related flags will be set to \"false\"";
-    }
-    else if (hltL1TSeeds.size() == 1) {
+                               << " (hltL1TSeeds.size() = " << hltL1TSeeds.size()
+                               << ") -- L1T-related flags will be set to \"false\"";
+    } else if (hltL1TSeeds.size() == 1) {
       auto l1tSeedExpr(hltL1TSeeds.at(0));
       if (l1tSeedExpr.empty()) {
         throw cms::Exception("Input") << "value of L1T-Seed expression is empty";
-      }
-      else if (l1tSeedExpr == "L1GlobalDecision") {
-        throw cms::Exception("Input") << "Unsupported case: HLT-Path \"" << iPathName << "\" seeded at L1T by \"L1GlobalDecision\"";
-      }
-      else {
+      } else if (l1tSeedExpr == "L1GlobalDecision") {
+        throw cms::Exception("Input") << "Unsupported case: HLT-Path \"" << iPathName
+                                      << "\" seeded at L1T by \"L1GlobalDecision\"";
+      } else {
         LogTrace("") << "[TriggerFlagsProducer::produce]        " << l1tSeedExpr;
         // logical expression of L1T seed [ref: HLTL1Seed plugin]
         //  - three instances (initial, interm, final)
         //  - note: use GlobalLogicParser ctor with (non-const) std::string& - add/remove spaces if needed
-        bool l1tSeedAcceptFromL1GlobalUtilInitial(false), l1tSeedAcceptFromL1GlobalUtilInterm(false), l1tSeedAcceptFromL1GlobalUtilFinal(false);
+        bool l1tSeedAcceptFromL1GlobalUtilInitial(false), l1tSeedAcceptFromL1GlobalUtilInterm(false),
+            l1tSeedAcceptFromL1GlobalUtilFinal(false);
 
         // GlobalLogicParser - Initial
         auto l1AlgoLogicParserInitial = GlobalLogicParser(l1tSeedExpr);
@@ -265,17 +275,19 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
           bool decInitial(false);
           auto const decInitialIsValid(l1GlobalUtils.getInitialDecisionByName(l1tSeedName, decInitial));
 
-          if(decInitialIsValid){
+          if (decInitialIsValid) {
             token_i.tokenResult = decInitial;
           } else {
-            edm::LogWarning("Input") << "call to HLTPrescaleProvider::l1GlobalUtils().getInitialDecisionByName(\""
-              << l1tSeedName << "\", bool&) did not succeed -> result of L1T-Seed set to \"false\" (HLT-Path = \"" << iPathName << "\")";
+            edm::LogWarning("Input")
+                << "call to HLTPrescaleProvider::l1GlobalUtils().getInitialDecisionByName(\"" << l1tSeedName
+                << "\", bool&) did not succeed -> result of L1T-Seed set to \"false\" (HLT-Path = \"" << iPathName
+                << "\")";
 
             token_i.tokenResult = false;
           }
 
           LogTrace("") << "[TriggerFlagsProducer::produce]           " << l1tSeedName
-            << " getInitialDecisionByName = " << decInitial << " (valid = " << decInitialIsValid << ")";
+                       << " getInitialDecisionByName = " << decInitial << " (valid = " << decInitialIsValid << ")";
         }
         l1tSeedAcceptFromL1GlobalUtilInitial = l1AlgoLogicParserInitial.expressionResult();
 
@@ -288,17 +300,19 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
           bool decInterm(false);
           auto const decIntermIsValid(l1GlobalUtils.getIntermDecisionByName(l1tSeedName, decInterm));
 
-          if(decIntermIsValid){
+          if (decIntermIsValid) {
             token_i.tokenResult = decInterm;
           } else {
-            edm::LogWarning("Input") << "call to HLTPrescaleProvider::l1GlobalUtils().getIntermDecisionByName(\""
-              << l1tSeedName << "\", bool&) did not succeed -> result of L1T-Seed set to \"false\" (HLT-Path = \"" << iPathName << "\")";
+            edm::LogWarning("Input")
+                << "call to HLTPrescaleProvider::l1GlobalUtils().getIntermDecisionByName(\"" << l1tSeedName
+                << "\", bool&) did not succeed -> result of L1T-Seed set to \"false\" (HLT-Path = \"" << iPathName
+                << "\")";
 
             token_i.tokenResult = false;
           }
 
           LogTrace("") << "[TriggerFlagsProducer::produce]           " << l1tSeedName
-            << " getIntermDecisionByName = " << decInterm << " (valid = " << decIntermIsValid << ")";
+                       << " getIntermDecisionByName = " << decInterm << " (valid = " << decIntermIsValid << ")";
         }
         l1tSeedAcceptFromL1GlobalUtilInterm = l1AlgoLogicParserInterm.expressionResult();
 
@@ -311,62 +325,65 @@ void TriggerFlagsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iS
           bool decFinal(false);
           auto const decFinalIsValid(l1GlobalUtils.getFinalDecisionByName(l1tSeedName, decFinal));
 
-          if(decFinalIsValid){
+          if (decFinalIsValid) {
             token_i.tokenResult = decFinal;
           } else {
-            edm::LogWarning("Input") << "call to HLTPrescaleProvider::l1GlobalUtils().getFinalDecisionByName(\""
-              << l1tSeedName << "\", bool&) did not succeed -> result of L1T-Seed set to \"false\" (HLT-Path = \"" << iPathName << "\")";
+            edm::LogWarning("Input")
+                << "call to HLTPrescaleProvider::l1GlobalUtils().getFinalDecisionByName(\"" << l1tSeedName
+                << "\", bool&) did not succeed -> result of L1T-Seed set to \"false\" (HLT-Path = \"" << iPathName
+                << "\")";
 
             token_i.tokenResult = false;
           }
 
           LogTrace("") << "[TriggerFlagsProducer::produce]           " << l1tSeedName
-            << " getFinalDecisionByName = " << decFinal << " (valid = " << decFinalIsValid << ")";
+                       << " getFinalDecisionByName = " << decFinal << " (valid = " << decFinalIsValid << ")";
         }
         l1tSeedAcceptFromL1GlobalUtilFinal = l1AlgoLogicParserFinal.expressionResult();
 
         // consistency check between HLT-Path and L1GlobalUtil
-        if(hltL1TSeedModuleIndex <= hltPathLastModuleIndex){
-          if(l1tSeedAccept != l1tSeedAcceptFromL1GlobalUtilFinal){
-            throw cms::Exception("Input") << "Return value of L1T-Seed module of HLT-Path ("
-              << l1tSeedAccept << ") differs from value returned by the HLTPrescaleProvider::l1tGlobalUtil ("
-              << l1tSeedAcceptFromL1GlobalUtilFinal << "): " << iPathName;
+        if (hltL1TSeedModuleIndex <= hltPathLastModuleIndex) {
+          if (l1tSeedAccept != l1tSeedAcceptFromL1GlobalUtilFinal) {
+            throw cms::Exception("Input") << "Return value of L1T-Seed module of HLT-Path (" << l1tSeedAccept
+                                          << ") differs from value returned by the HLTPrescaleProvider::l1tGlobalUtil ("
+                                          << l1tSeedAcceptFromL1GlobalUtilFinal << "): " << iPathName;
           }
         }
 
         // l1tSeedPrescaledOrMasked
         l1tSeedPrescaledOrMasked = (l1tSeedAcceptFromL1GlobalUtilInitial != l1tSeedAcceptFromL1GlobalUtilFinal);
 
-        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr << " l1tSeedAcceptFromL1GlobalUtilInitial = " << l1tSeedAcceptFromL1GlobalUtilInitial;
-        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr << " l1tSeedAcceptFromL1GlobalUtilInterm = " << l1tSeedAcceptFromL1GlobalUtilInterm;
-        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr << " l1tSeedAcceptFromL1GlobalUtilFinal = " << l1tSeedAcceptFromL1GlobalUtilFinal;
-        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr << " l1tSeedPrescaledOrMasked = " << l1tSeedPrescaledOrMasked;
+        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr
+                     << " l1tSeedAcceptFromL1GlobalUtilInitial = " << l1tSeedAcceptFromL1GlobalUtilInitial;
+        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr
+                     << " l1tSeedAcceptFromL1GlobalUtilInterm = " << l1tSeedAcceptFromL1GlobalUtilInterm;
+        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr
+                     << " l1tSeedAcceptFromL1GlobalUtilFinal = " << l1tSeedAcceptFromL1GlobalUtilFinal;
+        LogTrace("") << "[TriggerFlagsProducer::produce]       " << l1tSeedExpr
+                     << " l1tSeedPrescaledOrMasked = " << l1tSeedPrescaledOrMasked;
       }
-    }
-    else{
+    } else {
       edm::LogError("Input") << "Unsupported case: HLT-Path does not use a unique L1T-Seed expression"
-        << " (hltL1TSeeds.size() = " << hltL1TSeeds.size() << ") -- L1T-related output products will be set to \"false\"";
+                             << " (hltL1TSeeds.size() = " << hltL1TSeeds.size()
+                             << ") -- L1T-related output products will be set to \"false\"";
     }
 
     LogTrace("") << "[TriggerFlagsProducer::produce]       "
-                 << "Path = \"" << iPathName << "\", HLTConfigProvider::triggerIndex(\"" << iPathName << "\") = " << iPathIndex
-                 << " l1tSeedAccept = " << l1tSeedAccept
+                 << "Path = \"" << iPathName << "\", HLTConfigProvider::triggerIndex(\"" << iPathName
+                 << "\") = " << iPathIndex << " l1tSeedAccept = " << l1tSeedAccept
                  << " l1tSeedPrescaledOrMasked = " << l1tSeedPrescaledOrMasked
-                 << " hltPathPrescaled = " << hltPathPrescaled
-                 << " hltPathAccept = " << hltPathAccept;
+                 << " hltPathPrescaled = " << hltPathPrescaled << " hltPathAccept = " << hltPathAccept;
   }
 
-  if(numMatches < 1){
-    edm::LogWarning("Output") << "Zero matches found for path name \""
-      << pathName_ << "\" --> all output products will be \"false\"";
+  if (numMatches < 1) {
+    edm::LogWarning("Output") << "Zero matches found for path name \"" << pathName_
+                              << "\" --> all output products will be \"false\"";
   }
 
   LogTrace("") << "[TriggerFlagsProducer::produce]       "
-               << "Path = \"" << originalMatch
-               << ", l1tSeedAccept = " << l1tSeedAccept
+               << "Path = \"" << originalMatch << ", l1tSeedAccept = " << l1tSeedAccept
                << ", l1tSeedPrescaledOrMasked = " << l1tSeedPrescaledOrMasked
-               << ", hltPathPrescaled = " << hltPathPrescaled
-               << ", hltPathAccept = " << hltPathAccept;
+               << ", hltPathPrescaled = " << hltPathPrescaled << ", hltPathAccept = " << hltPathAccept;
 
   auto out_l1tSeedAccept = std::make_unique<bool>(l1tSeedAccept);
   auto out_l1tSeedPrescaledOrMasked = std::make_unique<bool>(l1tSeedPrescaledOrMasked);

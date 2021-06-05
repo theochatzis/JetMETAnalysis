@@ -6,18 +6,21 @@
 #include <JMETriggerAnalysis/NTupleAnalysis/interface/JMETriggerAnalysisDriver.h>
 
 class JMETriggerAnalysisDriverPhase2MET : public JMETriggerAnalysisDriver {
-
- public:
-  explicit JMETriggerAnalysisDriverPhase2MET(const std::string& outputFilePath="", const std::string& outputFileMode="recreate");
-  explicit JMETriggerAnalysisDriverPhase2MET(const std::string& tfile, const std::string& ttree, const std::string& outputFilePath, const std::string& outputFileMode="recreate");
-  ~JMETriggerAnalysisDriverPhase2MET() {}
+public:
+  explicit JMETriggerAnalysisDriverPhase2MET(const std::string& outputFilePath = "",
+                                             const std::string& outputFileMode = "recreate");
+  explicit JMETriggerAnalysisDriverPhase2MET(const std::string& tfile,
+                                             const std::string& ttree,
+                                             const std::string& outputFilePath,
+                                             const std::string& outputFileMode = "recreate");
+  ~JMETriggerAnalysisDriverPhase2MET() override {}
 
   void init() override;
   void analyze() override;
 
- protected:
+protected:
   void bookHistograms(const std::string&);
-  void fillHistograms(const std::string&, float const weight=1.f);
+  void fillHistograms(const std::string&, float const weight = 1.f);
 
   bool l1tMETSeed(std::string const& key) const;
 

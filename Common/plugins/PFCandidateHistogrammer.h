@@ -19,13 +19,12 @@
 
 template <typename PFCandType>
 class PFCandidateHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+public:
+  explicit PFCandidateHistogrammer(const edm::ParameterSet &);
+  static void fillDescriptions(edm::ConfigurationDescriptions &);
 
- public:
-  explicit PFCandidateHistogrammer(const edm::ParameterSet&);
-  static void fillDescriptions(edm::ConfigurationDescriptions&);
-
- private:
-  void analyze(const edm::Event&, const edm::EventSetup&) override;
+private:
+  void analyze(const edm::Event &, const edm::EventSetup &) override;
 
   const edm::InputTag pfCands_tag_;
   const edm::EDGetTokenT<std::vector<PFCandType>> pfCands_token_;
@@ -55,16 +54,15 @@ class PFCandidateHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedReso
 };
 
 template <typename PFCandType>
-PFCandidateHistogrammer<PFCandType>::PFCandidateHistogrammer(const edm::ParameterSet& iConfig)
-  : pfCands_tag_(iConfig.getParameter<edm::InputTag>("src"))
-  , pfCands_token_(consumes<std::vector<PFCandType>>(pfCands_tag_))
-  , stringCutSelector_(iConfig.getParameter<std::string>("cut")){
-
+PFCandidateHistogrammer<PFCandType>::PFCandidateHistogrammer(const edm::ParameterSet &iConfig)
+    : pfCands_tag_(iConfig.getParameter<edm::InputTag>("src")),
+      pfCands_token_(consumes<std::vector<PFCandType>>(pfCands_tag_)),
+      stringCutSelector_(iConfig.getParameter<std::string>("cut")) {
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
-  if(not fs){
+  if (not fs) {
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -100,17 +98,15 @@ PFCandidateHistogrammer<PFCandType>::PFCandidateHistogrammer(const edm::Paramete
 }
 
 template <typename PFCandType>
-void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event &iEvent, const edm::EventSetup &iSetup) {
+  auto const &pfCands_handle(iEvent.getHandle(pfCands_token_));
 
-  auto const& pfCands_handle(iEvent.getHandle(pfCands_token_));
+  if (pfCands_handle.isValid()) {
+    uint pfcand_mult(0), pfcand_mult_X(0), pfcand_mult_h(0), pfcand_mult_e(0), pfcand_mult_mu(0), pfcand_mult_gamma(0),
+        pfcand_mult_h0(0), pfcand_mult_hHF(0), pfcand_mult_egammaHF(0);
 
-  if(pfCands_handle.isValid()){
-    uint pfcand_mult(0), pfcand_mult_X(0), pfcand_mult_h(0), pfcand_mult_e(0),
-         pfcand_mult_mu(0), pfcand_mult_gamma(0), pfcand_mult_h0(0),
-         pfcand_mult_hHF(0), pfcand_mult_egammaHF(0);
-
-    for(auto const& pfc : *pfCands_handle){
-      if(not stringCutSelector_(pfc)){
+    for (auto const &pfc : *pfCands_handle) {
+      if (not stringCutSelector_(pfc)) {
         continue;
       }
 
@@ -118,14 +114,30 @@ void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event& iEvent, cons
 
       auto const pid(dummyPFCandToUseTranslatePdgId_.translatePdgIdToType(pfc.pdgId()));
 
-      if(pid == reco::PFCandidate::X){ ++pfcand_mult_X; } // undefined
-      else if(pid == reco::PFCandidate::h){ ++pfcand_mult_h; } // charged hadron
-      else if(pid == reco::PFCandidate::e){ ++pfcand_mult_e; } // electron
-      else if(pid == reco::PFCandidate::mu){ ++pfcand_mult_mu; } // muon
-      else if(pid == reco::PFCandidate::gamma){ ++pfcand_mult_gamma; } // photon
-      else if(pid == reco::PFCandidate::h0){ ++pfcand_mult_h0; } // neutral hadron
-      else if(pid == reco::PFCandidate::h_HF){ ++pfcand_mult_hHF; } // HF tower identified as a hadron
-      else if(pid == reco::PFCandidate::egamma_HF){ ++pfcand_mult_egammaHF; } // HF tower identified as an EM particle
+      if (pid == reco::PFCandidate::X) {
+        ++pfcand_mult_X;
+      }  // undefined
+      else if (pid == reco::PFCandidate::h) {
+        ++pfcand_mult_h;
+      }  // charged hadron
+      else if (pid == reco::PFCandidate::e) {
+        ++pfcand_mult_e;
+      }  // electron
+      else if (pid == reco::PFCandidate::mu) {
+        ++pfcand_mult_mu;
+      }  // muon
+      else if (pid == reco::PFCandidate::gamma) {
+        ++pfcand_mult_gamma;
+      }  // photon
+      else if (pid == reco::PFCandidate::h0) {
+        ++pfcand_mult_h0;
+      }  // neutral hadron
+      else if (pid == reco::PFCandidate::h_HF) {
+        ++pfcand_mult_hHF;
+      }  // HF tower identified as a hadron
+      else if (pid == reco::PFCandidate::egamma_HF) {
+        ++pfcand_mult_egammaHF;
+      }  // HF tower identified as an EM particle
 
       h_pfcand_particleId_->Fill(pid + 0.5);
       h_pfcand_pt_->Fill(pfc.pt());
@@ -147,16 +159,16 @@ void PFCandidateHistogrammer<PFCandType>::analyze(const edm::Event& iEvent, cons
     h_pfcand_mult_h0_->Fill(pfcand_mult_h0);
     h_pfcand_mult_hHF_->Fill(pfcand_mult_hHF);
     h_pfcand_mult_egammaHF_->Fill(pfcand_mult_egammaHF);
-  }
-  else {
+  } else {
     edm::LogWarning("Input") << "invalid handle to input collection : " << pfCands_tag_.encode();
   }
 }
 
 template <typename PFCandType>
-void PFCandidateHistogrammer<PFCandType>::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void PFCandidateHistogrammer<PFCandType>::fillDescriptions(edm::ConfigurationDescriptions &descriptions) {
   edm::ParameterSetDescription desc;
-  desc.add<edm::InputTag>("src", edm::InputTag("particleFlow"))->setComment("edm::InputTag of PF candidates collection");
+  desc.add<edm::InputTag>("src", edm::InputTag("particleFlow"))
+      ->setComment("edm::InputTag of PF candidates collection");
   desc.add<std::string>("cut", "")->setComment("string selector for PF candidates collection");
   descriptions.add(defaultModuleLabel<PFCandidateHistogrammer<PFCandType>>(), desc);
 }

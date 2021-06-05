@@ -214,7 +214,8 @@ JMETriggerNTuple::JMETriggerNTuple(const edm::ParameterSet& iConfig)
   }
 
   if (consumeGenEventInfoProduct_) {
-    genEventInfoProductToken_ = this->consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("GenEventInfoProduct"));
+    genEventInfoProductToken_ =
+        this->consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("GenEventInfoProduct"));
   }
 
   if (consumePileupSummaryInfo_) {
@@ -856,21 +857,33 @@ void JMETriggerNTuple::analyze(const edm::Event& iEvent, const edm::EventSetup& 
         pileupInfo_BX0_numTrueInteractions_ = pileupInfo_i.getTrueNumInteractions();
         pileupInfo_BX0_numPUInteractions_ = pileupInfo_i.getPU_NumInteractions();
 
-        if(not pileupInfo_i.getPU_pT_hats().empty())
-          pileupInfo_BX0_max_pT_hats_ = *std::max_element(pileupInfo_i.getPU_pT_hats().begin(), pileupInfo_i.getPU_pT_hats().end());
+        if (not pileupInfo_i.getPU_pT_hats().empty())
+          pileupInfo_BX0_max_pT_hats_ =
+              *std::max_element(pileupInfo_i.getPU_pT_hats().begin(), pileupInfo_i.getPU_pT_hats().end());
 
-        for (uint idx=0; idx<=pileupInfo_i.getPU_pT_hats().size(); ++idx) {
-          auto const i_pThat = (idx == pileupInfo_i.getPU_pT_hats().size()) ? genEventInfo_qScale_ : pileupInfo_i.getPU_pT_hats().at(idx);
-          if(0. <= i_pThat and i_pThat < 20.) ++pileupInfo_BX0_n_pThat000to020_;
-          else if(20. <= i_pThat and i_pThat < 30.) ++pileupInfo_BX0_n_pThat020to030_;
-          else if(30. <= i_pThat and i_pThat < 50.) ++pileupInfo_BX0_n_pThat030to050_;
-          else if(50. <= i_pThat and i_pThat < 80.) ++pileupInfo_BX0_n_pThat050to080_;
-          else if(80. <= i_pThat and i_pThat < 120.) ++pileupInfo_BX0_n_pThat080to120_;
-          else if(120. <= i_pThat and i_pThat < 170.) ++pileupInfo_BX0_n_pThat120to170_;
-          else if(170. <= i_pThat and i_pThat < 300.) ++pileupInfo_BX0_n_pThat170to300_;
-          else if(300. <= i_pThat and i_pThat < 470.) ++pileupInfo_BX0_n_pThat300to470_;
-          else if(470. <= i_pThat and i_pThat < 600.) ++pileupInfo_BX0_n_pThat470to600_;
-          else if(600. <= i_pThat) ++pileupInfo_BX0_n_pThat600toInf_;
+        for (uint idx = 0; idx <= pileupInfo_i.getPU_pT_hats().size(); ++idx) {
+          auto const i_pThat = (idx == pileupInfo_i.getPU_pT_hats().size()) ? genEventInfo_qScale_
+                                                                            : pileupInfo_i.getPU_pT_hats().at(idx);
+          if (0. <= i_pThat and i_pThat < 20.)
+            ++pileupInfo_BX0_n_pThat000to020_;
+          else if (20. <= i_pThat and i_pThat < 30.)
+            ++pileupInfo_BX0_n_pThat020to030_;
+          else if (30. <= i_pThat and i_pThat < 50.)
+            ++pileupInfo_BX0_n_pThat030to050_;
+          else if (50. <= i_pThat and i_pThat < 80.)
+            ++pileupInfo_BX0_n_pThat050to080_;
+          else if (80. <= i_pThat and i_pThat < 120.)
+            ++pileupInfo_BX0_n_pThat080to120_;
+          else if (120. <= i_pThat and i_pThat < 170.)
+            ++pileupInfo_BX0_n_pThat120to170_;
+          else if (170. <= i_pThat and i_pThat < 300.)
+            ++pileupInfo_BX0_n_pThat170to300_;
+          else if (300. <= i_pThat and i_pThat < 470.)
+            ++pileupInfo_BX0_n_pThat300to470_;
+          else if (470. <= i_pThat and i_pThat < 600.)
+            ++pileupInfo_BX0_n_pThat470to600_;
+          else if (600. <= i_pThat)
+            ++pileupInfo_BX0_n_pThat600toInf_;
         }
       }
     }

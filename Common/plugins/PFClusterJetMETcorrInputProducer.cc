@@ -3,6 +3,7 @@
 #include "DataFormats/JetReco/interface/PFClusterJet.h"
 #include "PFClusterJetMETcorrInputProducerT.h"
 
-typedef PFClusterJetMETcorrInputProducerT<reco::PFClusterJet, JetCorrExtractorT<reco::PFClusterJet>> PFClusterJetMETcorrInputProducer;
+typedef PFClusterJetMETcorrInputProducerT<reco::PFClusterJet, JetCorrExtractorT<reco::PFClusterJet>>
+    PFClusterJetMETcorrInputProducer;
 
 DEFINE_FWK_MODULE(PFClusterJetMETcorrInputProducer);

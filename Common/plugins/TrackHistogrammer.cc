@@ -13,33 +13,31 @@
 #include <TH1D.h>
 
 class TrackHistogrammer : public edm::one::EDAnalyzer<edm::one::SharedResources> {
-
- public:
+public:
   explicit TrackHistogrammer(const edm::ParameterSet&);
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
- private:
+private:
   void analyze(const edm::Event&, const edm::EventSetup&) override;
 
   const edm::InputTag tracks_tag_;
   const edm::EDGetTokenT<reco::TrackCollection> tracks_token_;
 
-  TH1D *h_track_mult_ = nullptr;
-  TH1D *h_track_pt_ = nullptr;
-  TH1D *h_track_pt_2_ = nullptr;
-  TH1D *h_track_eta_ = nullptr;
-  TH1D *h_track_phi_ = nullptr;
+  TH1D* h_track_mult_ = nullptr;
+  TH1D* h_track_pt_ = nullptr;
+  TH1D* h_track_pt_2_ = nullptr;
+  TH1D* h_track_eta_ = nullptr;
+  TH1D* h_track_phi_ = nullptr;
 };
 
 TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
-  : tracks_tag_(iConfig.getParameter<edm::InputTag>("src"))
-  , tracks_token_(consumes<reco::TrackCollection>(tracks_tag_)) {
-
+    : tracks_tag_(iConfig.getParameter<edm::InputTag>("src")),
+      tracks_token_(consumes<reco::TrackCollection>(tracks_tag_)) {
   usesResource(TFileService::kSharedResource);
 
   edm::Service<TFileService> fs;
 
-  if(not fs){
+  if (not fs) {
     throw edm::Exception(edm::errors::Configuration, "TFileService is not registered in cfg file");
   }
 
@@ -50,19 +48,18 @@ TrackHistogrammer::TrackHistogrammer(const edm::ParameterSet& iConfig)
   h_track_phi_ = fs->make<TH1D>("track_phi", "track_phi", 600, -3., 3.);
 }
 
-void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void TrackHistogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
   auto const& tracks(iEvent.getHandle(tracks_token_));
 
-  if(tracks.isValid()){
+  if (tracks.isValid()) {
     h_track_mult_->Fill(tracks->size());
-    for(auto const& trk : *tracks){
+    for (auto const& trk : *tracks) {
       h_track_pt_->Fill(trk.pt());
       h_track_pt_2_->Fill(trk.pt());
       h_track_eta_->Fill(trk.eta());
       h_track_phi_->Fill(trk.phi());
     }
-  }
-  else {
+  } else {
     edm::LogWarning("Input") << "invalid handle to reco::TrackCollection : " << tracks_tag_.encode();
   }
 }
