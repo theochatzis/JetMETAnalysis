@@ -187,8 +187,6 @@ TString JetInfo::getConeSize(TString s) {
 
 //______________________________________________________________________________
 TString JetInfo::getJetType(TString s) {
-  if(s == "ak4puppiHLT") s = "ak4pfpuppiHLT";//!!
-  else if(s == "ak8puppiHLT") s = "ak8pfpuppiHLT";//!!
 
   TRegexp e2("[0-9][0-9]?"); //gets cone size
   TRegexp e3("l[0-9]"); //to get first l[0-9]
