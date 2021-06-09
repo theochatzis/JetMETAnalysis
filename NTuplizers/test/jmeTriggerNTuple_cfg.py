@@ -350,6 +350,9 @@ process.JMETriggerNTuple = cms.EDAnalyzer('JMETriggerNTuple',
     hltPFMET = cms.InputTag('hltPFMETProducer'),
     hltPFMETTypeOne = cms.InputTag('hltPFMETTypeOne'),
 
+    hltPFCHSMET = cms.InputTag('hltPFCHSMET'),
+    hltPFCHSMETTypeOne = cms.InputTag('hltPFCHSMETTypeOne'),
+
     hltPFPuppiMET = cms.InputTag('hltPFPuppiMET'),
     hltPFPuppiMETTypeOne = cms.InputTag('hltPFPuppiMETTypeOne'),
   ),
