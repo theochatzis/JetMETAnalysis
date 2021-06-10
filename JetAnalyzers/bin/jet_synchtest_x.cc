@@ -1242,9 +1242,9 @@ bool MatchEventsAndJets::FillHistograms(bool reduceHistograms) {
 
       vector<int> pdgid_indecies;
       if(tpu->refpdgid){
-        pdgid_indecies = JetInfo::getPDGIDIndecies(tpu->refpdgid->at(jpu));
-        if(tnopu->refpdgid)
-          diff_pdgid = tpu->refpdgid->at(jpu) - tnopu->refpdgid->at(jnopu);
+        //pdgid_indecies = JetInfo::getPDGIDIndecies(tpu->refpdgid->at(jpu));
+        //if(tnopu->refpdgid)
+        //  diff_pdgid = tpu->refpdgid->at(jpu) - tnopu->refpdgid->at(jnopu);
       }
 
       offset        = tpu->jtpt->at(jpu) - tnopu->jtpt->at(jnopu);
