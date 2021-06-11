@@ -17,12 +17,7 @@
 #include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
 #include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
-#if __has_include("xrootd/XrdCl/XrdClFileSystem.hh")
-#include "xrootd/XrdCl/XrdClFileSystem.hh"
-#define has_xrdcl 1
-#else
 #define has_xrdcl 0
-#endif
 
 #include "TROOT.h"
 #include "TSystem.h"
