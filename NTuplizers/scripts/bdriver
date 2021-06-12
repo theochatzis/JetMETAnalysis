@@ -73,6 +73,9 @@ if __name__ == '__main__':
    parser.add_argument('--name', dest='job_name', action='store', default=None,
                        help='name of batch job (HTCondor: "batch_name", SLURM: "--job-name") [default: basename of argument of "--output"]')
 
+   parser.add_argument('--customise-commands', dest='customise_commands', nargs='+', default=[],
+                       help='list of strings to be appended at the end of the final cmsRun configuration file')
+
    parser.add_argument('--submit', dest='submit', action='store_true', default=False,
                        help='submit job(s) on the batch system')
 
@@ -226,7 +229,7 @@ opts.register('skipEvents', 0,
 opts.register('output', 'out.root',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
-              'path to output ROOT file of PrimaryVertexAnalyzer4PU plugin')
+              'path to output file')
 
 opts.parseArguments()
 
@@ -242,10 +245,11 @@ process.source.fileNames = opts.inputFiles
 # input EDM files [secondary]
 process.source.secondaryFileNames = opts.secondaryInputFiles
 
-# output [TFileService]
-if hasattr(process, 'TFileService'):
-  process.TFileService.fileName = opts.output
+## output [TFileService]
+#if hasattr(process, 'TFileService'):
+#  process.TFileService.fileName = opts.output
 """
+       if opts.customise_commands: custom_str += '\n'+'\n'.join(opts.customise_commands)+'\n'
        cfg_file.write(custom_str.format(os.path.basename(__file__), str(datetime.datetime.now())))
 
    ### copy driver command
@@ -573,9 +577,3 @@ if hasattr(process, 'TFileService'):
        EXE('condor_submit '+SUBFILE_ABSPATH, suspend=False, verbose=(opts.verbosity > 0), dry_run=opts.dry_run)
      elif opts.batch_system == 'slurm':
        EXE('squeue ---array=0-'+str(jobCounter-1)+' '+EXEFILE_ABSPATH, suspend=False, verbose=(opts.verbosity > 0), dry_run=opts.dry_run)
-
-## TO-DOs
-##  * add info to stdout on the job memory usage (similarly to what is currently available for processing time)
-##  * include CI/CD workflow to validate changes
-##  * convert plugin to stream/global module (and move to TFileService?)
-##  * modernise plugin (e.g. getHandle, getData, fillDescription)
