@@ -13,4 +13,11 @@ cmsRun hltResults_cfg.py maxEvents=500 reco=HLT_Run3TRK output=tmp.root
 
 # submit jobs to the batch system
 bmonitor -i tmpout -r
+
+# when EDM outputs are available, write raw and pure counts of HLT paths to .json file
+./triggerResultsCounts.py \
+  -i tmpout/job_*/out_*.root \
+  -o tmp.json \
+  -l json_323775.txt \
+  -p MYHLT -v 10
 ```

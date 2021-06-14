@@ -29,6 +29,9 @@ if __name__ == '__main__':
    parser.add_argument('-l', '--lumi-json', dest='lumi_json', action='store', default=None,
                        help='path to file with dictionary of valid run:luminosityBlock values (.json format)')
 
+   parser.add_argument('-t', '--triggers-json', dest='triggers_json', action='store', default=None,
+                       help='path to file with list of HLT paths to be used for pure counts (.json format)')
+
    parser.add_argument('-p', '--processName', dest='processName', action='store', default='HLTX',
                        help='process name of edm::TriggerResults in EDM input file(s)')
 
@@ -61,6 +64,10 @@ if __name__ == '__main__':
    goodLSDict = None
    if opts.lumi_json is not None:
      goodLSDict = json.load(open(opts.lumi_json, 'r'))
+
+   triggersForPureCounts = None
+   if opts.triggers_json is not None:
+     triggersForPureCounts = json.load(open(opts.triggers_json, 'r'))
 
    rateDict = {}
    nEvents = 0
@@ -104,24 +111,28 @@ if __name__ == '__main__':
            name = str(name)
            if 'HLTriggerFirstPath' in name or 'HLTriggerFinalPath' in name: continue
            rateDict[runnbr][runls]['pathAcceptsRawAndPure'][name] = [0, 0]
-   
-       triggerCountsBool = {}
+
+       triggersFired = []
        triggerCounts = 0
        for triggerName in rateDict[runnbr][runls]['pathAcceptsRawAndPure']:
-         triggerCountsBool[triggerName] = False
          index = names.triggerIndex(triggerName)
          if index >= names.triggerNames().size(): raise RuntimeError(name)
-   
+
          if triggerBits.product().accept(index):
-           triggerCountsBool[triggerName] = True
-           if triggerName.startswith('HLT_'): triggerCounts += 1
-   
-       for trigger in rateDict[runnbr][runls]['pathAcceptsRawAndPure']:
-         if not triggerCountsBool[trigger]: continue
-         rateDict[runnbr][runls]['pathAcceptsRawAndPure'][trigger][0] += 1
-         if triggerCounts != 1 or not trigger.startswith('HLT_'): continue
-         rateDict[runnbr][runls]['pathAcceptsRawAndPure'][trigger][1] += 1
-   
+           triggersFired.append(triggerName)
+           if triggerName.startswith('HLT_'):
+             if triggersForPureCounts is None or triggerName in triggersForPureCounts:
+               triggerCounts += 1
+
+       for triggerName in rateDict[runnbr][runls]['pathAcceptsRawAndPure']:
+         if triggerName not in triggersFired: continue
+         rateDict[runnbr][runls]['pathAcceptsRawAndPure'][triggerName][0] += 1
+
+         if triggerName.startswith('HLT_IsoMu24_v'): print triggersFired, triggerCounts
+
+         if triggerCounts != 1 or not triggerName.startswith('HLT_'): continue
+         rateDict[runnbr][runls]['pathAcceptsRawAndPure'][triggerName][1] += 1
+
        rateDict[runnbr][runls]['numberOfEvents'] += 1
 
    if not opts.dry_run:
