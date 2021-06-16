@@ -19,5 +19,10 @@ bmonitor -i tmpout -r
   -i tmpout/job_*/out_*.root \
   -o tmp.json \
   -l json_323775.txt \
-  -p MYHLT -v 10
+  -p HLTX -v 10
+
+# print to stdout the rates of selected trigger paths
+./triggerRates.py \
+  -p 1100 -t 'HLT_PFJet*' 'HLT_PFHT*' 'HLT_PFMET*' \
+  -i tmp.json
 ```
