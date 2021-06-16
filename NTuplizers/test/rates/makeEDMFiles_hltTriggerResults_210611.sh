@@ -17,7 +17,7 @@ if [ -d ${ODIR} ]; then
 fi
 
 declare -A samplesMap
-samplesMap["Run2018D_EphemeralHLTPhysics1_RAW_run323775_ls53to62"]="${CMSSW_BASE}"/src/JMETriggerAnalysis/NTuplizers/test/rates/data/Run2018D_EphemeralHLTPhysics1_RAW_run323775_ls53to62.json
+samplesMap["Run2018D_EphemeralHLTPhysics1_RAW_run323775_ls52to151"]="${CMSSW_BASE}"/src/JMETriggerAnalysis/NTuplizers/test/rates/data/Run2018D_EphemeralHLTPhysics1_RAW_run323775_ls52to151.json
 
 recoKeys=(
   HLT_GRun_oldJECs
@@ -28,7 +28,7 @@ recoKeys=(
 
 for recoKey in "${recoKeys[@]}"; do
   python "${CMSSW_BASE}"/src/JMETriggerAnalysis/NTuplizers/test/rates/hltResults_cfg.py \
-    dumpPython=.tmp_${recoKey}_cfg.py numThreads=1 reco=${recoKey} output=out_0.root
+    dumpPython=.tmp_${recoKey}_cfg.py numThreads=1 reco=${recoKey}
 
   for sampleKey in ${!samplesMap[@]}; do
     sampleName=${samplesMap[${sampleKey}]}

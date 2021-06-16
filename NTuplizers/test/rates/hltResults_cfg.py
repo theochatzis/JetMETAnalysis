@@ -235,7 +235,7 @@ process.hltOutput = cms.OutputModule('PoolOutputModule',
   ),
   outputCommands = cms.untracked.vstring(
     'drop *',
-    'keep edmTriggerResults_*_*_MYHLT',
+    'keep edmTriggerResults_*_*_'+process.name_(),
   )
 )
 
@@ -298,6 +298,7 @@ if opts.verbosity > 0:
   print 'option: reco =', opts.reco
   print 'option: dumpPython =', opts.dumpPython
   print ''
+  print 'process.name_() =', process.name_()
   print 'process.GlobalTag =', process.GlobalTag.dumpPython()
   print 'process.source =', process.source.dumpPython()
   print 'process.maxEvents =', process.maxEvents.dumpPython()

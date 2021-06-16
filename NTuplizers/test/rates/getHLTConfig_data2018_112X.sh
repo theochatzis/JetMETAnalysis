@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OUTCFG="${CMSSW_BASE}"/src/JMETriggerAnalysis/Common/python/HLT_dev_CMSSW_11_2_0_GRun_V19_Data_NoOutput_configDump.py
+OUTCFG="${CMSSW_BASE}"/src/JMETriggerAnalysis/Common/python/configs/HLT_dev_CMSSW_11_2_0_GRun_V19_Data_NoOutput_configDump.py
 
 inputFiles=(
   # run=323775, ls=[53,62]
@@ -19,7 +19,7 @@ inputFiles=(
 printf -v inputFilesStr '%s,' "${inputFiles[@]}"
 
 hltGetConfiguration /dev/CMSSW_11_2_0/GRun/V19 --full --offline --no-output --data --process MYHLT --type GRun \
- --prescale 2.0e34+ZB+HLTPhysics --globaltag auto:run3_hlt_GRun --input "${inputFilesStr%,}" --max-events -1 \
+ --prescale 2.0e34+ZB+HLTPhysics --globaltag 112X_dataRun3_HLT_v4 --input "${inputFilesStr%,}" --max-events -1 \
  > .tmp.py
 
 edmConfigDump .tmp.py > "${OUTCFG}"
