@@ -1,4 +1,6 @@
 import fnmatch
+import os
+from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 
 ###
 ### command-line arguments
@@ -71,20 +73,27 @@ opts.parseArguments()
 ###
 ### HLT configuration
 ###
-if opts.reco == 'HLT_GRun':
+if opts.reco == 'HLT_GRun_oldJECs':
   from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  update_jmeCalibs = False
+
+elif opts.reco == 'HLT_GRun':
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  update_jmeCalibs = True
 
 elif opts.reco == 'HLT_Run3TRK':
   # (a) Run-3 tracking: standard
   from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
   from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
   process = customizeHLTRun3Tracking(process)
+  update_jmeCalibs = True
 
 elif opts.reco == 'HLT_Run3TRKWithPU':
   # (b) Run-3 tracking: all pixel vertices
   from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
   from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
   process = customizeHLTRun3TrackingAllPixelVertices(process)
+  update_jmeCalibs = True
 
 else:
   raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
@@ -160,79 +169,117 @@ process = addPaths_MC_JMEPF(process)
 process = addPaths_MC_JMEPFCHS(process)
 process = addPaths_MC_JMEPFPuppi(process)
 
-## ES modules for PF-Hadron Calibrations
-import os
-from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
-process.pfhcESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
-  toGet = cms.VPSet(
-    cms.PSet(
-      record = cms.string('PFCalibrationRcd'),
-      tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
-      label = cms.untracked.string('HLT'),
+if update_jmeCalibs:
+  ## ES modules for PF-Hadron Calibrations
+  process.pfhcESSource = cms.ESSource('PoolDBESSource',
+    _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+    toGet = cms.VPSet(
+      cms.PSet(
+        record = cms.string('PFCalibrationRcd'),
+        tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
+        label = cms.untracked.string('HLT'),
+      ),
     ),
-  ),
-)
-process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
-#process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
+  )
+  process.pfhcESPrefer = cms.ESPrefer('PoolDBESSource', 'pfhcESSource')
+  #process.hltParticleFlow.calibrationsLabel = '' # standard label for Offline-PFHC in GT
 
-## ES modules for HLT JECs
-process.jescESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db'),
-  toGet = cms.VPSet(
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4CaloHLT'),
-      label = cms.untracked.string('AK4CaloHLT'),
+  ## ES modules for HLT JECs
+  process.jescESSource = cms.ESSource('PoolDBESSource',
+    _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db'),
+    toGet = cms.VPSet(
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4CaloHLT'),
+        label = cms.untracked.string('AK4CaloHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFClusterHLT'),
+        label = cms.untracked.string('AK4PFClusterHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),
+        label = cms.untracked.string('AK4PFHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),#!!
+        label = cms.untracked.string('AK4PFchsHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFPuppiHLT'),
+        label = cms.untracked.string('AK4PFPuppiHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8CaloHLT'),
+        label = cms.untracked.string('AK8CaloHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFClusterHLT'),
+        label = cms.untracked.string('AK8PFClusterHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),
+        label = cms.untracked.string('AK8PFHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),#!!
+        label = cms.untracked.string('AK8PFchsHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFPuppiHLT'),
+        label = cms.untracked.string('AK8PFPuppiHLT'),
+      ),
     ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFClusterHLT'),
-      label = cms.untracked.string('AK4PFClusterHLT'),
+  )
+  process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
+
+else:
+  ## ES modules for HLT JECs
+  process.jescESSource = cms.ESSource('PoolDBESSource',
+    _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db'),
+    toGet = cms.VPSet(
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFClusterHLT'),
+        label = cms.untracked.string('AK4PFClusterHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),#!!
+        label = cms.untracked.string('AK4PFchsHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFPuppiHLT'),
+        label = cms.untracked.string('AK4PFPuppiHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFClusterHLT'),
+        label = cms.untracked.string('AK8PFClusterHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),#!!
+        label = cms.untracked.string('AK8PFchsHLT'),
+      ),
+      cms.PSet(
+        record = cms.string('JetCorrectionsRecord'),
+        tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFPuppiHLT'),
+        label = cms.untracked.string('AK8PFPuppiHLT'),
+      ),
     ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),
-      label = cms.untracked.string('AK4PFHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFHLT'),#!!
-      label = cms.untracked.string('AK4PFchsHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK4PFPuppiHLT'),
-      label = cms.untracked.string('AK4PFPuppiHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8CaloHLT'),
-      label = cms.untracked.string('AK8CaloHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFClusterHLT'),
-      label = cms.untracked.string('AK8PFClusterHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),
-      label = cms.untracked.string('AK8PFHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFHLT'),#!!
-      label = cms.untracked.string('AK8PFchsHLT'),
-    ),
-    cms.PSet(
-      record = cms.string('JetCorrectionsRecord'),
-      tag = cms.string('JetCorrectorParametersCollection_Run3Winter20_V2_MC_AK8PFPuppiHLT'),
-      label = cms.untracked.string('AK8PFPuppiHLT'),
-    ),
-  ),
-)
-process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
+  )
+  process.jescESPrefer = cms.ESPrefer('PoolDBESSource', 'jescESSource')
 
 ## Output NTuple
 process.TFileService = cms.Service('TFileService', fileName = cms.string(opts.output))
