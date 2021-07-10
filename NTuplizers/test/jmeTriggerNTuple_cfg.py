@@ -43,7 +43,7 @@ opts.register('wantSummary', False,
 #              vpo.VarParsing.varType.string,
 #              'argument of process.GlobalTag.globaltag')
 
-opts.register('reco', 'HLT_GRun',
+opts.register('reco', 'HLT_Run3TRK',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword to define HLT reconstruction')
@@ -74,25 +74,25 @@ opts.parseArguments()
 ### HLT configuration
 ###
 if opts.reco == 'HLT_GRun_oldJECs':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
   update_jmeCalibs = False
 
 elif opts.reco == 'HLT_GRun':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
   update_jmeCalibs = True
 
 elif opts.reco == 'HLT_Run3TRK':
   # (a) Run-3 tracking: standard
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-  process = customizeHLTRun3Tracking(process)
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+  process = customizeHLTforRun3Tracking(process)
   update_jmeCalibs = True
 
 elif opts.reco == 'HLT_Run3TRKWithPU':
   # (b) Run-3 tracking: all pixel vertices
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
-  process = customizeHLTRun3TrackingAllPixelVertices(process)
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3TrackingAllPixelVertices
+  process = customizeHLTforRun3TrackingAllPixelVertices(process)
   update_jmeCalibs = True
 
 else:
@@ -104,7 +104,7 @@ for _modname in process.outputModules_():
     if type(_mod) == cms.OutputModule:
        process.__delattr__(_modname)
        if opts.verbosity > 0:
-          print '> removed cms.OutputModule:', _modname
+          print('> removed cms.OutputModule:', _modname)
 
 # remove cms.EndPath objects from HLT config-dump
 for _modname in process.endpaths_():
@@ -112,12 +112,12 @@ for _modname in process.endpaths_():
     if type(_mod) == cms.EndPath:
        process.__delattr__(_modname)
        if opts.verbosity > 0:
-          print '> removed cms.EndPath:', _modname
+          print('> removed cms.EndPath:', _modname)
 
 # remove selected cms.Path objects from HLT config-dump
-print '-'*108
-print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
-print '-'*108
+print('-'*108)
+print('{:<99} | {:<4} |'.format('cms.Path', 'keep'))
+print('-'*108)
 
 # list of patterns to determine paths to keep
 keepPaths = [
@@ -131,6 +131,10 @@ keepPaths = [
   'HLT_PFMET*_PFMHT*_v*',
 ]
 
+vetoPaths = [
+  'HLT_*ForPPRef_v*',
+]
+
 # list of paths that are kept
 listOfPaths = []
 
@@ -139,15 +143,22 @@ for _modname in sorted(process.paths_()):
     for _tmpPatt in keepPaths:
       _keepPath = fnmatch.fnmatch(_modname, _tmpPatt)
       if _keepPath: break
+
     if _keepPath:
-      print '{:<99} | {:<4} |'.format(_modname, '+')
+      for _tmpPatt in vetoPaths:
+        if fnmatch.fnmatch(_modname, _tmpPatt):
+          _keepPath = False
+          break
+
+    if _keepPath:
+      print('{:<99} | {:<4} |'.format(_modname, '+'))
       listOfPaths.append(_modname)
       continue
     _mod = getattr(process, _modname)
     if type(_mod) == cms.Path:
       process.__delattr__(_modname)
-      print '{:<99} | {:<4} |'.format(_modname, '')
-print '-'*108
+      print('{:<99} | {:<4} |'.format(_modname, ''))
+print('-'*108)
 
 # remove FastTimerService
 if hasattr(process, 'FastTimerService'):
@@ -510,14 +521,14 @@ if opts.dumpPython is not None:
 
 # printouts
 if opts.verbosity > 0:
-   print '--- jmeTriggerNTuple_cfg.py ---'
-   print ''
-   print 'option: output =', opts.output
-   print 'option: reco =', opts.reco
-   print 'option: dumpPython =', opts.dumpPython
-   print ''
-   print 'process.GlobalTag =', process.GlobalTag.dumpPython()
-   print 'process.source =', process.source.dumpPython()
-   print 'process.maxEvents =', process.maxEvents.dumpPython()
-   print 'process.options =', process.options.dumpPython()
-   print '-------------------------------'
+   print('--- jmeTriggerNTuple_cfg.py ---')
+   print('')
+   print('option: output =', opts.output)
+   print('option: reco =', opts.reco)
+   print('option: dumpPython =', opts.dumpPython)
+   print('')
+   print('process.GlobalTag =', process.GlobalTag.dumpPython())
+   print('process.source =', process.source.dumpPython())
+   print('process.maxEvents =', process.maxEvents.dumpPython())
+   print('process.options =', process.options.dumpPython())
+   print('-------------------------------')
