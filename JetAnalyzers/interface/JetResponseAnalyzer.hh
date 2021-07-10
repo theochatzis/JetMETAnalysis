@@ -42,7 +42,7 @@
 
 #include "JetMETCorrections/Objects/interface/JetCorrector.h"
 
-#include "SimDataFormats/JetMatching/interface/JetMatchedPartons.h"
+#include "DataFormats/JetMatching/interface/JetMatchedPartons.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 
