@@ -22,12 +22,10 @@ please ignore this `readme`, and follow the instructions in the dedicated `readm
 cmsrel CMSSW_12_0_0_pre4
 cd CMSSW_12_0_0_pre4/src
 cmsenv
-git cms-addpkg HLTrigger/Configuration
-git cms-addpkg CommonTools/RecoAlgos
-git cms-remote add mmasciov
-git fetch mmasciov
-git diff a0c27eab5ee^^ a0c27eab5ee | git apply
-git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
+git cms-merge-topic missirol:devel_hltRun3TRK_1200pre4
+
+git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3_devel
+git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b devel_hlt2
 
 # external data
 mkdir -p ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data
@@ -39,8 +37,6 @@ cp /afs/cern.ch/work/m/missirol/public/run3/PFHC/PFHC_Run3Winter20_HLT_v01.db \
 # JESC: preliminary HLT-JESCs for Run-3
 cp /afs/cern.ch/work/m/missirol/public/run3/JESC/Run3Winter20_V2_MC/Run3Winter20_V2_MC.db \
    ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data/JESC_Run3Winter20_V2_MC.db
-
-git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b run3_jrantuples
 
 scram b -j 12
 ```

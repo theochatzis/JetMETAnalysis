@@ -12,8 +12,4 @@
 scram project CMSSW_12_0_0_pre4
 cd CMSSW_12_0_0_pre4/src
 eval `scram runtime -sh`
-git cms-addpkg HLTrigger/Configuration
-git cms-addpkg CommonTools/RecoAlgos
-git cms-remote add mmasciov
-git fetch mmasciov
-git diff a0c27eab5ee^^ a0c27eab5ee | git apply
+git cms-merge-topic missirol:devel_hltRun3TRK_1200pre4
