@@ -9,8 +9,8 @@
 #include "DataFormats/L1TGlobal/interface/GlobalLogicParser.h"
 #include "HLTrigger/HLTcore/interface/HLTPrescaleProvider.h"
 
-#include <iostream>
-#define LogTrace(X) std::cout << std::endl
+//#include <iostream>
+//#define LogTrace(X) std::cout << std::endl
 
 class TriggerFlagsProducer : public edm::stream::EDProducer<> {
 public:

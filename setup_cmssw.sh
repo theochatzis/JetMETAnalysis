@@ -9,10 +9,11 @@
 #  - do not compile with scram inside this script
 #
 
-scram project CMSSW_11_2_0_Patatrack
-cd CMSSW_11_2_0_Patatrack/src
+scram project CMSSW_12_0_0_pre4
+cd CMSSW_12_0_0_pre4/src
 eval `scram runtime -sh`
-
-git cms-merge-topic missirol:devel_1120pa_kineParticleFilter -u
-git cms-merge-topic missirol:devel_puppiPUProxy_1120patatrack -u
-git cms-merge-topic mmasciov:tracking-allPVs -u
+git cms-addpkg HLTrigger/Configuration
+git cms-addpkg CommonTools/RecoAlgos
+git cms-remote add mmasciov
+git fetch mmasciov
+git diff a0c27eab5ee^^ a0c27eab5ee | git apply
