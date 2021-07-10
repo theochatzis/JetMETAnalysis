@@ -214,36 +214,40 @@ def addPaths_MC_JMEPFCluster(process):
       srcCorrections = cms.VInputTag('hltPFClusterMETCorrection:type1'),
     )
 
+    process.hltPFClusterJMETask = cms.Task(
+      ## AK4 Jets
+      process.hltAK4PFClusterJets,
+      process.hltFixedGridRhoFastjetAllPFCluster,
+      process.hltAK4PFClusterJetCorrectorL1,
+      process.hltAK4PFClusterJetCorrectorL2,
+      process.hltAK4PFClusterJetCorrectorL3,
+      process.hltAK4PFClusterJetCorrector,
+      process.hltAK4PFClusterJetsCorrected,
+      ## AK8 Jets
+      process.hltAK8PFClusterJets,
+      process.hltAK8PFClusterJetCorrectorL1,
+      process.hltAK8PFClusterJetCorrectorL2,
+      process.hltAK8PFClusterJetCorrectorL3,
+      process.hltAK8PFClusterJetCorrector,
+      process.hltAK8PFClusterJetsCorrected,
+      ## MET
+      process.hltPFClusterMET,
+      ## MET Type-1
+      process.hltPFClusterMETCorrection,
+      process.hltPFClusterMETTypeOne,
+    )
+
     process.MC_JMEPFCluster_v1 = cms.Path(
         process.HLTBeginSequence
       + process.hltPreMCJMEPFCluster
       + process.HLTParticleFlowClusterSequence
       + process.HLTParticleFlowClusterRefsSequence
-      ## AK4 Jets
-      + process.hltAK4PFClusterJets
-      + process.hltFixedGridRhoFastjetAllPFCluster
-      + process.hltAK4PFClusterJetCorrectorL1
-      + process.hltAK4PFClusterJetCorrectorL2
-      + process.hltAK4PFClusterJetCorrectorL3
-      + process.hltAK4PFClusterJetCorrector
-      + process.hltAK4PFClusterJetsCorrected
-      ## AK8 Jets
-      + process.hltAK8PFClusterJets
-      + process.hltAK8PFClusterJetCorrectorL1
-      + process.hltAK8PFClusterJetCorrectorL2
-      + process.hltAK8PFClusterJetCorrectorL3
-      + process.hltAK8PFClusterJetCorrector
-      + process.hltAK8PFClusterJetsCorrected
-      ## MET
-      + process.hltPFClusterMET
-      ## MET Type-1
-      + process.hltPFClusterMETCorrection
-      + process.hltPFClusterMETTypeOne
-      + process.HLTEndSequence
+      + process.HLTEndSequence,
+      process.hltPFClusterJMETask,
     )
 
     if process.schedule_():
-       process.schedule_().append(process.MC_JMEPFCluster_v1)
+      process.schedule_().append(process.MC_JMEPFCluster_v1)
 
     return process
 
@@ -332,13 +336,13 @@ def addPaths_MC_JMEPFCHS(process):
       correctors = cms.VInputTag('hltAK4PFCHSJetCorrector'),
     )
 
-    process.HLTAK4PFCHSJetsSequence = cms.Sequence(
-        process.hltAK4PFCHSJets
-      + process.hltAK4PFCHSJetCorrectorL1
-      + process.hltAK4PFCHSJetCorrectorL2
-      + process.hltAK4PFCHSJetCorrectorL3
-      + process.hltAK4PFCHSJetCorrector
-      + process.hltAK4PFCHSJetsCorrected
+    process.HLTAK4PFCHSJetsTask = cms.Task(
+      process.hltAK4PFCHSJets,
+      process.hltAK4PFCHSJetCorrectorL1,
+      process.hltAK4PFCHSJetCorrectorL2,
+      process.hltAK4PFCHSJetCorrectorL3,
+      process.hltAK4PFCHSJetCorrector,
+      process.hltAK4PFCHSJetsCorrected,
     )
 
     ## AK8
@@ -373,16 +377,16 @@ def addPaths_MC_JMEPFCHS(process):
       correctors = cms.VInputTag('hltAK8PFCHSJetCorrector'),
     )
 
-    process.HLTAK8PFCHSJetsSequence = cms.Sequence(
-        process.hltAK8PFCHSJets
-      + process.hltAK8PFCHSJetCorrectorL1
-      + process.hltAK8PFCHSJetCorrectorL2
-      + process.hltAK8PFCHSJetCorrectorL3
-      + process.hltAK8PFCHSJetCorrector
-      + process.hltAK8PFCHSJetsCorrected
+    process.HLTAK8PFCHSJetsTask = cms.Task(
+      process.hltAK8PFCHSJets,
+      process.hltAK8PFCHSJetCorrectorL1,
+      process.hltAK8PFCHSJetCorrectorL2,
+      process.hltAK8PFCHSJetCorrectorL3,
+      process.hltAK8PFCHSJetCorrector,
+      process.hltAK8PFCHSJetsCorrected,
     )
 
-    ## MET: CHS
+    ## MET
     process.hltParticleFlowCHS = cms.EDProducer('FwdPtrRecoPFCandidateConverter',
       src = process.hltAK4PFCHSJets.src,
     )
@@ -413,11 +417,11 @@ def addPaths_MC_JMEPFCHS(process):
     )
 
     ## Sequence: MET CHS
-    process.HLTPFCHSMETSequence = cms.Sequence(
-        process.hltParticleFlowCHS
-      + process.hltPFCHSMET
-      + process.hltPFCHSMETCorrection
-      + process.hltPFCHSMETTypeOne
+    process.HLTPFCHSMETTask = cms.Task(
+      process.hltParticleFlowCHS,
+      process.hltPFCHSMET,
+      process.hltPFCHSMETCorrection,
+      process.hltPFCHSMETTypeOne,
     )
 
     ## Path
@@ -425,14 +429,14 @@ def addPaths_MC_JMEPFCHS(process):
         process.HLTBeginSequence
       + process.hltPreMCJMEPFCHS
       + process.HLTPFCHSSequence
-      + process.HLTAK4PFCHSJetsSequence
-      + process.HLTAK8PFCHSJetsSequence
-      + process.HLTPFCHSMETSequence
-      + process.HLTEndSequence
+      + process.HLTEndSequence,
+      process.HLTAK4PFCHSJetsTask,
+      process.HLTAK8PFCHSJetsTask,
+      process.HLTPFCHSMETTask,
     )
 
     if process.schedule_():
-       process.schedule_().append(process.MC_JMEPFCHS_v1)
+      process.schedule_().append(process.MC_JMEPFCHS_v1)
 
     return process
 
@@ -499,13 +503,13 @@ def addPaths_MC_JMEPFPuppi(process):
       correctors = cms.VInputTag('hltAK4PFPuppiJetCorrector'),
     )
 
-    process.HLTAK4PFPuppiJetsSequence = cms.Sequence(
-        process.hltAK4PFPuppiJets
-      + process.hltAK4PFPuppiJetCorrectorL1
-      + process.hltAK4PFPuppiJetCorrectorL2
-      + process.hltAK4PFPuppiJetCorrectorL3
-      + process.hltAK4PFPuppiJetCorrector
-      + process.hltAK4PFPuppiJetsCorrected
+    process.HLTAK4PFPuppiJetsTask = cms.Task(
+      process.hltAK4PFPuppiJets,
+      process.hltAK4PFPuppiJetCorrectorL1,
+      process.hltAK4PFPuppiJetCorrectorL2,
+      process.hltAK4PFPuppiJetCorrectorL3,
+      process.hltAK4PFPuppiJetCorrector,
+      process.hltAK4PFPuppiJetsCorrected,
     )
 
     ## AK8
@@ -544,13 +548,13 @@ def addPaths_MC_JMEPFPuppi(process):
       correctors = cms.VInputTag('hltAK8PFPuppiJetCorrector'),
     )
 
-    process.HLTAK8PFPuppiJetsSequence = cms.Sequence(
-        process.hltAK8PFPuppiJets
-      + process.hltAK8PFPuppiJetCorrectorL1
-      + process.hltAK8PFPuppiJetCorrectorL2
-      + process.hltAK8PFPuppiJetCorrectorL3
-      + process.hltAK8PFPuppiJetCorrector
-      + process.hltAK8PFPuppiJetsCorrected
+    process.HLTAK8PFPuppiJetsTask = cms.Task(
+      process.hltAK8PFPuppiJets,
+      process.hltAK8PFPuppiJetCorrectorL1,
+      process.hltAK8PFPuppiJetCorrectorL2,
+      process.hltAK8PFPuppiJetCorrectorL3,
+      process.hltAK8PFPuppiJetCorrector,
+      process.hltAK8PFPuppiJetsCorrected,
     )
 
     ## MET
@@ -569,11 +573,6 @@ def addPaths_MC_JMEPFPuppi(process):
       parameters = cms.PSet(),
       src = cms.InputTag('hltParticleFlow'),
       srcWeights = cms.InputTag('hltPFPuppiNoLep'),
-    )
-
-    process.HLTPFPuppiMETSequence = cms.Sequence(
-        process.hltPFPuppiNoLep
-      + process.hltPFPuppiMET
     )
 
     ## MET Type-1
@@ -595,6 +594,13 @@ def addPaths_MC_JMEPFPuppi(process):
       srcCorrections = cms.VInputTag('hltPFPuppiMETCorrection:type1'),
     )
 
+    process.HLTPFPuppiMETTask = cms.Task(
+      process.hltPFPuppiNoLep,
+      process.hltPFPuppiMET,
+      process.hltPFPuppiMETCorrection,
+      process.hltPFPuppiMETTypeOne,
+    )
+
     ## Modifications to PUPPI parameters
     for mod_i in [process.hltPFPuppi, process.hltPFPuppiNoLep]:
       for algo_idx in range(len(mod_i.algos)):
@@ -609,19 +615,14 @@ def addPaths_MC_JMEPFPuppi(process):
     process.MC_JMEPFPuppi_v1 = cms.Path(
         process.HLTBeginSequence
       + process.hltPreMCJMEPFPuppi
-      ## AK{4,8} Jets
       + process.HLTPFPuppiSequence
-      + process.HLTAK4PFPuppiJetsSequence
-      + process.HLTAK8PFPuppiJetsSequence
-      ## MET
-      + process.HLTPFPuppiMETSequence
-      ## MET Type-1
-      + process.hltPFPuppiMETCorrection
-      + process.hltPFPuppiMETTypeOne
-      + process.HLTEndSequence
+      + process.HLTEndSequence,
+      process.HLTAK4PFPuppiJetsTask,
+      process.HLTAK8PFPuppiJetsTask,
+      process.HLTPFPuppiMETTask,
     )
 
     if process.schedule_():
-       process.schedule_().append(process.MC_JMEPFPuppi_v1)
+      process.schedule_().append(process.MC_JMEPFPuppi_v1)
 
     return process
