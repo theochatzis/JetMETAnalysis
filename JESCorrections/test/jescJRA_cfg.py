@@ -41,7 +41,7 @@ opts.register('wantSummary', False,
 #              vpo.VarParsing.varType.string,
 #              'argument of process.GlobalTag.globaltag')
 
-opts.register('reco', 'HLT_GRun',
+opts.register('reco', 'HLT_Run3TRK',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword to define HLT reconstruction')
@@ -62,19 +62,19 @@ opts.parseArguments()
 ### HLT configuration
 ###
 if opts.reco == 'HLT_GRun':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
 
 elif opts.reco == 'HLT_Run3TRK':
   # (a) Run-3 tracking: standard
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3Tracking
-  process = customizeHLTRun3Tracking(process)
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+  process = customizeHLTforRun3Tracking(process)
 
 elif opts.reco == 'HLT_Run3TRKWithPU':
   # (b) Run-3 tracking: all pixel vertices
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_2_0_GRun_V19_configDump import cms, process
-  from HLTrigger.Configuration.customizeHLTRun3Tracking import customizeHLTRun3TrackingAllPixelVertices
-  process = customizeHLTRun3TrackingAllPixelVertices(process)
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3TrackingAllPixelVertices
+  process = customizeHLTforRun3TrackingAllPixelVertices(process)
 
 else:
   raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
@@ -85,7 +85,7 @@ for _modname in process.outputModules_():
   if type(_mod) == cms.OutputModule:
     process.__delattr__(_modname)
     if opts.verbosity > 0:
-      print '> removed cms.OutputModule:', _modname
+      print('> removed cms.OutputModule:', _modname)
 
 # remove cms.EndPath objects from HLT config-dump
 for _modname in process.endpaths_():
@@ -93,14 +93,14 @@ for _modname in process.endpaths_():
   if type(_mod) == cms.EndPath:
     process.__delattr__(_modname)
     if opts.verbosity > 0:
-      print '> removed cms.EndPath:', _modname
+      print('> removed cms.EndPath:', _modname)
 
 # remove selected cms.Path objects from HLT config-dump
-print '-'*108
-print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
-print '-'*108
+print('-'*108)
+print('{:<99} | {:<4} |'.format('cms.Path', 'keep'))
+print('-'*108)
 
-# list of patterns to determine paths to keep
+# list of patterns to determine which paths to keep
 keepPaths = [
   'MC_*Jets*',
   'MC_*AK8Calo*',
@@ -112,13 +112,13 @@ for _modname in sorted(process.paths_()):
     _keepPath = fnmatch.fnmatch(_modname, _tmpPatt)
     if _keepPath: break
   if _keepPath:
-    print '{:<99} | {:<4} |'.format(_modname, '+')
+    print('{:<99} | {:<4} |'.format(_modname, '+'))
     continue
   _mod = getattr(process, _modname)
   if type(_mod) == cms.Path:
     process.__delattr__(_modname)
-    print '{:<99} | {:<4} |'.format(_modname, '')
-print '-'*108
+    print('{:<99} | {:<4} |'.format(_modname, ''))
+print('-'*108)
 
 # remove FastTimerService
 if hasattr(process, 'FastTimerService'):
@@ -140,6 +140,7 @@ process = addPaths_MC_JMEPFPuppi(process)
 
 ## ES modules for PF-Hadron Calibrations
 import os
+
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 process.pfhcESSource = cms.ESSource('PoolDBESSource',
   _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
@@ -221,14 +222,14 @@ if opts.dumpPython is not None:
 
 # printouts
 if opts.verbosity > 0:
-   print '--- jescJRA_cfg.py ---'
-   print ''
-   print 'option: output =', opts.output
-   print 'option: reco =', opts.reco
-   print 'option: dumpPython =', opts.dumpPython
-   print ''
-   print 'process.GlobalTag =', process.GlobalTag.dumpPython()
-   print 'process.source =', process.source.dumpPython()
-   print 'process.maxEvents =', process.maxEvents.dumpPython()
-   print 'process.options =', process.options.dumpPython()
-   print '----------------------'
+   print('--- jescJRA_cfg.py ---')
+   print('')
+   print('option: output =', opts.output)
+   print('option: reco =', opts.reco)
+   print('option: dumpPython =', opts.dumpPython)
+   print('')
+   print('process.GlobalTag =', process.GlobalTag.dumpPython())
+   print('process.source =', process.source.dumpPython())
+   print('process.maxEvents =', process.maxEvents.dumpPython())
+   print('process.options =', process.options.dumpPython())
+   print('----------------------')

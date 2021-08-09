@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-hltGetConfiguration /dev/CMSSW_11_3_0/GRun/V14 \
+hltGetConfiguration /dev/CMSSW_12_0_0/HLT/V4 \
  --full \
  --offline \
  --unprescale \
@@ -11,5 +11,5 @@ hltGetConfiguration /dev/CMSSW_11_3_0/GRun/V14 \
  --max-events 10 \
  > tmp.py
 
-edmConfigDump tmp.py > ${CMSSW_BASE}/src/JMETriggerAnalysis/Common/python/configs/HLT_dev_CMSSW_11_3_0_GRun_V14_configDump.py
+edmConfigDump tmp.py > ${CMSSW_BASE}/src/JMETriggerAnalysis/Common/python/configs/HLT_dev_CMSSW_12_0_0_HLT_V4_configDump.py
 rm -f tmp.py
