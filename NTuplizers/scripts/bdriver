@@ -244,10 +244,6 @@ process.source.fileNames = opts.inputFiles
 
 # input EDM files [secondary]
 process.source.secondaryFileNames = opts.secondaryInputFiles
-
-## output [TFileService]
-#if hasattr(process, 'TFileService'):
-#  process.TFileService.fileName = opts.output
 """
        if opts.customise_commands: custom_str += '\n'+'\n'.join(opts.customise_commands)+'\n'
        cfg_file.write(custom_str.format(os.path.basename(__file__), str(datetime.datetime.now())))
