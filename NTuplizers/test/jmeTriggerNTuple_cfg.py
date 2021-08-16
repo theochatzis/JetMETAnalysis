@@ -1,5 +1,6 @@
-import fnmatch
 import os
+import fnmatch
+
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 
 ###
