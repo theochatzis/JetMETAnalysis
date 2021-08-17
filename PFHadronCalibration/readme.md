@@ -12,10 +12,11 @@ used in the High-Level Trigger (HLT).
 
 Instructions to set up the local CMSSW area:
 ```
-scram project CMSSW CMSSW_11_3_1_patch1
-cd CMSSW_11_3_1_patch1/src
+scram project CMSSW_12_0_0_pre4
+cd CMSSW_12_0_0_pre4/src
 eval `scram runtime -sh`
-git cms-init
+git cms-merge-topic missirol:devel_hltRun3TRK_1200pre4
+
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 scram b -j 8
 ```

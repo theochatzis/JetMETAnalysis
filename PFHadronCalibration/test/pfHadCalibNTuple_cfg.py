@@ -24,7 +24,7 @@ opts.register('dumpPython', None,
               vpo.VarParsing.varType.string,
               'path to python file with content of cms.Process')
 
-opts.register('reco', 'HLT_GRun',
+opts.register('reco', 'HLT_Run3TRK',
               vpo.VarParsing.multiplicity.singleton,
               vpo.VarParsing.varType.string,
               'keyword to define HLT reconstruction')
@@ -45,7 +45,19 @@ opts.parseArguments()
 ### HLT configuration
 ###
 if opts.reco == 'HLT_GRun':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_11_3_0_GRun_V14_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+
+elif opts.reco == 'HLT_Run3TRK':
+  # (a) Run-3 tracking: standard
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
+  process = customizeHLTforRun3Tracking(process)
+
+elif opts.reco == 'HLT_Run3TRKWithPU':
+  # (b) Run-3 tracking: all pixel vertices
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3TrackingAllPixelVertices
+  process = customizeHLTforRun3TrackingAllPixelVertices(process)
 
 else:
   raise RuntimeError('keyword "reco = '+opts.reco+'" not recognised')
@@ -56,7 +68,7 @@ for _modname in process.outputModules_():
   if type(_mod) == cms.OutputModule:
     process.__delattr__(_modname)
     if opts.verbosity > 0:
-      print '> removed cms.OutputModule:', _modname
+      print('> removed cms.OutputModule:', _modname)
 
 # remove cms.EndPath objects from HLT config-dump
 for _modname in process.endpaths_():
@@ -64,23 +76,23 @@ for _modname in process.endpaths_():
     if type(_mod) == cms.EndPath:
        process.__delattr__(_modname)
        if opts.verbosity > 0:
-          print '> removed cms.EndPath:', _modname
+          print('> removed cms.EndPath:', _modname)
 
 # remove selected cms.Path objects from HLT config-dump
-print '-'*108
-print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
-print '-'*108
+print('-'*108)
+print('{:<99} | {:<4} |'.format('cms.Path', 'keep'))
+print('-'*108)
 for _modname in sorted(process.paths_()):
   _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
   _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
   if _keepPath:
-    print '{:<99} | {:<4} |'.format(_modname, '+')
+    print('{:<99} | {:<4} |'.format(_modname, '+'))
     continue
   _mod = getattr(process, _modname)
   if type(_mod) == cms.Path:
     process.__delattr__(_modname)
-    print '{:<99} | {:<4} |'.format(_modname, '')
-print '-'*108
+    print('{:<99} | {:<4} |'.format(_modname, ''))
+print('-'*108)
 
 # remove FastTimerService
 del process.FastTimerService
