@@ -68,7 +68,7 @@ for _modname in process.outputModules_():
   if type(_mod) == cms.OutputModule:
     process.__delattr__(_modname)
     if opts.verbosity > 0:
-      print '> removed cms.OutputModule:', _modname
+      print('> removed cms.OutputModule:', _modname)
 
 # remove cms.EndPath objects from HLT config-dump
 for _modname in process.endpaths_():
@@ -76,23 +76,23 @@ for _modname in process.endpaths_():
     if type(_mod) == cms.EndPath:
        process.__delattr__(_modname)
        if opts.verbosity > 0:
-          print '> removed cms.EndPath:', _modname
+          print('> removed cms.EndPath:', _modname)
 
 # remove selected cms.Path objects from HLT config-dump
-print '-'*108
-print '{:<99} | {:<4} |'.format('cms.Path', 'keep')
-print '-'*108
+print('-'*108)
+print('{:<99} | {:<4} |'.format('cms.Path', 'keep'))
+print('-'*108)
 for _modname in sorted(process.paths_()):
   _keepPath = _modname.startswith('MC_') and ('Jets' in _modname or 'MET' in _modname)
   _keepPath |= _modname.startswith('MC_ReducedIterativeTracking')
   if _keepPath:
-    print '{:<99} | {:<4} |'.format(_modname, '+')
+    print('{:<99} | {:<4} |'.format(_modname, '+'))
     continue
   _mod = getattr(process, _modname)
   if type(_mod) == cms.Path:
     process.__delattr__(_modname)
-    print '{:<99} | {:<4} |'.format(_modname, '')
-print '-'*108
+    print('{:<99} | {:<4} |'.format(_modname, ''))
+print('-'*108)
 
 # remove FastTimerService
 del process.FastTimerService
