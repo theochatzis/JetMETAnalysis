@@ -6,10 +6,11 @@ for the jets used in the High-Level Trigger (HLT).
 
 Instructions to set up the CMSSW area to produce JRA NTuples, and derive JESCs:
 ```
-scram p CMSSW CMSSW_11_2_0_Patatrack
-cd CMSSW_11_2_0_Patatrack/src
+scram project CMSSW_12_0_0_pre4
+cd CMSSW_12_0_0_pre4/src
 eval `scram runtime -sh`
-git cms-init
+git cms-merge-topic missirol:devel_hltRun3TRK_1200pre4
+
 git clone https://github.com/missirol/JetMETAnalysis.git -o missirol -b devel_hlt2
 git clone https://github.com/missirol/JMETriggerAnalysis.git -o missirol -b run3
 scram b -j 8
