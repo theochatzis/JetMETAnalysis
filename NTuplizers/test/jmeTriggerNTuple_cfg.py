@@ -75,23 +75,23 @@ opts.parseArguments()
 ### HLT configuration
 ###
 if opts.reco == 'HLT_GRun_oldJECs':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V6_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_GRun_V6_configDump import cms, process
   update_jmeCalibs = False
 
 elif opts.reco == 'HLT_GRun':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V6_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_GRun_V6_configDump import cms, process
   update_jmeCalibs = True
 
 elif opts.reco == 'HLT_Run3TRK':
   # (a) Run-3 tracking: standard
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V6_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_GRun_V6_configDump import cms, process
   from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
   process = customizeHLTforRun3Tracking(process)
   update_jmeCalibs = True
 
 elif opts.reco == 'HLT_Run3TRKWithPU':
   # (b) Run-3 tracking: all pixel vertices
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V6_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_GRun_V6_configDump import cms, process
   from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3TrackingAllPixelVertices
   process = customizeHLTforRun3TrackingAllPixelVertices(process)
   update_jmeCalibs = True
