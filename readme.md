@@ -19,13 +19,12 @@ please ignore this `readme`, and follow the instructions in the dedicated `readm
 ### Tests on HLT Tracking for Run-3
 
 ```
-cmsrel CMSSW_12_0_0_pre6
-cd CMSSW_12_0_0_pre6/src
+cmsrel CMSSW_12_0_1
+cd CMSSW_12_0_1/src
 cmsenv
-git cms-merge-topic pallabidas:test_HLT_12_0_0_pre6
+git cms-merge-topic pallabidas:test_HLT_12_0_1
 
 git clone https://github.com/pallabidas/JMETriggerAnalysis.git -o pallabi -b run3
-git clone https://github.com/pallabidas/JetMETAnalysis.git -o pallabi -b devel_hlt2
 
 # external data
 mkdir -p ${CMSSW_BASE}/src/JMETriggerAnalysis/NTuplizers/data
@@ -42,7 +41,7 @@ scram b -j 12
 ```
 
 The baseline HLT menu for Run-3 in 12_0_X can be found in
-[Common/python/configs/HLT_dev_CMSSW_12_0_0_HLT_V4_configDump.py](https://github.com/pallabidas/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_dev_CMSSW_12_0_0_HLT_V4_configDump.py).
+[Common/python/configs/HLT_dev_CMSSW_12_0_0_GRun_V6_configDump.py](https://github.com/pallabidas/JMETriggerAnalysis/blob/run3/Common/python/configs/HLT_dev_CMSSW_12_0_0_GRun_V6_configDump.py).
 
 It was created with `hltGetConfiguration` via the commands listed in
 [`Common/test/dumpHLTMenus_mcRun3.sh`](https://github.com/pallabidas/JMETriggerAnalysis/blob/run3/Common/test/dumpHLTMenus_mcRun3.sh).
