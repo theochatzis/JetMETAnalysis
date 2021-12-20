@@ -62,17 +62,17 @@ opts.parseArguments()
 ### HLT configuration
 ###
 if opts.reco == 'HLT_GRun':
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_GRun_V6_configDump import cms, process
 
 elif opts.reco == 'HLT_Run3TRK':
   # (a) Run-3 tracking: standard
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_GRun_V6_configDump import cms, process
   from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3Tracking
   process = customizeHLTforRun3Tracking(process)
 
 elif opts.reco == 'HLT_Run3TRKWithPU':
   # (b) Run-3 tracking: all pixel vertices
-  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_HLT_V4_configDump import cms, process
+  from JMETriggerAnalysis.Common.configs.HLT_dev_CMSSW_12_0_0_GRun_V6_configDump import cms, process
   from HLTrigger.Configuration.customizeHLTforRun3Tracking import customizeHLTforRun3TrackingAllPixelVertices
   process = customizeHLTforRun3TrackingAllPixelVertices(process)
 
@@ -143,11 +143,12 @@ import os
 
 from CondCore.CondDB.CondDB_cfi import CondDB as _CondDB
 process.pfhcESSource = cms.ESSource('PoolDBESSource',
-  _CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter20_HLT_v01.db'),
+  _CondDB.clone(connect = 'sqlite_file:PFHC_Run3Winter21_E2to500.db'),
+  #_CondDB.clone(connect = 'sqlite_file:'+os.environ['CMSSW_BASE']+'/src/JMETriggerAnalysis/NTuplizers/data/PFHC_Run3Winter21_E2to500.db'),
   toGet = cms.VPSet(
     cms.PSet(
       record = cms.string('PFCalibrationRcd'),
-      tag = cms.string('PFCalibration_HLT_mcRun3_2021'),
+      tag = cms.string('PFCalibration_CMSSW_12_0_1_HLT_120X_mcRun3_2021'),
       label = cms.untracked.string('HLT'),
     ),
   ),
@@ -207,7 +208,8 @@ if opts.inputFiles:
    process.source.fileNames = opts.inputFiles
 else:
    process.source.fileNames = [
-     '/store/mc/Run3Winter21DRMiniAOD/QCD_Pt15to7000_TuneCP5_14TeV-pythia8/GEN-SIM-DIGI-RAW/FlatPU0to80FEVT_castor_112X_mcRun3_2021_realistic_v16-v2/280000/05c52296-cc48-4c07-8444-ed00163e44de.root',
+     #'/store/mc/Run3Winter21DRMiniAOD/QCD_Pt15to7000_TuneCP5_14TeV-pythia8/GEN-SIM-DIGI-RAW/FlatPU0to80FEVT_castor_112X_mcRun3_2021_realistic_v16-v2/280000/05c52296-cc48-4c07-8444-ed00163e44de.root',
+     '/store/mc/Run3Winter21DRMiniAOD/QCD_Pt15to7000_TuneCP5_14TeV-pythia8/GEN-SIM-DIGI-RAW/NoPUFEVT_castor_112X_mcRun3_2021_realistic_v16-v2/280000/001b3535-4919-4301-bd5b-c05a1261fbd2.root',
    ]
 
 # input EDM files [secondary]
