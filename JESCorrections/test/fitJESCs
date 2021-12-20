@@ -6,24 +6,30 @@ set -euo pipefail
 ## -------------------------
 JESC_BASE=${CMSSW_BASE}/src/JMETriggerAnalysis/JESCorrections/test
 
-JRANTuple_NoPU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_noPU/npvFix_noPU.root
-JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/npv_fix_flatPU/npvFix_flatPU.root
+JRANTuple_NoPU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/jescs_dec_PFHC_E2to500_noPU.root
+JRANTuple_PU=root://cms-xrd-global.cern.ch//store/group/phys_jetmet/saparede/runIII_hlt_jec/jra_ntuples/jecs_dec_PFHC_E2to500_flatPU.root
 
 ERA=Run3Winter20_V2_MC
 
+#JET_TYPES=(
+#  ak4caloHLT
+#  ak4pfclusterHLT
+#  ak4pfHLT
+#  ak4pfchsHLT
+#  ak4pfpuppiHLT
+#  ak8caloHLT
+#  ak8pfclusterHLT
+#  ak8pfHLT
+#  ak8pfchsHLT
+#  ak8pfpuppiHLT
+#)
 JET_TYPES=(
-  ak4caloHLT
-  ak4pfclusterHLT
-  ak4pfHLT
-  ak4chsHLT
-  ak4puppiHLT
-  ak8caloHLT
   ak8pfclusterHLT
   ak8pfHLT
-  ak8chsHLT
-  ak8puppiHLT
+  ak8pfchsHLT
+  ak8pfpuppiHLT
 )
-## -------------------------
+### -------------------------
 
 ## -------------------------
 ## Main
@@ -46,6 +52,8 @@ Options:
   -h, --help          Show this help message
   -o, --output-dir    Path to output directory          [Default: .]
   -n, --maxEvents     Max number of events to process   [Default: -1]
+  -b, --batch-mode    Run on batch mode (see htc scritp)[Default: true]
+  -j, --jet-type      Jet name for batch (e.g. ak4pfpuppiHLT)   
   -p, --parallelise   Parallelise by jet algorithm      [Default: false]
   --skip-L1-PFPuppi   Skip L1FastJet for PFPuppi jets   [Default: false]
   -d, --dry-run       Enable dry-run mode               [Default: false]
@@ -55,18 +63,29 @@ Options:
 maxEvents=-1
 paralleliseByAlgo=false
 skipL1PFPuppi=false
+doBatch=false
+batchJetType="dummyJetType"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -h|--help) showHelpMsg=true; shift;;
+    -h|-khelp) showHelpMsg=true; shift;;
+    -j|--jet-type) batchJetType=$2; shift; shift;;
     -o|--output-dir) outputDir=$2; shift; shift;;
     -n|--maxEvents) maxEvents=$2; shift; shift;;
     -p|--parallelise) paralleliseByAlgo=true; shift;;
     --skip-L1-PFPuppi) skipL1PFPuppi=true; shift;;
     -d|--dry-run) dryRun=true; shift;;
+    -b|--batch-mode) doBatch=true; shift;;
+    -j|--jet-type) batchJetType=$2; shift; shift;;
     *) printf "%s\n" ">> ERROR -- unrecognised command-line argument: ${1}"; exit 1; shift;;
   esac
 done
+
+if [ "X$doBatch" = "Xtrue" ]
+then
+  echo "running on batch mode for jet-type $batchJetType"
+  JET_TYPES=( $batchJetType )
+fi
 
 # print help message
 if [ "X${showHelpMsg}" = "Xtrue" ]; then
@@ -100,6 +119,7 @@ runJECWorflowForOneAlgo(){
   cd ${OUTDIR}
 
   stepN=0
+  stepName=""
 
   dRgen=0.2
   if [[ ${jetType} == ak8* ]]; then dRgen=0.4; fi
