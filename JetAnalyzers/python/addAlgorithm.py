@@ -160,9 +160,9 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
       alg_size_type_corr: a string, e.g. kt4calol2l3
                           alg=kt4, size=0.4, type=calo, corr=l2l3
       reco:               indicates wether the jets should be reconstructed
-	  prod                indicates if the output ntuple should be in EDM format
-	                      using an EDProducer or in the JRA Ntuple format unsing
-						  the EDAnalyzer
+      prod                indicates if the output ntuple should be in EDM format
+                          using an EDProducer or in the JRA Ntuple format unsing
+                          the EDAnalyzer
     it will then create a complete sequence within an executable path
     to kinematically select references and jets, select partons and match
     them to the references, match references and jets, and finally execute
@@ -243,19 +243,19 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
 
     ## check that alg_size_type_corr refers to valid jet configuration
     try:
-        not reco and stdGenJetsDict.keys().index(alg_size_type)
-        not reco and stdRecJetsDict.keys().index(alg_size_type)
+        not reco and list(stdGenJetsDict.keys()).index(alg_size_type)
+        not reco and list(stdRecJetsDict.keys()).index(alg_size_type)
     except ValueError:
         raise ValueError("Algorithm unavailable in standard format: " + alg_size_type)
     
     try:
-        reco and genJetsDict.keys().index(alg_size_type)
-        reco and recJetsDict.keys().index(alg_size_type)
+        reco and list(genJetsDict.keys()).index(alg_size_type)
+        reco and list(recJetsDict.keys()).index(alg_size_type)
     except ValueError:
         raise ValueError("Invalid jet configuration: " + alg_size_type)
 
     try:
-        correctl2l3 and corrJetsDict.keys().index(alg_size_type_corr)
+        correctl2l3 and list(corrJetsDict.keys()).index(alg_size_type_corr)
     except ValueError:
         raise ValueError("Invalid jet correction: " + alg_size_type_corr)
         
@@ -280,11 +280,11 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
     ## create the sequence
     sequence = cms.Sequence(refPtEta * jetPtEta)
 
-	#############################
+    #############################
     jetPtEtaUncor = jetPtEta.clone()
     setattr(process, alg_size_type_corr + 'PtEtaUncor', jetPtEtaUncor)
     sequence = cms.Sequence(sequence * jetPtEtaUncor)
-	#############################
+    #############################
 
     ## correct jets
     corrLabel = ''
@@ -430,13 +430,13 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
                     src = cms.InputTag(recLabel),
                     discriminators = cms.VPSet(tauDiscriminatorConfigs)
                 )
-		# merge OneProg1Pi0 and OneProng2Pi0
+                # merge OneProg1Pi0 and OneProng2Pi0
                 if (tauDecayMode == "OneProng1Pi0" or tauDecayMode == "OneProng2Pi0"):
                     setattr(selTauModule, "cut", cms.string("decayMode() == 1 || decayMode() == 2"))
-		else:
-                     if tauDecayMode != "*":
-                          #setattr(selTauModule, "cut", cms.string("isDecayMode('%s')" % tauDecayMode))
-                          setattr(selTauModule, "cut", cms.string("decayMode() == %s" % tauDecayMode))
+                else:
+                    if tauDecayMode != "*":
+                        #setattr(selTauModule, "cut", cms.string("isDecayMode('%s')" % tauDecayMode))
+                        setattr(selTauModule, "cut", cms.string("decayMode() == %s" % tauDecayMode))
                 selTauModuleName = alg_size_type + "Selected"
                 setattr(process, selTauModuleName, selTauModule)
                 tauRecoSequence += getattr(process, selTauModuleName)
@@ -486,14 +486,14 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
     setattr(process,alg_size_type_corr + 'JetToRef', jetToRef)
     sequence = cms.Sequence(sequence * jetToRef)
 
-	##############################
+    ##############################
     jetToUncorJet = cms.EDProducer('MatchRecToGen',
         srcGen = cms.InputTag(jetPtEtaUncor.label()),
         srcRec = cms.InputTag(jetPtEta.label())
     )
     setattr(process,alg_size_type_corr + 'JetToUncorJet', jetToUncorJet)
     sequence = cms.Sequence(sequence * jetToUncorJet)
-	##############################
+    ##############################
 
     ## jet response analyzer
     jraAnalyzer = 'JetResponseAnalyzer'
@@ -506,7 +506,7 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
                          srcRho            = cms.InputTag(''),
                          srcRhoHLT         = cms.InputTag(''),
                          srcVtx            = cms.InputTag('offlinePrimaryVertices'),
-						 srcJetToUncorJetMap = cms.InputTag(jetToUncorJet.label(), 'rec2gen'),
+                         srcJetToUncorJetMap = cms.InputTag(jetToUncorJet.label(), 'rec2gen'),
                          srcPFCandidates   = cms.InputTag(''),
                          srcGenParticles   = cms.InputTag('genParticles')
                         )
@@ -570,7 +570,7 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
         jra.jecLabel = corrJets.correctors[0].replace("Corrector","")
 
     if Defaults.JetResponseParameters.doFlavor.value():
-		jra.srcRefToPartonMap = cms.InputTag(genToParton.label())
+        jra.srcRefToPartonMap = cms.InputTag(genToParton.label())
 
     setattr(process,alg_size_type_corr,jra)
     sequence = cms.Sequence(sequence * jra)
@@ -584,4 +584,4 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
     setattr(process, alg_size_type_corr + 'Sequence', sequence)
     path = cms.Path( sequence )
     setattr(process, alg_size_type_corr + 'Path', path)
-    print alg_size_type_corr
+    print(alg_size_type_corr)
