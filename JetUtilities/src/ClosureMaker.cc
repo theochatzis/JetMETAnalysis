@@ -19,7 +19,7 @@ ClosureMaker::ClosureMaker() {
     outputDir       = "./";
     outputFilename  = "";
     outputFormat    = {".png",".eps",".pdf"};
-    CMEnergy        = 13000;
+    CMEnergy        = 13600;
     draw_guidelines = true;
 
     //
@@ -53,7 +53,7 @@ ClosureMaker::ClosureMaker(CommandLine& cl) {
     outputDir       = cl.getValue<TString>  ("outputDir",             "./");
     outputFilename  = cl.getValue<TString>  ("outputFilename",          "");
     outputFormat    = cl.getVector<TString> ("outputFormat", ".png:::.eps");
-    CMEnergy        = cl.getValue<double>   ("CMEnergy",             13000);
+    CMEnergy        = cl.getValue<double>   ("CMEnergy",             13600);
     histMet         = cl.getValue<TString>  ("histMet",             "mu_h");
     histogramMetric = HistUtil::getHistogramMetricType(string(histMet));
     bool help       = cl.getValue<bool>     ("help",                 false);
@@ -482,7 +482,7 @@ void ClosureMaker::makeCanvases() {
         }
         frame->GetXaxis()->SetMoreLogLabels();
         frame->GetXaxis()->SetNoExponent();
-        frame->GetYaxis()->SetRangeUser(0.95,1.05);
+        frame->GetYaxis()->SetRangeUser(0.50,1.20);
         //frame->GetYaxis()->SetRangeUser(0.35,1.35);
         //frame->GetYaxis()->SetRangeUser(0.00,1.3);
         frame->GetXaxis()->SetTitle(getVariableAxisTitleString(var).c_str());

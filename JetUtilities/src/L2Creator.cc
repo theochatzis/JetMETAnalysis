@@ -470,14 +470,23 @@ void L2Creator::loopOverEtaBins() {
                 }
                 else if (alg.find("calo")!=string::npos) {
                     if(l2calofit.EqualTo("standard",TString::kIgnoreCase)) {
+/*
                         if (xmin<6) xmin=6;
                         fabscor=new TF1("fit","[0]+[1]/(pow(log10(x),[2])+[3])",xmin,xmax);
                         fabscor->SetParameter(0,1.0);
                         fabscor->SetParameter(1,5.0);
                         fabscor->SetParameter(2,3.0);
                         fabscor->SetParameter(3,3.0);
-
                         fabscor->SetParLimits(3,0,100);
+*/
+												xmin = 20;
+                        fabscor=new TF1("fit","[0]+[1]/(pow(log10(x),2)+[2])+[3]*exp(-[4]*(log10(x)-[5])*(log10(x)-[5]))",xmin,xmax);
+                        fabscor->SetParameter(0,-8.9);
+                        fabscor->SetParameter(1,530);
+                        fabscor->SetParameter(2,16);
+                        fabscor->SetParameter(3,-22);
+                        fabscor->SetParameter(4,0.06);
+                        fabscor->SetParameter(5,-0.28);
                     }
                     else if(l2calofit.EqualTo("DynamicMin",TString::kIgnoreCase)) {
                         xmin=findPeak(gabscor,0,3,3,false);

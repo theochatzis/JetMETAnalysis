@@ -15,7 +15,7 @@
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 //#include "FWCore/Framework/interface/EDAnalyzer.h"
-#include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/Framework/interface/stream/EDProducer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -38,7 +38,7 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/Common/interface/RefVectorHolderBase.h"
 
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "JetMETCorrections/JetCorrector/interface/JetCorrector.h"
 
 #include "DataFormats/JetMatching/interface/JetMatchedPartons.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -63,7 +63,7 @@ using namespace std;
 // class definition
 ////////////////////////////////////////////////////////////////////////////////
 
-class JetResponseAnalyzerProducer : public edm::EDProducer
+class JetResponseAnalyzerProducer : public edm::stream::EDProducer<>
 {
 public:
   // construction/destruction
@@ -110,7 +110,10 @@ private:
   bool          isTrackJet_;
   bool          isTauJet_;
 
-  const JetCorrector* jetCorrector_;
+  //const JetCorrector* jetCorrector_;
+	//edm::Handle<reco::JetCorrector>* jetCorrector_;
+	//edm::EDGetTokenT<reco::JetCorrector>* jetCorrector_;
+	const reco::JetCorrector* jetCorrector_;
 
    unique_ptr<JRAEvent> JRAEvt_;
 };

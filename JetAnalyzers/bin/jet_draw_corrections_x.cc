@@ -172,7 +172,7 @@ void analyzeAlgo(TString algo, CommandLine & cl){
   string          outputDir    = cl.getValue<string>   ("outputDir",         "images");
   vector<TString> outputFormat = cl.getVector<TString> ("outputFormat", ".png:::.eps");
   bool            tdr          = cl.getValue<bool>     ("tdr",                   true);
-  double          CMEnergy     = cl.getValue<double>   ("CMEnergy",             13000);
+  double          CMEnergy     = cl.getValue<double>   ("CMEnergy",             13600);
 
   if(combineAlgs) {
     allJetCorrs.push_back(make_pair(jetCorr,corrLabel));

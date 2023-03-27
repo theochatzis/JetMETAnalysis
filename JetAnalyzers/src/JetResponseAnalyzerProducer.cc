@@ -115,7 +115,7 @@ void JetResponseAnalyzerProducer::produce(edm::Event& iEvent,
   edm::Handle<reco::VertexCollection>            vtx;
 
   // JET CORRECTOR
-  jetCorrector_ = (jecLabel_.empty()) ? 0 : JetCorrector::getJetCorrector(jecLabel_,iSetup);
+  //jetCorrector_ = (jecLabel_.empty()) ? 0 : JetCorrector::getJetCorrector(jecLabel_,iSetup);
   
   // GENERATOR INFORMATION
   JRAEvt_->pthat  = 0.0;
@@ -261,23 +261,28 @@ void JetResponseAnalyzerProducer::produce(edm::Event& iEvent,
         JRAEvt_->jtarea->at(JRAEvt_->nref) = jet.castTo<reco::PFJetRef>()->jetArea();
      }
 
-     if (0!=jetCorrector_) {
+     //if (0!=jetCorrector_) {
+     if (jetCorrector_) {
         if (!jetCorrector_->vectorialCorrection()) {
-           if (jetCorrector_->eventRequired()||isJPTJet_) {
+           //if (jetCorrector_->eventRequired()||isJPTJet_) {
+           if (jetCorrector_->refRequired()||isJPTJet_) {
               if (isCaloJet_) {
                  reco::CaloJetRef caloJetRef;
                  caloJetRef=jet.castTo<reco::CaloJetRef>();
-                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*caloJetRef,iEvent,iSetup);
+                 //JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*caloJetRef,iEvent,iSetup);
+                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*caloJetRef);
               }
               else if (isJPTJet_) {
                  reco::JPTJetRef jptJetRef;
                  jptJetRef=jet.castTo<reco::JPTJetRef>();
-                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*jptJetRef,iEvent,iSetup);
+                 //JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*jptJetRef,iEvent,iSetup);
+                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*jptJetRef);
               }
               else if (isPFJet_) {
                  reco::PFJetRef pfJetRef;
                  pfJetRef=jet.castTo<reco::PFJetRef>();
-                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*pfJetRef,iEvent,iSetup);
+                 //JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*pfJetRef,iEvent,iSetup);
+                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*pfJetRef);
               }
            }
            else {

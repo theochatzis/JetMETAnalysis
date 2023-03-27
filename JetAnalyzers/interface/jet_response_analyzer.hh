@@ -23,7 +23,7 @@
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/stream/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -65,7 +65,7 @@ using namespace std;
 // class definition
 ////////////////////////////////////////////////////////////////////////////////
 
-class jet_response_analyzer : public edm::EDAnalyzer
+class jet_response_analyzer : public edm::stream::EDAnalyzer<>
 {
 public:
   /// construction/destruction

@@ -55,7 +55,7 @@ int main(int argc,char**argv)
   bool            mpv          = cl.getValue<bool>     ("mpv",           false);
   TString         outputDir    = cl.getValue<TString>  ("outputDir",  "images");
   TString         outputFormat = cl.getValue<TString>  ("outputFormat", ".png");
-  double          CMEnergy     = cl.getValue<double>   ("CMEnergy",      13000);
+  double          CMEnergy     = cl.getValue<double>   ("CMEnergy",      13600);
 
   if (!cl.check()) return 0;
   cl.print();

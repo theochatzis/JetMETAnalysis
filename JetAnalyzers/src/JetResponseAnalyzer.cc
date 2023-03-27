@@ -42,7 +42,8 @@ JetResponseAnalyzer::JetResponseAnalyzer(const edm::ParameterSet& iConfig)
   , deltaRPartonMax_(0.0)
   , doBalancing_(false)
   , getFlavorFromMap_(false)
-  , jetCorrector_(0)
+	, jetCorrector_(0)
+  //, jetCorrector_(consumes<reco::JetCorrector>(edm::InputTag(iConfig.getParameter<std::string>("jetCorrector"))))
 {
   if (iConfig.exists("deltaRMax")) {
     doBalancing_=false;
@@ -78,7 +79,7 @@ JetResponseAnalyzer::JetResponseAnalyzer(const edm::ParameterSet& iConfig)
   //if (isTauJet_)   cout<<"These are TauJets   ("<<moduleLabel_<<")"<<endl;
 
   //must state that we are using the TFileService
-  usesResource("TFileService");
+  //usesResource("TFileService");
   //setupTree();
   //cout << "This is the thread id: " << std::this_thread::get_id() << endl;
 }
@@ -134,7 +135,9 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
   edm::Handle<vector<reco::GenParticle> >        genParticles;
 
   // Jet CORRECTOR
-  jetCorrector_ = (jecLabel_.empty()) ? 0 : JetCorrector::getJetCorrector(jecLabel_,iSetup);
+  //jetCorrector_ = (jecLabel_.empty()) ? 0 : JetCorrector::getJetCorrector(jecLabel_,iSetup);
+	//edm::Handle<reco::JetCorrector>  corrector;
+	//jetCorrector_ = corrector.product();
 
   // GENERATOR INFORMATION
   JRAEvt_->pthat  = 0.0;
@@ -388,18 +391,22 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
         JRAEvt_->jtarea->at(JRAEvt_->nref) = jet.castTo<reco::PFJetRef>()->jetArea();
      }
 
-     if (0!=jetCorrector_) {
+     //if (0!=jetCorrector_) {
+     if (jetCorrector_) {
         if (!jetCorrector_->vectorialCorrection()) {
-           if (jetCorrector_->eventRequired()||isJPTJet_) {
+           //if (jetCorrector_->eventRequired()||isJPTJet_) {
+           if (jetCorrector_->refRequired()||isJPTJet_) {
               if (isCaloJet_) {
                  reco::CaloJetRef caloJetRef;
                  caloJetRef = jet.castTo<reco::CaloJetRef>();
-                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*caloJetRef,iEvent,iSetup);
+                 //JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*caloJetRef,iEvent,iSetup);
+                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*caloJetRef);
               }
               else if (isJPTJet_) {
                  reco::JPTJetRef jptJetRef;
                  jptJetRef = jet.castTo<reco::JPTJetRef>();
-                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*jptJetRef,iEvent,iSetup);
+                 //JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*jptJetRef,iEvent,iSetup);
+                 JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*jptJetRef);
               }
               else if (isPFJet_) {
                  reco::CandViewMatchMap::const_iterator jetMatch=jetToUncorJetMap->find(jet);
@@ -407,7 +414,8 @@ void JetResponseAnalyzer::analyze(const edm::Event& iEvent,
                     reco::CandidateBaseRef ujet = jetMatch->val;
                     reco::PFJetRef pfJetRef;
                     pfJetRef=ujet.castTo<reco::PFJetRef>();
-                    JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*pfJetRef,iEvent,iSetup);
+                    //JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*pfJetRef,iEvent,iSetup);
+                    JRAEvt_->jtjec->at(JRAEvt_->nref) = jetCorrector_->correction(*pfJetRef);
                  }
               }
            }

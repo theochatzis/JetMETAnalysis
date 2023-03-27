@@ -8,7 +8,7 @@
 
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/Framework/interface/stream/EDProducer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -31,7 +31,7 @@
 // class definition
 ////////////////////////////////////////////////////////////////////////////////
 
-class JetViewCleaner : public edm::EDProducer
+class JetViewCleaner : public edm::stream::EDProducer<>
 {
 public:
   // construction/destruction

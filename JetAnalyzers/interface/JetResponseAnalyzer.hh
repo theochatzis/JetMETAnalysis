@@ -15,7 +15,7 @@
 #include "JetMETAnalysis/JetUtilities/interface/JRAEvent.h"
 
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/stream/EDAnalyzer.h"
 #include "FWCore/Framework/interface/one/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -40,7 +40,7 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/TrackReco/interface/TrackFwd.h"
 
-#include "JetMETCorrections/Objects/interface/JetCorrector.h"
+#include "JetMETCorrections/JetCorrector/interface/JetCorrector.h"
 
 #include "DataFormats/JetMatching/interface/JetMatchedPartons.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -129,7 +129,10 @@ private:
   bool          isTrackJet_;
   bool          isTauJet_;
 
-  const JetCorrector* jetCorrector_;
+  //const JetCorrector* jetCorrector_;
+	//edm::Handle<reco::JetCorrector>* jetCorrector_;
+	//edm::EDGetTokenT<reco::JetCorrector>* jetCorrector_;
+	const reco::JetCorrector* jetCorrector_;
   
   // tree & branches
   TTree*        tree_;

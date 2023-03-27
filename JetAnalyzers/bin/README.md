@@ -528,7 +528,7 @@ This is a complete list of the options available. However, not all options will 
 | _flavor_             | *TString*  | ""                    | used as a suffix to the input and output files |
 | _nsigma_             | *double*   | 1.5                   | the number of sigma to be using in a Gaussian fit of the response histograms (if the histogram metric is chosen to be the mode) |
 | _draw\_guidelines_   | *bool*     | true                  | draw the +/-1\% guidelines |
-| _CMEnergy_           | *double*   | 13000                 | center of mass energy used to calcualate the maximum range in eta for a given pT |
+| _CMEnergy_           | *double*   | 13600                 | center of mass energy used to calcualate the maximum range in eta for a given pT |
 | _histMet_            | *TString*  | "mu_h"                | the histogram metric used to calculate the response (options are mu_h, mu_f, mpv, and median) |
 | _filepath1_          | *string*   |                       | input file containing the histograms used as the numerator for the ratio plots |
 | _filepath2_          | *string*   |                       | input file containing the histograms used as the denominator for the ratio plots |

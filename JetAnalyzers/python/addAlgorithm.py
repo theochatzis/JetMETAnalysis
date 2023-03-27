@@ -433,7 +433,7 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
 		# merge OneProg1Pi0 and OneProng2Pi0
                 if (tauDecayMode == "OneProng1Pi0" or tauDecayMode == "OneProng2Pi0"):
                     setattr(selTauModule, "cut", cms.string("decayMode() == 1 || decayMode() == 2"))
-		else:
+                else:
                      if tauDecayMode != "*":
                           #setattr(selTauModule, "cut", cms.string("isDecayMode('%s')" % tauDecayMode))
                           setattr(selTauModule, "cut", cms.string("decayMode() == %s" % tauDecayMode))
@@ -570,7 +570,7 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
         jra.jecLabel = corrJets.correctors[0].replace("Corrector","")
 
     if Defaults.JetResponseParameters.doFlavor.value():
-		jra.srcRefToPartonMap = cms.InputTag(genToParton.label())
+        jra.srcRefToPartonMap = cms.InputTag(genToParton.label())
 
     setattr(process,alg_size_type_corr,jra)
     sequence = cms.Sequence(sequence * jra)
@@ -584,4 +584,4 @@ def addAlgorithm(process, alg_size_type_corr, Defaults, reco, doProducer):
     setattr(process, alg_size_type_corr + 'Sequence', sequence)
     path = cms.Path( sequence )
     setattr(process, alg_size_type_corr + 'Path', path)
-    print alg_size_type_corr
+    print(alg_size_type_corr)

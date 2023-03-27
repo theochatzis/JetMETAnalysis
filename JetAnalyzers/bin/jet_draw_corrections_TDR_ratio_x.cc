@@ -72,7 +72,7 @@ int main(int argc,char**argv)
    TString         outputDir    = cl.getValue<TString>  ("outputDir",         "images");
    vector<TString> outputFormat = cl.getVector<TString> ("outputFormat", ".png:::.eps");
    bool            tdr          = cl.getValue<bool>     ("tdr",                  false);
-   double          CMEnergy     = cl.getValue<double>   ("CMEnergy",             13000);
+   double          CMEnergy     = cl.getValue<double>   ("CMEnergy",             13600);
 
    if (!cl.check()) return 0;
    cl.print();

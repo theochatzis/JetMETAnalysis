@@ -55,10 +55,10 @@ jet_response_analyzer::jet_response_analyzer(const edm::ParameterSet& iConfig)
   , MCPUReWeighting   (iConfig.getParameter<string>    ("MCPUReWeighting"))
   , DataPUReWeighting (iConfig.getParameter<string>  ("DataPUReWeighting"))
   //, getterOfProducts_(edm::ProcessMatch("JRAP"), this)
-  , getterOfProducts_(edm::ModuleLabelMatch(moduleLabel_), this)
+  //, getterOfProducts_(edm::ModuleLabelMatch(moduleLabel_), this)
 {
 
-  callWhenNewProductsRegistered(getterOfProducts_);
+  //callWhenNewProductsRegistered(getterOfProducts_);
 
   dorelrsp=(nbinsrelrsp>0);
   doabsrsp=(nbinsabsrsp>0);

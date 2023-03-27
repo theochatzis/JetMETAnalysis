@@ -15,7 +15,7 @@ RatioMaker::RatioMaker() {
 	algo         	= "";
 	numerator    	= "";
 	denominator  	= "";
-	CMEnergy	 	= 13000;
+	CMEnergy	 	= 13600;
     eta_max         = 4.7;
 	doflavor     	= false;
 	draw_guidelines = true;
@@ -49,7 +49,7 @@ RatioMaker::RatioMaker(CommandLine& cl) {
   	algo         	= cl.getValue<string>   ("algo");
   	numerator    	= cl.getValue<string>   ("numerator",            "53X");
   	denominator  	= cl.getValue<string>   ("denominator",          "52X");
-  	CMEnergy     	= cl.getValue<double>   ("CMEnergy",  			 13000);
+  	CMEnergy     	= cl.getValue<double>   ("CMEnergy",  			 13600);
     eta_max         = cl.getValue<double>   ("eta_max",                4.7);
   	doflavor     	= cl.getValue<bool>     ("doflavor",             false);
   	draw_guidelines = cl.getValue<bool>		("draw_guidelines",       true);
