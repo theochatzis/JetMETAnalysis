@@ -552,6 +552,7 @@ void ClosureMaker::makeMergedCanvas() {
     //frame->GetYaxis()->SetRangeUser(0.95,1.05);
     //frame->GetYaxis()->SetRangeUser(0.35,1.35);
   frame->GetYaxis()->SetRangeUser(range.first,range.second);
+        frame->GetYaxis()->SetRangeUser(0.50,1.20);
     frame->GetXaxis()->SetTitle(getVariableAxisTitleString(var).c_str());
     frame->GetYaxis()->SetTitle("Response");
     canvases_legends.push_back(make_pair(tdrCanvas(name,frame,14,11,true),

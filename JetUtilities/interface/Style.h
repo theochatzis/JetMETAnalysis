@@ -230,13 +230,13 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool verbose )
   else if ( iPeriod==4 )
     {
       lumiText += lumi_13TeV;
-      lumiText += " (13 TeV)";
+      lumiText += " (13.6 TeV)";
     }
   else if ( iPeriod==7 )
     { 
       if( outOfFrame ) lumiText += "#scale[0.85]{";
       lumiText += lumi_13TeV; 
-      lumiText += " (13 TeV)";
+      lumiText += " (13.6 TeV)";
       lumiText += " + ";
       lumiText += lumi_8TeV; 
       lumiText += " (8 TeV)";
@@ -259,7 +259,7 @@ CMS_lumi( TPad* pad, int iPeriod, int iPosX, bool verbose )
     }
   else if ( iPeriod==14 )
     {
-      lumiText += "13 TeV";
+      lumiText += "13.6 TeV";
     }
   else if ( iPeriod==15 )
     {
@@ -583,7 +583,7 @@ inline void cmsPrelim(double intLUMI = 0) {
    latex.SetTextSize(0.045);
 
    latex.SetTextAlign(31); // align right
-   latex.DrawLatex(0.93,0.96,"#sqrt{s} = 13 TeV");
+   latex.DrawLatex(0.93,0.96,"#sqrt{s} = 13.6 TeV");
    if (LUMINOSITY > 0.) {
       latex.SetTextAlign(31); // align right
       //latex.DrawLatex(0.82,0.7,Form("#int #font[12]{L} dt = %d pb^{-1}", (int) LUMINOSITY)); //Original

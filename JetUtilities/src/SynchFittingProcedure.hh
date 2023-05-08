@@ -399,10 +399,10 @@ TH1 * getMeanOverBinCenterHistoFromHisto(TString cname, TString title, TH2 *off_
 
    // make an empty copy to fill and return
    TH1 * histo = 0;
-   if(off_in)
+   //if(off_in)
       histo = off_in->ProjectionX(cname);
-   else
-      return histo;
+   //else
+   //   return histo;
    histo->Reset();
    //histo->Clear();
    histo->GetYaxis()->SetTitle(title);
@@ -789,6 +789,7 @@ TCanvas * getGausMeanOffset(TString cname, TString ctitle, TString algo, vector<
    c->GetPad(0)->SetLogx();
 
    vector<TH1*> hh(off.size(),(TH1*)0);
+	 hh.clear();
    double maxy = 0;
    double miny = 0;
    for (unsigned int j=0;j<off.size();j++){
@@ -968,18 +969,20 @@ TCanvas * getGausMeanOffsetWithSum(TString cname, TString ctitle, TString algo, 
 // output mean of each x slice
 // Legend depends on cname. If cname contains "rho", output rho legend. If cname contains "npv", output npv legend. Otherwise, output PF legend.
 TCanvas * getGausMeanOffsetOverPtref(TString cname, TString ctitle, TString algo, vector<TH2*> off, bool fixedRange, vector<pair<int,int> > npvRhoNpuBins){
+   setTDRStyle();
 
    cout<<"\t Doing fits for Mean "<<cname<<endl;
+   JetInfo ji(algo);
    algo.ToUpper();
   
   
    TCanvas * c = new TCanvas(cname,cname);
    c->SetLogx();
 
-   TLegend * leg = new TLegend(0.2,0.72,0.45,0.99);
-   leg->SetHeader(algo);
-   leg->SetFillColor(0);
-   leg->SetBorderSize(0);
+   //TLegend * leg = new TLegend(0.2,0.72,0.45,0.99);
+   //leg->SetHeader(algo);
+   //leg->SetFillColor(0);
+   //leg->SetBorderSize(0);
    int NPV_Rho;
    if (cname.Contains("npv",TString::kIgnoreCase))
       NPV_Rho = 1;
@@ -993,6 +996,7 @@ TCanvas * getGausMeanOffsetOverPtref(TString cname, TString ctitle, TString algo
       NPV_Rho = 0;
 
    vector<TH1*> hh(off.size(),(TH1*)0);
+		hh.clear();
    double maxy = 0;
    for (unsigned int j=0;j<off.size();j++){
       TString hname = cname;
@@ -1005,6 +1009,10 @@ TCanvas * getGausMeanOffsetOverPtref(TString cname, TString ctitle, TString algo
            << "Returning blank canvas." << endl;
       return c;
    }
+
+   TLegend* leg = tdrLeg(0.38,0.55,0.78,1-gPad->GetTopMargin()-0.045*(1-gPad->GetTopMargin()-gPad->GetBottomMargin())+0.005);
+   leg->AddEntry((TObject*)0,ji.get_legend_title(string(ji.abbreviation),true).c_str(),"");
+
    for (unsigned int j=0;j<hh.size();j++){
       setHistoColor(hh[j],colNpv[j]);
    }
@@ -1020,11 +1028,15 @@ TCanvas * getGausMeanOffsetOverPtref(TString cname, TString ctitle, TString algo
    hh[0]->GetXaxis()->SetNoExponent();
 
    for (unsigned int j=0;j<hh.size();j++) {
-      if(j==0)
-         hh[0]->Draw("E");
-      else
-         hh[j]->Draw("sameE");
+      //if(j==0)
+      //   hh[0]->Draw("E");
+      //else
+      //   hh[j]->Draw("sameE");
       TString var;
+      if(NPV_Rho == 4)
+         tdrDraw(hh[j],"E",kFullCircle,colPDGID[j],kSolid,colPDGID[j]);
+      else
+         tdrDraw(hh[j],"E",kFullCircle,colNpv[j],kSolid,colNpv[j]);
 
       if (NPV_Rho == 1)
          var = "N_{PV}";

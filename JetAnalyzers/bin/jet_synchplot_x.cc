@@ -1112,11 +1112,11 @@ void SynchPlots(TString inputDir="./",TString calgo1="ak5pf",TString calgo2="ak5
       hname = Form("p_offresVsrefpt_bb_npu%i_%i",npvRhoNpuBins[ibin].first,npvRhoNpuBins[ibin].second);
       hOffRho[ibin] = dynamic_cast<TH2D*>(histograms[hname]);
    }
+   c = getGausMeanOffsetOverPtref("OffMeanOverPtnpuRef_BB","<offset>/p_{T}^{GEN}",algo,hOffRho,fixedRange,npvRhoNpuBins);
+   c->Draw();
    c = getGausMeanOffset("OffMeannpuRef_BB","<offset> (GeV)",algo,hOffRho,fixedRange,npvRhoNpuBins);
    c->Draw();
    c = getGausMeanOffsetWithSum("OffMeannpuRefWithSum_BB","<offset> (GeV)",algo,hOffRho,dynamic_cast<TH2D*>(histograms["p_offresVsrefpt_bb_npu0_49"]),fixedRange,npvRhoNpuBins,make_pair(minNpvRhoNpu,maxNpvRhoNpu));
-   c->Draw();
-   c = getGausMeanOffsetOverPtref("OffMeanOverPtnpuRef_BB","<offset>/p_{T}^{GEN}",algo,hOffRho,fixedRange,npvRhoNpuBins);
    c->Draw();
 	clearHistograms(hResRho,hOffRho,hOffPdgid,pOffPF,npvRhoNpuBins.size());
 

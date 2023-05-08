@@ -299,9 +299,9 @@ ITS MatchEventsAndJets::fillMap(bool noPU, string treeName, string outputPath) {
          continue;
       }
 
-      if(mapTree.find(evtid(t->run, lumi, t->evt, t->refpt->at(0)))!=mapTree.end()) {
-         cout << "\tWARNING::This evtid already exists in the map." << endl;
-      }
+      //if(mapTree.find(evtid(t->run, lumi, t->evt, t->refpt->at(0)))!=mapTree.end()) {
+      //   cout << "\tWARNING::This vtid already exists in the map." << endl;
+      //}
 
       mapTree[evtid(t->run, lumi, t->evt, t->refpt->at(0))] = std::make_pair(jentry, (ull)ientry);
       loadbar2(jentry+1,nentries,50,"\t\t");
