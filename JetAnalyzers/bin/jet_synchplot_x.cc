@@ -32,7 +32,7 @@
 #include "THStack.h"
 
 #include "JetMETAnalysis/JetUtilities/interface/JetInfo.hh"
-#include "JetMETAnalysis/JetUtilities/src/SynchFittingProcedure.hh"
+#include "JetMETAnalysis/JetUtilities/interface/SynchFittingProcedure.hh"
 #include "JetMETAnalysis/JetUtilities/interface/CommandLine.h"
 #include "JetMETAnalysis/JetUtilities/interface/ObjectLoader.h"
 #include "JetMETAnalysis/JetAnalyzers/interface/REStyle.h"
