@@ -1026,6 +1026,7 @@ TCanvas * getGausMeanOffsetOverPtref(TString cname, TString ctitle, TString algo
    hh[0]->GetXaxis()->SetRangeUser(0,1000);
    hh[0]->GetXaxis()->SetMoreLogLabels();
    hh[0]->GetXaxis()->SetNoExponent();
+   hh[0]->Draw("E"); // Added by Junghyun Lee at [ Nov 14th, 2024 ] to draw pile-up plots
 
    for (unsigned int j=0;j<hh.size();j++) {
       //if(j==0)
